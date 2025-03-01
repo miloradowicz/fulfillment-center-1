@@ -7,7 +7,7 @@
   "objectWrap": "preserve",
   "printWidth": 120,
   "quoteProps": "consistent",
-  "semi": true,
+  "semi": false,
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all",

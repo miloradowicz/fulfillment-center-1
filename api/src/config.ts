@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'path'
 
 const config = {
   server: {
@@ -11,6 +11,6 @@ const config = {
   saltWorkFactor: 10,
   rootPath: join(__dirname, '..'),
   publicPath: 'public',
-};
+}
 
-export default config;
+export default config
