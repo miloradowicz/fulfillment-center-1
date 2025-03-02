@@ -41,3 +41,34 @@ export interface Product {
 }
 
 export type ProductMutation = Omit<Product, '_id'>;
+
+export interface Defect {
+  product: string;
+  defect_description: string;
+  amount: number;
+}
+
+export interface ProductArrival {
+  product: string;
+  description: string;
+  amount: number;
+}
+
+export interface Arrival {
+  _id: string;
+  client: string;
+  products: ProductArrival[];
+  arrival_price: number;
+  arrival_status: string;
+  arrival_date: string;
+  sent_amount: string;
+  logs: Log[];
+  defects: Defect[];
+  received_amount?: number;
+}
+
+export type ArrivalMutation = Omit<Arrival, '_id'>;
+
+
+
+
