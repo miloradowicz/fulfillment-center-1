@@ -9,4 +9,4 @@ async function bootstrap() {
   await seederService.seed()
   await app.close()
 }
-bootstrap()
+bootstrap().catch(console.error)

@@ -10,5 +10,6 @@ import { ArrivalsService } from './arrivals/arrivals.service'
   imports: [DbModule],
   controllers: [ClientsController, ProductsController, ArrivalsController],
   providers: [ProductsService, ArrivalsService],
+
 })
 export class AppModule {}
