@@ -27,7 +27,7 @@ export class CreateProductDto {
 
   @IsNotEmpty({ message: 'Поле артикул обязательно для заполнения' }) article: string
 
-  @IsOptional() // Делаем поле опциональным
+  @IsOptional()
   @IsArray({ message: 'dynamic_fields должно быть массивом' })
   @ValidateNested({ each: true })
   @Type(() => DynamicFieldDto)
