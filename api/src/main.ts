@@ -10,6 +10,6 @@ async function bootstrap() {
   app.enableCors()
   app.useStaticAssets(join(config.rootPath, config.publicPath))
   app.useGlobalPipes(new ValidationPipe())
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(config.server.port)
 }
 bootstrap().catch(console.error)
