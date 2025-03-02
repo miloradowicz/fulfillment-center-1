@@ -48,7 +48,17 @@ export default tseslint.config(
       'semi': ['error', 'never'],
       'import/first': 'off',
       'template-curly-spacing': ['error', 'always'],
-      'indent': ['error', 2],
+      'indent': [
+        'error',
+        2,
+        {
+          ignoredNodes: [
+            `FunctionExpression > .params[decorators.length > 0]`,
+            `FunctionExpression > .params > :matches(Decorator, :not(:first-child))`,
+            `ClassBody.body > PropertyDefinition[decorators.length > 0] > .key`,
+          ],
+        },
+      ],
       'space-before-function-paren': 'off',
       'comma-dangle': ['error', 'always-multiline'],
       'arrow-parens': ['error', 'as-needed'],
