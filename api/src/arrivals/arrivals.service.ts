@@ -24,7 +24,7 @@ export class ArrivalsService {
   }
 
   async update(id: string, arrivalDto: UpdateArrivalDto) {
-    const arrival = await this.arrivalModel.findByIdAndUpdate(id, arrivalDto)
+    const arrival = await this.arrivalModel.findByIdAndUpdate(id, arrivalDto, { new: true })
     if (!arrival) {
       throw new NotFoundException('Поставка не найдена.')
     }
@@ -32,9 +32,8 @@ export class ArrivalsService {
   }
 
   async delete(id: string) {
-    const arrival = await this.arrivalModel.findById(id)
+    const arrival = await this.arrivalModel.findByIdAndDelete(id)
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
-    await this.arrivalModel.findByIdAndDelete(id)
     return { message: 'Поставка успешно удалена.' }
   }
 }
