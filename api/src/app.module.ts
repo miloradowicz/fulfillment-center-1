@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { Client, ClientSchema } from './schemas/client.schema'
 import { ClientsController } from './clients/clients.controller'
 import { Arrival, ArrivalSchema } from './schemas/arrival.schema'
-import { ArrivalsController } from './arrivals/arrivals.controller';
-import { ArrivalsService } from './arrivals/arrivals.service';
+import { ArrivalsController } from './arrivals/arrivals.controller'
+import { ArrivalsService } from './arrivals/arrivals.service'
 
 @Module({
   imports: [
