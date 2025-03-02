@@ -1,16 +1,12 @@
 import { Module } from '@nestjs/common'
-import { MongooseModule } from '@nestjs/mongoose'
-import { Client, ClientSchema } from './schemas/client.schema'
 import { ClientsController } from './clients/clients.controller'
-import { Arrival, ArrivalSchema } from './schemas/arrival.schema'
+import { ProductsController } from './products/products.controller'
+import { ProductsService } from './products/products.service'
+import { DbModule } from './db/db.module'
 
 @Module({
-  imports: [
-    MongooseModule.forRoot('mongodb://localhost/fulfillment-center'),
-    MongooseModule.forFeature([{ name: Client.name, schema: ClientSchema }]),
-    MongooseModule.forFeature([{ name: Arrival.name, schema: ArrivalSchema }]),
-  ],
-  controllers: [ClientsController],
-  providers: [],
+  imports: [DbModule],
+  controllers: [ClientsController, ProductsController],
+  providers: [ProductsService],
 })
 export class AppModule {}

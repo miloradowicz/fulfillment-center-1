@@ -1,15 +1,9 @@
 import { Module } from '@nestjs/common'
-import { MongooseModule } from '@nestjs/mongoose'
 import { SeederService } from './seeder.service'
-import { Client, ClientSchema } from '../schemas/client.schema'
-import { Arrival, ArrivalSchema } from '../schemas/arrival.schema'
+import { DbModule } from '../db/db.module'
 
 @Module({
-  imports: [
-    MongooseModule.forRoot('mongodb://localhost/fulfillment-center'),
-    MongooseModule.forFeature([{ name: Client.name, schema: ClientSchema }]),
-    MongooseModule.forFeature([{ name: Arrival.name, schema: ArrivalSchema }]),
-  ],
+  imports: [DbModule],
   providers: [SeederService],
 })
 export class SeedModule {}
