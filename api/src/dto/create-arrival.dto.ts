@@ -35,6 +35,17 @@ class DefectDto {
   amount: number
 }
 
+class ReceivedProductDto {
+  @IsNotEmpty({ message: 'Заполните поле товара.' })
+  product: string
+
+  @IsNotEmpty({ message: 'Заполните описание товара.' })
+  description: string
+
+  @IsNotEmpty({ message: 'Заполните количество товара.' })
+  amount: number
+}
+
 export class CreateArrivalDto {
   @IsNotEmpty({ message: 'Заполните поле клиента.' })
   client: string
@@ -69,5 +80,8 @@ export class CreateArrivalDto {
   defects?: DefectDto[]
 
   @IsOptional()
-  received_amount?: number
+  @IsArray({ message: 'Заполните список полученных товаров.' })
+  @ValidateNested({ each: true })
+  @Type(() => ReceivedProductDto)
+  received_amount?: ReceivedProductDto[]
 }
