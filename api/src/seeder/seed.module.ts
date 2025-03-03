@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { SeederService } from './seeder.service'
-import { DbModule } from '../db/db.module'
+import { DbModule } from '../modules/db.module'
 
 @Module({
   imports: [DbModule],
