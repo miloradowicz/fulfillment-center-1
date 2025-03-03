@@ -25,7 +25,7 @@ export interface DynamicField {
 export interface Log {
   user: string;
   change: string;
-  date: Date;
+  date: string;
 }
 
 export interface Product {
@@ -59,16 +59,31 @@ export interface Arrival {
   client: string;
   products: ProductArrival[];
   arrival_price: number;
-  arrival_status: string;
+  arrival_status: 'Ожидается доставка' | 'Получен' | 'Отсортирован';
   arrival_date: string;
+  created_at: string;
+  updated_at?: string;
   sent_amount: string;
-  logs: Log[];
-  defects: Defect[];
+  logs?: Log[];
+  defects?: Defect[];
   received_amount?: number;
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>;
 
+export interface Order {
+  _id: string;
+  client: string;
+  products: Product[];
+  price: number;
+  sent_at: string;
+  delivered_at: string;
+  comment?: string;
+  status: 'в сборке' | 'в пути' | 'доставлен';
+  logs?: Log[];
+  defects?: Defect[];
+}
 
+export type OrderMutation = Omit<Order, '_id'>;
 
 
