@@ -19,6 +19,11 @@ export class ProductsController {
     }
   }
 
+  @Get()
+  async getByClientId(@Query('clientId') clientId: string) {
+    return this.productsService.getAllByClient(clientId)
+  }
+
   @Get(':id') async getProduct(@Param('id') id: string) {
     return await this.productsService.getById(id)
   }
