@@ -39,10 +39,28 @@ const ProductForm = () => {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    if (!form.title || !form.amount || !form.barcode || !form.article || !form.client) {
-      toast.warn('Все поля обязательны для заполнения!')
+    if (!form.client) {
+      toast.warn('Поле "Клиент" обязательно для заполнения!')
       return
     }
+    if (!form.title.trim() || !form.title) {
+      toast.warn('Поле "Название" обязательно для заполнения!')
+      return
+    }
+    if (!form.amount) {
+      toast.warn('Поле "Количество" обязательно для заполнения!')
+      return
+    }
+    if (!form.barcode.trim() || !form.barcode ) {
+      toast.warn('Поле "Баркод" обязательно для заполнения!')
+      return
+    }
+    if (!form.article.trim() || !form.article) {
+      toast.warn('Поле "Артикул" обязательно для заполнения!')
+      return
+    }
+
+
 
     try {
       const productData: ProductMutation = {
