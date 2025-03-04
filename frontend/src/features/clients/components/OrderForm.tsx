@@ -109,7 +109,7 @@ const OrderForm = () => {
           setProductsForm(prev => ([
             ...prev,
             { product: clientProducts[i],
-              amount: newField.amount,
+              amount: Number(newField.amount),
               description: newField.description,
             },
           ]))
@@ -198,7 +198,7 @@ const OrderForm = () => {
                 style={{ marginBottom: '10px' }}
                 type="number"
                 value={newField.amount}
-                onChange={e => setNewField({ ...newField, amount: e.target.value as unknown as number })}
+                onChange={e => setNewField({ ...newField, amount: Number( e.target.value) })}
               />
               <TextField
                 label="описание товара"
