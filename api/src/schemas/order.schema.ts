@@ -74,6 +74,7 @@ export class Order {
   @Prop({
     type: String,
     enum: ['в сборке', 'в пути', 'доставлен'],
+    default:'в сборке',
   })
   status: 'в сборке' | 'в пути' | 'доставлен'
 }

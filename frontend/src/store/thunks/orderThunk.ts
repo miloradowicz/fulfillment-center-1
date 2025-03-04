@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Order, OrderMutation } from '../../types'
+import { GlobalError, Order, OrderMutation, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchOrders = createAsyncThunk<Order[]>(
@@ -19,17 +19,18 @@ export const fetchOrderById = createAsyncThunk<Order, string>(
   },
 )
 
-export const addOrder = createAsyncThunk<void, OrderMutation, { rejectValue: GlobalError }
+export const addOrder= createAsyncThunk<void, OrderMutation, { rejectValue: ValidationError}
 >('orders/addOrder', async (data: OrderMutation, { rejectWithValue }) => {
   try {
     await axiosAPI.post('/orders', data)
-  } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+  } catch (error) {
+    if (isAxiosError(error) && error.response && error.response.status === 400) {
+      return rejectWithValue(error.response.data as ValidationError)
     }
-    throw e
+    throw error
   }
 })
+
 
 export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('orders/deleteOrder', async (orderId: string, { rejectWithValue }) => {

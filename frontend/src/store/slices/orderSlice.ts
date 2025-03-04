@@ -1,4 +1,4 @@
-import { GlobalError, Order } from '../../types'
+import { GlobalError, Order, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { addOrder, deleteOrder, fetchOrderById, fetchOrders, updateOrder } from '../thunks/orderThunk.ts'
@@ -11,6 +11,7 @@ interface OrderState {
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
+  createError: ValidationError | null;
 }
 
 const initialState: OrderState = {
@@ -21,6 +22,7 @@ const initialState: OrderState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+  createError:null,
 }
 
 export const selectOrder = (state: RootState) => state.orders.order
@@ -30,6 +32,7 @@ export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingA
 export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
 export const selectLoadingUpdateOrder = (state: RootState) => state.orders.loadingUpdate
 export const selectOrderError = (state: RootState) => state.orders.error
+export const selectCreateOrderError = (state: RootState) => state.orders.createError
 
 const orderSlice = createSlice({
   name: 'orders',
@@ -58,13 +61,14 @@ const orderSlice = createSlice({
     })
     builder.addCase(addOrder.pending, state => {
       state.loadingAdd = true
+      state.createError=null
     })
     builder.addCase(addOrder.fulfilled, state => {
       state.loadingAdd = false
     })
     builder.addCase(addOrder.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
-      state.error = error || null
+      state.createError = error || null
     })
     builder.addCase(deleteOrder.pending, state => {
       state.loadingDelete = true
