@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common'
-import { DbModule } from './db/db.module'
-import { ClientsController } from './clients/clients.controller'
-import { ProductsController } from './products/products.controller'
-import { ProductsService } from './products/products.service'
-import { ArrivalsController } from './arrivals/arrivals.controller'
-import { ArrivalsService } from './arrivals/arrivals.service'
-import { OrdersService } from './orders/orders.service'
-import { OrdersController } from './orders/orders.controller'
+import { DbModule } from './modules/db.module'
+import { ClientsModule } from './modules/clients.module'
+import { ProductsModule } from './modules/products.module'
+import { ArrivalsModule } from './modules/arrivals.module'
+import { OrdersModule } from './modules/orders.module'
+import { CsrfModule } from './modules/csrf.module'
 
 @Module({
-  imports: [DbModule],
-  controllers: [ClientsController, ProductsController, ArrivalsController, OrdersController],
-  providers: [ProductsService, ArrivalsService, OrdersService],
-
+  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule],
+  controllers: [],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
-import { ArrivalsService } from './arrivals.service'
+import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 
 @Controller('arrivals')

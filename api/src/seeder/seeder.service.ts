@@ -45,6 +45,6 @@ export class SeederService {
           value: 'Красный',
         },
       ],
-    })
+    },)
   }
 }

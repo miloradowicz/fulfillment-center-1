@@ -25,7 +25,7 @@ export interface DynamicField {
 export interface Log {
   user: string;
   change: string;
-  date: Date;
+  date: string;
 }
 
 export interface Product {
@@ -40,11 +40,18 @@ export interface Product {
   logs?: Log[];
 }
 
+
 export type ProductMutation = Omit<Product, '_id'>;
 
 export interface Defect {
   product: string;
   defect_description: string;
+  amount: number;
+}
+
+export interface ProductOrder {
+  product: string;
+  description: string;
   amount: number;
 }
 
@@ -59,16 +66,43 @@ export interface Arrival {
   client: string;
   products: ProductArrival[];
   arrival_price: number;
-  arrival_status: string;
+  arrival_status: 'Ожидается доставка' | 'Получен' | 'Отсортирован';
   arrival_date: string;
+  created_at: string;
+  updated_at?: string;
   sent_amount: string;
-  logs: Log[];
-  defects: Defect[];
+  logs?: Log[];
+  defects?: Defect[];
   received_amount?: number;
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>;
 
+export interface Order {
+  _id: string;
+  client: string;
+  products: ProductOrder[];
+  price: number;
+  sent_at: string;
+  delivered_at: string;
+  comment?: string;
+  status?: 'в сборке' | 'в пути' | 'доставлен';
+  logs?: Log[];
+  defects?: Defect[];
+}
 
+export type OrderMutation = Omit<Order, '_id'>;
+
+export interface ValidationError {
+  errors: {
+    [key: string]: {
+      name: string;
+      messages: string;
+    }
+  },
+  message: string;
+  name: string;
+  _message: string;
+}
 
 

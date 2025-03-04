@@ -1,26 +1,37 @@
 import { GlobalError, Product } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
-import { addProduct, deleteProduct, fetchProductById, fetchProducts, updateProduct } from '../thunks/productThunk.ts'
+import {
+  addProduct,
+  deleteProduct,
+  fetchProductById,
+  fetchProducts,
+  fetchProductsOneClient,
+  updateProduct,
+} from '../thunks/productThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ProductState {
   product: Product | null;
   products: Product[] | null;
   loadingFetch : boolean;
+  loadingFetchOneClient : boolean;
   loadingAdd: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
+
 }
 
 const initialState: ProductState = {
   product: null,
   products: null,
   loadingFetch: false,
+  loadingFetchOneClient:false,
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+
 }
 
 export const selectProduct = (state: RootState) => state.products.product
@@ -46,6 +57,16 @@ const productSlice = createSlice({
     builder.addCase(fetchProducts.rejected, state => {
       state.loadingFetch = false
     })
+    builder.addCase(fetchProductsOneClient.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchProductsOneClient.fulfilled, (state, action) => {
+      state.loadingFetch= false
+      state.products = action.payload
+    })
+    builder.addCase(fetchProductsOneClient.rejected, state => {
+      state.loadingFetch = false
+    })
     builder.addCase(fetchProductById.pending, state => {
       state.loadingFetch = true
     })
@@ -64,7 +85,7 @@ const productSlice = createSlice({
     })
     builder.addCase(addProduct.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
-      state.error = error || null
+      state.error = error||null
     })
     builder.addCase(deleteProduct.pending, state => {
       state.loadingDelete = true

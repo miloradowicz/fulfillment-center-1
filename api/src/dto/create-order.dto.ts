@@ -69,7 +69,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' }) sent_at: Date
 
-  @IsNotEmpty({ message: 'Поле дата доставки обязательно для заполнения' }) delivery_at: Date
+  @IsNotEmpty({ message: 'Поле дата доставки обязательно для заполнения' }) delivered_at: Date
 
   @IsOptional()
   comment?: string

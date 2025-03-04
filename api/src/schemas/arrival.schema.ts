@@ -78,8 +78,21 @@ export class Arrival {
     amount: number
   }[]
 
-  @Prop({ required: false })
-  received_amount?: number
+  @Prop({
+    type: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        description: { type: String, required: true },
+        amount: { type: Number, required: true },
+      },
+    ],
+    default: [],
+  })
+  received_amount: {
+    product: mongoose.Schema.Types.ObjectId
+    description: string
+    amount: number
+  }[]
 }
 
 export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
