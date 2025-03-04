@@ -1,16 +1,17 @@
-import { Arrival, GlobalError } from '../../types'
+import { Arrival, GlobalError, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { addArrival, deleteArrival, fetchArrivalById, fetchArrivals, updateArrival } from '../thunks/arrivalThunk.ts'
 
 interface ArrivalState {
-  arrival: Arrival | null;
-  arrivals: Arrival[] | null;
-  loadingFetch : boolean;
-  loadingAdd: boolean;
-  loadingDelete: boolean;
-  loadingUpdate: boolean;
-  error: GlobalError | null;
+  arrival: Arrival | null
+  arrivals: Arrival[] | null
+  loadingFetch: boolean
+  loadingAdd: boolean
+  loadingDelete: boolean
+  loadingUpdate: boolean
+  error: GlobalError | null
+  createError: ValidationError | null
 }
 
 const initialState: ArrivalState = {
@@ -21,6 +22,7 @@ const initialState: ArrivalState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+  createError: null,
 }
 
 export const selectArrival = (state: RootState) => state.arrivals.arrival
@@ -30,6 +32,7 @@ export const selectLoadingAddArrival = (state: RootState) => state.arrivals.load
 export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
 export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
 export const selectArrivalError = (state: RootState) => state.arrivals.error
+export const selectCreateError = (state: RootState) => state.arrivals.createError
 
 const arrivalSlice = createSlice({
   name: 'arrivals',
@@ -64,7 +67,7 @@ const arrivalSlice = createSlice({
     })
     builder.addCase(addArrival.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
-      state.error = error || null
+      state.createError = error || null
     })
     builder.addCase(deleteArrival.pending, state => {
       state.loadingDelete = true
