@@ -1,6 +1,13 @@
 import { GlobalError, Product } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
-import { addProduct, deleteProduct, fetchProductById, fetchProducts, updateProduct } from '../thunks/productThunk.ts'
+import {
+  addProduct,
+  deleteProduct,
+  fetchProductsByClientId,
+  fetchProductById,
+  fetchProducts,
+  updateProduct,
+} from '../thunks/productThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ProductState {
@@ -54,6 +61,16 @@ const productSlice = createSlice({
       state.product = action.payload
     })
     builder.addCase(fetchProductById.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchProductsByClientId.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchProductsByClientId.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.products = action.payload
+    })
+    builder.addCase(fetchProductsByClientId.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(addProduct.pending, state => {
