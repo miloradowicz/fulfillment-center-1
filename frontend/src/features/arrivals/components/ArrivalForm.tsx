@@ -112,7 +112,7 @@ const ArrivalForm = () => {
   }
 
   const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
-    if (!product.product || !product.description || product.amount === 0) return
+    if (!product.product || product.amount === 0) return
 
     if (isReceivedProduct) {
       setReceivedForm(prev => {
