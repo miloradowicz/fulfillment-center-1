@@ -38,6 +38,25 @@ const initialDefectState = {
 
 const ArrivalForm = () => {
   const [form, setForm] = useState<ArrivalMutation>({ ...initialState })
+  const [errors, setErrors] = useState<{
+    client: string
+    product: string
+    arrival_price: number
+    arrival_date: string
+    sent_amount: string
+    amount: number
+    defect_description: string
+    description: string
+  }>({
+    client: '',
+    product: '',
+    arrival_price: 0,
+    arrival_date: '',
+    amount: 0,
+    sent_amount: '',
+    defect_description: '',
+    description: '',
+  })
 
   const [newReceived, setNewReceived] = useState<ProductArrival>({ ...initialProductState })
   const [receivedForm, setReceivedForm] = useState<ProductArrival[]>([])
@@ -66,61 +85,83 @@ const ArrivalForm = () => {
     }
   }, [dispatch, form.client])
 
-  const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
-    if (isReceivedProduct) {
-      if (!product || product.amount <= 0 || product.description.trim().length === 0) {
-        toast.warn('Заполните все поля товара.')
-      } else {
-        setReceivedForm((prev) => {
-          const updatedReceivedProducts = [...prev, product]
-          setForm((prevForm) => ({
-            ...prevForm,
-            received_amount: updatedReceivedProducts,
-          }))
-          return updatedReceivedProducts
-        })
-      }
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+
+    if (value.trim() === '') {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Это поле обязательно для заполнения',
+      }))
+    } else if ((name === 'arrival_price' && Number(value) === 0) || Number(value) < 0) {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Цена доставки должна быть больше 0',
+      }))
+    } else if ((name === 'amount' && Number(value) === 0) || Number(value) < 0) {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Количество товара должно быть больше 0',
+      }))
     } else {
-      if (!product || product.amount <= 0 || product.description.trim().length === 0) {
-        toast.warn('Заполните все поля товара.')
-      } else {
-        setProductsForm((prev) => {
-          const updatedProducts = [...prev, product]
-          setForm((prevForm) => ({
-            ...prevForm,
-            products: updatedProducts,
-          }))
-          return updatedProducts
-        })
-      }
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: '',
+      }))
+    }
+  }
+
+  const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
+    if (!product.product || product.amount === 0) return
+
+    if (isReceivedProduct) {
+      setReceivedForm(prev => {
+        const updatedReceivedProducts = [...prev, product]
+        setForm(prevForm => ({
+          ...prevForm,
+          received_amount: updatedReceivedProducts,
+        }))
+        return updatedReceivedProducts
+      })
+    } else {
+      setProductsForm(prev => {
+        const updatedProducts = [...prev, product]
+        setForm(prevForm => ({
+          ...prevForm,
+          products: updatedProducts,
+        }))
+        return updatedProducts
+      })
     }
 
+    setModalOpen(false)
+    setReceivedModalOpen(false)
     setNewProduct({ ...initialProductState })
     setNewReceived({ ...initialProductState })
   }
 
   const deleteProduct = (index: number, setState: React.Dispatch<React.SetStateAction<ProductArrival[]>>) => {
-    setState((prev) => prev.filter((_, i) => i !== index))
+    setState(prev => prev.filter((_, i) => i !== index))
   }
 
   const addDefect = (defect: Defect) => {
-    if (!defect.product || defect.amount <= 0 || defect.defect_description.trim().length === 0) {
-      toast.warn('Заполните все поля дефекта')
-    } else {
-      setDefectForm((prev) => {
-        const updatedDefects = [...prev, defect]
-        setForm((prevForm) => ({
-          ...prevForm,
-          defects: updatedDefects,
-        }))
-        return updatedDefects
-      })
-      setNewDefect(initialDefectState)
-    }
+    if (!defect.product || !defect.defect_description || defect.amount === 0) return
+
+    setDefectForm(prev => {
+      const updatedDefects = [...prev, defect]
+      setForm(prevForm => ({
+        ...prevForm,
+        defects: updatedDefects,
+      }))
+      return updatedDefects
+    })
+
+    setDefectModalOpen(false)
+    setNewDefect({ ...initialDefectState })
   }
 
   const deleteDefect = (index: number, setState: React.Dispatch<React.SetStateAction<Defect[]>>) => {
-    setState((prev) => prev.filter((_, i) => i !== index))
+    setState(prev => prev.filter((_, i) => i !== index))
   }
 
   const getFieldError = (fieldName: string) => {
@@ -132,7 +173,7 @@ const ArrivalForm = () => {
   }
 
   const getProductNameById = (productId: string): string => {
-    const product = products?.find((p) => p._id === productId)
+    const product = products?.find(p => p._id === productId)
     return product ? product.title : 'Неизвестный товар'
   }
 
@@ -141,7 +182,7 @@ const ArrivalForm = () => {
       {products.map((product, i) => (
         <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
           <Grid container direction="column" spacing={2}>
-            <Grid>
+            <Grid style={{ textTransform: 'capitalize' }}>
               <Typography fontWeight="bold">{getProductNameById(product.product)}</Typography>
             </Grid>
 
@@ -151,7 +192,7 @@ const ArrivalForm = () => {
 
             <Grid>
               <Typography variant="body2">
-                {product.description ? `Описание: ${product.description}` : 'Нет описания'}
+                {product.description ? `Описание: ${ product.description }` : null}
               </Typography>
             </Grid>
 
@@ -172,7 +213,7 @@ const ArrivalForm = () => {
       {defectForm.map((defect, i) => (
         <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
           <Grid container direction="column" spacing={2}>
-            <Grid>
+            <Grid style={{ textTransform: 'capitalize' }}>
               <Typography fontWeight="bold">{getProductNameById(defect.product)}</Typography>
             </Grid>
 
@@ -184,7 +225,7 @@ const ArrivalForm = () => {
 
             <Grid>
               <Typography variant="body2" color="textSecondary">
-                {defect.defect_description ? `Описание: ${defect.defect_description}` : 'Нет описания'}
+                {`Описание: ${ defect.defect_description }`}
               </Typography>
             </Grid>
 
@@ -202,27 +243,32 @@ const ArrivalForm = () => {
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      const updatedForm = { ...form, products: productsForm, received_amount: receivedForm, defects: defectForm }
-      await dispatch(addArrival(updatedForm)).unwrap()
-      setForm({ ...initialState })
-      setProductsForm([])
-      setReceivedForm([])
-      setDefectForm([])
-      navigate('/')
-      toast.success('Поставка успешно создана!')
-    } catch (e) {
-      console.error(e)
+
+    if (form.products.length === 0) {
+      toast.error('Добавьте товары')
+    } else {
+      try {
+        const updatedForm = { ...form, products: productsForm, received_amount: receivedForm, defects: defectForm, arrival_price: Number(form.arrival_price) }
+        await dispatch(addArrival(updatedForm)).unwrap()
+        setForm({ ...initialState })
+        setProductsForm([])
+        setReceivedForm([])
+        setDefectForm([])
+        navigate('/')
+        toast.success('Поставка успешно создана!')
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setForm((prevState) => ({ ...prevState, [name]: value }))
+    setForm(prevState => ({ ...prevState, [name]: value }))
   }
 
   const autoCompleteClients =
-    clients?.map((client) => ({
+    clients?.map(client => ({
       label: client.full_name,
       id: client._id,
     })) || []
@@ -240,19 +286,32 @@ const ArrivalForm = () => {
           <Grid>
             <Autocomplete
               id="client"
-              value={autoCompleteClients.find((option) => option.id === form.client) || null}
-              onChange={(_, newValue) => setForm((prevState) => ({ ...prevState, client: newValue?.id || '' }))}
+              value={autoCompleteClients.find(option => option.id === form.client) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, client: newValue?.id || '' }))}
               size="small"
               fullWidth
               disablePortal
               options={autoCompleteClients}
               sx={{ width: '100%' }}
-              renderInput={(params) => (
+              renderInput={params => (
                 <TextField
                   {...params}
                   label="Клиент"
-                  error={Boolean(getFieldError('client'))}
-                  helperText={getFieldError('client')}
+                  error={Boolean(errors.client)}
+                  helperText={errors.client || getFieldError('client')}
+                  onBlur={() => {
+                    if (!form.client) {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        client: 'Выберите клиента',
+                      }))
+                    } else {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        client: '',
+                      }))
+                    }
+                  }}
                 />
               )}
             />
@@ -260,7 +319,7 @@ const ArrivalForm = () => {
 
           <Grid>
             <Typography fontWeight="bold">Товары</Typography>
-            {renderProductsList(productsForm, (i) => deleteProduct(i, setProductsForm))}
+            {renderProductsList(productsForm, i => deleteProduct(i, setProductsForm))}
             <Button type="button" onClick={() => setModalOpen(true)}>
               + Добавить товары
             </Button>
@@ -276,12 +335,31 @@ const ArrivalForm = () => {
                 options={products ?? []}
                 onChange={(_, newValue) => {
                   if (newValue) {
-                    setNewProduct((prev) => ({ ...prev, product: newValue._id }))
+                    setNewProduct(prev => ({ ...prev, product: newValue._id }))
                   }
                 }}
-                getOptionLabel={(option) => `${option.title}. Артикул: ${option.article}`}
+                getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={(params) => <TextField {...params} label="Товар" />}
+                renderInput={params =>
+                  <TextField
+                    {...params}
+                    label="Товар"
+                    error={Boolean(errors.product)}
+                    helperText={errors.product || getFieldError('product')}
+                    onBlur={() => {
+                      if (!newProduct.product) {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: 'Выберите товар',
+                        }))
+                      } else {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: '',
+                        }))
+                      }
+                    }}
+                  />}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -289,9 +367,13 @@ const ArrivalForm = () => {
                 type="number"
                 fullWidth
                 size="small"
+                name="amount"
                 label="Количество товара"
                 value={newProduct.amount}
-                onChange={(e) => setNewProduct((prev) => ({ ...prev, amount: +e.target.value }))}
+                onChange={e => setNewProduct(prev => ({ ...prev, amount: +e.target.value }))}
+                error={Boolean(errors.amount)}
+                helperText={errors.amount || getFieldError('amount')}
+                onBlur={handleBlur}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -299,8 +381,9 @@ const ArrivalForm = () => {
                 label="Описание товара"
                 fullWidth
                 size="small"
+                name="description"
                 value={newProduct.description}
-                onChange={(e) => setNewProduct((prev) => ({ ...prev, description: e.target.value }))}
+                onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -319,7 +402,7 @@ const ArrivalForm = () => {
           <Grid>
             <Divider sx={{ width: '100%', marginBottom: '15px' }} />
             <Typography fontWeight="bold">Полученные товары</Typography>
-            {renderProductsList(receivedForm, (i) => deleteProduct(i, setReceivedForm))}
+            {renderProductsList(receivedForm, i => deleteProduct(i, setReceivedForm))}
             <Button type="button" onClick={() => setReceivedModalOpen(true)}>
               + Добавить полученные товары
             </Button>
@@ -335,12 +418,31 @@ const ArrivalForm = () => {
                 options={products ?? []}
                 onChange={(_, newValue) => {
                   if (newValue) {
-                    setNewReceived((prev) => ({ ...prev, product: newValue._id }))
+                    setNewReceived(prev => ({ ...prev, product: newValue._id }))
                   }
                 }}
-                getOptionLabel={(option) => `${option.title} артикул: ${option.article}`}
+                getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={(params) => <TextField {...params} label="Товар" />}
+                renderInput={params =>
+                  <TextField
+                    {...params}
+                    label="Товар"
+                    error={Boolean(errors.product)}
+                    helperText={errors.product || getFieldError('product')}
+                    onBlur={() => {
+                      if (!newReceived.product) {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: 'Выберите товар',
+                        }))
+                      } else {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: '',
+                        }))
+                      }
+                    }}
+                  />}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -348,9 +450,13 @@ const ArrivalForm = () => {
                 type="number"
                 fullWidth
                 size="small"
+                name="amount"
                 label="Количество товара"
                 value={newReceived.amount}
-                onChange={(e) => setNewReceived((prev) => ({ ...prev, amount: +e.target.value }))}
+                onChange={e => setNewReceived(prev => ({ ...prev, amount: +e.target.value }))}
+                error={Boolean(errors.amount)}
+                helperText={errors.amount || getFieldError('amount')}
+                onBlur={handleBlur}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -358,8 +464,9 @@ const ArrivalForm = () => {
                 label="Описание товара"
                 fullWidth
                 size="small"
+                name="description"
                 value={newReceived.description}
-                onChange={(e) => setNewReceived((prev) => ({ ...prev, description: e.target.value }))}
+                onChange={e => setNewReceived(prev => ({ ...prev, description: e.target.value }))}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -376,7 +483,7 @@ const ArrivalForm = () => {
           <Grid>
             <Divider sx={{ width: '100%', marginBottom: '15px' }} />
             <Typography fontWeight="bold">Дефекты</Typography>
-            {renderDefectsList(defectForm, (i) => deleteDefect(i, setDefectForm))}
+            {renderDefectsList(defectForm, i => deleteDefect(i, setDefectForm))}
             <Button type="button" onClick={() => setDefectModalOpen(true)}>
               + Добавить дефекты
             </Button>
@@ -392,12 +499,31 @@ const ArrivalForm = () => {
                 options={products ?? []}
                 onChange={(_, newValue) => {
                   if (newValue) {
-                    setNewDefect((prev) => ({ ...prev, product: newValue._id }))
+                    setNewDefect(prev => ({ ...prev, product: newValue._id }))
                   }
                 }}
-                getOptionLabel={(option) => `${option.title} артикул: ${option.article}`}
+                getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={(params) => <TextField {...params} label="Товар" />}
+                renderInput={params =>
+                  <TextField
+                    {...params}
+                    label="Товар"
+                    error={Boolean(errors.product)}
+                    helperText={errors.product || getFieldError('product')}
+                    onBlur={() => {
+                      if (!newDefect.product) {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: 'Выберите товар',
+                        }))
+                      } else {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          product: '',
+                        }))
+                      }
+                    }}
+                  />}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -406,8 +532,12 @@ const ArrivalForm = () => {
                 fullWidth
                 size="small"
                 label="Количество дефектного товара"
+                name="amount"
                 value={newDefect.amount}
-                onChange={(e) => setNewDefect((prev) => ({ ...prev, amount: +e.target.value }))}
+                onChange={e => setNewDefect(prev => ({ ...prev, amount: +e.target.value }))}
+                error={Boolean(errors.amount)}
+                helperText={errors.amount || getFieldError('amount')}
+                onBlur={handleBlur}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -415,8 +545,12 @@ const ArrivalForm = () => {
                 label="Описание дефекта"
                 fullWidth
                 size="small"
+                name="defect_description"
                 value={newDefect.defect_description}
-                onChange={(e) => setNewDefect((prev) => ({ ...prev, defect_description: e.target.value }))}
+                onChange={e => setNewDefect(prev => ({ ...prev, defect_description: e.target.value }))}
+                error={Boolean(errors.defect_description)}
+                helperText={errors.defect_description || getFieldError('defect_description')}
+                onBlur={handleBlur}
                 sx={{ marginBottom: '15px' }}
               />
 
@@ -436,10 +570,12 @@ const ArrivalForm = () => {
               id="arrival_price"
               name="arrival_price"
               label="Цена доставки"
-              value={Number(form.arrival_price)}
+              value={form.arrival_price}
               onChange={inputChangeHandler}
               size="small"
-              error={Boolean(getFieldError('arrival_price'))}
+              error={Boolean(errors.arrival_price)}
+              helperText={errors.arrival_price || getFieldError('arrival_price')}
+              onBlur={handleBlur}
               fullWidth
             />
           </Grid>
@@ -455,13 +591,12 @@ const ArrivalForm = () => {
               type="date"
               value={form.arrival_date}
               onChange={inputChangeHandler}
-              error={Boolean(getFieldError('arrival_date'))}
-              helperText={getFieldError('arrival_date')}
+              error={Boolean(errors.arrival_date)}
+              helperText={errors.arrival_date || getFieldError('arrival_date')}
+              onBlur={handleBlur}
               fullWidth
             />
           </Grid>
-
-          <Grid></Grid>
 
           <Grid>
             <TextField
@@ -471,7 +606,9 @@ const ArrivalForm = () => {
               value={form.sent_amount}
               onChange={inputChangeHandler}
               size="small"
-              error={Boolean(getFieldError('sent_amount'))}
+              error={Boolean(errors.sent_amount)}
+              helperText={errors.sent_amount || getFieldError('sent_amount')}
+              onBlur={handleBlur}
               fullWidth
             />
           </Grid>

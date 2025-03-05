@@ -16,7 +16,7 @@ export class Arrival {
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        description: { type: String, required: true },
+        description: { type: String, default: null },
         amount: { type: Number, required: true },
       },
     ],
@@ -80,7 +80,7 @@ export class Arrival {
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        description: { type: String, required: true },
+        description: { type: String, default: null },
         amount: { type: Number, required: true },
       },
     ],
