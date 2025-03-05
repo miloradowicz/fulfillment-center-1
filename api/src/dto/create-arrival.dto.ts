@@ -1,5 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator'
-import { ArrivalStatus } from '../schemas/arrival.schema'
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 class ProductDto {
@@ -58,14 +57,17 @@ export class CreateArrivalDto {
   @IsNotEmpty({ message: 'Заполните цену доставки.' })
   arrival_price: number
 
-  @IsNotEmpty({ message: 'Заполните статус прибытия.' })
-  arrival_status: ArrivalStatus
-
   @IsNotEmpty({ message: 'Заполните дату прибытия.' })
   arrival_date: Date
 
   @IsNotEmpty({ message: 'Заполните количество отправленного товара.' })
   sent_amount: string
+
+  @IsOptional()
+  @IsEnum(['Ожидается доставка', 'Получен', 'Отсортирован'], {
+    message: 'Статус должен быть одним из: "ожидается доставка", "получен", "отсортирован"',
+  })
+  arrival_status: 'Ожидается доставка' |  'Получен' | 'Отсортирован'
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })

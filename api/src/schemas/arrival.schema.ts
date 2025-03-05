@@ -3,12 +3,6 @@ import mongoose, { Document } from 'mongoose'
 
 export type ArrivalDocument = Arrival & Document
 
-export enum ArrivalStatus {
-  PENDING = 'Ожидается доставка',
-  RECEIVED = 'Получен',
-  SORTED = 'Отсортирован',
-}
-
 @Schema({ timestamps: true })
 export class Arrival {
   @Prop({
@@ -37,8 +31,12 @@ export class Arrival {
   @Prop({ required: true })
   arrival_price: number
 
-  @Prop({ required: true, enum: ArrivalStatus })
-  arrival_status: ArrivalStatus
+  @Prop({
+    type: String,
+    enum: ['Ожидается доставка', 'Получен', 'Отсортирован'],
+    default: 'Ожидается доставка',
+  })
+  arrival_status: 'Ожидается доставка' | 'Получен' | 'Отсортирован'
 
   @Prop({ required: true })
   arrival_date: Date

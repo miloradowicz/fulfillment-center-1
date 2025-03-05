@@ -16,6 +16,18 @@ export interface GlobalError {
   message: string;
 }
 
+export interface ValidationError {
+  errors: {
+    [key: string]: {
+      name: string;
+      messages: string[];
+    }
+  },
+  message: string;
+  name: string;
+  _message: string;
+}
+
 export interface DynamicField {
   key: string;
   label: string;
@@ -66,14 +78,14 @@ export interface Arrival {
   client: string;
   products: ProductArrival[];
   arrival_price: number;
-  arrival_status: 'Ожидается доставка' | 'Получен' | 'Отсортирован';
   arrival_date: string;
   created_at: string;
   updated_at?: string;
   sent_amount: string;
+  defects: Defect[];
+  arrival_status?: string;
+  received_amount?: ProductArrival[];
   logs?: Log[];
-  defects?: Defect[];
-  received_amount?: number;
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>;
@@ -92,17 +104,4 @@ export interface Order {
 }
 
 export type OrderMutation = Omit<Order, '_id'>;
-
-export interface ValidationError {
-  errors: {
-    [key: string]: {
-      name: string;
-      messages: string;
-    }
-  },
-  message: string;
-  name: string;
-  _message: string;
-}
-
 
