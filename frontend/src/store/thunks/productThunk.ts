@@ -11,18 +11,18 @@ export const fetchProducts = createAsyncThunk<Product[]>(
   },
 )
 
-export const fetchProductsOneClient = createAsyncThunk<Product[],string>(
-  'products/fetchProductsOneClient',
-  async (clientId:string) => {
-    const response = await axiosAPI.get(`/products?clientId=${ clientId }`)
-    return response.data
-  },
-)
-
 export const fetchProductById = createAsyncThunk<Product, string>(
   'products/fetchProductById',
   async (productId: string) => {
     const response = await axiosAPI.get(`/products/?=${ productId }`)
+    return response.data
+  },
+)
+
+export const fetchProductsByClientId = createAsyncThunk<Product[], string>(
+  'products/fetchByClientId',
+  async(clientId: string) => {
+    const response = await axiosAPI.get(`/products?client=${ clientId }`)
     return response.data
   },
 )

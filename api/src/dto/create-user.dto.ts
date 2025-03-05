@@ -19,7 +19,7 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'Заполните поле роль.' })
   @IsEnum(['super-admin', 'admin', 'manager', 'stock-worker'], {
-    message: 'Неверная роль. Доступные значения: root, admin, manager, stock-worker.',
+    message: 'Неверная роль. Доступные значения: super-admin, admin, manager, stock-worker.',
   })
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
 }
