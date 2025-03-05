@@ -79,8 +79,6 @@ export interface Arrival {
   products: ProductArrival[];
   arrival_price: number;
   arrival_date: string;
-  created_at: string;
-  updated_at?: string;
   sent_amount: string;
   defects: Defect[];
   arrival_status?: string;
