@@ -32,4 +32,8 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => DynamicFieldDto)
   dynamic_fields: DynamicFieldDto[]
+
+  @IsOptional()
+  @IsArray()
+  documents?: string[]
 }
