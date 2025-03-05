@@ -225,7 +225,7 @@ const ArrivalForm = () => {
 
             <Grid>
               <Typography variant="body2" color="textSecondary">
-                {defect.defect_description ? `Описание: ${ defect.defect_description }` : 'Нет описания'}
+                {`Описание: ${ defect.defect_description }`}
               </Typography>
             </Grid>
 
