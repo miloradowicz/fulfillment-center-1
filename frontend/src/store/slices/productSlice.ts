@@ -57,16 +57,6 @@ const productSlice = createSlice({
     builder.addCase(fetchProducts.rejected, state => {
       state.loadingFetch = false
     })
-    builder.addCase(fetchProductsOneClient.pending, state => {
-      state.loadingFetch = true
-    })
-    builder.addCase(fetchProductsOneClient.fulfilled, (state, action) => {
-      state.loadingFetch= false
-      state.products = action.payload
-    })
-    builder.addCase(fetchProductsOneClient.rejected, state => {
-      state.loadingFetch = false
-    })
     builder.addCase(fetchProductById.pending, state => {
       state.loadingFetch = true
     })
