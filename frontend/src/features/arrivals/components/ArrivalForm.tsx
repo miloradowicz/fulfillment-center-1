@@ -112,6 +112,8 @@ const ArrivalForm = () => {
   }
 
   const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
+    if (!product.product || !product.description || product.amount === 0) return
+
     if (isReceivedProduct) {
       setReceivedForm(prev => {
         const updatedReceivedProducts = [...prev, product]
@@ -143,6 +145,8 @@ const ArrivalForm = () => {
   }
 
   const addDefect = (defect: Defect) => {
+    if (!defect.product || !defect.defect_description || defect.amount === 0) return
+
     setDefectForm(prev => {
       const updatedDefects = [...prev, defect]
       setForm(prevForm => ({
@@ -178,7 +182,7 @@ const ArrivalForm = () => {
       {products.map((product, i) => (
         <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
           <Grid container direction="column" spacing={2}>
-            <Grid>
+            <Grid style={{ textTransform: 'capitalize' }}>
               <Typography fontWeight="bold">{getProductNameById(product.product)}</Typography>
             </Grid>
 
@@ -209,7 +213,7 @@ const ArrivalForm = () => {
       {defectForm.map((defect, i) => (
         <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
           <Grid container direction="column" spacing={2}>
-            <Grid>
+            <Grid style={{ textTransform: 'capitalize' }}>
               <Typography fontWeight="bold">{getProductNameById(defect.product)}</Typography>
             </Grid>
 
