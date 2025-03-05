@@ -53,7 +53,6 @@ class DefectDto {
 
 export class CreateOrderDto {
   @IsNotEmpty({ message: 'Поле клиент обязательно для заполнения' })
-  @IsMongoId({ message: 'Некорректный формат ID' })
   client: string
 
   @IsArray({ message: 'Список товаров должен быть массивом' })
@@ -64,7 +63,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'Поле сумма заказа обязательно для заполнения' })
   @IsInt({ message: 'Поле сумма заказа должно являться числом' })
-  @Min(0, { message: 'Поле сумма заказа не может быть отрицательным' })
+  @Min(0.0000001, { message: 'Поле сумма заказа не может равняться 0' })
   price: number
 
   @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' }) sent_at: Date
