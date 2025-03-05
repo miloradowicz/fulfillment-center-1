@@ -5,8 +5,7 @@ import {
   IsInt,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
-  Min,
+  IsOptional, IsPositive,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -21,7 +20,7 @@ class ProductDto {
 
   @IsNotEmpty({ message: 'Поле количество товара не должно быть пустым.' })
   @IsInt({ message: 'Поле количество товара должно являться числом' })
-  @Min(0, { message: 'Поле количество товара не может быть отрицательным' })
+  @IsPositive( { message: 'Поле количество товарa не может быть отрицательным' })
   amount: number
 }
 
@@ -47,7 +46,7 @@ class DefectDto {
 
   @IsNotEmpty({ message: 'Поле количество дефектных товаров не должно быть пустым.' })
   @IsInt({ message: 'Поле количество дефектных товаров должно являться числом' })
-  @Min(0, { message: 'Поле количество дефектных товаров не может быть отрицательным' })
+  @IsPositive( { message: 'Поле количество дефектных товаров не может быть отрицательным' })
   amount: number
 }
 
@@ -63,7 +62,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'Поле сумма заказа обязательно для заполнения' })
   @IsInt({ message: 'Поле сумма заказа должно являться числом' })
-  @Min(0.0000001, { message: 'Поле сумма заказа не может равняться 0' })
+  @IsPositive( { message: 'Поле сумма заказа не может равняться 0' })
   price: number
 
   @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' }) sent_at: Date

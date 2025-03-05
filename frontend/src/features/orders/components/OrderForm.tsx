@@ -62,7 +62,42 @@ const OrderForm = () => {
   const clients = useAppSelector(selectAllClients)
   const clientProducts = useAppSelector(selectAllProducts)
   const loadingFetchClient = useAppSelector(selectLoadingFetchClient)
-  const [isButtonVisible, setButtonVisible] = useState(true) // Состояние для видимости кнопки
+  const [isButtonVisible, setButtonVisible] = useState(true)
+  const [errors, setErrors] = useState<{ client: string; product: string; price: number;  amount: number;
+    defect_description:string; sent_at: string; delivered_at: string }>({
+      client: '',
+      product: '',
+      price: 0,
+      sent_at: '',
+      amount: 0,
+      defect_description:'',
+      delivered_at: '',
+    })
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    if (value.trim() === '') {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Это поле обязательно для заполнения',
+      }))
+    } else if (name === 'price' && Number(value) === 0 || Number(value) < 0 ){
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Поле сумма заказа должно быть больше 0',
+      }))
+    } else if (name === 'amount' && Number(value) === 0 || Number(value) < 0 ){
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: 'Поле количество товара должно быть больше 0',
+      }))
+    } else {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: '',
+      }))
+    }
+  }
 
   const handleButtonClick = () => {
     if(!currentClient){
@@ -77,7 +112,7 @@ const OrderForm = () => {
     setModalOpenDefects(false)
     setButtonDefectVisible(true)
   }
-  const handleButtonDeffectClick = () => {
+  const handleButtonDefectClick = () => {
     if(!currentClient){
       toast.warn('Выберите клиента')
     }else {
@@ -109,7 +144,7 @@ const OrderForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if(form.products.length === 0){
-      toast.success('Добавьте товары')
+      toast.error('Добавьте товары')
     } else {
       await dispatch(addOrder(form)).unwrap()
       setForm(initialState)
@@ -145,7 +180,7 @@ const OrderForm = () => {
     }))
   }
 
-  const deleteDeffect = (index: number) => {
+  const deleteDefect = (index: number) => {
     setDefectForm(defectForm.filter((_prod, i) => i !== index))
     setForm(prev => ({
       ...prev,
@@ -175,44 +210,36 @@ const OrderForm = () => {
 
   const addArrayProductInForm = ()=>{
     if(clientProducts){
-      if(!newField.product || newField.amount<=0){
-        toast.warn('Заполните поля товар и количество')
-      } else {
-        for(let i=0; i<clientProducts.length; i++) {
-          if(newField.product === clientProducts[i]._id){
-            setProductsForm(prev => ([
-              ...prev,
-              { product: clientProducts[i],
-                amount: Number(newField.amount),
-                description: newField.description,
-              },
-            ]))
-          }
+      for(let i=0; i<clientProducts.length; i++) {
+        if(newField.product === clientProducts[i]._id){
+          setProductsForm(prev => ([
+            ...prev,
+            { product: clientProducts[i],
+              amount: Number(newField.amount),
+              description: newField.description,
+            },
+          ]))
         }
         setFormArrayData()
       }}}
 
   const addArrayDefectInForm = ()=>{
     if(clientProducts){
-      if(!newFieldDefects.product || newFieldDefects.amount<=0 || newFieldDefects.defect_description.trim().length === 0){
-        toast.warn('Заполните все поля')
-      }
-      else {
-        for(let i=0; i<clientProducts.length; i++) {
-          if(newFieldDefects.product === clientProducts[i]._id){
-            setDefectForm(prev => ([
-              ...prev,
-              { product: clientProducts[i],
-                amount: Number(newFieldDefects.amount),
-                defect_description: newFieldDefects.defect_description,
-              },
-            ]))
-          }
+      for(let i=0; i<clientProducts.length; i++) {
+        if(newFieldDefects.product === clientProducts[i]._id){
+          setDefectForm(prev => ([
+            ...prev,
+            { product: clientProducts[i],
+              amount: Number(newFieldDefects.amount),
+              defect_description: newFieldDefects.defect_description,
+            },
+          ]))
         }
         setFormArrayData()
       }
     }
   }
+
 
 
   return (
@@ -237,8 +264,22 @@ const OrderForm = () => {
                   getOptionLabel={option => option.full_name || ''}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => <TextField {...params} label="Клиент"
-                    error={Boolean(getFieldError('client'))}
-                    helperText={getFieldError('client')}/>
+                    error={Boolean(errors.client)}
+                    helperText={errors.client || getFieldError('client')}
+                    onBlur={() => {
+                      if (!form.client) {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          client: 'Выберите клиента',
+                        }))
+                      } else {
+                        setErrors(prevErrors => ({
+                          ...prevErrors,
+                          client: '',
+                        }))
+                      }
+                    }}
+                  />
                   }
                 />
               </FormControl>
@@ -248,7 +289,7 @@ const OrderForm = () => {
             <label className={'fs-4 my-1'}>Товары</label>
             {productsForm.length===0?<Typography>В заказе отсутствуют товары</Typography>:<> {productsForm.map((product, i) => (
               <Grid style={{ border:'1px solid lightgrey', borderRadius:'5px' }} padding={'5px'} fontSize={'15px'} display={'flex'} justifyContent={'space-between'} alignItems={'center'} key={product.product._id + i }><Grid
-              >{product.product.title} <Typography fontSize={'15px'} fontWeight={'bolder'}>aртикул: {product.product.article}</Typography> {product.amount} шт</Grid>
+                style={{ textTransform:'capitalize' }} >{product.product.title} <Typography fontSize={'15px'} fontWeight={'bolder'}>aртикул: {product.product.article}</Typography> {product.amount} шт</Grid>
               <Button type={'button'} onClick={() => {
                 deleteProduct(i)
               }}><DeleteIcon/>
@@ -289,8 +330,25 @@ const OrderForm = () => {
                   }
                 }}
                 getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
+
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={params => <TextField {...params} label="Товар" required={true}/>
+                renderInput={params => <TextField {...params} label="Товар" required={true}
+                  error={Boolean(errors.product)}
+                  helperText={errors.product || getFieldError('product')}
+                  onBlur={() => {
+                    if (!newField.product) {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: 'Выберите товар',
+                      }))
+                    } else {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: '',
+                      }))
+                    }
+                  }}
+                />
                 }
               />
               <TextField
@@ -299,9 +357,13 @@ const OrderForm = () => {
                 label="количество товара"
                 style={{ marginBottom: '10px' }}
                 type="number"
+                name={'amount'}
                 required={true}
                 value={newField.amount}
                 onChange={e => setNewField({ ...newField, amount: Number(e.target.value) })}
+                error={Boolean(errors.amount)}
+                helperText={errors.amount || getFieldError('amount')}
+                onBlur={handleBlur}
               />
               <TextField
                 label="описание товара"
@@ -327,9 +389,10 @@ const OrderForm = () => {
               label="Сумма заказа"
               value={form.price}
               onChange={hndChange}
-              error={Boolean(getFieldError('price'))}
-              helperText={getFieldError('price')}
+              error={Boolean(errors.price)}
+              helperText={errors.price || getFieldError('price')}
               fullWidth
+              onBlur={handleBlur}
             />
           </Grid>
 
@@ -342,8 +405,9 @@ const OrderForm = () => {
               type="date"
               value={form.sent_at}
               onChange={hndChange}
-              error={Boolean(getFieldError('sent_at'))}
-              helperText={getFieldError('sent_at')}
+              error={Boolean(errors.sent_at)}
+              helperText={errors.sent_at || getFieldError('sent_at')}
+              onBlur={handleBlur}
               fullWidth
             />
           </Grid>
@@ -357,9 +421,10 @@ const OrderForm = () => {
               value={form.delivered_at}
               type="date"
               onChange={hndChange}
-              error={Boolean(getFieldError('delivered_at'))}
-              helperText={getFieldError('delivered_at')}
+              error={Boolean(errors.delivered_at)}
+              helperText={errors.delivered_at || getFieldError('delivered_at')}
               fullWidth
+              onBlur={handleBlur}
             />
           </Grid>
 
@@ -378,8 +443,8 @@ const OrderForm = () => {
             <label className={'fs-4 my-1'}>Дефекты товаров</label>
             {productsForm.length===0?<Typography>В заказе отсутствуют дефекты</Typography>:<> {defectForm.map((defect, i) => (
               <Grid style={{ border:'1px solid lightgrey', borderRadius:'5px' }} padding={'5px'} fontSize={'15px'} display={'flex'} justifyContent={'space-between'} alignItems={'center'} key={defect.product._id + i}><Grid
-              >{defect.product.title} <Typography fontSize={'15px'} fontWeight={'bolder'}>aртикул: {defect.product.article}</Typography> <Typography fontSize={'15px'} fontWeight={'bolder'}> {defect.defect_description}</Typography>  {defect.amount} шт</Grid>
-              <Button type={'button'} onClick={() => {deleteDeffect(i)
+                style={{ textTransform:'capitalize' }} >{defect.product.title} <Typography fontSize={'15px'} fontWeight={'bolder'}>aртикул: {defect.product.article}</Typography> <Typography fontSize={'15px'} > {defect.defect_description}</Typography>  {defect.amount} шт</Grid>
+              <Button type={'button'} onClick={() => {deleteDefect(i)
               }}><DeleteIcon/>
               </Button>
               </Grid>
@@ -393,7 +458,7 @@ const OrderForm = () => {
                 <Button
                   type="button"
                   className={'btn d-block w-50 mx-auto text-center'}
-                  onClick={handleButtonDeffectClick}
+                  onClick={handleButtonDefectClick}
                 >
                   + Добавить дефекты
                 </Button>
@@ -419,26 +484,47 @@ const OrderForm = () => {
                 }}
                 getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={params => <TextField {...params} label="Товар" required={true}/>
+                renderInput={params => <TextField {...params} label="Товар"
+                  error={Boolean(errors.product)}
+                  helperText={errors.product || getFieldError('product')}
+                  onBlur={() => {
+                    if (!newFieldDefects.product) {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: 'Выберите товар',
+                      }))
+                    } else {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: '',
+                      }))
+                    }
+                  }}/>
                 }
               />
               <TextField
                 fullWidth
-                required={true}
                 size={'small'}
                 label="количество дефектного товара"
                 style={{ marginBottom: '10px' }}
                 type="number"
+                error={Boolean(errors.amount)}
+                name={'amount'}
+                helperText={errors.amount|| getFieldError('amount')}
+                onBlur={handleBlur}
                 value={newFieldDefects.amount}
                 onChange={e => setNewFieldDefects({ ...newFieldDefects, amount: Number(e.target.value) })}
               />
               <TextField
                 label="описание дефекта товара"
                 fullWidth
-                required={true}
                 size={'small'}
                 style={{ marginBottom: '10px' }}
                 type="text"
+                name={'defect_description'}
+                error={Boolean(errors.defect_description)}
+                helperText={errors.defect_description|| getFieldError('defect_description')}
+                onBlur={handleBlur}
                 value={newFieldDefects.defect_description}
                 onChange={e => setNewFieldDefects({ ...newFieldDefects, defect_description: e.target.value })}
               />

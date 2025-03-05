@@ -2,7 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import ClientForm from './features/clients/components/ClientForm.tsx'
 import { Container, Typography } from '@mui/material'
 import ProductForm from './features/products/components/ProductForm.tsx'
-import OrderForm from './features/clients/components/OrderForm.tsx'
+import OrderForm from './features/orders/components/OrderForm.tsx'
 
 const App = () => {
   return <>
