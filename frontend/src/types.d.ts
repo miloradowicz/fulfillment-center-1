@@ -103,3 +103,17 @@ export interface Order {
 
 export type OrderMutation = Omit<Order, '_id'>;
 
+export interface User {
+  _id: string;
+  email: string;
+  displayName: string;
+  role: 'super-admin' | 'admin' | 'manager' | 'stock-worker';
+  token: string;
+}
+
+export type UserMutation = Omit<User, '_id'>;
+
+export interface LoginMutation {
+  email: string;
+  password: string;
+}
