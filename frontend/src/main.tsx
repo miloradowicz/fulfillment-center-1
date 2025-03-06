@@ -6,6 +6,7 @@ import { CssBaseline } from '@mui/material'
 import { ToastContainer } from 'react-toastify'
 import { BrowserRouter } from 'react-router-dom'
 import { addCsrf } from './utils/axiosAPI.ts'
+import './index.css'
 
 addCsrf()
 
