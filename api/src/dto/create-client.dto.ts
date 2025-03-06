@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, Matches } from 'class-validator'
 
 export class CreateClientDto {
-  @IsNotEmpty({ message: 'Заполните имя клиента.' }) full_name: string
+  @IsNotEmpty({ message: 'Заполните имя клиента.' }) name: string
 
   @IsNotEmpty({ message: 'Заполните номер телефона клиента.' })
   @Matches(/^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/, {
@@ -18,7 +18,6 @@ export class CreateClientDto {
   @IsNotEmpty({ message: 'Заполните ИНН клиента.' }) inn: string
 
   @IsOptional() address: string
-  @IsOptional() company_name: string
   @IsOptional() banking_data: string
   @IsOptional() ogrn: string
 }

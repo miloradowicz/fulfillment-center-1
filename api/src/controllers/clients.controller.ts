@@ -48,12 +48,11 @@ export class ClientsController {
       throw new NotFoundException('Клиент не найден!')
     }
 
-    existingClient.full_name = clientDto.full_name || existingClient.full_name
+    existingClient.name = clientDto.name || existingClient.name
     existingClient.phone_number = clientDto.phone_number || existingClient.phone_number
     existingClient.email = clientDto.email || existingClient.email
     existingClient.inn = clientDto.inn || existingClient.inn
     existingClient.address = clientDto.address || existingClient.address
-    existingClient.company_name = clientDto.company_name || existingClient.company_name
     existingClient.banking_data = clientDto.banking_data || existingClient.banking_data
     existingClient.ogrn = clientDto.ogrn || existingClient.ogrn
 

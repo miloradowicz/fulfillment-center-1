@@ -15,14 +15,14 @@ export class SeederService {
   ) {}
   async seed() {
     await this.clientModel.deleteMany({})
+    await this.productModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
-      full_name: 'test',
+      name: 'CHAPSAN',
       phone_number: '1 123-456-7890',
       email: 'test@gmail.com',
       inn: '123123',
       address: 'Малдыбаева 7/1',
-      company_name: 'CHAPSAN',
       banking_data: '123123',
       ogrn: '123123',
     })

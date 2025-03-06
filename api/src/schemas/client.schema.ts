@@ -5,7 +5,7 @@ export type ClientDocument = Client & Document
 
 @Schema()
 export class Client {
-  @Prop({ required: true }) full_name: string
+  @Prop({ required: true, unique: true }) name: string
 
   @Prop({ required: true }) phone_number: string
 
@@ -14,8 +14,6 @@ export class Client {
   @Prop({ required: true }) inn: string
 
   @Prop({ default: null }) address: string
-
-  @Prop({ default: null }) company_name: string
 
   @Prop({ default: null }) banking_data: string
 
