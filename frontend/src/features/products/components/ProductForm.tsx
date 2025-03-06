@@ -164,7 +164,7 @@ const ProductForm = () => {
           >
             {clients?.map(client => (
               <MenuItem key={client._id} value={client._id}>
-                {client.full_name}
+                {client.name}
               </MenuItem>
             ))}
           </Select>
