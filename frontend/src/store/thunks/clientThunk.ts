@@ -14,7 +14,7 @@ export const fetchClients = createAsyncThunk<Client[]>(
 export const fetchClientById = createAsyncThunk<Client, string>(
   'clients/fetchClient',
   async (clientId: string) => {
-    const response = await axiosAPI.get(`/clients/?=${ clientId }`)
+    const response = await axiosAPI.get(`/clients/${ clientId }`)
     return response.data
   },
 )
@@ -34,7 +34,7 @@ export const addClient = createAsyncThunk<void, ClientMutation, { rejectValue: G
 export const deleteClient = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('clients/deleteClient', async (clientId: string, { rejectWithValue }) => {
   try {
-    await axiosAPI.delete(`/clients/?=${ clientId }`)
+    await axiosAPI.delete(`/clients/${ clientId }`)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)

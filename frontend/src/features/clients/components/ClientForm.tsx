@@ -1,10 +1,10 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { ClientMutation } from '../../../types'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClientError, selectLoadingAddClient } from '../../../store/slices/clientSlice.ts'
-import { addClient } from '../../../store/thunks/clientThunk.ts'
+import { selectClientError, selectLoadingAddClient, selectAllClients } from '../../../store/slices/clientSlice.ts'
+import { addClient, fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { toast } from 'react-toastify'
 
 const initialState: ClientMutation = {
@@ -25,28 +25,41 @@ const ClientForm = () => {
   const dispatch = useAppDispatch()
   const loading = useAppSelector(selectLoadingAddClient)
   const createError = useAppSelector(selectClientError)
-  const [errors, setErrors] = useState<{ email?: string; phone_number?: string }>({})
+  const clients = useAppSelector(selectAllClients)
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone_number?: string;
+    inn?: string;
+  }>({})
+
+  useEffect(() => {
+    dispatch(fetchClients())
+  }, [dispatch])
+
+
+  const validateFields = useCallback(() => {
+    const newErrors: typeof errors = {}
+
+    if (!form.name.trim()) newErrors.name = 'Поле не может быть пустым'
+    if (!form.phone_number.trim()) newErrors.phone_number = 'Поле не может быть пустым'
+    if (!form.email.trim()) newErrors.email = 'Поле не может быть пустым'
+    if (!form.inn.trim()) newErrors.inn = 'Поле не может быть пустым'
+
+    if (JSON.stringify(newErrors) !== JSON.stringify(errors)) {
+      setErrors(newErrors)
+    }
+  }, [form, errors])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!form.name.trim()) {
-      toast.warn('Поле "ФИО" должно быть заполнено!')
-      return
-    }
-
-    if (!form.phone_number.trim()) {
-      toast.warn('Поле "Номер телефона" должно быть заполнено!')
-      return
-    }
-
-    if (!form.email.trim()) {
-      toast.warn('Поле "Эл. почта" должно быть заполнено!')
-      return
-    }
-
-    if (!form.inn.trim()) {
-      toast.warn('Поле "ИНН" должно быть заполнено!')
+    if (Object.values(errors).some(error => error) ||
+      !form.name.trim() ||
+      !form.phone_number.trim() ||
+      !form.email.trim() ||
+      !form.inn.trim()) {
+      validateFields()
       return
     }
 
@@ -60,7 +73,9 @@ const ClientForm = () => {
     setForm(prevState => ({ ...prevState, [name]: value }))
 
     if (name === 'email') {
-      if (regEmail.test(value)) {
+      if (!value.trim()) {
+        setErrors(prevState => ({ ...prevState, email: 'Поле не может быть пустым' }))
+      } else if (regEmail.test(value)) {
         setErrors(prevState => ({ ...prevState, email: '' }))
       } else {
         setErrors(prevState => ({ ...prevState, email: 'Неправильный формат Email' }))
@@ -68,10 +83,37 @@ const ClientForm = () => {
     }
 
     if (name === 'phone_number') {
-      if (regPhoneNumber.test(value)) {
+      if (!value.trim()) {
+        setErrors(prevState => ({ ...prevState, phone_number: 'Поле не может быть пустым' }))
+      } else if (regPhoneNumber.test(value)) {
         setErrors(prevState => ({ ...prevState, phone_number: '' }))
       } else {
         setErrors(prevState => ({ ...prevState, phone_number: 'Неправильный формат номера телефона' }))
+      }
+    }
+
+    if (name === 'inn') {
+      if (!value.trim()) {
+        setErrors(prevState => ({ ...prevState, inn: 'Поле не может быть пустым' }))
+      } else {
+        setErrors(prevState => ({ ...prevState, inn: '' }))
+      }
+    }
+
+    if (name === 'name' && clients) {
+      if (!value.trim()) {
+        setErrors(prevState => ({ ...prevState, name: 'Поле не может быть пустым' }))
+      } else {
+        const trimmedValue = value.trim()
+        const nameExists = clients.some(client =>
+          client.name.toLowerCase() === trimmedValue.toLowerCase(),
+        )
+
+        if (nameExists) {
+          setErrors(prevState => ({ ...prevState, name: 'Клиент с таким именем уже существует' }))
+        } else {
+          setErrors(prevState => ({ ...prevState, name: '' }))
+        }
       }
     }
   }
@@ -80,6 +122,8 @@ const ClientForm = () => {
     try {
       if (fieldName === 'email' && errors.email) return errors.email
       if (fieldName === 'phone_number' && errors.phone_number) return errors.phone_number
+      if (fieldName === 'name' && errors.name) return errors.name
+      if (fieldName === 'inn' && errors.inn) return errors.inn
       return createError ? createError.message : undefined
     } catch {
       return undefined
@@ -95,9 +139,11 @@ const ClientForm = () => {
             <TextField
               id="name"
               name="name"
-              label="ФИО / Название комании "
+              label="ФИО / Название комании *"
               value={form.name}
               onChange={inputChangeHandler}
+              error={Boolean(getFieldError('name'))}
+              helperText={getFieldError('name')}
               fullWidth
               size='small'
             />
@@ -107,7 +153,7 @@ const ClientForm = () => {
             <TextField
               id="phone_number"
               name="phone_number"
-              label="Номер телефона"
+              label="Номер телефона *"
               value={form.phone_number}
               onChange={inputChangeHandler}
               error={Boolean(getFieldError('phone_number'))}
@@ -121,7 +167,7 @@ const ClientForm = () => {
             <TextField
               id="email"
               name="email"
-              label="Эл. почта"
+              label="Эл. почта *"
               value={form.email}
               onChange={inputChangeHandler}
               error={Boolean(getFieldError('email'))}
@@ -135,9 +181,11 @@ const ClientForm = () => {
             <TextField
               id="inn"
               name="inn"
-              label="ИНН"
+              label="ИНН *"
               value={form.inn}
               onChange={inputChangeHandler}
+              error={Boolean(getFieldError('inn'))}
+              helperText={getFieldError('inn')}
               fullWidth
               size='small'
             />
