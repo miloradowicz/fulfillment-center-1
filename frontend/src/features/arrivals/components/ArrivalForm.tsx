@@ -112,7 +112,10 @@ const ArrivalForm = () => {
   }
 
   const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
-    if (!product.product || product.amount === 0) return
+    if (!product.product || product.amount === 0) {
+      toast.warn('Заполните название и количество товара.')
+      return
+    }
 
     if (isReceivedProduct) {
       setReceivedForm(prev => {
@@ -145,7 +148,10 @@ const ArrivalForm = () => {
   }
 
   const addDefect = (defect: Defect) => {
-    if (!defect.product || !defect.defect_description || defect.amount === 0) return
+    if (!defect.product || !defect.defect_description || defect.amount === 0) {
+      toast.warn('Заполните название, количество и описание дефекта.')
+      return
+    }
 
     setDefectForm(prev => {
       const updatedDefects = [...prev, defect]
