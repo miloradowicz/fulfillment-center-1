@@ -273,7 +273,7 @@ const OrderForm = () => {
                         setCurrentClient(newValue._id)
                       }
                     }}
-                    getOptionLabel={option => option.full_name || ''}
+                    getOptionLabel={option => option.name || ''}
                     isOptionEqualToValue={(option, value) => option._id === value._id}
                     renderInput={params => (
                       <TextField

@@ -275,7 +275,7 @@ const ArrivalForm = () => {
 
   const autoCompleteClients =
     clients?.map(client => ({
-      label: client.full_name,
+      label: client.name,
       id: client._id,
     })) || []
 
