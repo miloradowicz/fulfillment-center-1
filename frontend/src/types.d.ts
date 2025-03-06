@@ -101,5 +101,12 @@ export interface Order {
   defects?: Defect[];
 }
 
+export interface User {
+  _id: string;
+  username: string;
+  token: string;
+  role: string;
+}
+
 export type OrderMutation = Omit<Order, '_id'>;
 
