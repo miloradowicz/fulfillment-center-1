@@ -3,6 +3,7 @@ import { clientReducer } from '../store/slices/clientSlice.ts'
 import { productReducer } from '../store/slices/productSlice.ts'
 import { arrivalReducer } from '../store/slices/arrivalSlice.ts'
 import { orderReducer } from '../store/slices/orderSlice.ts'
+import { userReducer } from '../store/slices/userSlice.ts'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     products: productReducer,
     arrivals: arrivalReducer,
     orders: orderReducer,
+    users: userReducer,
   },
 })
 

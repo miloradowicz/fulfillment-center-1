@@ -29,14 +29,21 @@ export class Product {
       value: string
     },
   ]
-  @Prop()
-  logs: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId; ref: 'User' }
-      change: string
-      date: { type: Date }
-    },
-  ]
+  @Prop({
+    type: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        change: { type: String, required: true },
+        date: { type: Date, required: true, default: Date.now },
+      },
+    ],
+    default: [],
+  })
+  logs: {
+    user: mongoose.Schema.Types.ObjectId
+    change: string
+    date: Date
+  }[]
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product)
