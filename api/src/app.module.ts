@@ -6,9 +6,11 @@ import { ArrivalsModule } from './modules/arrivals.module'
 import { OrdersModule } from './modules/orders.module'
 import { CsrfModule } from './modules/csrf.module'
 import { UsersModule } from './modules/users.module'
+import { LogsModule } from './modules/logs.module'
 
 @Module({
-  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, UsersModule],
+  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, UsersModule, LogsModule],
   controllers: [],
+  providers: [],
 })
 export class AppModule {}
