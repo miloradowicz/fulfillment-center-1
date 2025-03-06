@@ -8,12 +8,11 @@ import { addClient } from '../../../store/thunks/clientThunk.ts'
 import { toast } from 'react-toastify'
 
 const initialState: ClientMutation = {
-  full_name: '',
+  name: '',
   phone_number: '',
   email: '',
   inn: '',
   address: '',
-  company_name: '',
   banking_data: '',
   ogrn: '',
 }
@@ -31,7 +30,7 @@ const ClientForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!form.full_name.trim()) {
+    if (!form.name.trim()) {
       toast.warn('Поле "ФИО" должно быть заполнено!')
       return
     }
@@ -94,12 +93,13 @@ const ClientForm = () => {
         <Grid container direction="column" spacing={2}>
           <Grid>
             <TextField
-              id="full_name"
-              name="full_name"
-              label="ФИО"
-              value={form.full_name}
+              id="name"
+              name="name"
+              label="ФИО / Название комании "
+              value={form.name}
               onChange={inputChangeHandler}
               fullWidth
+              size='small'
             />
           </Grid>
 
@@ -113,6 +113,7 @@ const ClientForm = () => {
               error={Boolean(getFieldError('phone_number'))}
               helperText={getFieldError('phone_number')}
               fullWidth
+              size='small'
             />
           </Grid>
 
@@ -126,6 +127,7 @@ const ClientForm = () => {
               error={Boolean(getFieldError('email'))}
               helperText={getFieldError('email')}
               fullWidth
+              size='small'
             />
           </Grid>
 
@@ -137,6 +139,7 @@ const ClientForm = () => {
               value={form.inn}
               onChange={inputChangeHandler}
               fullWidth
+              size='small'
             />
           </Grid>
 
@@ -148,17 +151,7 @@ const ClientForm = () => {
               value={form.address}
               onChange={inputChangeHandler}
               fullWidth
-            />
-          </Grid>
-
-          <Grid>
-            <TextField
-              id="company_name"
-              name="company_name"
-              label="Название компании"
-              value={form.company_name}
-              onChange={inputChangeHandler}
-              fullWidth
+              size='small'
             />
           </Grid>
 
@@ -170,6 +163,7 @@ const ClientForm = () => {
               value={form.banking_data}
               onChange={inputChangeHandler}
               fullWidth
+              size='small'
             />
           </Grid>
 
@@ -181,6 +175,7 @@ const ClientForm = () => {
               value={form.ogrn}
               onChange={inputChangeHandler}
               fullWidth
+              size='small'
             />
           </Grid>
 
