@@ -12,6 +12,7 @@ import ProductPage from './features/products/containers/ProductPage.tsx'
 import OrderPage from './features/orders/containers/OrderPage.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
+import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 
 
 
@@ -33,7 +34,10 @@ const App = () => {
           <Route path='/add-new-client' element={<ClientForm />} />
           <Route path='/add-new-product' element={<ProductForm />} />
           <Route path='/add-new-order' element={<OrderForm />} />
+          <Route path='/add-new-order' element={<OrderForm />} />
           <Route path='/add-new-arrival' element={<ArrivalForm/>}/>
+          <Route path='/add-new-order' element={<OrderForm />} />
+          <Route path='/add-new-user' element={<RegistrationForm/>} />
           <Route path="/*" element={<Typography variant={'h3'} textAlign="center">Not Found</Typography>}/>
         </Routes>
       </Layout>

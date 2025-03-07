@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { registerUser, loginUser, fetchUsers, fetchUserById, updateUser, deleteUser } from '../thunks/userThunk.ts'
 import { User, ValidationError, GlobalError } from '../../types'
@@ -40,7 +40,19 @@ export const selectCreateError = (state: RootState) => state.users.createError
 const userSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCreateError: (state, { payload }: PayloadAction<string | undefined>) => {
+      if (state.createError && payload) {
+        delete state.createError.errors[payload]
+
+        if (!Object.keys(state.createError.errors).length) {
+          state.createError = null
+        }
+      } else {
+        state.error = null
+      }
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchUsers.pending, state => {
       state.loadingFetch = true
@@ -106,5 +118,7 @@ const userSlice = createSlice({
     })
   },
 })
+
+export const { clearCreateError } = userSlice.actions
 
 export const userReducer = userSlice.reducer
