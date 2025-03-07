@@ -1,7 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional, Matches, MinLength } from 'class-validator'
+import { IsEnum, IsNotEmpty, Matches, MinLength } from 'class-validator'
+import { MongoDocumentExists } from 'src/validators/mongo-document-exists'
+import { User } from 'src/schemas/user.schema'
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Заполните поле эл. почту.' })
+  @MongoDocumentExists(User, 'email', { message: 'Пользователь с такой электронной почтой уже существует' }, true)
   @Matches(/^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/, {
     message: 'Неверный формат эл. почты',
   })
@@ -10,9 +13,6 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Заполните эл. почту.' })
   @MinLength(6, { message: 'Минимальная длина пароля 6 символов' })
   password: string
-
-  @IsOptional()
-  confirmPassword: string
 
   @IsNotEmpty({ message: 'Заполните поле отображаемое имя.' })
   displayName: string

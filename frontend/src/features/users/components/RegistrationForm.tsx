@@ -37,14 +37,18 @@ const RegistrationForm = () => {
       return void validateField('role')
     } else {
       try {
+        setForm(data => ({ ...data, displayName: data.displayName.trim() }))
         await dispatch(registerUser(form)).unwrap()
+
         setForm(initialState)
+        setConfirmPassword('')
+        dispatch(clearCreateError())
+        setFrontendError({})
         toast.success('Пользователь успешно создан!')
-      } catch (e) {
+      } catch {
         toast.error('Пользователь не создан')
       }
     }
-
   }
 
   const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,7 +61,15 @@ const RegistrationForm = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<unknown>) => {
     dispatch(clearCreateError(e.target.name))
-    setForm(data => ({ ...data, [e.target.name]: e.target.value }))
+
+    let value = e.target.value as string
+
+    if (e.target.name !== 'displayName')
+    {
+      value = value.trim()
+    }
+
+    setForm(data => ({ ...data, [e.target.name]: value }))
   }
 
   const validateField = (fieldName: string) => {
@@ -68,7 +80,7 @@ const RegistrationForm = () => {
     switch (fieldName) {
     case 'email':
       if(!emailRegex.test(form.email)) {
-        setFrontendError(error => ({ ...error, [fieldName]: 'Недействительный имейл' }))
+        setFrontendError(error => ({ ...error, [fieldName]: 'Недействительная почта' }))
       }
       break
 
@@ -100,8 +112,8 @@ const RegistrationForm = () => {
         <Typography variant="h4" sx={{ mb: 2 }}>
           Добавить нового пользователя
         </Typography>
-        <Grid container direction="column" spacing={2}>
-          <Grid>
+        <Grid container spacing={2}>
+          <Grid size={12}>
             <TextField
               required
               fullWidth
@@ -117,7 +129,22 @@ const RegistrationForm = () => {
             />
           </Grid>
 
-          <Grid>
+          <Grid size={12}>
+            <TextField
+              required
+              fullWidth
+              size="small"
+              id="displayName"
+              name="displayName"
+              label="Отображаемое имя"
+              value={form.displayName}
+              onChange={handleChange}
+              error={!!getFieldError('displayName')}
+              helperText={getFieldError('displayName')}
+            />
+          </Grid>
+
+          <Grid size={6}>
             <TextField
               required
               fullWidth
@@ -134,7 +161,7 @@ const RegistrationForm = () => {
             />
           </Grid>
 
-          <Grid>
+          <Grid size={6}>
             <TextField
               required
               fullWidth
@@ -151,22 +178,7 @@ const RegistrationForm = () => {
             />
           </Grid>
 
-          <Grid>
-            <TextField
-              required
-              fullWidth
-              size="small"
-              id="displayName"
-              name="displayName"
-              label="Отображаемое имя"
-              value={form.displayName}
-              onChange={handleChange}
-              error={!!getFieldError('displayName')}
-              helperText={getFieldError('displayName')}
-            />
-          </Grid>
-
-          <Grid>
+          <Grid size={12}>
             <SelectField
               required
               fullWidth
@@ -174,7 +186,7 @@ const RegistrationForm = () => {
               id="role"
               name="role"
               label="Роль"
-              defaultValue='default'
+              defaultValue="default"
               value={form.role}
               onChange={handleChange}
               error={!!getFieldError('role')}
@@ -189,13 +201,14 @@ const RegistrationForm = () => {
             </SelectField>
           </Grid>
 
-          <Grid>
+          <Grid size={12}>
             <Button
               type="submit"
               loading={sending}
+              variant="outlined"
               disabled={!!backendError && !!Object.keys(backendError.errors).length}
             >
-              Создать клиента
+              Создать пользователя
             </Button>
           </Grid>
         </Grid>

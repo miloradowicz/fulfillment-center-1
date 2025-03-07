@@ -9,9 +9,11 @@ import { CastErrorFilter } from './exception-filters/mongo-cast-error.filter'
 import * as express from 'express'
 import * as cookieParser from 'cookie-parser'
 import * as csurf from 'csurf'
+import { useContainer } from 'class-validator'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  useContainer(app.select(AppModule), { fallbackOnErrors: true })
   app.use(cookieParser())
   app.use(
     csurf({
