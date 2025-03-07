@@ -23,4 +23,3 @@ export class CreateUserDto {
   })
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
 }
-
