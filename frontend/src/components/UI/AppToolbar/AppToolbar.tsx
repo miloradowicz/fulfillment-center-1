@@ -20,6 +20,8 @@ const AppToolbar = () => {
     username: 'Мария',
     token: '77ba6207-7a6f-40fb-bf5a-e66b2203b07c',
     role: 'user',
+    email:'sdg@mail.ru',
+    displayName:'Мария',
   }
   // const user = null
   return (
@@ -29,7 +31,7 @@ const AppToolbar = () => {
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link to="/">
-              Fullfillment
+              <img src={'logo.jpeg'} alt="logo" style={{  height: '43px', borderRadius:'7px' }} />
             </Link>
           </Typography>
           {user ? <UserMenu user={user} /> : null}
