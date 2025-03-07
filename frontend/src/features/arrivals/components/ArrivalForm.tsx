@@ -9,7 +9,6 @@ import { selectCreateError, selectLoadingAddArrival } from '../../../store/slice
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import Autocomplete from '@mui/material/Autocomplete'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
@@ -71,7 +70,6 @@ const ArrivalForm = () => {
   const [defectModalOpen, setDefectModalOpen] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
@@ -260,7 +258,6 @@ const ArrivalForm = () => {
         setProductsForm([])
         setReceivedForm([])
         setDefectForm([])
-        navigate('/')
         toast.success('Поставка успешно создана!')
       } catch (e) {
         console.error(e)
@@ -281,351 +278,353 @@ const ArrivalForm = () => {
 
   return (
     <form onSubmit={submitFormHandler} style={{ marginTop: '3rem' }}>
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
-          <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
-            Добавить новую поставку
-          </Typography>
+      <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
+        {isLoading ?
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid> : null
+        }
 
+        <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
+            Добавить новую поставку
+        </Typography>
+
+        <Grid>
+          <Autocomplete
+            id="client"
+            value={autoCompleteClients.find(option => option.id === form.client) || null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, client: newValue?.id || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={autoCompleteClients}
+            sx={{ width: '100%' }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Клиент"
+                error={Boolean(errors.client)}
+                helperText={errors.client || getFieldError('client')}
+                onBlur={() => {
+                  if (!form.client) {
+                    setErrors(prevErrors => ({
+                      ...prevErrors,
+                      client: 'Выберите клиента',
+                    }))
+                  } else {
+                    setErrors(prevErrors => ({
+                      ...prevErrors,
+                      client: '',
+                    }))
+                  }
+                }}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid>
+          <Typography fontWeight="bold">Товары</Typography>
+          {renderProductsList(productsForm, i => deleteProduct(i, setProductsForm))}
+          <Button type="button" onClick={() => setModalOpen(true)}>
+              + Добавить товары
+          </Button>
+        </Grid>
+
+        {modalOpen && (
           <Grid>
+            <Typography sx={{ marginBottom: '15px' }}>Укажите товары</Typography>
             <Autocomplete
-              id="client"
-              value={autoCompleteClients.find(option => option.id === form.client) || null}
-              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, client: newValue?.id || '' }))}
-              size="small"
               fullWidth
+              size="small"
               disablePortal
-              options={autoCompleteClients}
-              sx={{ width: '100%' }}
-              renderInput={params => (
+              options={products ?? []}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setNewProduct(prev => ({ ...prev, product: newValue._id }))
+                }
+              }}
+              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
+              isOptionEqualToValue={(option, value) => option._id === value._id}
+              renderInput={params =>
                 <TextField
                   {...params}
-                  label="Клиент"
-                  error={Boolean(errors.client)}
-                  helperText={errors.client || getFieldError('client')}
+                  label="Товар"
+                  error={Boolean(errors.product)}
+                  helperText={errors.product || getFieldError('product')}
                   onBlur={() => {
-                    if (!form.client) {
+                    if (!newProduct.product) {
                       setErrors(prevErrors => ({
                         ...prevErrors,
-                        client: 'Выберите клиента',
+                        product: 'Выберите товар',
                       }))
                     } else {
                       setErrors(prevErrors => ({
                         ...prevErrors,
-                        client: '',
+                        product: '',
                       }))
                     }
                   }}
-                />
-              )}
+                />}
+              sx={{ marginBottom: '15px' }}
             />
-          </Grid>
 
-          <Grid>
-            <Typography fontWeight="bold">Товары</Typography>
-            {renderProductsList(productsForm, i => deleteProduct(i, setProductsForm))}
-            <Button type="button" onClick={() => setModalOpen(true)}>
-              + Добавить товары
-            </Button>
-          </Grid>
-
-          {modalOpen && (
-            <Grid>
-              <Typography sx={{ marginBottom: '15px' }}>Укажите товары</Typography>
-              <Autocomplete
-                fullWidth
-                size="small"
-                disablePortal
-                options={products ?? []}
-                onChange={(_, newValue) => {
-                  if (newValue) {
-                    setNewProduct(prev => ({ ...prev, product: newValue._id }))
-                  }
-                }}
-                getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
-                isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={params =>
-                  <TextField
-                    {...params}
-                    label="Товар"
-                    error={Boolean(errors.product)}
-                    helperText={errors.product || getFieldError('product')}
-                    onBlur={() => {
-                      if (!newProduct.product) {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: 'Выберите товар',
-                        }))
-                      } else {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: '',
-                        }))
-                      }
-                    }}
-                  />}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                type="number"
-                fullWidth
-                size="small"
-                name="amount"
-                label="Количество товара"
-                value={newProduct.amount}
-                onChange={e => setNewProduct(prev => ({ ...prev, amount: +e.target.value }))}
-                error={Boolean(errors.amount)}
-                helperText={errors.amount || getFieldError('amount')}
-                onBlur={handleBlur}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                label="Описание товара"
-                fullWidth
-                size="small"
-                name="description"
-                value={newProduct.description}
-                onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <Grid container spacing={2}>
-                <Button type="button" variant="outlined" onClick={() => addProduct(newProduct, false)}>
-                  Добавить
-                </Button>
-
-                <Button type="button" variant="outlined" onClick={() => setModalOpen(false)}>
-                  Закрыть
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-
-          <Grid>
-            <Divider sx={{ width: '100%', marginBottom: '15px' }} />
-            <Typography fontWeight="bold">Полученные товары</Typography>
-            {renderProductsList(receivedForm, i => deleteProduct(i, setReceivedForm))}
-            <Button type="button" onClick={() => setReceivedModalOpen(true)}>
-              + Добавить полученные товары
-            </Button>
-          </Grid>
-
-          {receivedModalOpen && (
-            <Grid>
-              <Typography sx={{ marginBottom: '15px' }}>Укажите полученные товары</Typography>
-              <Autocomplete
-                fullWidth
-                size="small"
-                disablePortal
-                options={products ?? []}
-                onChange={(_, newValue) => {
-                  if (newValue) {
-                    setNewReceived(prev => ({ ...prev, product: newValue._id }))
-                  }
-                }}
-                getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
-                isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={params =>
-                  <TextField
-                    {...params}
-                    label="Товар"
-                    error={Boolean(errors.product)}
-                    helperText={errors.product || getFieldError('product')}
-                    onBlur={() => {
-                      if (!newReceived.product) {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: 'Выберите товар',
-                        }))
-                      } else {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: '',
-                        }))
-                      }
-                    }}
-                  />}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                type="number"
-                fullWidth
-                size="small"
-                name="amount"
-                label="Количество товара"
-                value={newReceived.amount}
-                onChange={e => setNewReceived(prev => ({ ...prev, amount: +e.target.value }))}
-                error={Boolean(errors.amount)}
-                helperText={errors.amount || getFieldError('amount')}
-                onBlur={handleBlur}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                label="Описание товара"
-                fullWidth
-                size="small"
-                name="description"
-                value={newReceived.description}
-                onChange={e => setNewReceived(prev => ({ ...prev, description: e.target.value }))}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <Button type="button" onClick={() => addProduct(newReceived, true)}>
-                Добавить
-              </Button>
-
-              <Button type="button" onClick={() => setReceivedModalOpen(false)}>
-                Закрыть
-              </Button>
-            </Grid>
-          )}
-
-          <Grid>
-            <Divider sx={{ width: '100%', marginBottom: '15px' }} />
-            <Typography fontWeight="bold">Дефекты</Typography>
-            {renderDefectsList(defectForm, i => deleteDefect(i, setDefectForm))}
-            <Button type="button" onClick={() => setDefectModalOpen(true)}>
-              + Добавить дефекты
-            </Button>
-          </Grid>
-
-          {defectModalOpen && (
-            <Grid>
-              <Typography sx={{ marginBottom: '15px' }}>Укажите дефекты</Typography>
-              <Autocomplete
-                fullWidth
-                size="small"
-                disablePortal
-                options={products ?? []}
-                onChange={(_, newValue) => {
-                  if (newValue) {
-                    setNewDefect(prev => ({ ...prev, product: newValue._id }))
-                  }
-                }}
-                getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
-                isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={params =>
-                  <TextField
-                    {...params}
-                    label="Товар"
-                    error={Boolean(errors.product)}
-                    helperText={errors.product || getFieldError('product')}
-                    onBlur={() => {
-                      if (!newDefect.product) {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: 'Выберите товар',
-                        }))
-                      } else {
-                        setErrors(prevErrors => ({
-                          ...prevErrors,
-                          product: '',
-                        }))
-                      }
-                    }}
-                  />}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                type="number"
-                fullWidth
-                size="small"
-                label="Количество дефектного товара"
-                name="amount"
-                value={newDefect.amount}
-                onChange={e => setNewDefect(prev => ({ ...prev, amount: +e.target.value }))}
-                error={Boolean(errors.amount)}
-                helperText={errors.amount || getFieldError('amount')}
-                onBlur={handleBlur}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <TextField
-                label="Описание дефекта"
-                fullWidth
-                size="small"
-                name="defect_description"
-                value={newDefect.defect_description}
-                onChange={e => setNewDefect(prev => ({ ...prev, defect_description: e.target.value }))}
-                error={Boolean(errors.defect_description)}
-                helperText={errors.defect_description || getFieldError('defect_description')}
-                onBlur={handleBlur}
-                sx={{ marginBottom: '15px' }}
-              />
-
-              <Button type="button" onClick={() => addDefect(newDefect)}>
-                Добавить
-              </Button>
-
-              <Button type="button" onClick={() => setDefectModalOpen(false)}>
-                Закрыть
-              </Button>
-            </Grid>
-          )}
-
-          <Grid>
             <TextField
               type="number"
-              id="arrival_price"
-              name="arrival_price"
-              label="Цена доставки"
-              value={form.arrival_price}
-              onChange={inputChangeHandler}
+              fullWidth
               size="small"
-              error={Boolean(errors.arrival_price)}
-              helperText={errors.arrival_price || getFieldError('arrival_price')}
+              name="amount"
+              label="Количество товара"
+              value={newProduct.amount}
+              onChange={e => setNewProduct(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount)}
+              helperText={errors.amount || getFieldError('amount')}
               onBlur={handleBlur}
-              fullWidth
+              sx={{ marginBottom: '15px' }}
             />
-          </Grid>
 
-          <Grid>
-            <InputLabel htmlFor="arrival_date" style={{ fontSize: '15px', marginLeft: '12px' }}>
-              Дата прибытия
-            </InputLabel>
             <TextField
-              id="arrival_date"
-              name="arrival_date"
-              size={'small'}
-              type="date"
-              value={form.arrival_date}
-              onChange={inputChangeHandler}
-              error={Boolean(errors.arrival_date)}
-              helperText={errors.arrival_date || getFieldError('arrival_date')}
-              onBlur={handleBlur}
+              label="Описание товара"
               fullWidth
-            />
-          </Grid>
-
-          <Grid>
-            <TextField
-              id="sent_amount"
-              name="sent_amount"
-              label="Количество отправленного товара (шт/мешков/коробов)"
-              value={form.sent_amount}
-              onChange={inputChangeHandler}
               size="small"
-              error={Boolean(errors.sent_amount)}
-              helperText={errors.sent_amount || getFieldError('sent_amount')}
-              onBlur={handleBlur}
-              fullWidth
+              name="description"
+              value={newProduct.description}
+              onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
+              sx={{ marginBottom: '15px' }}
             />
-          </Grid>
 
+            <Grid container spacing={2}>
+              <Button type="button" variant="outlined" onClick={() => addProduct(newProduct, false)}>
+                  Добавить
+              </Button>
+
+              <Button type="button" variant="outlined" onClick={() => setModalOpen(false)}>
+                  Закрыть
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+
+        <Grid>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
+          <Typography fontWeight="bold">Полученные товары</Typography>
+          {renderProductsList(receivedForm, i => deleteProduct(i, setReceivedForm))}
+          <Button type="button" onClick={() => setReceivedModalOpen(true)}>
+              + Добавить полученные товары
+          </Button>
+        </Grid>
+
+        {receivedModalOpen && (
           <Grid>
-            <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Создать поставку
+            <Typography sx={{ marginBottom: '15px' }}>Укажите полученные товары</Typography>
+            <Autocomplete
+              fullWidth
+              size="small"
+              disablePortal
+              options={products ?? []}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setNewReceived(prev => ({ ...prev, product: newValue._id }))
+                }
+              }}
+              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              isOptionEqualToValue={(option, value) => option._id === value._id}
+              renderInput={params =>
+                <TextField
+                  {...params}
+                  label="Товар"
+                  error={Boolean(errors.product)}
+                  helperText={errors.product || getFieldError('product')}
+                  onBlur={() => {
+                    if (!newReceived.product) {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: 'Выберите товар',
+                      }))
+                    } else {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: '',
+                      }))
+                    }
+                  }}
+                />}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              type="number"
+              fullWidth
+              size="small"
+              name="amount"
+              label="Количество товара"
+              value={newReceived.amount}
+              onChange={e => setNewReceived(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount)}
+              helperText={errors.amount || getFieldError('amount')}
+              onBlur={handleBlur}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              label="Описание товара"
+              fullWidth
+              size="small"
+              name="description"
+              value={newReceived.description}
+              onChange={e => setNewReceived(prev => ({ ...prev, description: e.target.value }))}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <Button type="button" onClick={() => addProduct(newReceived, true)}>
+                Добавить
+            </Button>
+
+            <Button type="button" onClick={() => setReceivedModalOpen(false)}>
+                Закрыть
             </Button>
           </Grid>
+        )}
+
+        <Grid>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
+          <Typography fontWeight="bold">Дефекты</Typography>
+          {renderDefectsList(defectForm, i => deleteDefect(i, setDefectForm))}
+          <Button type="button" onClick={() => setDefectModalOpen(true)}>
+              + Добавить дефекты
+          </Button>
         </Grid>
-      )}
+
+        {defectModalOpen && (
+          <Grid>
+            <Typography sx={{ marginBottom: '15px' }}>Укажите дефекты</Typography>
+            <Autocomplete
+              fullWidth
+              size="small"
+              disablePortal
+              options={products ?? []}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setNewDefect(prev => ({ ...prev, product: newValue._id }))
+                }
+              }}
+              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              isOptionEqualToValue={(option, value) => option._id === value._id}
+              renderInput={params =>
+                <TextField
+                  {...params}
+                  label="Товар"
+                  error={Boolean(errors.product)}
+                  helperText={errors.product || getFieldError('product')}
+                  onBlur={() => {
+                    if (!newDefect.product) {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: 'Выберите товар',
+                      }))
+                    } else {
+                      setErrors(prevErrors => ({
+                        ...prevErrors,
+                        product: '',
+                      }))
+                    }
+                  }}
+                />}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              type="number"
+              fullWidth
+              size="small"
+              label="Количество дефектного товара"
+              name="amount"
+              value={newDefect.amount}
+              onChange={e => setNewDefect(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount)}
+              helperText={errors.amount || getFieldError('amount')}
+              onBlur={handleBlur}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              label="Описание дефекта"
+              fullWidth
+              size="small"
+              name="defect_description"
+              value={newDefect.defect_description}
+              onChange={e => setNewDefect(prev => ({ ...prev, defect_description: e.target.value }))}
+              error={Boolean(errors.defect_description)}
+              helperText={errors.defect_description || getFieldError('defect_description')}
+              onBlur={handleBlur}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <Button type="button" onClick={() => addDefect(newDefect)}>
+                Добавить
+            </Button>
+
+            <Button type="button" onClick={() => setDefectModalOpen(false)}>
+                Закрыть
+            </Button>
+          </Grid>
+        )}
+
+        <Grid>
+          <TextField
+            type="number"
+            id="arrival_price"
+            name="arrival_price"
+            label="Цена доставки"
+            value={form.arrival_price}
+            onChange={inputChangeHandler}
+            size="small"
+            error={Boolean(errors.arrival_price)}
+            helperText={errors.arrival_price || getFieldError('arrival_price')}
+            onBlur={handleBlur}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <InputLabel htmlFor="arrival_date" style={{ fontSize: '15px', marginLeft: '12px' }}>
+              Дата прибытия
+          </InputLabel>
+          <TextField
+            id="arrival_date"
+            name="arrival_date"
+            size={'small'}
+            type="date"
+            value={form.arrival_date}
+            onChange={inputChangeHandler}
+            error={Boolean(errors.arrival_date)}
+            helperText={errors.arrival_date || getFieldError('arrival_date')}
+            onBlur={handleBlur}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <TextField
+            id="sent_amount"
+            name="sent_amount"
+            label="Количество отправленного товара (шт/мешков/коробов)"
+            value={form.sent_amount}
+            onChange={inputChangeHandler}
+            size="small"
+            error={Boolean(errors.sent_amount)}
+            helperText={errors.sent_amount || getFieldError('sent_amount')}
+            onBlur={handleBlur}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
+            {isLoading ?  <CircularProgress size={24} color="inherit" /> : 'Создать поставку'}
+          </Button>
+        </Grid>
+      </Grid>
     </form>
   )
 }
