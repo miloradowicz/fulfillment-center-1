@@ -1,10 +1,22 @@
-import { Box }  from '@mui/material'
+import { Box, Button } from '@mui/material'
+import { NavLink } from 'react-router-dom'
 
 
 const ProductPage = () => {
   return (
-    <Box style={{ textAlign:'center', marginTop:'30px', fontSize:'20px' }}>
-      <>Товары</>
+    <Box display={'flex'}  style={{ textAlign:'center', marginTop:'30px', fontSize:'20px', alignItems: 'center', justifyContent:'space-around' }}>
+      <Box>Товары</Box>
+      <Button
+        sx={{
+          color: '#32363F',
+          borderColor: '#32363F',
+          backgroundColor: 'white',
+          '&:hover': {
+            backgroundColor: '#f8f9fa',
+            borderColor: '#5a6268',
+          },
+        }}
+        variant="outlined"  component={NavLink} to={'/add-new-product'}>Добавить товар</Button>
     </Box>
   )
 }
