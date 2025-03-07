@@ -42,7 +42,10 @@ export interface Log {
 
 export interface Product {
   _id: string
-  client: string
+  client: {
+    _id: string,
+    name: string
+  }
   title: string
   amount: number
   barcode: string

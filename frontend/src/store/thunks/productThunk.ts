@@ -44,7 +44,7 @@ export const addProduct = createAsyncThunk<void, ProductMutation, { rejectValue:
 export const deleteProduct = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('products/deleteProduct', async (productId: string, { rejectWithValue }) => {
   try {
-    await axiosAPI.delete(`/products/?=${ productId }`)
+    await axiosAPI.delete(`/products/${ productId }`)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)
