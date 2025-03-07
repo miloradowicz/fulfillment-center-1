@@ -16,6 +16,7 @@ export interface GlobalError {
 }
 
 export interface ValidationError {
+  type: string;
   errors: {
     [key: string]: {
       name: string;
