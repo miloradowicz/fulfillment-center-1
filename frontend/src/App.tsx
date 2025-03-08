@@ -13,6 +13,7 @@ import OrderPage from './features/orders/containers/OrderPage.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
+import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 
 
 
@@ -26,6 +27,7 @@ const App = () => {
           <Route path='/' element={<LoginPage/>} />
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/clients' element={<ClientPage/>} />
+          <Route path='/clients/:clientId' element={<ClientDetail/>} />
           <Route path='/arrivals' element={<ArrivalPage/>} />
           <Route path='/products' element={<ProductPage/>} />
           <Route path='/orders' element={<OrderPage/>} />
