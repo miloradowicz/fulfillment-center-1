@@ -65,8 +65,12 @@ export const useClientForm = () => {
     toast.success('Клиент успешно создан!')
   }
 
-  const getFieldError = (fieldName: keyof ClientMutation) =>
-    errors[fieldName] || createError?.message
+  const getFieldError = (fieldName: keyof ClientMutation) => {
+    const fieldErrors = errors[fieldName] ? [errors[fieldName]] : []
+    if (createError?.message) fieldErrors.push(createError.message)
+
+    return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
+  }
 
   return { form, errors, loading, inputChangeHandler, onSubmit, getFieldError }
 }
