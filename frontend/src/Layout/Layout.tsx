@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import AppToolbar from '../AppToolbar/AppToolbar.tsx'
+import AppToolbar from '../components/UI/AppToolbar/AppToolbar.tsx'
 import { Container, CssBaseline } from '@mui/material'
 
 

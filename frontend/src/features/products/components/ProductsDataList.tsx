@@ -3,17 +3,20 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, IconButton, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { deleteProduct, fetchProducts } from '../../../store/thunks/productThunk.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
-import { Product } from '../../../types'
+import { deleteProduct, fetchProductsWithPopulate } from '../../../store/thunks/productThunk.ts'
+import { selectProductsWithPopulate } from '../../../store/slices/productSlice.ts'
+import { ProductWithPopulate } from '../../../types'
 import EditIcon from '@mui/icons-material/Edit'
+import { ruRU } from '@mui/x-data-grid/locales'
+import { NavLink } from 'react-router-dom'
 
 const ProductsDataList = () => {
   const dispatch = useAppDispatch()
 
   const fetchAllProducts = useCallback(() => {
-    dispatch(fetchProducts())
+    dispatch(fetchProductsWithPopulate())
   }, [dispatch])
+
 
   useEffect(() => {
     void fetchAllProducts()
@@ -25,8 +28,8 @@ const ProductsDataList = () => {
     void fetchAllProducts()
   }
 
-  const products = useAppSelector(selectAllProducts)
-  const columns: GridColDef<Product>[] = [
+  const products = useAppSelector(selectProductsWithPopulate)
+  const columns: GridColDef<ProductWithPopulate>[] = [
     {
       field: 'title',
       headerName: 'Название',
@@ -40,7 +43,7 @@ const ProductsDataList = () => {
       flex: 1,
       editable: false,
       filterable: true,
-      valueGetter: (_value: string, row: Product) => row.client.name,
+      valueGetter: (_value: string, row: ProductWithPopulate) => row.client.name,
     },
     {
       field: 'article',
@@ -68,7 +71,7 @@ const ProductsDataList = () => {
       field: 'Actions',
       headerName: '',
       type: 'number',
-      width: 100,
+      width: 210,
       sortable: false,
       editable: false,
       filterable: false,
@@ -80,17 +83,23 @@ const ProductsDataList = () => {
           <IconButton onClick={() => deleteOneProduct(row._id)}>
             <ClearIcon />
           </IconButton>
+          <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
+            to={`/products/${ row._id }`}
+          >
+              Подробнее
+          </NavLink>
         </>
       ),
     },
   ]
   return (
-    <Box sx={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+    <Box className="max-w-[1000px] mx-auto w-full">
       {products ? (
         <DataGrid
           getRowId={row => row._id}
           rows={products}
           columns={columns}
+          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
             pagination: {
               paginationModel: {
@@ -102,8 +111,7 @@ const ProductsDataList = () => {
           checkboxSelection
           disableRowSelectionOnClick
         />
-      ) : <Typography textAlign={'center'}
-        marginTop={'20px'}>Товаров нет</Typography>}
+      ) : <Typography className="text-center mt-5">Товаров нет</Typography>}
     </Box>
   )
 }

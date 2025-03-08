@@ -23,8 +23,12 @@ export class ProductsService {
     return (await this.productModel.find({ client: clientId })).reverse()
   }
 
-  async getAll() {
+  async getAllWithPopulate() {
     return (await this.productModel.find().populate('client', 'name')).reverse()
+  }
+
+  async getAll() {
+    return (await this.productModel.find()).reverse()
   }
 
   async create(productDto: CreateProductDto) {

@@ -42,6 +42,18 @@ export interface Log {
 
 export interface Product {
   _id: string
+  client: string
+  title: string
+  amount: number
+  barcode: string
+  article: string
+  documents?: { document: string }[]
+  dynamic_fields?: DynamicField[]
+  logs?: Log[]
+}
+
+export interface ProductWithPopulate {
+  _id: string
   client: {
     _id: string,
     name: string
