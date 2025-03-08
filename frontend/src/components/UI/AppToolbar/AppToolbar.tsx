@@ -31,7 +31,7 @@ const AppToolbar = () => {
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link to="/">
-              <img src={'logo.jpeg'} alt="logo" style={{ height: '43px', borderRadius:'7px' }}  />
+              <img src={'logo.jpeg'} alt="logo" className="h-[43px] rounded-[7px] xl:ms-0 ms-10" />
             </Link>
           </Typography>
           {user ? <UserMenu user={user} /> : null}
