@@ -144,3 +144,13 @@ export type UserRegistrationMutation = {
   displayName: string
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
 }
+
+export interface ArrivalError {
+  client: string
+  product: string
+  arrival_price: number
+  arrival_date: string
+  sent_amount: string
+  amount: number
+  defect_description: string
+}
