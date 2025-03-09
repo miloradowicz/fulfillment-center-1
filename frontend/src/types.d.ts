@@ -40,6 +40,10 @@ export interface Log {
   date: string
 }
 
+export type LogWithPopulate = Omit<Log, 'user'> & {
+  user: UserStripped
+}
+
 export interface Product {
   _id: string
   client: string
@@ -72,6 +76,10 @@ export interface Defect {
   amount: number
 }
 
+export type DefectWithPopulate = Omit<Defect, 'product'> & {
+  product: Product
+}
+
 export interface ProductOrder {
   product: string
   description: string
@@ -82,6 +90,10 @@ export interface ProductArrival {
   product: string
   description: string
   amount: number
+}
+
+export type ProductArrivalWithPopulate = Omit<ProductArrival, 'product'> & {
+  product: Product
 }
 
 export interface Arrival {
@@ -95,6 +107,14 @@ export interface Arrival {
   arrival_status?: string
   received_amount?: ProductArrival[]
   logs?: Log[]
+}
+
+export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount'> & {
+  client: Client
+  products: ProductArrivalWithPopulate[]
+  defects: DefectWithPopulate[]
+  received_amount?: ProductArrivalWithPopulate[]
+  logs?: LogWithPopulate[]
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>
@@ -112,13 +132,6 @@ export interface Order {
   defects?: Defect[]
 }
 
-export interface User {
-  _id: string
-  username: string
-  token: string
-  role: string
-}
-
 export type OrderMutation = Omit<Order, '_id'>
 
 export interface User {
@@ -128,6 +141,8 @@ export interface User {
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
   token: string
 }
+
+export type UserStripped = Omit<User, 'token'>
 
 export type UserMutation = Omit<User, '_id' | 'token'> & {
   password: string

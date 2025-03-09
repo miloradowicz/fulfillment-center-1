@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { Arrival, ArrivalMutation, GlobalError, ValidationError } from '../../types'
+import { Arrival, ArrivalMutation, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
@@ -12,6 +12,14 @@ export const fetchArrivalById = createAsyncThunk<Arrival, string>(
   'arrivals/fetchArrivalById',
   async (arrivalId: string) => {
     const response = await axiosAPI.get(`/arrivals/?=${ arrivalId }`)
+    return response.data
+  },
+)
+
+export const fetchArrivalByIdWithPopulate = createAsyncThunk<ArrivalWithPopulate, string>(
+  'arrivals/fetchArrivalByIdWithPopulate',
+  async (arrivalId: string) => {
+    const response = await axiosAPI.get(`/arrivals/${ arrivalId }`, { params: { populate: '1' } })
     return response.data
   },
 )
