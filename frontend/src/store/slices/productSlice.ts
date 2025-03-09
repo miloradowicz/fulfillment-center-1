@@ -1,4 +1,4 @@
-import { GlobalError, Product } from '../../types'
+import { GlobalError, Product, ProductWithPopulate } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import {
   addProduct,
@@ -6,12 +6,13 @@ import {
   fetchProductsByClientId,
   fetchProductById,
   fetchProducts,
-  updateProduct,
+  updateProduct, fetchProductsWithPopulate,
 } from '../thunks/productThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ProductState {
   product: Product | null;
+  productsWithPopulate: ProductWithPopulate[] | null;
   products: Product[] | null;
   loadingFetch : boolean;
   loadingFetchOneClient : boolean;
@@ -24,6 +25,7 @@ interface ProductState {
 
 const initialState: ProductState = {
   product: null,
+  productsWithPopulate:null,
   products: null,
   loadingFetch: false,
   loadingFetchOneClient:false,
@@ -36,6 +38,7 @@ const initialState: ProductState = {
 
 export const selectProduct = (state: RootState) => state.products.product
 export const selectAllProducts = (state: RootState) => state.products.products
+export const selectProductsWithPopulate = (state: RootState) => state.products.productsWithPopulate
 export const selectLoadingFetchProduct = (state: RootState) => state.products.loadingFetch
 export const selectLoadingAddProduct = (state: RootState) => state.products.loadingAdd
 export const selectLoadingDeleteProduct = (state: RootState) => state.products.loadingDelete
@@ -55,6 +58,16 @@ const productSlice = createSlice({
       state.products = action.payload
     })
     builder.addCase(fetchProducts.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchProductsWithPopulate.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchProductsWithPopulate.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.productsWithPopulate = action.payload
+    })
+    builder.addCase(fetchProductsWithPopulate.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(fetchProductById.pending, state => {

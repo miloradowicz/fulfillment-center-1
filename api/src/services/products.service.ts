@@ -19,11 +19,17 @@ export class ProductsService {
     return product
   }
 
-  async getAllByClient(clientId: string) {
-    return (await this.productModel.find({ client: clientId })).reverse()
+  async getAllByClient(clientId: string, populate:boolean)  {
+    if (populate) {
+      return (await this.productModel.find({ client: clientId }).populate('client')).reverse()
+    }
+    else{ return (await this.productModel.find({ client: clientId })).reverse()}
   }
 
-  async getAll() {
+  async getAll(populate:boolean) {
+    if (populate) {
+      return (await this.productModel.find().populate('client')).reverse()
+    }
     return (await this.productModel.find()).reverse()
   }
 

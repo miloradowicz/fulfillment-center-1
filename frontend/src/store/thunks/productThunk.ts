@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Product, ProductMutation } from '../../types'
+import { GlobalError, Product, ProductMutation, ProductWithPopulate } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk<Product[]>(
@@ -27,6 +27,14 @@ export const fetchProductsByClientId = createAsyncThunk<Product[], string>(
   },
 )
 
+export const fetchProductsWithPopulate = createAsyncThunk<ProductWithPopulate[]>(
+  'products/fetchProductsWithPopulate',
+  async() => {
+    const response = await axiosAPI.get('/products?populate=1')
+    return response.data
+  },
+)
+
 export const addProduct = createAsyncThunk<void, ProductMutation, { rejectValue: GlobalError }
 >('products/addProduct', async (data: ProductMutation, { rejectWithValue }) => {
   try {
@@ -44,7 +52,7 @@ export const addProduct = createAsyncThunk<void, ProductMutation, { rejectValue:
 export const deleteProduct = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('products/deleteProduct', async (productId: string, { rejectWithValue }) => {
   try {
-    await axiosAPI.delete(`/products/?=${ productId }`)
+    await axiosAPI.delete(`/products/${ productId }`)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)

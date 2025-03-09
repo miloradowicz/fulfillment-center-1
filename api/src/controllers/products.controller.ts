@@ -11,11 +11,13 @@ export class ProductsController {
     return await this.productsService.create(productDto)
   }
 
-  @Get() async getAllProducts(@Query('client') clientId?: string) {
-    if (clientId) {
-      return await this.productsService.getAllByClient(clientId)
-    } else {
-      return await this.productsService.getAll()
+  @Get() async getAllProducts(@Query('client') ClientID: string,
+  @Query('populate') populate?: string) {
+    if (ClientID) {
+      return await this.productsService.getAllByClient(ClientID, populate === '1')
+    }
+    else {
+      return await this.productsService.getAll(populate === '1')
     }
   }
 

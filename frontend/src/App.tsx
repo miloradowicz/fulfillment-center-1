@@ -2,9 +2,8 @@ import { Route, Routes } from 'react-router-dom'
 import ClientForm from './features/clients/components/ClientForm.tsx'
 import { Typography } from '@mui/material'
 import ArrivalForm from './features/arrivals/components/ArrivalForm.tsx'
-import ProductForm from './features/products/components/ProductForm.tsx'
 import OrderForm from './features/orders/components/OrderForm.tsx'
-import Layout from './components/UI/Layout/Layout.tsx'
+import Layout from './Layout/Layout.tsx'
 import LoginPage from './features/users/containers/LoginPage.tsx'
 import { ThemeProvider, createTheme } from '@mui/material'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
@@ -34,7 +33,6 @@ const App = () => {
           <Route path='/reports' element={<ReportPage/>} />
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/add-new-client' element={<ClientForm />} />
-          <Route path='/add-new-product' element={<ProductForm />} />
           <Route path='/add-new-order' element={<OrderForm />} />
           <Route path='/add-new-order' element={<OrderForm />} />
           <Route path='/add-new-arrival' element={<ArrivalForm/>}/>

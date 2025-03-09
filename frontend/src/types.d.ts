@@ -52,6 +52,18 @@ export interface Product {
   logs?: Log[]
 }
 
+export interface ProductWithPopulate {
+  _id: string
+  client: Client
+  title: string
+  amount: number
+  barcode: string
+  article: string
+  documents?: { document: string }[]
+  dynamic_fields?: DynamicField[]
+  logs?: Log[]
+}
+
 export type ProductMutation = Omit<Product, '_id'>
 
 export interface Defect {
