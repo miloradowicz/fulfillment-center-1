@@ -6,3 +6,4 @@ export const roles = [
   { name: 'manager', title: 'Менеджер' },
   { name: 'stock-worker', title: 'Складской работник' },
 ]
+
