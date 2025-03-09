@@ -5,6 +5,7 @@ import ItemsList from './ItemsList.tsx'
 import { useArrivalForm } from '../hooks/useArrivalForm.ts'
 import { inputChangeHandler } from '../utils/arrivalUtils.ts'
 import { Defect, ProductArrival } from '../../../types'
+import { initialItemState } from '../state/arrivalState.ts'
 
 const ArrivalForm = () => {
   const {
@@ -27,9 +28,7 @@ const ArrivalForm = () => {
     setReceivedModalOpen,
     defectsModalOpen,
     setDefectsModalOpen,
-    openProductsModal,
-    openReceivedModal,
-    openDefectsModal,
+    openModal,
     addItem,
     deleteItem,
     handleBlur,
@@ -81,7 +80,7 @@ const ArrivalForm = () => {
             onDelete={i => deleteItem(i, setProductsForm)}
             getProductNameById={getProductNameById}
           />
-          <Button type="button" onClick={openProductsModal}>
+          <Button type="button" onClick={() => openModal('products', initialItemState)}>
             + Добавить товары
           </Button>
         </Grid>
@@ -160,7 +159,7 @@ const ArrivalForm = () => {
             onDelete={i => deleteItem(i, setReceivedForm)}
             getProductNameById={getProductNameById}
           />
-          <Button type="button" onClick={openReceivedModal}>
+          <Button type="button" onClick={() => openModal('received_amount', initialItemState)}>
             + Добавить полученные товары
           </Button>
         </Grid>
@@ -237,7 +236,7 @@ const ArrivalForm = () => {
             onDelete={i => deleteItem(i, setDefectForm)}
             getProductNameById={getProductNameById}
           />
-          <Button type="button" onClick={openDefectsModal}>
+          <Button type="button" onClick={() => openModal('defects', initialItemState)}>
             + Добавить дефекты
           </Button>
         </Grid>

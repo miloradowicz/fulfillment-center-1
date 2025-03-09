@@ -36,19 +36,17 @@ export const useArrivalForm = () => {
     }
   }, [dispatch, form.client])
 
-  const openProductsModal = () => {
-    setNewItem({ ...initialItemState })
-    setProductsModalOpen(true)
-  }
+  const openModal = (type: 'products' | 'received_amount' | 'defects', initialState: ProductArrival | Defect) => {
+    setNewItem(initialState)
 
-  const openReceivedModal = () => {
-    setNewItem({ ...initialItemState })
-    setReceivedModalOpen(true)
-  }
+    const modalSetters = {
+      products: setProductsModalOpen,
+      received_amount: setReceivedModalOpen,
+      defects: setDefectsModalOpen,
+    }
 
-  const openDefectsModal = () => {
-    setNewItem({ ...initialItemState })
-    setDefectsModalOpen(true)
+    Object.values(modalSetters).forEach(setter => setter(false))
+    modalSetters[type](true)
   }
 
   const addItem = (type: 'products' | 'received_amount' | 'defects') => {
@@ -172,9 +170,7 @@ export const useArrivalForm = () => {
     setReceivedModalOpen,
     defectsModalOpen,
     setDefectsModalOpen,
-    openProductsModal,
-    openReceivedModal,
-    openDefectsModal,
+    openModal,
     addItem,
     deleteItem,
     handleBlur,
