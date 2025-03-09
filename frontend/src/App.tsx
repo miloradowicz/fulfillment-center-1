@@ -13,36 +13,47 @@ import ClientPage from './features/clients/containers/ClientPage.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
+import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 
 
 
 const App = () => {
 
   const theme = createTheme()
-  return <>
-    <ThemeProvider theme={theme}>
-      <Layout>
-        <Routes>
-          <Route path='/' element={<LoginPage/>} />
-          <Route path='/login' element={<LoginPage/>} />
-          <Route path='/clients' element={<ClientPage/>} />
-          <Route path='/clients/:clientId' element={<ClientDetail/>} />
-          <Route path='/arrivals' element={<ArrivalPage/>} />
-          <Route path='/products' element={<ProductPage/>} />
-          <Route path='/orders' element={<OrderPage/>} />
-          <Route path='/reports' element={<ReportPage/>} />
-          <Route path='/login' element={<LoginPage/>} />
-          <Route path='/add-new-client' element={<ClientForm />} />
-          <Route path='/add-new-order' element={<OrderForm />} />
-          <Route path='/add-new-order' element={<OrderForm />} />
-          <Route path='/add-new-arrival' element={<ArrivalForm/>}/>
-          <Route path='/add-new-order' element={<OrderForm />} />
-          <Route path='/add-new-user' element={<RegistrationForm/>} />
-          <Route path="/*" element={<Typography variant={'h3'} textAlign="center">Not Found</Typography>}/>
-        </Routes>
-      </Layout>
-    </ThemeProvider>
-  </>
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/clients" element={<ClientPage />} />
+            <Route path="/clients/:clientId" element={<ClientDetail />} />
+            <Route path="/arrivals" element={<ArrivalPage />} />
+            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
+            <Route path="/products" element={<ProductPage />} />
+            <Route path="/orders" element={<OrderPage />} />
+            <Route path="/reports" element={<ReportPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/add-new-client" element={<ClientForm />} />
+            <Route path="/add-new-order" element={<OrderForm />} />
+            <Route path="/add-new-order" element={<OrderForm />} />
+            <Route path="/add-new-arrival" element={<ArrivalForm />} />
+            <Route path="/add-new-order" element={<OrderForm />} />
+            <Route path="/add-new-user" element={<RegistrationForm />} />
+            <Route
+              path="/*"
+              element={
+                <Typography variant={'h3'} textAlign="center">
+                  Not Found
+                </Typography>
+              }
+            />
+          </Routes>
+        </Layout>
+      </ThemeProvider>
+    </>
+  )
 }
 
 export default App
