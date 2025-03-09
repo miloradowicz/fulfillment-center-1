@@ -3,6 +3,7 @@ import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
+import { User, UserDocument } from 'src/schemas/user.schema'
 
 @Injectable()
 export class SeederService {
@@ -12,6 +13,9 @@ export class SeederService {
 
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
   ) {}
   async seed() {
     await this.clientModel.deleteMany({})
@@ -45,6 +49,14 @@ export class SeederService {
           value: 'Красный',
         },
       ],
-    },)
+    })
+
+    const _users = await this.userModel.create({
+      email: 'john@doe.com',
+      password: '-',
+      displayName: 'John Doe',
+      role: 'super-admin',
+      token: '-',
+    })
   }
 }

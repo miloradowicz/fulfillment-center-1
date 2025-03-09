@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
@@ -13,8 +13,11 @@ export class ArrivalsController {
   }
 
   @Get(':id')
-  async getOneArrival(@Param('id') id: string) {
-    return this.arrivalsService.getOne(id)
+  async getOneArrival(
+    @Param('id') id: string,
+    @Query('populate') populate: string
+  ) {
+    return this.arrivalsService.getOne(id, populate === '1')
   }
 
   @Post()
