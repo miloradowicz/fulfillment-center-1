@@ -22,7 +22,7 @@ export const fetchProductById = createAsyncThunk<Product, string>(
 export const fetchProductsByClientId = createAsyncThunk<Product[], string>(
   'products/fetchByClientId',
   async(clientId: string) => {
-    const response = await axiosAPI.get(`/products?populate=${ clientId }`)
+    const response = await axiosAPI.get(`/products?client=${ clientId }`)
     return response.data
   },
 )

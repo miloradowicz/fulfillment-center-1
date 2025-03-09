@@ -54,10 +54,7 @@ export interface Product {
 
 export interface ProductWithPopulate {
   _id: string
-  client: {
-    _id: string,
-    name: string
-  }
+  client: Client
   title: string
   amount: number
   barcode: string
