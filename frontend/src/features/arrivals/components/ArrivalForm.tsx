@@ -43,7 +43,7 @@ const ArrivalForm = () => {
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress/>
+            <CircularProgress />
           </Grid>
         ) : null}
 
@@ -65,7 +65,7 @@ const ArrivalForm = () => {
               <TextField
                 {...params}
                 label="Клиент"
-                error={Boolean(errors.client)}
+                error={Boolean(errors.client || getFieldError('client'))}
                 helperText={errors.client || getFieldError('client')}
                 onBlur={e => handleBlur('client', e.target.value)}
               />
@@ -104,7 +104,7 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
+                  error={Boolean(errors.product || getFieldError('product'))}
                   helperText={errors.product || getFieldError('product')}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
@@ -120,7 +120,7 @@ const ArrivalForm = () => {
               label="Количество товара"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
+              error={Boolean(errors.amount || getFieldError('amount'))}
               helperText={errors.amount || getFieldError('amount')}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
@@ -132,10 +132,12 @@ const ArrivalForm = () => {
               size="small"
               name="description"
               value={(newItem as ProductArrival).description || ''}
-              onChange={e => setNewItem(prev => ({
-                ...prev,
-                description: e.target.value,
-              }))}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               sx={{ marginBottom: '15px' }}
             />
 
@@ -152,7 +154,7 @@ const ArrivalForm = () => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Полученные товары</Typography>
           <ItemsList
             items={receivedForm}
@@ -183,7 +185,7 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
+                  error={Boolean(errors.product || getFieldError('product'))}
                   helperText={errors.product || getFieldError('product')}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
@@ -199,7 +201,7 @@ const ArrivalForm = () => {
               label="Количество товара"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
+              error={Boolean(errors.amount || getFieldError('amount'))}
               helperText={errors.amount || getFieldError('amount')}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
@@ -211,10 +213,12 @@ const ArrivalForm = () => {
               size="small"
               name="description"
               value={(newItem as ProductArrival).description || ''}
-              onChange={e => setNewItem(prev => ({
-                ...prev,
-                description: e.target.value,
-              }))}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               sx={{ marginBottom: '15px' }}
             />
 
@@ -229,7 +233,7 @@ const ArrivalForm = () => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Дефекты</Typography>
           <ItemsList
             items={defectForm}
@@ -260,7 +264,7 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
+                  error={Boolean(errors.product || getFieldError('product'))}
                   helperText={errors.product || getFieldError('product')}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
@@ -276,7 +280,7 @@ const ArrivalForm = () => {
               name="amount"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
+              error={Boolean(errors.amount || getFieldError('amount'))}
               helperText={errors.amount || getFieldError('amount')}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
@@ -288,11 +292,13 @@ const ArrivalForm = () => {
               size="small"
               name="defect_description"
               value={(newItem as Defect).defect_description || ''}
-              onChange={e => setNewItem(prev => ({
-                ...prev,
-                defect_description: e.target.value,
-              }))}
-              error={Boolean(errors.defect_description)}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  defect_description: e.target.value,
+                }))
+              }
+              error={Boolean(errors.defect_description || getFieldError('defect_description'))}
               helperText={errors.defect_description || getFieldError('defect_description')}
               onBlur={e => handleBlur('defect_description', e.target.value)}
               sx={{ marginBottom: '15px' }}
@@ -315,12 +321,14 @@ const ArrivalForm = () => {
             name="arrival_price"
             label="Цена доставки"
             value={form.arrival_price || ''}
-            onChange={e => setForm(prev => ({
-              ...prev,
-              arrival_price: Number(e.target.value),
-            }))}
+            onChange={e =>
+              setForm(prev => ({
+                ...prev,
+                arrival_price: Number(e.target.value),
+              }))
+            }
             size="small"
-            error={Boolean(errors.arrival_price)}
+            error={Boolean(errors.arrival_price || getFieldError('arrival_price'))}
             helperText={errors.arrival_price || getFieldError('arrival_price')}
             onBlur={e => handleBlur('arrival_price', e.target.value)}
             fullWidth
@@ -338,7 +346,7 @@ const ArrivalForm = () => {
             type="date"
             value={form.arrival_date}
             onChange={e => inputChangeHandler(e, setForm)}
-            error={Boolean(errors.arrival_date)}
+            error={Boolean(errors.arrival_date || getFieldError('arrival_date'))}
             helperText={errors.arrival_date || getFieldError('arrival_date')}
             onBlur={e => handleBlur('arrival_date', e.target.value)}
             fullWidth
@@ -353,7 +361,7 @@ const ArrivalForm = () => {
             value={form.sent_amount}
             onChange={e => inputChangeHandler(e, setForm)}
             size="small"
-            error={Boolean(errors.sent_amount)}
+            error={Boolean(errors.sent_amount || getFieldError('sent_amount'))}
             helperText={errors.sent_amount || getFieldError('sent_amount')}
             onBlur={e => handleBlur('sent_amount', e.target.value)}
             fullWidth
@@ -362,7 +370,7 @@ const ArrivalForm = () => {
 
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} color="inherit"/> : 'Создать поставку'}
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Создать поставку'}
           </Button>
         </Grid>
       </Grid>
