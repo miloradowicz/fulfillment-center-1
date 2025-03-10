@@ -14,7 +14,7 @@ export const fetchOrders = createAsyncThunk<Order[]>(
 export const fetchOrderById = createAsyncThunk<Order, string>(
   'orders/fetchOrderById',
   async (orderId: string) => {
-    const response = await axiosAPI.get(`/orders/?=${ orderId }`)
+    const response = await axiosAPI.get(`/orders/${ orderId }`)
     return response.data
   },
 )

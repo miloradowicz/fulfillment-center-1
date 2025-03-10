@@ -9,11 +9,10 @@ import LoginPage from './features/users/containers/LoginPage.tsx'
 import { ThemeProvider, createTheme } from '@mui/material'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ProductPage from './features/products/containers/ProductPage.tsx'
-import OrderPage from './features/orders/containers/OrderPage.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
-
-
+import OrderDetails from './features/orders/containers/OrderDetails.tsx'
+import OrderPage from './features/orders/containers/OrderPage.tsx'
 
 const App = () => {
 
@@ -28,6 +27,7 @@ const App = () => {
           <Route path='/arrivals' element={<ArrivalPage/>} />
           <Route path='/products' element={<ProductPage/>} />
           <Route path='/orders' element={<OrderPage/>} />
+          <Route path='/orders/:id' element={<OrderDetails/>} />
           <Route path='/reports' element={<ReportPage/>} />
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/add-new-client' element={<ClientForm />} />

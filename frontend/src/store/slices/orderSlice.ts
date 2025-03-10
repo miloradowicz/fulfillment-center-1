@@ -26,7 +26,7 @@ const initialState: OrderState = {
 }
 
 export const selectOrder = (state: RootState) => state.orders.order
-export const selectAllOrder = (state: RootState) => state.orders.orders
+export const selectAllOrders = (state: RootState) => state.orders.orders
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
 export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete

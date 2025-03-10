@@ -60,8 +60,13 @@ export interface Defect {
   amount: number;
 }
 
+export interface DefectMutation extends Defect {
+  productName: string;
+}
+
 export interface ProductOrder {
-  product: string;
+  _id: string;
+  product: Product;
   description: string;
   amount: number;
 }
