@@ -1,9 +1,9 @@
 import Grid from '@mui/material/Grid2'
 import { Autocomplete, Button, CircularProgress, FormControl, InputLabel, TextField, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import {inputChangeHandler} from "../../../utils/inputChangeHandler.ts";
-import {getFieldError} from "../../../utils/getFieldError.ts";
-import {useOrderForm} from "../hooks/useOrderForm.ts";
+import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
+import { useOrderForm } from '../hooks/useOrderForm.ts'
 
 
 const OrderForm = () => {
@@ -39,7 +39,7 @@ const OrderForm = () => {
     addArrayProductInForm,
     addArrayDefectInForm,
     onSubmit,
-  } = useOrderForm();
+  } = useOrderForm()
 
   return (
     <>
@@ -72,7 +72,7 @@ const OrderForm = () => {
                       <TextField
                         {...params}
                         label="Клиент"
-                        error={Boolean(errors.client)}
+                        error={Boolean(errors.client || getFieldError('client',createError))}
                         helperText={errors.client || getFieldError('client',createError)}
                         onBlur={()=>handleBlurAutoComplete('client', setErrors, form, 'Выберите клиента')}
                       />
@@ -149,7 +149,7 @@ const OrderForm = () => {
                       {...params}
                       label="Товар"
                       required={true}
-                      error={Boolean(errors.product)}
+                      error={Boolean(errors.product||getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
                       onBlur={()=>handleBlurAutoComplete('product', setErrors, newField, 'Выберите товар')}
                     />
@@ -165,7 +165,7 @@ const OrderForm = () => {
                   required={true}
                   value={newField.amount || ''}
                   onChange={e => setNewField({ ...newField, amount: Number(e.target.value) })}
-                  error={Boolean(errors.amount)}
+                  error={Boolean(errors.amount || getFieldError('amount', createError))}
                   helperText={errors.amount || getFieldError('amount' , createError)}
                   onBlur={handleBlur}
                 />
@@ -196,7 +196,7 @@ const OrderForm = () => {
                 label="Сумма заказа"
                 value={form.price || '' }
                 onChange={e => setForm({ ...form, price: Number(e.target.value) })}
-                error={Boolean(errors.price)}
+                error={Boolean(errors.price || getFieldError('price', createError))}
                 helperText={errors.price || getFieldError('price', createError)}
                 fullWidth
                 onBlur={handleBlur}
@@ -213,8 +213,8 @@ const OrderForm = () => {
                 size={'small'}
                 type="date"
                 value={form.sent_at}
-                onChange={(e) => inputChangeHandler(e, setForm)}
-                error={Boolean(errors.sent_at)}
+                onChange={e => inputChangeHandler(e, setForm)}
+                error={Boolean(errors.sent_at || getFieldError('sent_at', createError))}
                 helperText={errors.sent_at || getFieldError('sent_at', createError)}
                 onBlur={handleBlur}
                 fullWidth
@@ -231,8 +231,8 @@ const OrderForm = () => {
                 size={'small'}
                 value={form.delivered_at}
                 type="date"
-                onChange={(e) => inputChangeHandler(e, setForm)}
-                error={Boolean(errors.delivered_at)}
+                onChange={e => inputChangeHandler(e, setForm)}
+                error={Boolean(errors.delivered_at || getFieldError('delivered_at', createError))}
                 helperText={errors.delivered_at || getFieldError('delivered_at', createError)}
                 fullWidth
                 onBlur={handleBlur}
@@ -246,7 +246,7 @@ const OrderForm = () => {
                 name="comment"
                 label="Комментарий"
                 value={form.comment}
-                onChange={(e) => inputChangeHandler(e, setForm)}
+                onChange={e => inputChangeHandler(e, setForm)}
                 fullWidth
               />
             </Grid>
@@ -322,7 +322,7 @@ const OrderForm = () => {
                     <TextField
                       {...params}
                       label="Товар"
-                      error={Boolean(errors.product)}
+                      error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
                       onBlur={()=>handleBlurAutoComplete('product', setErrors, newFieldDefects, 'Выберите товар')}
                     />
@@ -334,7 +334,7 @@ const OrderForm = () => {
                   label="количество дефектного товара"
                   style={{ marginBottom: '10px' }}
                   type="number"
-                  error={Boolean(errors.amount)}
+                  error={Boolean(errors.amount||getFieldError('amount', createError))}
                   name={'amount'}
                   helperText={errors.amount || getFieldError('amount', createError)}
                   onBlur={handleBlur}
@@ -348,7 +348,7 @@ const OrderForm = () => {
                   style={{ marginBottom: '10px' }}
                   type="text"
                   name={'defect_description'}
-                  error={Boolean(errors.defect_description)}
+                  error={Boolean(errors.defect_description||getFieldError('defect_description', createError))}
                   helperText={errors.defect_description || getFieldError('defect_description', createError)}
                   onBlur={handleBlur}
                   value={newFieldDefects.defect_description}
