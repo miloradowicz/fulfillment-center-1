@@ -179,7 +179,7 @@ const ArrivalForm = () => {
                   setNewItem(prev => ({ ...prev, product: newValue._id }))
                 }
               }}
-              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
               isOptionEqualToValue={(option, value) => option._id === value._id}
               renderInput={params => (
                 <TextField
@@ -258,7 +258,7 @@ const ArrivalForm = () => {
                   setNewItem(prev => ({ ...prev, product: newValue._id }))
                 }
               }}
-              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
               isOptionEqualToValue={(option, value) => option._id === value._id}
               renderInput={params => (
                 <TextField
