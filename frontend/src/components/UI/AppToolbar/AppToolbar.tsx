@@ -25,7 +25,7 @@ const AppToolbar = () => {
   }
   // const user = null
   return (
-    <AppBar position="sticky"  sx={{ mb: 2, backgroundColor: '#32363F', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+    <AppBar position="sticky" sx={{ mb: 2, backgroundColor: '#32363F', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
       <SideBar/>
       <Container >
         <Toolbar>
