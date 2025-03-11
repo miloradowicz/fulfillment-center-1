@@ -5,7 +5,7 @@ import { fetchOrderById } from '../../../store/thunks/orderThunk.ts'
 import { useParams } from 'react-router-dom'
 import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import { selectClient } from '../../../store/slices/clientSlice.ts'
-import { DefectMutation, Order } from '../../../types'
+import { DefectMutation, OrderWithProducts } from '../../../types'
 
 export const useOrderDetails = () => {
   const { id } = useParams()
@@ -28,7 +28,7 @@ export const useOrderDetails = () => {
     }
   }, [dispatch, order])
 
-  const mapDefectsWithProductNames = (order: Order): DefectMutation[] => {
+  const mapDefectsWithProductNames = (order: OrderWithProducts): DefectMutation[] => {
     if (!order || !order.defects) return []
 
     return order.defects.map(defect => {

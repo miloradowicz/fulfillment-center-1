@@ -1,10 +1,10 @@
-import { GlobalError, Order, ValidationError } from '../../types'
+import { GlobalError, Order, OrderWithProducts, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { addOrder, deleteOrder, fetchOrderById, fetchOrders, updateOrder } from '../thunks/orderThunk.ts'
 
 interface OrderState {
-  order: Order | null;
+  order: OrderWithProducts | null;
   orders: Order[] | null;
   loadingFetch : boolean;
   loadingAdd: boolean;
