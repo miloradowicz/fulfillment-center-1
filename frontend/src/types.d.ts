@@ -70,7 +70,6 @@ export interface Defect {
   product: string
   defect_description: string
   amount: number
-}
 
 export interface DefectMutation extends Defect {
   productName: string

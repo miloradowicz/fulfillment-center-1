@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { CreateUserDto } from '../dto/create-user.dto'
 import { UsersService } from '../services/user.service'
 import { UpdateUserDto } from '../dto/update-user.dto'
@@ -10,9 +10,6 @@ export class UsersController {
 
   @Post('register')
   async createUser(@Body() createUserDto: CreateUserDto){
-    if (createUserDto.password !== createUserDto.confirmPassword) {
-      throw new HttpException('Пароли не совпадают', HttpStatus.CONFLICT)
-    }
     return await this.usersService.create(createUserDto)
   }
 

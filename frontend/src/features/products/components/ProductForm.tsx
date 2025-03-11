@@ -144,7 +144,7 @@ const ProductForm = () => {
 
   return (
     <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
+      <Typography variant="h5" sx={{ mb: 1 }}>
         Добавить новый продукт
       </Typography>
       <Grid container direction="column" spacing={2}>

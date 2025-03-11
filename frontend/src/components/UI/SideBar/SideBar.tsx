@@ -32,7 +32,7 @@ export default function Sidebar() {
 
   return (
     <Box position="absolute" top={'12px'} left={'30px'}>
-      <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white', marginRight: '50px'  }}>
+      <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white', marginRight: '50px', zIndex: 100  }}>
         <MenuIcon />
       </IconButton>
 
@@ -42,11 +42,11 @@ export default function Sidebar() {
         onClose={toggleDrawer(false)}
         sx={{
           flexShrink: 0,
-          mt: '75px',
+          mt: '75px' ,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            marginTop: '65px',
+            marginTop: { xs: '57px', sm: '65px' },
             height: 'calc(100vh - 64px)',
           },
         }}

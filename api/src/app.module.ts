@@ -7,9 +7,10 @@ import { OrdersModule } from './modules/orders.module'
 import { CsrfModule } from './modules/csrf.module'
 import { UsersModule } from './modules/users.module'
 import { LogsModule } from './modules/logs.module'
+import { ValidatorsModule } from './modules/validators.module'
 
 @Module({
-  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, UsersModule, LogsModule],
+  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, UsersModule, LogsModule, ValidatorsModule],
   controllers: [],
   providers: [],
 })
