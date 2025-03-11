@@ -55,13 +55,13 @@ const OrderDetails = () => {
           Заказ #{order._id}
         </Typography>
         <Box className="text-right">
-          <Typography className="text-gray-600 text-sm">
+          <Typography variant='body2' className="text-gray-600 text-sm">
             Отправлен: <span className="font-bold">{dayjs(order.sent_at).format('DD.MM.YYYY HH:mm')}</span>
           </Typography>
-          <Typography className="text-gray-600 text-sm">
+          <Typography variant='body2' className="text-gray-600 text-sm">
             Доставлен: <span className="font-bold">{dayjs(order.delivered_at).format('DD.MM.YYYY HH:mm')}</span>
           </Typography>
-          <Typography className="text-lg font-bold text-sky-700 mt-1">
+          <Typography variant='h6' className="text-sky-700" sx={{ fontWeight: 600, fontSize: '18px' }}>
             Стоимость: {order.price}
           </Typography>
         </Box>
