@@ -153,7 +153,8 @@ export interface ArrivalError {
   sent_amount: string
   amount: number
   defect_description: string
-=======
+}
+
 export interface ErrorForOrder {
   client: string
   product: string
