@@ -14,7 +14,7 @@ export class OrdersService {
   }
 
   async getById(id: string) {
-    const order = await this.orderModel.findById(id)
+    const order = await this.orderModel.findById(id).populate('products.product').exec()
     if (!order) throw new NotFoundException('Заказ не найден')
     return order
   }

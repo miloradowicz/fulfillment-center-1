@@ -70,12 +70,20 @@ export interface Defect {
   product: string
   defect_description: string
   amount: number
+
+export interface DefectMutation extends Defect {
+  productName: string
 }
 
 export interface ProductOrder {
   product: string
   description: string
   amount: number
+}
+
+export type ProductOrderMutation = Omit<ProductOrder, 'product'> & {
+  _id: string
+  product: Product
 }
 
 export interface ProductArrival {
@@ -110,6 +118,10 @@ export interface Order {
   status?: 'в сборке' | 'в пути' | 'доставлен'
   logs?: Log[]
   defects?: Defect[]
+}
+
+export type OrderWithProducts = Omit<Order, 'products'> & {
+  products: ProductOrderMutation[]
 }
 
 export interface User {
