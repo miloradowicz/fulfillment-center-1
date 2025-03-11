@@ -153,4 +153,25 @@ export interface ArrivalError {
   sent_amount: string
   amount: number
   defect_description: string
+=======
+export interface ErrorForOrder {
+  client: string
+  product: string
+  price: number
+  amount: number
+  defect_description: string
+  sent_at: string
+  delivered_at: string
+}
+
+export interface DefectForOrderForm {
+  product: Product
+  description: string
+  amount: number
+}
+
+export interface ProductForOrderForm {
+  product: Product
+  defect_description: string
+  amount: number
 }
