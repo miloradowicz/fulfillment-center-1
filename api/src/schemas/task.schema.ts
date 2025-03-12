@@ -19,6 +19,13 @@ export class Task {
   description: string
 
   @Prop({
+    type: String,
+    enum: ['к выполнению', 'в работе', 'готово'],
+    default:'к выполнению',
+  })
+  status: 'в сборке' | 'в пути' | 'доставлен'
+
+  @Prop({
     type: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -33,13 +40,6 @@ export class Task {
     change: string
     date: Date
   }[]
-
-  @Prop({
-    type: String,
-    enum: ['к выполнению', 'в работе', 'готово'],
-    default:'к выполнению',
-  })
-  status: 'в сборке' | 'в пути' | 'доставлен'
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task)
