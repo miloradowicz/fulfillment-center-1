@@ -8,11 +8,13 @@ import { CsrfModule } from './modules/csrf.module'
 import { UsersModule } from './modules/users.module'
 import { LogsModule } from './modules/logs.module'
 import { ValidatorsModule } from './modules/validators.module'
+import { TasksModule } from './modules/tasks.module'
 import { APP_PIPE } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 
+
 @Module({
-  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, UsersModule, LogsModule, ValidatorsModule],
+  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, TasksModule, UsersModule, LogsModule, ValidatorsModule],
   controllers: [],
   providers: [
     {
