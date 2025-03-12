@@ -5,7 +5,7 @@ import { initialErrorState, initialItemState, initialState } from '../state/arri
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addArrival } from '../../../store/thunks/arrivalThunk.ts'
+import { addArrival, fetchPopulatedArrivals } from '../../../store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
@@ -137,6 +137,7 @@ export const useArrivalForm = () => {
       setReceivedForm([])
       setDefectForm([])
       toast.success('Поставка успешно создана!')
+      await dispatch(fetchPopulatedArrivals())
     } catch (e) {
       console.error(e)
     }
