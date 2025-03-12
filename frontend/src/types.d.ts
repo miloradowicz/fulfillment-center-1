@@ -106,6 +106,10 @@ export interface Arrival {
   logs?: Log[]
 }
 
+export interface ArrivalWithClient extends Omit<Arrival, 'client'> {
+  client: Client;
+}
+
 export type ArrivalMutation = Omit<Arrival, '_id'>
 
 export interface Order {
