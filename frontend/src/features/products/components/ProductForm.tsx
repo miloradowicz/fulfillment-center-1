@@ -22,6 +22,8 @@ const ProductForm = () => {
     setSelectedClient,
     setNewField,
     setShowNewFieldInputs,
+    setErrors,
+    errors,
   } = useProductForm()
 
   return (
@@ -38,6 +40,7 @@ const ProductForm = () => {
             onChange={(_event, newValue) => {
               const clientId = newValue ? newValue._id : ''
               setSelectedClient(clientId)
+              setErrors(prevErrors => ({ ...prevErrors, client: '' }))
               setForm(prevState => ({ ...prevState, client: clientId }))
             }}
             renderInput={params => (
@@ -46,6 +49,8 @@ const ProductForm = () => {
                 label="Клиент"
                 fullWidth
                 size="small"
+                error={!!errors.client}
+                helperText={errors.client}
               />
             )}
           />
@@ -59,6 +64,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.title}
+            helperText={errors.title}
           />
         </Grid>
         <Grid>
@@ -70,6 +77,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.amount}
+            helperText={errors.amount}
           />
         </Grid>
         <Grid>
@@ -80,6 +89,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.barcode}
+            helperText={errors.barcode}
           />
         </Grid>
         <Grid>
@@ -90,6 +101,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.article}
+            helperText={errors.article}
           />
         </Grid>
 
@@ -147,7 +160,7 @@ const ProductForm = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button variant="outlined" component="label" sx={{ mr: 2 }}>
               Выбрать файл
-              <input type="file" accept=".pdf,.docx" hidden onChange={handleFileChange} />
+              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange} />
             </Button>
             {file && <Typography variant="body2">{file.name}</Typography>}
           </Box>

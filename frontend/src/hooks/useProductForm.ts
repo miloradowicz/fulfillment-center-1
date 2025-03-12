@@ -24,6 +24,7 @@ const useProductForm = () => {
   const [newField, setNewField] = useState<DynamicField>({ key: '', label: '', value: '' })
   const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
   const [file, setFile] = useState<File | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
@@ -35,7 +36,7 @@ const useProductForm = () => {
 
   const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-
+    setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     if (name === 'amount') {
       const amountValue = value === '' ? 0 : Number(value)
       if (amountValue < 0 || isNaN(amountValue)) return
@@ -78,29 +79,13 @@ const useProductForm = () => {
   ) => {
     const value = e.target.value
     setDynamicFields(prev => prev.map((field, i) => (i === index ? { ...field, value } : field)))
+    setErrors(prevErrors => ({ ...prevErrors, [`dynamicField_${ index }`]: '' }))
   }
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    if (!form.client) {
-      toast.warn('Поле "Клиент" обязательно для заполнения!')
-      return
-    }
-    if (!form.title.trim() || !form.title) {
-      toast.warn('Поле "Название" обязательно для заполнения!')
-      return
-    }
-    if (form.amount === 0) {
-      toast.warn('Поле "Количество" обязательно для заполнения!')
-      return
-    }
-    if (!form.barcode.trim() || !form.barcode) {
-      toast.warn('Поле "Баркод" обязательно для заполнения!')
-      return
-    }
-    if (!form.article.trim() || !form.article) {
-      toast.warn('Поле "Артикул" обязательно для заполнения!')
+    if (!validateForm()) {
       return
     }
 
@@ -127,6 +112,7 @@ const useProductForm = () => {
       setDynamicFields([])
       setSelectedClient('')
       setFile(null)
+      setErrors({})
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         console.error('Ошибки валидации:', e.response.data)
@@ -135,6 +121,29 @@ const useProductForm = () => {
         toast.error('Не удалось создать продукт.')
       }
     }
+  }
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!form.client) {
+      newErrors.client = 'Поле "Клиент" обязательно для заполнения!'
+    }
+    if (!form.title.trim()) {
+      newErrors.title = 'Поле "Название" обязательно для заполнения!'
+    }
+    if (form.amount === 0) {
+      newErrors.amount = 'Поле "Количество" обязательно для заполнения!'
+    }
+    if (!form.barcode.trim()) {
+      newErrors.barcode = 'Поле "Баркод" обязательно для заполнения!'
+    }
+    if (!form.article.trim()) {
+      newErrors.article = 'Поле "Артикул" обязательно для заполнения!'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   return {
@@ -157,6 +166,8 @@ const useProductForm = () => {
     setFile,
     setNewField,
     setShowNewFieldInputs,
+    setErrors,
+    errors,
   }
 }
 
