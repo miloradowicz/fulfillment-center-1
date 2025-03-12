@@ -1,7 +1,4 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
-import { OrdersService } from '../services/orders.service'
-import { CreateOrderDto } from '../dto/create-order.dto'
-import { UpdateOrderDto } from '../dto/update-order.dto'
 import { CreateTaskDto } from '../dto/create-task.dto'
 import { UpdateTaskDto } from '../dto/update-task.dto'
 import { TasksService } from '../services/tasks.service'
@@ -12,7 +9,7 @@ export class TasksController {
 
   @Get()
   async getAllTasks(@Query('user') user?: string) {
-    if (user === '1') {
+    if (user === 'populate') {
       return this.tasksService.getAllWithUser()
     }
     return this.tasksService.getAll()

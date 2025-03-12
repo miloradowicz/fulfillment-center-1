@@ -3,19 +3,27 @@ import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
+import { Task, TaskDocument } from '../schemas/task.schema'
+import { User, UserDocument } from '../schemas/user.schema'
+import { randomUUID } from 'node:crypto'
 
 @Injectable()
 export class SeederService {
   constructor(
     @InjectModel(Client.name)
     private readonly clientModel: Model<ClientDocument>,
-
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
+    @InjectModel(Task.name)
+    private readonly taskModel: Model<TaskDocument>,
   ) {}
   async seed() {
     await this.clientModel.deleteMany({})
     await this.productModel.deleteMany({})
+    await this.taskModel.deleteMany({})
+    await this.userModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -28,7 +36,7 @@ export class SeederService {
     })
 
     const _products = await this.productModel.create({
-      client: _clients,
+      client: _clients._id,
       title: 'Сарафан',
       amount: 7,
       barcode: '012345678901',
@@ -46,5 +54,51 @@ export class SeederService {
         },
       ],
     },)
+
+    const [_User1, _User2]= await this.userModel.create([{
+      email: 'test@gmail.com',
+      password: '1234567890',
+      confirmPassword: '1234567890',
+      displayName:'Мария',
+      role: 'stock-worker',
+      token: randomUUID(),
+    },
+    {
+      email: 'test1@gmail.com',
+      password: '1234567890',
+      confirmPassword: '1234567890',
+      displayName:'Вася',
+      role: 'stock-worker',
+      token: randomUUID(),
+    }])
+
+    const _tasks = await this.taskModel.create([
+      {
+        user: _User1._id,
+        title: 'Принять товар из поставки №2248239487',
+        description: 'Проверить товар на дефекты и внести информацию в базу',
+        status: 'к выполнению',
+      },
+      {
+        user: _User2._id,
+        title: 'Собрать заказ  №12423424',
+        status: 'в работе',
+      },
+      {
+        user: _User1._id,
+        title: 'Упаковка товара для заказа №12423424',
+        status: 'готово',
+      },
+      {
+        user: _User2._id,
+        title: 'Проверить складские остатки',
+        status: 'в работе',
+      },
+      {
+        user: _User1._id,
+        title: 'Связаться с клиентом по заказу №556677',
+        status: 'готово',
+      },
+    ])
   }
 }
