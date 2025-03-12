@@ -96,9 +96,9 @@ const productSlice = createSlice({
     builder.addCase(addProduct.fulfilled, state => {
       state.loadingAdd = false
     })
-    builder.addCase(addProduct.rejected, (state, { payload: error }) => {
+    builder.addCase(addProduct.rejected, (state, action) => {
       state.loadingAdd = false
-      state.error = error||null
+      state.error = action.payload ?? { message: 'Ошибка создания продукта' }
     })
     builder.addCase(deleteProduct.pending, state => {
       state.loadingDelete = true

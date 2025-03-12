@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
@@ -8,8 +8,12 @@ export class ArrivalsController {
   constructor(private arrivalsService: ArrivalsService) {}
 
   @Get()
-  async getAllArrivals() {
-    return this.arrivalsService.getAll()
+  async getAllArrivals(@Query('client') clientId: string, @Query('populate') populate?: string) {
+    if (clientId) {
+      return await this.arrivalsService.getAllByClient(clientId, populate === '1')
+    } else {
+      return await this.arrivalsService.getAll(populate === '1')
+    }
   }
 
   @Get(':id')

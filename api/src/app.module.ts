@@ -9,10 +9,20 @@ import { UsersModule } from './modules/users.module'
 import { LogsModule } from './modules/logs.module'
 import { ValidatorsModule } from './modules/validators.module'
 import { TasksModule } from './modules/tasks.module'
+import { APP_PIPE } from '@nestjs/core'
+import { ValidationPipe } from '@nestjs/common'
+
 
 @Module({
   imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, TasksModule, UsersModule, LogsModule, ValidatorsModule],
   controllers: [],
-  providers: [],
-})
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    },
+  ] })
 export class AppModule {}
