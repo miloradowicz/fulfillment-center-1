@@ -105,14 +105,6 @@ export const useArrivalForm = () => {
     }))
   }
 
-  const getFieldError = (fieldName: string) => {
-    try {
-      return error?.errors[fieldName].messages.join('; ')
-    } catch {
-      return undefined
-    }
-  }
-
   const autoCompleteClients =
     clients?.map(client => ({
       label: client.name,
@@ -174,9 +166,9 @@ export const useArrivalForm = () => {
     addItem,
     deleteItem,
     handleBlur,
-    getFieldError,
     autoCompleteClients,
     getProductNameById,
+    error,
     submitFormHandler,
   }
 }
