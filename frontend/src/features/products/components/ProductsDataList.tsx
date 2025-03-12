@@ -107,7 +107,7 @@ const ProductsDataList = () => {
               },
             },
           }}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[5, 10, 20]}
           checkboxSelection
           disableRowSelectionOnClick
         />

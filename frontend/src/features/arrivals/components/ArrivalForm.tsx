@@ -3,9 +3,10 @@ import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } 
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
 import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { inputChangeHandler } from '../utils/arrivalUtils.ts'
 import { Defect, ProductArrival } from '../../../types'
 import { initialItemState } from '../state/arrivalState.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
+import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 
 const ArrivalForm = () => {
   const {
@@ -32,14 +33,14 @@ const ArrivalForm = () => {
     addItem,
     deleteItem,
     handleBlur,
-    getFieldError,
     autoCompleteClients,
     getProductNameById,
+    error,
     submitFormHandler,
   } = useArrivalForm()
 
   return (
-    <form onSubmit={submitFormHandler} style={{ marginTop: '3rem' }}>
+    <form onSubmit={submitFormHandler}>
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
@@ -65,8 +66,8 @@ const ArrivalForm = () => {
               <TextField
                 {...params}
                 label="Клиент"
-                error={Boolean(errors.client || getFieldError('client'))}
-                helperText={errors.client || getFieldError('client')}
+                error={Boolean(errors.client || getFieldError('client', error))}
+                helperText={errors.client || getFieldError('client', error)}
                 onBlur={e => handleBlur('client', e.target.value)}
               />
             )}
@@ -104,8 +105,8 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product || getFieldError('product'))}
-                  helperText={errors.product || getFieldError('product')}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
               )}
@@ -120,8 +121,8 @@ const ArrivalForm = () => {
               label="Количество товара"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount || getFieldError('amount'))}
-              helperText={errors.amount || getFieldError('amount')}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
@@ -185,8 +186,8 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product || getFieldError('product'))}
-                  helperText={errors.product || getFieldError('product')}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
               )}
@@ -201,8 +202,8 @@ const ArrivalForm = () => {
               label="Количество товара"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount || getFieldError('amount'))}
-              helperText={errors.amount || getFieldError('amount')}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
@@ -264,8 +265,8 @@ const ArrivalForm = () => {
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product || getFieldError('product'))}
-                  helperText={errors.product || getFieldError('product')}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
                   onBlur={e => handleBlur('product', e.target.value)}
                 />
               )}
@@ -280,8 +281,8 @@ const ArrivalForm = () => {
               name="amount"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount || getFieldError('amount'))}
-              helperText={errors.amount || getFieldError('amount')}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
               onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
@@ -298,8 +299,8 @@ const ArrivalForm = () => {
                   defect_description: e.target.value,
                 }))
               }
-              error={Boolean(errors.defect_description || getFieldError('defect_description'))}
-              helperText={errors.defect_description || getFieldError('defect_description')}
+              error={Boolean(errors.defect_description || getFieldError('defect_description', error))}
+              helperText={errors.defect_description || getFieldError('defect_description', error)}
               onBlur={e => handleBlur('defect_description', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
@@ -328,8 +329,8 @@ const ArrivalForm = () => {
               }))
             }
             size="small"
-            error={Boolean(errors.arrival_price || getFieldError('arrival_price'))}
-            helperText={errors.arrival_price || getFieldError('arrival_price')}
+            error={Boolean(errors.arrival_price || getFieldError('arrival_price', error))}
+            helperText={errors.arrival_price || getFieldError('arrival_price', error)}
             onBlur={e => handleBlur('arrival_price', e.target.value)}
             fullWidth
           />
@@ -346,8 +347,8 @@ const ArrivalForm = () => {
             type="date"
             value={form.arrival_date}
             onChange={e => inputChangeHandler(e, setForm)}
-            error={Boolean(errors.arrival_date || getFieldError('arrival_date'))}
-            helperText={errors.arrival_date || getFieldError('arrival_date')}
+            error={Boolean(errors.arrival_date || getFieldError('arrival_date', error))}
+            helperText={errors.arrival_date || getFieldError('arrival_date', error)}
             onBlur={e => handleBlur('arrival_date', e.target.value)}
             fullWidth
           />
@@ -361,8 +362,8 @@ const ArrivalForm = () => {
             value={form.sent_amount}
             onChange={e => inputChangeHandler(e, setForm)}
             size="small"
-            error={Boolean(errors.sent_amount || getFieldError('sent_amount'))}
-            helperText={errors.sent_amount || getFieldError('sent_amount')}
+            error={Boolean(errors.sent_amount || getFieldError('sent_amount', error))}
+            helperText={errors.sent_amount || getFieldError('sent_amount', error)}
             onBlur={e => handleBlur('sent_amount', e.target.value)}
             fullWidth
           />
