@@ -3,19 +3,33 @@ import { FilesInterceptor } from '@nestjs/platform-express'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { ProductsService } from '../services/products.service'
 import { UpdateProductDto } from '../dto/update-product.dto'
+import { diskStorage } from 'multer'
+import * as path from 'node:path'
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('documents', 10, { dest: './uploads/documents' }))
+  @UseInterceptors(
+    FilesInterceptor('documents', 10, {
+      storage: diskStorage({
+        destination: './uploads/documents',
+        filename: (_req, file, cb) => {
+          const originalExt = path.extname(file.originalname) || ''
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+          cb(null, `${ file.fieldname }-${ uniqueSuffix }${ originalExt }`)
+        },
+      }),
+    })
+  )
   async createProduct(
     @Body() productDto: CreateProductDto,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
     return await this.productsService.create(productDto, files)
   }
+
 
   @Get()
   async getAllProducts(
