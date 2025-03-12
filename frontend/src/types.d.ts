@@ -125,6 +125,10 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
   products: ProductOrderMutation[]
 }
 
+export type OrderWithClient = Omit<Order, 'client'> & {
+  client: Client
+}
+
 export interface User {
   _id: string
   username: string

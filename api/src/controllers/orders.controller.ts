@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { OrdersService } from '../services/orders.service'
 import { CreateOrderDto } from '../dto/create-order.dto'
 import { UpdateOrderDto } from '../dto/update-order.dto'
@@ -8,7 +8,10 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async getAllOrders() {
+  async getAllOrders(@Query('client') client?: string) {
+    if (client === '1') {
+      return this.ordersService.getAllWithClient()
+    }
     return this.ordersService.getAll()
   }
 

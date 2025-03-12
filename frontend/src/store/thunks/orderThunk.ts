@@ -1,12 +1,20 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Order, OrderMutation, OrderWithProducts, ValidationError } from '../../types'
+import { GlobalError, Order, OrderMutation, OrderWithClient, OrderWithProducts, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchOrders = createAsyncThunk<Order[]>(
   'orders/fetchOrders',
   async () => {
     const response = await axiosAPI.get('/orders')
+    return response.data
+  },
+)
+
+export const fetchOrdersWithClient = createAsyncThunk<OrderWithClient[]>(
+  'orders/fetchOrdersWithClient',
+  async () => {
+    const response = await axiosAPI.get('/orders?client=1')
     return response.data
   },
 )
