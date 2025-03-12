@@ -38,14 +38,14 @@ const ArrivalsDataList = () => {
     {
       field: 'sent_amount',
       headerName: 'Отправлено',
-      width: 120,
+      flex: 1,
       filterable: true,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount,
     },
     {
       field: 'defects',
       headerName: 'Дефекты',
-      width: 100,
+      flex: 1,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.defects.length,
       filterable: false,
     },
@@ -61,20 +61,22 @@ const ArrivalsDataList = () => {
         }
 
         const status = row.arrival_status || 'В обработке'
+        const capitalizeFirstLetter = (text: string) =>
+          text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
-        return <Chip className="capitalize" label={status} color={statusColors[status] ?? 'default'} />
+        return <Chip label={capitalizeFirstLetter(status)} color={statusColors[status] ?? 'default'} />
       },
     },
     {
       field: 'products',
       headerName: 'Товаров',
-      width: 100,
+      flex: 1,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.products.length,
     },
     {
       field: 'Actions',
       headerName: '',
-      width: 210,
+      flex: 1,
       sortable: false,
       filterable: false,
       renderCell: ({ row }) => {
