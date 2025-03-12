@@ -47,11 +47,11 @@ const ProductForm = () => {
       toast.warn('Поле "Название" обязательно для заполнения!')
       return
     }
-    if (!form.amount) {
+    if (form.amount === 0) {
       toast.warn('Поле "Количество" обязательно для заполнения!')
       return
     }
-    if (!form.barcode.trim() || !form.barcode ) {
+    if (!form.barcode.trim() || !form.barcode) {
       toast.warn('Поле "Баркод" обязательно для заполнения!')
       return
     }
@@ -60,16 +60,23 @@ const ProductForm = () => {
       return
     }
 
-
-
     try {
-      const productData: ProductMutation = {
-        ...form,
-        dynamic_fields: dynamicFields,
-        documents: file ? [{ document: await convertFileToBase64(file) }] : [],
+      const formData = new FormData()
+      formData.append('client', form.client)
+      formData.append('title', form.title)
+      formData.append('amount', String(form.amount))
+      formData.append('barcode', form.barcode)
+      formData.append('article', form.article)
+
+      if (dynamicFields.length > 0) {
+        formData.append('dynamic_fields', JSON.stringify(dynamicFields))
       }
 
-      await dispatch(addProduct(productData)).unwrap()
+      if (file) {
+        formData.append('documents', file)
+      }
+
+      await dispatch(addProduct(formData)).unwrap()
       toast.success('Продукт успешно создан.')
 
       setForm(initialState)
@@ -79,9 +86,10 @@ const ProductForm = () => {
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         console.error('Ошибки валидации:', e.response.data)
+      } else {
+        console.error('Ошибка сервера:', e)
+        toast.error('Не удалось создать продукт.')
       }
-      console.error('Ошибка сервера:', e)
-      toast.error('Не удалось создать продукт.')
     }
   }
 
@@ -114,19 +122,6 @@ const ProductForm = () => {
       }
       setFile(selectedFile)
     }
-  }
-
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (reader.result) {
-          resolve(reader.result.toString())
-        }
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
   }
 
   const addDynamicField = () => {
