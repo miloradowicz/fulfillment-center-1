@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, InputLabel, MenuItem, Select, TextField, Typography, Box } from '@mui/material'
+import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
 import useProductForm from '../../../hooks/useProductForm.ts'
 
 const ProductForm = () => {
@@ -31,25 +31,24 @@ const ProductForm = () => {
       </Typography>
       <Grid container direction="column" spacing={2}>
         <Grid>
-          <InputLabel id="client-select-label">Клиент</InputLabel>
-          <Select
-            labelId="client-select-label"
-            id="client-select"
-            value={selectedClient}
-            onChange={e => {
-              const clientId = e.target.value
+          <Autocomplete
+            options={clients || []}
+            getOptionLabel={option => option.name}
+            value={clients?.find(client => client._id === selectedClient) || null}
+            onChange={(_event, newValue) => {
+              const clientId = newValue ? newValue._id : ''
               setSelectedClient(clientId)
               setForm(prevState => ({ ...prevState, client: clientId }))
             }}
-            fullWidth
-            size="small"
-          >
-            {clients?.map(client => (
-              <MenuItem key={client._id} value={client._id}>
-                {client.name}
-              </MenuItem>
-            ))}
-          </Select>
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Клиент"
+                fullWidth
+                size="small"
+              />
+            )}
+          />
         </Grid>
 
         <Grid>
