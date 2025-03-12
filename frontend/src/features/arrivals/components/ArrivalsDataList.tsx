@@ -76,7 +76,7 @@ const ArrivalsDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      flex: 1,
+      flex: 2,
       sortable: false,
       filterable: false,
       renderCell: ({ row }) => {
