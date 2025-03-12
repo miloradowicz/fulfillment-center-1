@@ -40,7 +40,7 @@ const ArrivalForm = () => {
   } = useArrivalForm()
 
   return (
-    <form onSubmit={submitFormHandler} style={{ marginTop: '3rem' }}>
+    <form onSubmit={submitFormHandler}>
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
