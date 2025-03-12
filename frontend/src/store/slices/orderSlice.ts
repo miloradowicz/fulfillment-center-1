@@ -1,22 +1,31 @@
-import { GlobalError, Order, OrderWithProducts, ValidationError } from '../../types'
+import { GlobalError, Order, OrderWithClient, OrderWithProducts, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
-import { addOrder, deleteOrder, fetchOrderById, fetchOrders, updateOrder } from '../thunks/orderThunk.ts'
+import {
+  addOrder,
+  deleteOrder,
+  fetchOrderById,
+  fetchOrders,
+  fetchOrdersWithClient,
+  updateOrder,
+} from '../thunks/orderThunk.ts'
 
 interface OrderState {
-  order: OrderWithProducts | null;
-  orders: Order[] | null;
-  loadingFetch : boolean;
-  loadingAdd: boolean;
-  loadingDelete: boolean;
-  loadingUpdate: boolean;
-  error: GlobalError | null;
-  createError: ValidationError | null;
+  order: OrderWithProducts | null
+  orders: Order[] | null
+  ordersWithClient: OrderWithClient[] | null
+  loadingFetch : boolean
+  loadingAdd: boolean
+  loadingDelete: boolean
+  loadingUpdate: boolean
+  error: GlobalError | null
+  createError: ValidationError | null
 }
 
 const initialState: OrderState = {
   order: null,
   orders: null,
+  ordersWithClient: null,
   loadingFetch: false,
   loadingAdd: false,
   loadingDelete: false,
@@ -27,6 +36,7 @@ const initialState: OrderState = {
 
 export const selectOrder = (state: RootState) => state.orders.order
 export const selectAllOrders = (state: RootState) => state.orders.orders
+export const selectAllOrdersWithClient = (state: RootState) => state.orders.ordersWithClient
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
 export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
@@ -47,6 +57,16 @@ const orderSlice = createSlice({
       state.orders = action.payload
     })
     builder.addCase(fetchOrders.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchOrdersWithClient.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchOrdersWithClient.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.ordersWithClient = action.payload
+    })
+    builder.addCase(fetchOrdersWithClient.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(fetchOrderById.pending, state => {
