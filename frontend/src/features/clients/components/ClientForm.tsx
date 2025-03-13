@@ -15,7 +15,7 @@ const ClientForm = () => {
             <TextField
               id="name"
               name="name"
-              label="ФИО / Название комании *"
+              label="ФИО / Название компании *"
               value={form.name}
               onChange={inputChangeHandler}
               error={Boolean(getFieldError('name'))}

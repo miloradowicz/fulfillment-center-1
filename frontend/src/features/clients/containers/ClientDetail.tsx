@@ -19,11 +19,14 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectClient, selectClientError, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
 import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
+import { useClientsList } from '../hooks/useClientsList.ts'
+import { toast } from 'react-toastify'
 
 const ClientDetail = () => {
   const { clientId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { deleteOneClient } = useClientsList()
 
   const client = useAppSelector(selectClient)
   const loading = useAppSelector(selectLoadingFetchClient)
@@ -148,6 +151,17 @@ const ClientDetail = () => {
                   px: 3,
                   borderRadius: 2,
                   textTransform: 'none',
+                }}
+                onClick={async () => {
+                  if (clientId) {
+                    try {
+                      await deleteOneClient(clientId)
+                      toast.success('Клиент успешно удалён!')
+                      navigate('/clients')
+                    } catch {
+                      toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
+                    }
+                  }
                 }}
               >
                 Удалить

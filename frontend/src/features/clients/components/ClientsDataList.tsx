@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Client } from '../../../types'
@@ -8,7 +8,8 @@ import { NavLink } from 'react-router-dom'
 import { useClientsList } from '../hooks/useClientsList.ts'
 
 const ClientsDataList = () => {
-  const { clients, deleteOneClient } = useClientsList()
+  const { clients, deleteOneClient, isLoading } = useClientsList()
+
   const columns: GridColDef<Client>[] = [
     {
       field: 'name',
@@ -52,30 +53,37 @@ const ClientsDataList = () => {
       field: 'Actions',
       headerName: '',
       type: 'number',
-      width: 150,
+      width: 200,
       sortable: false,
       editable: false,
       filterable: false,
       renderCell: ({ row }) => (
-        <>
+        <Box display="flex" alignItems="center">
           <IconButton>
             <EditIcon />
           </IconButton>
           <IconButton onClick={() => deleteOneClient(row._id)}>
             <ClearIcon />
           </IconButton>
-          <NavLink className="text-gray-500 hover:text-gray-700 ml-2" to={`/clients/${ row._id }`}
+          <NavLink
+            to={`/clients/${ row._id }`}
+            style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
+            className="text-gray-500 hover:text-gray-700"
           >
             Подробнее
           </NavLink>
-        </>
+        </Box>
       ),
     },
   ]
 
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
-      {clients ? (
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
+          <CircularProgress />
+        </Box>
+      ) : clients && clients.length > 0 ? (
         <DataGrid
           getRowId={row => row._id}
           rows={clients}

@@ -61,6 +61,7 @@ export const useClientForm = () => {
     if (validateFields()) return
 
     await dispatch(addClient(form))
+    await dispatch(fetchClients())
     setForm(initialClientState)
     toast.success('Клиент успешно создан!')
   }
