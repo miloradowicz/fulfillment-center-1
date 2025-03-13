@@ -8,6 +8,7 @@ import { User, UserDocument } from '../schemas/user.schema'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
+import { Stock, StockDocument } from '../schemas/stock.schema'
 
 @Injectable()
 export class SeederService {
@@ -24,6 +25,8 @@ export class SeederService {
     private readonly arrivalModel: Model<ArrivalDocument>,
     @InjectModel(Service.name)
     private readonly serviceModel: Model<ServiceDocument>,
+    @InjectModel(Stock.name)
+    private readonly stockModel: Model<StockDocument>,
   ) {}
 
   async seed() {
@@ -33,6 +36,7 @@ export class SeederService {
     await this.userModel.deleteMany({})
     await this.arrivalModel.deleteMany({})
     await this.serviceModel.deleteMany({})
+    await this.stockModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -146,5 +150,11 @@ export class SeederService {
         ],
       },
     ])
+
+    await this.stockModel.create({
+      name: 'Склад Бишкек',
+      address: 'Ул. Малдыбаева 7/1',
+      products: [{ product: _products, description: '', amount: 20 }],
+    })
   }
 }
