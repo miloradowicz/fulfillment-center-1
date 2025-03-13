@@ -13,6 +13,10 @@ export class ServicesService {
     return this.serviceModel.find()
   }
 
+  async getAllByName(name: string) {
+    return this.serviceModel.find({ 'name': { $regex: name, $options: 'i' } })
+  }
+
   async getById(id: string) {
     const service = await this.serviceModel.findById(id).exec()
     if (!service) throw new NotFoundException('Услуга не найдена')

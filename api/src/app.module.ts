@@ -11,10 +11,11 @@ import { ValidatorsModule } from './modules/validators.module'
 import { TasksModule } from './modules/tasks.module'
 import { APP_PIPE } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
+import { ServicesModule } from './modules/services.module'
 
 
 @Module({
-  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, TasksModule, UsersModule, LogsModule, ValidatorsModule],
+  imports: [CsrfModule, DbModule, ClientsModule, ProductsModule, ArrivalsModule, OrdersModule, TasksModule, UsersModule, LogsModule, ValidatorsModule, ServicesModule],
   controllers: [],
   providers: [
     {
