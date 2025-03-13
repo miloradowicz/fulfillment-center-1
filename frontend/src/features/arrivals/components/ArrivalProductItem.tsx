@@ -1,87 +1,47 @@
-import { Card, CardContent, Grid2 as Grid, Typography } from '@mui/material'
-import {  DefectWithPopulate, ProductArrivalWithPopulate } from '../../../types'
+import { Card, CardContent, Grid2 as Grid } from '@mui/material'
+import { DefectWithPopulate, ProductArrivalWithPopulate } from '../../../types'
 import { FC } from 'react'
+import ArrivalDetailsTextItem from './ArrivalDetailsTextItem'
 
 interface Props {
   product: ProductArrivalWithPopulate | DefectWithPopulate
+  loading: boolean
 }
 
-const ArrivalProductItem: FC<Props> = ({ product }) => {
+const ArrivalProductItem: FC<Props> = ({ product, loading }) => {
   return (
-    <Card>
+    <Card sx={{ minWidth: 200 }}>
       <CardContent>
         <Grid container direction="column">
-          <Grid container>
-            <Grid size={6}>
-              <Typography variant="body2" color="text.secondary">
-              Название
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography variant="body2">{product.product.title}</Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography variant="body2" color="text.secondary">
-                  Артикул
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography variant="body2">{product.product.article}</Typography>
-            </Grid>
+          <Grid>
+            <ArrivalDetailsTextItem label='Название' value={product.product.title} loading={loading} />
           </Grid>
-          {product.product.dynamic_fields?.length && (
-            <Grid container size={12}>
-              {product.product.dynamic_fields.map(x => (
-                <>
-                  <Grid size={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      {x.label}
-                    </Typography>
-                  </Grid>
-                  <Grid size={6}>
-                    <Typography>{x.value}</Typography>
-                  </Grid>
-                </>
-              ))}
+          <Grid>
+            <ArrivalDetailsTextItem label='Артикул' value={product.product.article} loading={loading} />
+          </Grid>
+          {product.product.dynamic_fields &&
+            product.product.dynamic_fields.map(x => (
+              <Grid key={x.key}>
+                <ArrivalDetailsTextItem label={x.label} value={x.value} loading={loading} />
+              </Grid>
+            ))
+          }
+          <Grid>
+            <ArrivalDetailsTextItem label='Количество' value={product.amount} loading={loading} />
+          </Grid>
+          {'description' in product && product.description &&
+            <Grid>
+              <ArrivalDetailsTextItem label='Описание' value={product.description} loading={loading} />
+            </Grid>
+          }
+          {'defect_description' in product && product.defect_description && (
+            <Grid>
+              <ArrivalDetailsTextItem label='Описание дефекта' value={product.defect_description} loading={loading} />
             </Grid>
           )}
-          <Grid container>
-            <Grid size={6}>
-              <Typography variant="body2" color="text.secondary">
-                  Количество
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography variant="body2">{product.amount}</Typography>
-            </Grid>
-            {'description' in product && product.description && (
-              <>
-                <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
-                      Описание
-                  </Typography>
-                </Grid>
-                <Grid size={6}>
-                  <Typography variant="body2">{product.description}</Typography>
-                </Grid>
-              </>
-            )}
-            {'defect_description' in product && product.defect_description && (
-              <>
-                <Grid size={6}>
-                  <Typography variant="body2" color="text.secondary">
-                      Описание
-                  </Typography>
-                </Grid>
-                <Grid size={6}>
-                  <Typography variant="body2">{product.defect_description}</Typography>
-                </Grid>
-              </>
-            )}
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+        </Grid >
+      </CardContent >
+    </Card >
   )
 }
 
