@@ -197,3 +197,27 @@ export interface ProductForOrderForm {
   defect_description: string
   amount: number
 }
+
+export interface Task {
+  _id: string
+  user: string
+  title: string
+  description: string
+  status: string
+  logs?: Log[]
+}
+
+export interface TaskWithPopulate {
+  _id: string
+  user: {
+      '_id': string,
+      'email': string,
+      'displayName': string,
+      'role': string,
+     }
+  title: string
+  description: string
+  status:string
+  logs?: Log[]
+}
+export type TaskMutation = Omit<Task, '_id'>

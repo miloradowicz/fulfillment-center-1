@@ -11,6 +11,7 @@ import OrderDetails from './features/orders/containers/OrderDetails.tsx'
 import OrderPage from './features/orders/containers/OrderPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
+import CanbanBoard from './features/tasks/components/CanbanBoard.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/reports" element={<ReportPage />} />
+            <Route path="/tasks" element={<CanbanBoard />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/add-new-client" element={<ClientForm />} />
             <Route path="/add-new-user" element={<RegistrationForm />} />

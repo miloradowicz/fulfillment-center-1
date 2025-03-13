@@ -1,29 +1,29 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from 'react'
 import {
   Defect,
   DefectForOrderForm,
   ErrorForOrder,
   OrderMutation,
   ProductForOrderForm,
-  ProductOrder
-} from "../../../types";
+  ProductOrder,
+} from '../../../types'
 import {
   initialStateDefectForOrder,
   initialStateErrorForOrder,
   initialStateOrder,
-  initialStateProductForOrder
-} from "./initialState.ts";
-import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
-import {selectCreateOrderError, selectLoadingAddOrder} from "../../../store/slices/orderSlice.ts";
-import {selectAllClients, selectLoadingFetchClient} from "../../../store/slices/clientSlice.ts";
-import {selectAllProducts} from "../../../store/slices/productSlice.ts";
-import {validationRules} from "./ValidationRulesForBlur.ts";
-import {toast} from "react-toastify";
-import {fetchClients} from "../../../store/thunks/clientThunk.ts";
-import {fetchProductsByClientId} from "../../../store/thunks/productThunk.ts";
-import {addOrder} from "../../../store/thunks/orderThunk.ts";
-import {deleteItem} from "./deleteItem.ts";
-import {addArrayItemInForm} from "./addArrayItemInForm.ts";
+  initialStateProductForOrder,
+} from './initialState.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { selectCreateOrderError, selectLoadingAddOrder } from '../../../store/slices/orderSlice.ts'
+import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
+import { selectAllProducts } from '../../../store/slices/productSlice.ts'
+import { validationRules } from './ValidationRulesForBlur.ts'
+import { toast } from 'react-toastify'
+import { fetchClients } from '../../../store/thunks/clientThunk.ts'
+import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
+import { addOrder } from '../../../store/thunks/orderThunk.ts'
+import { deleteItem } from './deleteItem.ts'
+import { addArrayItemInForm } from './addArrayItemInForm.ts'
 
 export const useOrderForm = () => {
   const [form, setForm] = useState<OrderMutation>(initialStateOrder)
@@ -45,12 +45,12 @@ export const useOrderForm = () => {
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const errorMessage = validationRules[name]?.(value) || (value.trim() === '' ? 'Это поле обязательно для заполнения' : '');
+    const { name, value } = e.target
+    const errorMessage = validationRules[name]?.(value) || (value.trim() === '' ? 'Это поле обязательно для заполнения' : '')
     setErrors(prevErrors => ({
       ...prevErrors,
       [name]: errorMessage,
-    }));
+    }))
   }
 
   const handleButtonClick = () => {
@@ -98,42 +98,42 @@ export const useOrderForm = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(form);
+    console.log(form)
     if (form.products.length === 0) {
       toast.error('Добавьте товары')
     } else {
       await dispatch(addOrder(form)).unwrap()
-      setForm({...initialStateOrder})
+      setForm({ ...initialStateOrder })
       setProductsForm([])
       toast.success('Заказ успешно создан!')
     }
   }
 
   const deleteProduct = (index: number) => {
-    deleteItem(index, setProductsForm, setForm, "products");
-  };
+    deleteItem(index, setProductsForm, setForm, 'products')
+  }
   const deleteDefect = (index: number) => {
-    deleteItem(index, setDefectForm, setForm, "defects");
-  };
+    deleteItem(index, setDefectForm, setForm, 'defects')
+  }
 
   const handleBlurAutoComplete = (
     field: string,
     setErrors: React.Dispatch<React.SetStateAction<ErrorForOrder>>,
     formData: any,
-    errorMessage: string
+    errorMessage: string,
   ) => {
     if (!formData[field]) {
-      setErrors((prevErrors) => ({
+      setErrors(prevErrors => ({
         ...prevErrors,
         [field]: errorMessage,
-      }));
+      }))
     } else {
-      setErrors((prevErrors) => ({
+      setErrors(prevErrors => ({
         ...prevErrors,
         [field]: '',
-      }));
+      }))
     }
-  };
+  }
 
   const setFormArrayData = () => {
     setForm(prev => ({
@@ -159,11 +159,11 @@ export const useOrderForm = () => {
       setProductsForm,
       setFormArrayData,
       clientProducts,
-      "amount",
-      "description",
-      "product"
-    );
-  };
+      'amount',
+      'description',
+      'product',
+    )
+  }
 
   const addArrayDefectInForm = () => {
     addArrayItemInForm(
@@ -171,10 +171,10 @@ export const useOrderForm = () => {
       setDefectForm,
       setFormArrayData,
       clientProducts,
-      "amount",
-      "defect_description",
-      "product"
-    );
+      'amount',
+      'defect_description',
+      'product',
+    )
   }
   return{
     form,
