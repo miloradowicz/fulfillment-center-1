@@ -122,7 +122,7 @@ export interface Order {
   comment?: string
   status?: 'в сборке' | 'в пути' | 'доставлен'
   logs?: Log[]
-  defects?: Defect[]
+  defects: Defect[]
 }
 
 export type OrderWithProducts = Omit<Order, 'products'> & {
