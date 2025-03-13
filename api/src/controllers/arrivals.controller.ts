@@ -5,7 +5,7 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 
 @Controller('arrivals')
 export class ArrivalsController {
-  constructor(private arrivalsService: ArrivalsService) {}
+  constructor(private readonly arrivalsService: ArrivalsService) {}
 
   @Get()
   async getAllArrivals(@Query('client') clientId: string, @Query('populate') populate?: string) {
