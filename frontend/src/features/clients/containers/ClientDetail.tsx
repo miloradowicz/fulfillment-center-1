@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box, Button,
@@ -19,8 +19,15 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectClient, selectClientError, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
 import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
+import ClientForm from '../components/ClientForm.tsx'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
 
 const ClientDetail = () => {
+  const [editModalOpen, setEditModalOpen] = useState(false)
+
+  const handleOpenEditModal = () => setEditModalOpen(true)
+  const handleCloseEditModal = () => setEditModalOpen(false)
+
   const { clientId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -132,6 +139,7 @@ const ClientDetail = () => {
               <Button
                 variant="contained"
                 startIcon={<EditOutlined />}
+                onClick={handleOpenEditModal}
                 sx={{
                   px: 3,
                   borderRadius: 2,
@@ -154,6 +162,9 @@ const ClientDetail = () => {
               </Button>
             </Box>
           </Card>
+          <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
+            <ClientForm client={client} onClose={handleCloseEditModal} />
+          </Modal>
         </Box>
       </>}
     </>

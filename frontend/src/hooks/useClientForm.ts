@@ -2,24 +2,32 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { ClientMutation } from '../types'
 import { useAppDispatch, useAppSelector } from '../app/hooks.ts'
-import { selectAllClients, selectClientError, selectLoadingAddClient } from '../store/slices/clientSlice.ts'
-import { addClient, fetchClients } from '../store/thunks/clientThunk.ts'
+import { selectClient, selectClientError, selectLoadingAddClient } from '../store/slices/clientSlice.ts'
+import { addClient, fetchClientById, updateClient } from '../store/thunks/clientThunk.ts'
 import { emailRegex, phoneNumberRegex, initialClientState } from '../constants.ts'
 
 const requiredFields: (keyof ClientMutation)[] = ['name', 'email', 'phone_number', 'inn']
 
-export const useClientForm = () => {
+export const useClientForm = (clientId?: string, onClose?: () => void) => {
   const [form, setForm] = useState<ClientMutation>(initialClientState)
   const [errors, setErrors] = useState<Partial<ClientMutation>>({})
 
   const dispatch = useAppDispatch()
   const loading = useAppSelector(selectLoadingAddClient)
   const createError = useAppSelector(selectClientError)
-  const clients = useAppSelector(selectAllClients) || []
+  const client = useAppSelector(selectClient)
 
   useEffect(() => {
-    dispatch(fetchClients())
-  }, [dispatch])
+    if (clientId) {
+      dispatch(fetchClientById(clientId))
+    }
+  }, [dispatch, clientId])
+
+  useEffect(() => {
+    if (clientId && client) {
+      setForm(client)
+    }
+  }, [clientId, client])
 
   const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -35,13 +43,8 @@ export const useClientForm = () => {
 
   const validateField = (name: keyof ClientMutation, value: string): string => {
     if (!value.trim()) return 'Поле не может быть пустым'
-
     if (name === 'email' && !emailRegex.test(value)) return 'Неправильный формат Email'
     if (name === 'phone_number' && !phoneNumberRegex.test(value)) return 'Неправильный формат номера телефона'
-    if (name === 'name' && clients.some(client => client.name.toLowerCase() === value.trim().toLowerCase())) {
-      return 'Клиент с таким именем уже существует'
-    }
-
     return ''
   }
 
@@ -60,9 +63,17 @@ export const useClientForm = () => {
     e.preventDefault()
     if (validateFields()) return
 
-    await dispatch(addClient(form))
+    if (clientId) {
+      await dispatch(updateClient({ clientId: clientId, data: form }))
+      await dispatch(fetchClientById(clientId))
+      toast.success('Клиент успешно обновлен!')
+    } else {
+      await dispatch(addClient(form))
+      toast.success('Клиент успешно создан!')
+    }
+
     setForm(initialClientState)
-    toast.success('Клиент успешно создан!')
+    if (onClose) onClose()
   }
 
   const getFieldError = (fieldName: keyof ClientMutation) => {
