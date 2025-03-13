@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { useClientForm } from '../../../hooks/useClientForm.ts'
+import { useClientForm } from '../hooks/useClientForm.ts'
 
 const ClientForm = () => {
 
@@ -15,7 +15,7 @@ const ClientForm = () => {
             <TextField
               id="name"
               name="name"
-              label="ФИО / Название комании *"
+              label="ФИО / Название компании *"
               value={form.name}
               onChange={inputChangeHandler}
               error={Boolean(getFieldError('name'))}
