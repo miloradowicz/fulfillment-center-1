@@ -1,28 +1,83 @@
 import { OrderWithClient } from '../../../types'
-import React, { useState } from 'react'
-import { Box, IconButton, Typography } from '@mui/material'
+import React from 'react'
+import { Box, Chip, IconButton, Typography } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from './OrderForm.tsx'
+import { ruRU } from '@mui/x-data-grid/locales'
+import dayjs from 'dayjs'
 
 interface Props {
   orders: OrderWithClient[] | [];
   handleDelete: (id: string) => void
+  open: boolean
+  handleOpen: () => void
+  handleClose: () => void
 }
 
-const OrdersList: React.FC<Props> = ({ orders, handleDelete }) => {
-  const [open, setOpen] = useState(false)
+const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, handleClose }) => {
+
   const columns: GridColDef<OrderWithClient>[] = [
-    { field: '_id', headerName: 'Номер заказа', flex: 0.2 },
-    { field: 'client', headerName: 'Клиент', flex: 0.2,
+    {
+      field: 'client',
+      headerName: 'Клиент',
+      flex: 0.1,
+      editable: false,
+      filterable: true,
       valueGetter: (_value: string, row: OrderWithClient) => row.client.name },
-    { field: 'price', headerName: 'Стоимость', flex: 0.1 },
-    { field: 'status', headerName: 'Статус', flex: 0.1 },
-    { field: 'sent_at', headerName: 'Отправлен', flex: 0.1 },
-    { field: 'delivered_at', headerName: 'Доставлен', flex: 0.1 },
+    {
+      field: 'sent_at',
+      headerName: 'Отправлен',
+      flex: 0.1,
+      valueGetter: (_value: string, row: OrderWithClient) => new Date(row.sent_at),
+      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
+    },
+    {
+      field: 'delivered_at',
+      headerName: 'Доставлен',
+      flex: 0.1,
+      valueGetter: (_value: string, row: OrderWithClient) => new Date(row.delivered_at),
+      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
+    },
+    {
+      field: 'price',
+      headerName: 'Стоимость',
+      flex: 0.1,
+    },
+    {
+      field: 'defects',
+      headerName: 'Дефекты',
+      flex: 0.1,
+      valueGetter: (_value: string, row: OrderWithClient) => row.defects.length,
+      filterable: false,
+    },
+    {
+      field: 'status',
+      headerName: 'Статус',
+      flex: 0.1,
+      renderCell: ({ row }) => {
+        const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
+          'в сборке': 'warning',
+          'доставлен': 'success',
+          'в пути': 'info',
+        }
+
+        const status = row.status || 'В обработке'
+        const capitalizeFirstLetter = (text: string) =>
+          text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+
+        return <Chip label={capitalizeFirstLetter(status)} color={statusColors[status] ?? 'default'} />
+      },
+    },
+    {
+      field: 'products',
+      headerName: 'Товаров',
+      flex: 0.1,
+      valueGetter: (_value: string, row: OrderWithClient) => row.products.length,
+    },
     {
       field: 'actions',
       headerName: '',
@@ -35,7 +90,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete }) => {
             <EditIcon fontSize="inherit" />
           </IconButton>
           <IconButton
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleDelete(params.row._id)}
           >
             <ClearIcon fontSize="inherit" />
           </IconButton>
@@ -49,13 +104,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete }) => {
     },
   ]
 
-  const handleOpen = () => setOpen(true)
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
       {orders ? (
@@ -63,6 +111,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete }) => {
           getRowId={row => row._id}
           rows={orders}
           columns={columns}
+          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
             pagination: {
               paginationModel: {
@@ -70,14 +119,13 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete }) => {
               },
             },
           }}
-          pageSizeOptions={[5, 10, 15]}
+          pageSizeOptions={[5, 10, 20]}
+          checkboxSelection
           disableRowSelectionOnClick
         />
       ) :
         (
-          <Typography className="text-gray-500 text-center">
-            Нет данных для отображения
-          </Typography>
+          <Typography className="text-center mt-5">Заказы не найдены.</Typography>
         )
       }
       <Modal handleClose={handleClose} open={open}><OrderForm/></Modal>

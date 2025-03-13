@@ -29,6 +29,7 @@ export class SeederService {
   async seed() {
     await this.clientModel.deleteMany({})
     await this.productModel.deleteMany({})
+    await this.orderModel.deleteMany({})
     await this.taskModel.deleteMany({})
     await this.userModel.deleteMany({})
     await this.arrivalModel.deleteMany({})
