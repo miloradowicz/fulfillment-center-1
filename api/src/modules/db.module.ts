@@ -7,6 +7,7 @@ import { Product, ProductSchema } from '../schemas/product.schema'
 import { Order, OrderSchema } from 'src/schemas/order.schema'
 import { User, UserSchema } from '../schemas/user.schema'
 import { Task, TaskSchema } from '../schemas/task.schema'
+import { Service, ServiceSchema } from '../schemas/service.schema'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Task, TaskSchema } from '../schemas/task.schema'
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
+    MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
   ],
   exports: [MongooseModule],
 })
