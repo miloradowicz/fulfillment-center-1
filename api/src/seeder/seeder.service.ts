@@ -7,6 +7,7 @@ import { Task, TaskDocument } from '../schemas/task.schema'
 import { User, UserDocument } from '../schemas/user.schema'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
+import { Service, ServiceDocument } from '../schemas/service.schema'
 
 @Injectable()
 export class SeederService {
@@ -21,6 +22,8 @@ export class SeederService {
     private readonly taskModel: Model<TaskDocument>,
     @InjectModel(Arrival.name)
     private readonly arrivalModel: Model<ArrivalDocument>,
+    @InjectModel(Service.name)
+    private readonly serviceModel: Model<ServiceDocument>,
   ) {}
 
   async seed() {
@@ -29,6 +32,7 @@ export class SeederService {
     await this.taskModel.deleteMany({})
     await this.userModel.deleteMany({})
     await this.arrivalModel.deleteMany({})
+    await this.serviceModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -123,6 +127,23 @@ export class SeederService {
         arrival_status: 'отсортирована',
         arrival_date: new Date().toISOString(),
         sent_amount: '5 коробов',
+      },
+    ])
+
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром',
+        dynamic_fields: [
+          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
+          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
+        ],
+      },
+      {
+        name: 'Забор товара',
+        dynamic_fields: [
+          { key: '1', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '2', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
       },
     ])
   }
