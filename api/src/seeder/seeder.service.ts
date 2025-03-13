@@ -18,8 +18,9 @@ export class SeederService {
     private readonly userModel: Model<UserDocument>,
   ) {}
   async seed() {
-    await this.clientModel.deleteMany({})
-    await this.productModel.deleteMany({})
+    await this.clientModel.deleteMany()
+    await this.productModel.deleteMany()
+    await this.userModel.deleteMany()
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
