@@ -11,9 +11,7 @@ import OrderDetails from './features/orders/containers/OrderDetails.tsx'
 import OrderPage from './features/orders/containers/OrderPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
-import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
-import OrderForm from './features/orders/components/OrderForm.tsx'
-import ArrivalForm from './features/arrivals/components/ArrivalForm.tsx'
+import TaskBoard from './features/tasks/components/TaskBoard.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -27,18 +25,11 @@ const App = () => {
             <Route path="/clients" element={<ClientPage />} />
             <Route path="/clients/:clientId" element={<ClientDetail />} />
             <Route path="/arrivals" element={<ArrivalPage />} />
-            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
-            <Route path="/products" element={<ProductPage />} />
-            <Route path="/orders" element={<OrderPage />} />
-            <Route path="/reports" element={<ReportPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/add-new-client" element={<ClientForm />} />
-            <Route path="/add-new-order" element={<OrderForm />} />
-            <Route path="/add-new-arrival" element={<ArrivalForm />} />
             <Route path="/products" element={<ProductPage />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/reports" element={<ReportPage />} />
+            <Route path="/tasks" element={<TaskBoard />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/add-new-client" element={<ClientForm />} />
             <Route path="/add-new-user" element={<RegistrationForm />} />
