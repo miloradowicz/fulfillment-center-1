@@ -1,29 +1,43 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { ArrivalError, ArrivalMutation, Defect, ProductArrival } from '../../../types'
+import { ArrivalError, ArrivalMutation, ArrivalWithClient, Defect, ProductArrival } from '../../../types'
 import { initialErrorState, initialItemState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addArrival, fetchPopulatedArrivals } from '../../../store/thunks/arrivalThunk.ts'
+import { addArrival, fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
+import dayjs from 'dayjs'
 
-export const useArrivalForm = () => {
+export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
 
-  const [form, setForm] = useState<ArrivalMutation>({ ...initialState })
+  const [form, setForm] = useState<ArrivalMutation>(
+    initialData
+      ? {
+        client: initialData.client._id,
+        arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
+        arrival_price: initialData.arrival_price,
+        sent_amount: initialData.sent_amount,
+        products: [],
+        defects: [],
+        received_amount: [],
+      }
+      : { ...initialState },
+  )
+
+  const [productsForm, setProductsForm] = useState<ProductArrival[]>(initialData?.products || [])
+  const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(initialData?.received_amount || [])
+  const [defectsForm, setDefectForm] = useState<Defect[]>(initialData?.defects || [])
+
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
   const [errors, setErrors] = useState<ArrivalError>({ ...initialErrorState })
-
-  const [productsForm, setProductsForm] = useState<ProductArrival[]>([])
-  const [receivedForm, setReceivedForm] = useState<ProductArrival[]>([])
-  const [defectForm, setDefectForm] = useState<Defect[]>([])
 
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
@@ -118,25 +132,34 @@ export const useArrivalForm = () => {
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
+
     if (productsForm.length === 0) {
-      toast.error('Добавьте товары')
+      toast.error('Добавьте товары.')
       return
     }
+
     try {
       const updatedForm = {
         ...form,
         products: productsForm,
         received_amount: receivedForm,
-        defects: defectForm,
+        defects: defectsForm,
         arrival_price: Number(form.arrival_price),
       }
 
-      await dispatch(addArrival(updatedForm)).unwrap()
+      if (initialData) {
+        await dispatch(updateArrival({ arrivalId: initialData._id, data: updatedForm })).unwrap()
+        onSuccess?.()
+        toast.success('Поставка успешно обновлена!')
+      } else {
+        await dispatch(addArrival(updatedForm)).unwrap()
+        toast.success('Поставка успешно создана!')
+      }
+
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
-      toast.success('Поставка успешно создана!')
       await dispatch(fetchPopulatedArrivals())
     } catch (e) {
       console.error(e)
@@ -155,7 +178,7 @@ export const useArrivalForm = () => {
     setProductsForm,
     receivedForm,
     setReceivedForm,
-    defectForm,
+    defectsForm,
     setDefectForm,
     productsModalOpen,
     setProductsModalOpen,
