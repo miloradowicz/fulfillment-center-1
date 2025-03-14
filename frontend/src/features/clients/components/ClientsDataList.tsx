@@ -9,18 +9,22 @@ import { useClientsList } from '../hooks/useClientsList.ts'
 import { useState } from 'react'
 import ClientForm from './ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import { useAppSelector } from '../../../app/hooks.ts'
-import { selectClient } from '../../../store/slices/clientSlice.ts'
 
 const ClientsDataList = () => {
   const { clients, deleteOneClient, isLoading } = useClientsList()
 
   const [editModalOpen, setEditModalOpen] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 
-  const handleOpenEditModal = () => setEditModalOpen(true)
-  const handleCloseEditModal = () => setEditModalOpen(false)
-  const client = useAppSelector(selectClient)
+  const handleOpenEditModal = (client: Client) => {
+    setSelectedClient(client)
+    setEditModalOpen(true)
+  }
 
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false)
+    setSelectedClient(null)
+  }
 
   const columns: GridColDef<Client>[] = [
     {
@@ -71,7 +75,7 @@ const ClientsDataList = () => {
       filterable: false,
       renderCell: ({ row }) => (
         <Box display="flex" alignItems="center">
-          <IconButton onClick={handleOpenEditModal}>
+          <IconButton onClick={() => handleOpenEditModal(row)}>
             <EditIcon />
           </IconButton>
           <IconButton onClick={() => deleteOneClient(row._id)}>
@@ -82,7 +86,7 @@ const ClientsDataList = () => {
             style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
             className="text-gray-500 hover:text-gray-700"
           >
-            Подробнее
+              Подробнее
           </NavLink>
         </Box>
       ),
@@ -116,7 +120,7 @@ const ClientsDataList = () => {
         <Typography className="text-center mt-5">Клиентов нет</Typography>
       )}
       <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
-        <ClientForm client={client} onClose={handleCloseEditModal} />
+        {selectedClient && <ClientForm client={selectedClient} onClose={handleCloseEditModal} />}
       </Modal>
     </Box>
   )
