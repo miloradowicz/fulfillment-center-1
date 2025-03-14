@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { Arrival, ArrivalMutation, ArrivalWithClient, GlobalError, ValidationError } from '../../types'
+import { Arrival, ArrivalMutation, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
@@ -11,7 +11,15 @@ export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals
 export const fetchArrivalById = createAsyncThunk<Arrival, string>(
   'arrivals/fetchArrivalById',
   async (arrivalId: string) => {
-    const response = await axiosAPI.get(`/arrivals/?=${ arrivalId }`)
+    const response = await axiosAPI.get(`/arrivals/?=${arrivalId}`)
+    return response.data
+  },
+)
+
+export const fetchArrivalByIdWithPopulate = createAsyncThunk<ArrivalWithPopulate, string>(
+  'arrivals/fetchArrivalByIdWithPopulate',
+  async (arrivalId: string) => {
+    const response = await axiosAPI.get(`/arrivals/${arrivalId}`, { params: { populate: '1' } })
     return response.data
   },
 )
@@ -67,7 +75,7 @@ export const updateArrival = createAsyncThunk<
   { rejectValue: GlobalError }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
-    await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
+    await axiosAPI.put(`/arrivals/${arrivalId}`, data)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)

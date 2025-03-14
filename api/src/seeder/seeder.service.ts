@@ -3,12 +3,14 @@ import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
+import { User, UserDocument } from 'src/schemas/user.schema'
 import { Task, TaskDocument } from '../schemas/task.schema'
 import { User, UserDocument } from '../schemas/user.schema'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
 import { Stock, StockDocument } from '../schemas/stock.schema'
+
 
 @Injectable()
 export class SeederService {
@@ -17,6 +19,8 @@ export class SeederService {
     private readonly clientModel: Model<ClientDocument>,
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     @InjectModel(Task.name)
@@ -30,6 +34,9 @@ export class SeederService {
   ) {}
 
   async seed() {
+    await this.clientModel.deleteMany()
+    await this.productModel.deleteMany()
+    await this.userModel.deleteMany()
     await this.clientModel.deleteMany({})
     await this.productModel.deleteMany({})
     await this.taskModel.deleteMany({})
@@ -59,7 +66,12 @@ export class SeederService {
         { label: 'Цвет', key: 'color', value: 'Красный' },
       ],
     })
-
+    const _users = await this.userModel.create({
+      email: 'john@doe.com',
+      password: '-',
+      displayName: 'John Doe',
+      role: 'super-admin',
+      token: '-',
     const [_User1, _User2] = await this.userModel.create([
       {
         email: 'test@gmail.com',

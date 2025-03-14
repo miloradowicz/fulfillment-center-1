@@ -1,3 +1,11 @@
+import { Arrival, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
+import { createSlice } from '@reduxjs/toolkit'
+import { RootState } from '../../app/store.ts'
+import { addArrival, deleteArrival, fetchArrivalById, fetchArrivalByIdWithPopulate, fetchArrivals, updateArrival } from '../thunks/arrivalThunk.ts'
+
+interface ArrivalState {
+  arrival: Arrival | null
+  arrivalWithPopulate: ArrivalWithPopulate | null
 import { Arrival, ArrivalWithClient, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
@@ -25,6 +33,7 @@ interface ArrivalState {
 
 const initialState: ArrivalState = {
   arrival: null,
+  arrivalWithPopulate: null,
   arrivalsPopulate: null,
   arrivals: null,
   loadingFetch: false,
@@ -36,6 +45,8 @@ const initialState: ArrivalState = {
 }
 
 export const selectArrival = (state: RootState) => state.arrivals.arrival
+export const selectArrivalWithPopulate = (state: RootState) => state.arrivals.arrivalWithPopulate
+export const selectAllArrival = (state: RootState) => state.arrivals.arrivals
 export const selectAllArrivals = (state: RootState) => state.arrivals.arrivals
 export const selectPopulatedArrivals = (state: RootState) => state.arrivals.arrivalsPopulate
 export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.loadingFetch
@@ -53,6 +64,10 @@ const arrivalSlice = createSlice({
     builder
       .addCase(fetchArrivals.pending, state => {
         state.loadingFetch = true
+      })
+      .addCase(fetchArrivals.fulfilled, (state, action) => {
+        state.loadingFetch = false
+        state.arrivals = action.payload
         state.error = false
       })
       .addCase(fetchArrivals.fulfilled, (state, { payload: arrivals }) => {
@@ -62,7 +77,12 @@ const arrivalSlice = createSlice({
       .addCase(fetchArrivals.rejected, state => {
         state.loadingFetch = false
       })
-
+      .addCase(fetchArrivalById.pending, state => {
+        state.loadingFetch = true
+      })
+      .addCase(fetchArrivalById.fulfilled, (state, action) => {
+        state.loadingFetch = false
+        state.arrival = action.payload
       .addCase(fetchArrivalById.pending, state => {
         state.loadingFetch = true
         state.error = false
@@ -74,6 +94,18 @@ const arrivalSlice = createSlice({
       .addCase(fetchArrivalById.rejected, state => {
         state.loadingFetch = false
       })
+      .addCase(fetchArrivalByIdWithPopulate.pending, state => {
+        state.loadingFetch = true
+      })
+      .addCase(fetchArrivalByIdWithPopulate.fulfilled, (state, action) => {
+        state.loadingFetch = false
+        state.arrivalWithPopulate = action.payload
+      })
+      .addCase(fetchArrivalByIdWithPopulate.rejected, state => {
+        state.loadingFetch = false
+      })
+      .addCase(addArrival.pending, state => {
+        state.loadingAdd = true
 
       .addCase(fetchArrivalsByClientId.pending, state => {
         state.loadingFetch = true
@@ -112,6 +144,29 @@ const arrivalSlice = createSlice({
         state.loadingAdd = false
         state.createError = error || null
       })
+      .addCase(deleteArrival.pending, state => {
+        state.loadingDelete = true
+        state.error = null
+      })
+      .addCase(deleteArrival.fulfilled, state => {
+        state.loadingDelete = false
+        state.error = null
+      })
+      .addCase(deleteArrival.rejected, (state, { payload: error }) => {
+        state.loadingDelete = false
+        state.error = error || null
+      })
+      .addCase(updateArrival.pending, state => {
+        state.loadingUpdate = true
+        state.error = null
+      })
+      .addCase(updateArrival.fulfilled, state => {
+        state.loadingUpdate = false
+        state.error = null
+      })
+      .addCase(updateArrival.rejected, (state, { payload: error }) => {
+        state.loadingUpdate = false
+        state.error = error || null
 
       .addCase(deleteArrival.pending, state => {
         state.loadingDelete = true

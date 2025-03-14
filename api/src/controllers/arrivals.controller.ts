@@ -17,8 +17,11 @@ export class ArrivalsController {
   }
 
   @Get(':id')
-  async getOneArrival(@Param('id') id: string) {
-    return this.arrivalsService.getOne(id)
+  async getOneArrival(
+    @Param('id') id: string,
+    @Query('populate') populate: string
+  ) {
+    return this.arrivalsService.getOne(id, populate === '1')
   }
 
   @Post()
