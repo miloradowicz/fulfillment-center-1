@@ -4,9 +4,12 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
+import React from 'react'
 
-
-const OrderForm = () => {
+interface Props {
+  onSuccess?: () => void
+}
+const OrderForm: React.FC<Props> = ({ onSuccess }) => {
   const {
     form,
     setForm,
@@ -39,7 +42,9 @@ const OrderForm = () => {
     addArrayProductInForm,
     addArrayDefectInForm,
     onSubmit,
-  } = useOrderForm()
+    initialData1,
+  } = useOrderForm(onSuccess)
+  console.log(initialData1)
 
   return (
     <>
@@ -48,7 +53,7 @@ const OrderForm = () => {
       ) : (
         <form onSubmit={onSubmit} style={{ width: '60%', margin: '20px auto' }}>
           <Typography variant="h5" sx={{ mb: 2 }}>
-            Добавить новый заказ
+            {initialData1 ? 'Редактировать данные заказа' : 'Добавить новый заказ'}
           </Typography>
           <Grid container direction="column" spacing={2}>
             {clients && clients?.length > 0 && (
@@ -365,7 +370,13 @@ const OrderForm = () => {
 
             <Grid>
               <Button type="submit" disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Создать заказ'}
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : initialData1 ? (
+                  'Обновить заказ'
+                ) : (
+                  'Создать заказ'
+                )}
               </Button>
             </Grid>
           </Grid>

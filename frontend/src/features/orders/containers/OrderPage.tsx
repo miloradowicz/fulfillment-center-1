@@ -5,9 +5,8 @@ import OrderForm from '../components/OrderForm.tsx'
 import Grid from '@mui/material/Grid2'
 import useOrderPage from '../hooks/useOrderPage.ts'
 
-
 const OrderPage = () => {
-  const { orders, open, handleOpen, handleClose, handleDelete, loading } = useOrderPage()
+  const { orders, open, handleOpen, handleClose, handleDelete, loading, handleOpenEdit } = useOrderPage()
 
   return (
     <>
@@ -17,7 +16,7 @@ const OrderPage = () => {
         </Grid>
       ) : null}
 
-      <Modal handleClose={handleClose} open={open}><OrderForm/></Modal>
+      <Modal handleClose={handleClose} open={open}><OrderForm onSuccess={handleClose}/></Modal>
       <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
         <Typography className="flex-grow text-[20px]">Заказы</Typography>
         <Button
@@ -33,6 +32,7 @@ const OrderPage = () => {
           variant="outlined" onClick={handleOpen}>Добавить заказ</Button>
       </Box>
       <OrdersList
+        onEdit={handleOpenEdit}
         orders={orders || []}
         handleDelete={handleDelete}
         open={open}

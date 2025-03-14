@@ -23,6 +23,17 @@ export class OrdersService {
     return order
   }
 
+  async getByIdWithPopulate (id: string){
+    const order = await this.orderModel.findById(id)
+      .populate('client')
+      .populate('products.product')
+      .populate('defects.product')
+      .exec()
+    if (!order) throw new NotFoundException('Заказ не найден')
+    return order
+  }
+
+
   async create(orderDto: CreateOrderDto) {
     return await this.orderModel.create(orderDto)
   }

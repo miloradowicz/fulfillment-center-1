@@ -1,10 +1,17 @@
-import { GlobalError, Order, OrderWithClient, OrderWithProducts, ValidationError } from '../../types'
+import {
+  GlobalError,
+  Order,
+  OrderWithClient,
+  OrderWithProducts,
+  OrderWithProductsAndClients,
+  ValidationError,
+} from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import {
   addOrder,
   deleteOrder,
-  fetchOrderById,
+  fetchOrderById, fetchOrderByIdWithPopulate,
   fetchOrders,
   fetchOrdersWithClient,
   updateOrder,
@@ -13,6 +20,7 @@ import {
 interface OrderState {
   order: OrderWithProducts | null
   orders: Order[] | null
+  populateOrder: OrderWithProductsAndClients | null
   ordersWithClient: OrderWithClient[] | null
   loadingFetch : boolean
   loadingAdd: boolean
@@ -25,6 +33,7 @@ interface OrderState {
 const initialState: OrderState = {
   order: null,
   orders: null,
+  populateOrder: null,
   ordersWithClient: null,
   loadingFetch: false,
   loadingAdd: false,
@@ -36,6 +45,7 @@ const initialState: OrderState = {
 
 export const selectOrder = (state: RootState) => state.orders.order
 export const selectAllOrders = (state: RootState) => state.orders.orders
+export const selectPopulateOrder = (state: RootState) => state.orders.populateOrder
 export const selectAllOrdersWithClient = (state: RootState) => state.orders.ordersWithClient
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
@@ -77,6 +87,16 @@ const orderSlice = createSlice({
       state.order = action.payload
     })
     builder.addCase(fetchOrderById.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchOrderByIdWithPopulate.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchOrderByIdWithPopulate.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.populateOrder= action.payload
+    })
+    builder.addCase(fetchOrderByIdWithPopulate.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(addOrder.pending, state => {

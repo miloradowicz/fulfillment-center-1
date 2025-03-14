@@ -1,7 +1,7 @@
 import { OrderWithClient } from '../../../types'
 import React from 'react'
 import { Box, Chip, IconButton, Typography } from '@mui/material'
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
@@ -16,9 +16,10 @@ interface Props {
   open: boolean
   handleOpen: () => void
   handleClose: () => void
+  onEdit: (data:OrderWithClient) => void
 }
 
-const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, handleClose }) => {
+const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, handleClose, onEdit }) => {
 
   const columns: GridColDef<OrderWithClient>[] = [
     {
@@ -82,20 +83,22 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, h
       field: 'actions',
       headerName: '',
       flex: 0.2,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: ({ row } ) => (
         <>
-          <IconButton
-            onClick={handleOpen}
+          <IconButton onClick={() => {
+            onEdit(row)
+            handleOpen()
+          }}
           >
             <EditIcon fontSize="inherit" />
           </IconButton>
           <IconButton
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => handleDelete(row._id)}
           >
             <ClearIcon fontSize="inherit" />
           </IconButton>
           <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
-            to={`/orders/${ params.row._id }`}
+            to={`/orders/${ row._id }`}
           >
             Подробнее
           </NavLink>
