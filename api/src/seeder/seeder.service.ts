@@ -9,6 +9,7 @@ import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
 import { Stock, StockDocument } from '../schemas/stock.schema'
+import { Order, OrderDocument } from '../schemas/order.schema'
 
 
 @Injectable()
@@ -20,6 +21,8 @@ export class SeederService {
     private readonly productModel: Model<ProductDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    @InjectModel(Order.name)
+    private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Task.name)
     private readonly taskModel: Model<TaskDocument>,
     @InjectModel(Arrival.name)
@@ -31,13 +34,11 @@ export class SeederService {
   ) {}
 
   async seed() {
-    await this.clientModel.deleteMany()
-    await this.productModel.deleteMany()
     await this.userModel.deleteMany()
     await this.clientModel.deleteMany({})
     await this.productModel.deleteMany({})
     await this.taskModel.deleteMany({})
-    await this.userModel.deleteMany({})
+    await this.orderModel.deleteMany({})
     await this.arrivalModel.deleteMany({})
     await this.serviceModel.deleteMany({})
     await this.stockModel.deleteMany({})
@@ -52,17 +53,77 @@ export class SeederService {
       ogrn: '123123',
     })
 
-    const _products = await this.productModel.create({
-      client: _clients._id,
-      title: 'Сарафан',
-      amount: 7,
-      barcode: '012345678901',
-      article: '01234567',
-      dynamic_fields: [
-        { label: 'Размер', key: 'size', value: '42' },
-        { label: 'Цвет', key: 'color', value: 'Красный' },
-      ],
-    })
+    const [_product1, _product2, _product3] = await this.productModel.create([
+      {
+        client: _clients._id,
+        title: 'Сарафан',
+        amount: 7,
+        barcode: '012345678901',
+        article: '01234567',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '42' },
+          { label: 'Цвет', key: 'color', value: 'Красный' },
+        ],
+      },
+      {
+        client: _clients._id,
+        title: 'Джинсы',
+        amount: 10,
+        barcode: '987654321012',
+        article: '987654',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+      },
+      {
+        client: _clients._id,
+        title: 'Футболка',
+        amount: 15,
+        barcode: '567890123456',
+        article: '567890',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: 'L' },
+          { label: 'Цвет', key: 'color', value: 'Белый' },
+        ],
+      },
+    ])
+
+    await this.orderModel.create([
+      {
+        client: _clients._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
+          { product: _product2._id, description: 'Заказ 1 - Джинсы', amount: 1 },
+        ],
+        price: 2500,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
+        status: 'в сборке',
+      },
+      {
+        client: _clients._id,
+        products: [
+          { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
+          { product: _product3._id, description: 'Заказ 2 - Футболка', amount: 3 },
+        ],
+        price: 4500,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(),
+        status: 'в пути',
+      },
+      {
+        client: _clients._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
+          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+        ],
+        price: 1900,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
+        status: 'доставлен',
+      },
+    ])
 
     const [_User1, _User2, _admin] = await this.userModel.create([
       {
@@ -123,14 +184,14 @@ export class SeederService {
     await this.arrivalModel.create([
       {
         client: _clients,
-        products: [{ product: _products, description: '', amount: 20 }],
+        products: [{ product: _product1, description: '', amount: 20 }],
         arrival_price: 500,
         arrival_date: new Date().toISOString(),
         sent_amount: '2 короба',
       },
       {
         client: _clients,
-        products: [{ product: _products, description: '', amount: 100 }],
+        products: [{ product: _product2, description: '', amount: 100 }],
         arrival_price: 2500,
         arrival_status: 'получена',
         arrival_date: new Date().toISOString(),
@@ -138,7 +199,7 @@ export class SeederService {
       },
       {
         client: _clients,
-        products: [{ product: _products, description: '', amount: 30 }],
+        products: [{ product: _product3, description: '', amount: 30 }],
         arrival_price: 1000,
         arrival_status: 'отсортирована',
         arrival_date: new Date().toISOString(),
@@ -166,7 +227,7 @@ export class SeederService {
     await this.stockModel.create({
       name: 'Склад Бишкек',
       address: 'Ул. Малдыбаева 7/1',
-      products: [{ product: _products, description: '', amount: 20 }],
+      products: [{ product: _product1, description: '', amount: 20 }],
     })
   }
 }
