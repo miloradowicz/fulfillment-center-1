@@ -6,9 +6,21 @@ import { Client } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import { useClientsList } from '../hooks/useClientsList.ts'
+import { useState } from 'react'
+import ClientForm from './ClientForm.tsx'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import { useAppSelector } from '../../../app/hooks.ts'
+import { selectClient } from '../../../store/slices/clientSlice.ts'
 
 const ClientsDataList = () => {
   const { clients, deleteOneClient, isLoading } = useClientsList()
+
+  const [editModalOpen, setEditModalOpen] = useState(false)
+
+  const handleOpenEditModal = () => setEditModalOpen(true)
+  const handleCloseEditModal = () => setEditModalOpen(false)
+  const client = useAppSelector(selectClient)
+
 
   const columns: GridColDef<Client>[] = [
     {
@@ -59,7 +71,7 @@ const ClientsDataList = () => {
       filterable: false,
       renderCell: ({ row }) => (
         <Box display="flex" alignItems="center">
-          <IconButton>
+          <IconButton onClick={handleOpenEditModal}>
             <EditIcon />
           </IconButton>
           <IconButton onClick={() => deleteOneClient(row._id)}>
@@ -103,6 +115,9 @@ const ClientsDataList = () => {
       ) : (
         <Typography className="text-center mt-5">Клиентов нет</Typography>
       )}
+      <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
+        <ClientForm client={client} onClose={handleCloseEditModal} />
+      </Modal>
     </Box>
   )
 }
