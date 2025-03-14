@@ -17,6 +17,7 @@ import {
   Theme,
   Box } from '@mui/material'
 import { NavLink } from 'react-router-dom'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 
 
 export default function Sidebar() {
@@ -82,6 +83,13 @@ export default function Sidebar() {
             <ListItemButton component={NavLink} to="/orders">
               <ListItemIcon><ReceiptLongIcon/></ListItemIcon>
               <ListItemText primary="Заказы" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/tasks">
+              <ListItemIcon><AssignmentIcon/></ListItemIcon>
+              <ListItemText primary="Задачи" />
             </ListItemButton>
           </ListItem>
 

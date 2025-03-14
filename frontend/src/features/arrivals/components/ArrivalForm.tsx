@@ -3,12 +3,18 @@ import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } 
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
 import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { Defect, ProductArrival } from '../../../types'
+import { ArrivalWithClient, Defect, ProductArrival } from '../../../types'
 import { initialItemState } from '../state/arrivalState.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
+import React from 'react'
 
-const ArrivalForm = () => {
+interface Props {
+  initialData?: ArrivalWithClient
+  onSuccess?: () => void
+}
+
+const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     products,
     isLoading,
@@ -21,7 +27,7 @@ const ArrivalForm = () => {
     setProductsForm,
     receivedForm,
     setReceivedForm,
-    defectForm,
+    defectsForm,
     setDefectForm,
     productsModalOpen,
     setProductsModalOpen,
@@ -37,7 +43,7 @@ const ArrivalForm = () => {
     getProductNameById,
     error,
     submitFormHandler,
-  } = useArrivalForm()
+  } = useArrivalForm(initialData, onSuccess)
 
   return (
     <form onSubmit={submitFormHandler}>
@@ -49,7 +55,7 @@ const ArrivalForm = () => {
         ) : null}
 
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
-          Добавить новую поставку
+          {initialData ? 'Редактировать данные поставки' : 'Добавить новую поставку'}
         </Typography>
 
         <Grid>
@@ -237,7 +243,7 @@ const ArrivalForm = () => {
           <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Дефекты</Typography>
           <ItemsList
-            items={defectForm}
+            items={defectsForm}
             onDelete={i => deleteItem(i, setDefectForm)}
             getProductNameById={getProductNameById}
           />
@@ -371,7 +377,13 @@ const ArrivalForm = () => {
 
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Создать поставку'}
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : initialData ? (
+              'Обновить поставку'
+            ) : (
+              'Создать поставку'
+            )}
           </Button>
         </Grid>
       </Grid>

@@ -7,9 +7,16 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
+import React from 'react'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ArrivalForm from './ArrivalForm.tsx'
 
-const ArrivalsDataList = () => {
-  const { arrivals, deleteOneArrival } = useArrivalsList()
+interface Props {
+  onEdit: (data: ArrivalWithClient) => void
+}
+
+const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
+  const { arrivals, deleteOneArrival, handleClose, isOpen } = useArrivalsList()
 
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
@@ -61,8 +68,7 @@ const ArrivalsDataList = () => {
         }
 
         const status = row.arrival_status || 'В обработке'
-        const capitalizeFirstLetter = (text: string) =>
-          text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+        const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
         return <Chip label={capitalizeFirstLetter(status)} color={statusColors[status] ?? 'default'} />
       },
@@ -82,7 +88,7 @@ const ArrivalsDataList = () => {
       renderCell: ({ row }) => {
         return (
           <>
-            <IconButton>
+            <IconButton onClick={() => onEdit(row)}>
               <EditIcon />
             </IconButton>
             <IconButton onClick={() => deleteOneArrival(row._id)}>
@@ -119,6 +125,12 @@ const ArrivalsDataList = () => {
       ) : (
         <Typography className="text-center mt-5">Поставки не найдены.</Typography>
       )}
+
+      <Box className="my-8">
+        <Modal handleClose={handleClose} open={isOpen}>
+          <ArrivalForm />
+        </Modal>
+      </Box>
     </Box>
   )
 }

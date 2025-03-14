@@ -3,11 +3,14 @@ import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
+import { User, UserDocument } from 'src/schemas/user.schema'
 import { Task, TaskDocument } from '../schemas/task.schema'
-import { User, UserDocument } from '../schemas/user.schema'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
+import { Service, ServiceDocument } from '../schemas/service.schema'
+import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
+
 
 @Injectable()
 export class SeederService {
@@ -18,21 +21,27 @@ export class SeederService {
     private readonly productModel: Model<ProductDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    @InjectModel(Order.name)
+    private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Task.name)
     private readonly taskModel: Model<TaskDocument>,
     @InjectModel(Arrival.name)
     private readonly arrivalModel: Model<ArrivalDocument>,
-    @InjectModel(Order.name)
-    private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(Service.name)
+    private readonly serviceModel: Model<ServiceDocument>,
+    @InjectModel(Stock.name)
+    private readonly stockModel: Model<StockDocument>,
   ) {}
 
   async seed() {
+    await this.userModel.deleteMany()
     await this.clientModel.deleteMany({})
     await this.productModel.deleteMany({})
-    await this.orderModel.deleteMany({})
     await this.taskModel.deleteMany({})
-    await this.userModel.deleteMany({})
+    await this.orderModel.deleteMany({})
     await this.arrivalModel.deleteMany({})
+    await this.serviceModel.deleteMany({})
+    await this.stockModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -116,7 +125,7 @@ export class SeederService {
       },
     ])
 
-    const [_User1, _User2] = await this.userModel.create([
+    const [_User1, _User2, _admin] = await this.userModel.create([
       {
         email: 'test@gmail.com',
         password: '1234567890',
@@ -131,6 +140,14 @@ export class SeederService {
         confirmPassword: '1234567890',
         displayName: 'Вася',
         role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Admin',
+        role: 'super-admin',
         token: randomUUID(),
       },
     ])
@@ -189,5 +206,28 @@ export class SeederService {
         sent_amount: '5 коробов',
       },
     ])
+
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром',
+        dynamic_fields: [
+          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
+          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
+        ],
+      },
+      {
+        name: 'Забор товара',
+        dynamic_fields: [
+          { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
+      },
+    ])
+
+    await this.stockModel.create({
+      name: 'Склад Бишкек',
+      address: 'Ул. Малдыбаева 7/1',
+      products: [{ product: _product1, description: '', amount: 20 }],
+    })
   }
 }

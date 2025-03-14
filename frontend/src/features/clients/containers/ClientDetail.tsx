@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box, Button,
@@ -21,6 +21,8 @@ import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
 import ClientForm from '../components/ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
+import { useClientsList } from '../hooks/useClientsList.ts'
+import { toast } from 'react-toastify'
 
 const ClientDetail = () => {
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -31,6 +33,7 @@ const ClientDetail = () => {
   const { clientId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { deleteOneClient } = useClientsList()
 
   const client = useAppSelector(selectClient)
   const loading = useAppSelector(selectLoadingFetchClient)
@@ -156,6 +159,17 @@ const ClientDetail = () => {
                   px: 3,
                   borderRadius: 2,
                   textTransform: 'none',
+                }}
+                onClick={async () => {
+                  if (clientId) {
+                    try {
+                      await deleteOneClient(clientId)
+                      toast.success('Клиент успешно удалён!')
+                      navigate('/clients')
+                    } catch {
+                      toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
+                    }
+                  }
                 }}
               >
                 Удалить
