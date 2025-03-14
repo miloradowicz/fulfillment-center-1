@@ -8,7 +8,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  async getAllArrivals(@Query('user') userId: string, @Query('populate') populate?: string) {
+  async getAllTasks(@Query('user') userId: string, @Query('populate') populate?: string) {
     if (userId) {
       return await this.tasksService.getAllByUser(userId, populate === '1')
     } else {

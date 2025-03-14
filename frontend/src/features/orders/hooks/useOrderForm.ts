@@ -98,7 +98,6 @@ export const useOrderForm = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(form)
     if (form.products.length === 0) {
       toast.error('Добавьте товары')
     } else {
