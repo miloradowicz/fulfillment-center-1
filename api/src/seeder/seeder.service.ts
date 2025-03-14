@@ -5,7 +5,6 @@ import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { User, UserDocument } from 'src/schemas/user.schema'
 import { Task, TaskDocument } from '../schemas/task.schema'
-import { User, UserDocument } from '../schemas/user.schema'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
@@ -19,8 +18,6 @@ export class SeederService {
     private readonly clientModel: Model<ClientDocument>,
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     @InjectModel(Task.name)
@@ -66,13 +63,8 @@ export class SeederService {
         { label: 'Цвет', key: 'color', value: 'Красный' },
       ],
     })
-    const _users = await this.userModel.create({
-      email: 'john@doe.com',
-      password: '-',
-      displayName: 'John Doe',
-      role: 'super-admin',
-      token: '-',
-    const [_User1, _User2] = await this.userModel.create([
+
+    const [_User1, _User2, _admin] = await this.userModel.create([
       {
         email: 'test@gmail.com',
         password: '1234567890',
@@ -87,6 +79,14 @@ export class SeederService {
         confirmPassword: '1234567890',
         displayName: 'Вася',
         role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Admin',
+        role: 'super-admin',
         token: randomUUID(),
       },
     ])
