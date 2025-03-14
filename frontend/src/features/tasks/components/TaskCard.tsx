@@ -2,10 +2,10 @@ import { useDraggable } from '@dnd-kit/core'
 import { Card, CardContent, Typography } from '@mui/material'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
-import { KanbanCardProps } from '../hooks/TypesProps'
+import { TaskCardProps } from '../hooks/TypesProps'
 
 
-const KanbanCard:React.FC<KanbanCardProps> = ({ task, index, parent }) => {
+const TaskCard:React.FC<TaskCardProps> = ({ task, index, parent }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task._id,
     data: {
@@ -44,6 +44,6 @@ const KanbanCard:React.FC<KanbanCardProps> = ({ task, index, parent }) => {
   )
 }
 
-export default KanbanCard
+export default TaskCard
 
 

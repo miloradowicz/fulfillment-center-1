@@ -1,11 +1,11 @@
 import { FC } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { Box, Typography, Paper } from '@mui/material'
-import KanbanCard from './CanbanCard.tsx'
-import { KanbanLaneProps } from '../hooks/TypesProps'
+import { TaskLineProps } from '../hooks/TypesProps'
+import TaskCard from './TaskCard.tsx'
 
 
-const KanbanLane: FC<KanbanLaneProps> = ({ title, items }) => {
+const TaskLine: FC<TaskLineProps> = ({ title, items }) => {
   const { setNodeRef } = useDroppable({
     id: title,
   })
@@ -27,11 +27,11 @@ const KanbanLane: FC<KanbanLaneProps> = ({ title, items }) => {
         }}
       >
         {items.map((task, key) => (
-          <KanbanCard key={task._id} index={key} parent={title} task={task} />
+          <TaskCard key={task._id} index={key} parent={title} task={task} />
         ))}
       </Paper>
     </Box>
   )
 }
 
-export default KanbanLane
+export default TaskLine

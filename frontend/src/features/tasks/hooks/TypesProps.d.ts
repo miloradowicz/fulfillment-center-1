@@ -1,11 +1,11 @@
 import { TaskWithPopulate } from '../../../types'
 
-export interface KanbanLaneProps {
+export interface TaskLineProps {
   title: string;
   items: TaskWithPopulate[];
 }
 
-export interface KanbanCardProps {
+export interface TaskCardProps {
   task: TaskWithPopulate
   index: number
   parent: string

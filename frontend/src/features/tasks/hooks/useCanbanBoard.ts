@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectLoadingFetchTask, selectPopulatedTasks } from '../../../store/slices/taskSlice.ts'
 import { fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
 
-export const useCanbanBoard = () => {
+export const useTaskBoard = () => {
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
   const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
   const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
