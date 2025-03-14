@@ -24,8 +24,17 @@ export class ArrivalsService {
     return (await this.arrivalModel.find()).reverse()
   }
 
-  async getOne(id: string) {
-    const arrival = await this.arrivalModel.findById(id)
+  async getOne(id: string, populate: boolean) {
+    let arrival: ArrivalDocument | null
+
+    if (populate) {
+      arrival = await this.arrivalModel.findById(id)
+        .populate('client products.product defects.product received_amount.product')
+        .populate({ path: 'logs.user', select: '-password -token' })
+    } else {
+      arrival = await this.arrivalModel.findById(id)
+    }
+
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
     return arrival
   }

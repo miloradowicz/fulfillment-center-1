@@ -1,10 +1,10 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { ClientMutation } from '../types'
-import { useAppDispatch, useAppSelector } from '../app/hooks.ts'
-import { selectAllClients, selectClientError, selectLoadingAddClient } from '../store/slices/clientSlice.ts'
-import { addClient, fetchClients } from '../store/thunks/clientThunk.ts'
-import { emailRegex, phoneNumberRegex, initialClientState } from '../constants.ts'
+import { ClientMutation } from '../../../types'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { selectAllClients, selectClientError, selectLoadingAddClient } from '../../../store/slices/clientSlice.ts'
+import { addClient, fetchClients } from '../../../store/thunks/clientThunk.ts'
+import { emailRegex, phoneNumberRegex, initialClientState } from '../../../constants.ts'
 
 const requiredFields: (keyof ClientMutation)[] = ['name', 'email', 'phone_number', 'inn']
 
@@ -61,6 +61,7 @@ export const useClientForm = () => {
     if (validateFields()) return
 
     await dispatch(addClient(form))
+    await dispatch(fetchClients())
     setForm(initialClientState)
     toast.success('Клиент успешно создан!')
   }

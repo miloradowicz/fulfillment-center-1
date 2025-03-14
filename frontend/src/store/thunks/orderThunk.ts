@@ -43,7 +43,7 @@ export const addOrder= createAsyncThunk<void, OrderMutation, { rejectValue: Vali
 export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('orders/deleteOrder', async (orderId: string, { rejectWithValue }) => {
   try {
-    await axiosAPI.delete(`/orders/?=${ orderId }`)
+    await axiosAPI.delete(`/orders/${ orderId }`)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)
