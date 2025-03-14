@@ -76,14 +76,24 @@ export interface Defect {
   amount: number
 }
 
+
 export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
+}
+
+export interface DefectMutation extends Defect {
+  productName: string
 }
 
 export interface ProductOrder {
   product: string
   description: string
   amount: number
+}
+
+export type ProductOrderMutation = Omit<ProductOrder, 'product'> & {
+  _id: string
+  product: Product
 }
 
 export interface ProductArrival {
@@ -109,12 +119,17 @@ export interface Arrival {
   logs?: Log[]
 }
 
+
 export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount'> & {
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
   received_amount?: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
+}
+
+export interface ArrivalWithClient extends Omit<Arrival, 'client'> {
+  client: Client;
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>
@@ -129,7 +144,15 @@ export interface Order {
   comment?: string
   status?: 'в сборке' | 'в пути' | 'доставлен'
   logs?: Log[]
-  defects?: Defect[]
+  defects: Defect[]
+}
+
+export type OrderWithProducts = Omit<Order, 'products'> & {
+  products: ProductOrderMutation[]
+}
+
+export type OrderWithClient = Omit<Order, 'client'> & {
+  client: Client
 }
 
 export type OrderMutation = Omit<Order, '_id'>
@@ -158,4 +181,36 @@ export type UserRegistrationMutation = {
   password: string
   displayName: string
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+}
+
+export interface ArrivalError {
+  client: string
+  product: string
+  arrival_price: number
+  arrival_date: string
+  sent_amount: string
+  amount: number
+  defect_description: string
+}
+
+export interface ErrorForOrder {
+  client: string
+  product: string
+  price: number
+  amount: number
+  defect_description: string
+  sent_at: string
+  delivered_at: string
+}
+
+export interface DefectForOrderForm {
+  product: Product
+  description: string
+  amount: number
+}
+
+export interface ProductForOrderForm {
+  product: Product
+  defect_description: string
+  amount: number
 }

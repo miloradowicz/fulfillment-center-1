@@ -1,292 +1,55 @@
-import React, { useEffect, useState } from 'react'
-import { ArrivalMutation, Defect, ProductArrival } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { addArrival } from '../../../store/thunks/arrivalThunk.ts'
 import Grid from '@mui/material/Grid2'
-import DeleteIcon from '@mui/icons-material/Delete'
 import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } from '@mui/material'
-import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import Autocomplete from '@mui/material/Autocomplete'
-import { toast } from 'react-toastify'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
-import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-
-const initialState = {
-  client: '',
-  arrival_price: 0,
-  arrival_date: '',
-  sent_amount: '',
-  products: [],
-  defects: [],
-  received_amount: [],
-}
-
-const initialProductState = {
-  product: '',
-  description: '',
-  amount: 0,
-}
-
-const initialDefectState = {
-  product: '',
-  defect_description: '',
-  amount: 0,
-}
+import ItemsList from './ItemsList.tsx'
+import { useArrivalForm } from '../hooks/useArrivalForm.ts'
+import { Defect, ProductArrival } from '../../../types'
+import { initialItemState } from '../state/arrivalState.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
+import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 
 const ArrivalForm = () => {
-  const [form, setForm] = useState<ArrivalMutation>({ ...initialState })
-  const [errors, setErrors] = useState<{
-    client: string
-    product: string
-    arrival_price: number
-    arrival_date: string
-    sent_amount: string
-    amount: number
-    defect_description: string
-    description: string
-  }>({
-    client: '',
-    product: '',
-    arrival_price: 0,
-    arrival_date: '',
-    amount: 0,
-    sent_amount: '',
-    defect_description: '',
-    description: '',
-  })
-
-  const [newReceived, setNewReceived] = useState<ProductArrival>({ ...initialProductState })
-  const [receivedForm, setReceivedForm] = useState<ProductArrival[]>([])
-  const [receivedModalOpen, setReceivedModalOpen] = useState<boolean>(false)
-
-  const [newProduct, setNewProduct] = useState<ProductArrival>({ ...initialProductState })
-  const [productsForm, setProductsForm] = useState<ProductArrival[]>([])
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
-
-  const [newDefect, setNewDefect] = useState<Defect>({ ...initialDefectState })
-  const [defectForm, setDefectForm] = useState<Defect[]>([])
-  const [defectModalOpen, setDefectModalOpen] = useState<boolean>(false)
-
-  const dispatch = useAppDispatch()
-
-  const clients = useAppSelector(selectAllClients)
-  const products = useAppSelector(selectAllProducts)
-  const error = useAppSelector(selectCreateError)
-  const isLoading = useAppSelector(selectLoadingAddArrival)
-
-  useEffect(() => {
-    dispatch(fetchClients())
-    if (form.client) {
-      dispatch(fetchProductsByClientId(form.client))
-    }
-  }, [dispatch, form.client])
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-
-    if (value.trim() === '') {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: 'Это поле обязательно для заполнения',
-      }))
-    } else if ((name === 'arrival_price' && Number(value) === 0) || Number(value) < 0) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: 'Цена доставки должна быть больше 0',
-      }))
-    } else if ((name === 'amount' && Number(value) === 0) || Number(value) < 0) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: 'Количество товара должно быть больше 0',
-      }))
-    } else {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: '',
-      }))
-    }
-  }
-
-  const addProduct = (product: ProductArrival, isReceivedProduct: boolean) => {
-    if (!product.product || product.amount === 0) {
-      toast.warn('Заполните название и количество товара.')
-      return
-    }
-
-    if (isReceivedProduct) {
-      setReceivedForm(prev => {
-        const updatedReceivedProducts = [...prev, product]
-        setForm(prevForm => ({
-          ...prevForm,
-          received_amount: updatedReceivedProducts,
-        }))
-        return updatedReceivedProducts
-      })
-    } else {
-      setProductsForm(prev => {
-        const updatedProducts = [...prev, product]
-        setForm(prevForm => ({
-          ...prevForm,
-          products: updatedProducts,
-        }))
-        return updatedProducts
-      })
-    }
-
-    setModalOpen(false)
-    setReceivedModalOpen(false)
-    setNewProduct({ ...initialProductState })
-    setNewReceived({ ...initialProductState })
-  }
-
-  const deleteProduct = (index: number, setState: React.Dispatch<React.SetStateAction<ProductArrival[]>>) => {
-    setState(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const addDefect = (defect: Defect) => {
-    if (!defect.product || !defect.defect_description || defect.amount === 0) {
-      toast.warn('Заполните название, количество и описание дефекта.')
-      return
-    }
-
-    setDefectForm(prev => {
-      const updatedDefects = [...prev, defect]
-      setForm(prevForm => ({
-        ...prevForm,
-        defects: updatedDefects,
-      }))
-      return updatedDefects
-    })
-
-    setDefectModalOpen(false)
-    setNewDefect({ ...initialDefectState })
-  }
-
-  const deleteDefect = (index: number, setState: React.Dispatch<React.SetStateAction<Defect[]>>) => {
-    setState(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const getFieldError = (fieldName: string) => {
-    try {
-      return error?.errors[fieldName].messages[0]
-    } catch {
-      return undefined
-    }
-  }
-
-  const getProductNameById = (productId: string): string => {
-    const product = products?.find(p => p._id === productId)
-    return product ? product.title : 'Неизвестный товар'
-  }
-
-  const renderProductsList = (products: ProductArrival[], onDelete: (index: number) => void) => (
-    <>
-      {products.map((product, i) => (
-        <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
-          <Grid container direction="column" spacing={2}>
-            <Grid style={{ textTransform: 'capitalize' }}>
-              <Typography fontWeight="bold">{getProductNameById(product.product)}</Typography>
-            </Grid>
-
-            <Grid>
-              <Typography variant="body2">Количество: {product.amount}</Typography>
-            </Grid>
-
-            <Grid>
-              <Typography variant="body2">
-                {product.description ? `Описание: ${ product.description }` : null}
-              </Typography>
-            </Grid>
-
-            <Grid>
-              <Button variant="outlined" color="error" onClick={() => onDelete(i)} startIcon={<DeleteIcon />}>
-                Удалить
-              </Button>
-            </Grid>
-          </Grid>
-          {products.length > 1 ? <Divider sx={{ width: '100%', marginTop: '15px' }} /> : null}
-        </Grid>
-      ))}
-    </>
-  )
-
-  const renderDefectsList = (defectForm: Defect[], onDelete: (index: number) => void) => (
-    <>
-      {defectForm.map((defect, i) => (
-        <Grid container key={i} spacing={2} alignItems="center" sx={{ marginBottom: '15px', marginTop: '15px' }}>
-          <Grid container direction="column" spacing={2}>
-            <Grid style={{ textTransform: 'capitalize' }}>
-              <Typography fontWeight="bold">{getProductNameById(defect.product)}</Typography>
-            </Grid>
-
-            <Grid>
-              <Typography variant="body2" color="textPrimary">
-                Количество: {defect.amount}
-              </Typography>
-            </Grid>
-
-            <Grid>
-              <Typography variant="body2" color="textSecondary">
-                {`Описание: ${ defect.defect_description }`}
-              </Typography>
-            </Grid>
-
-            <Grid>
-              <Button variant="outlined" color="error" onClick={() => onDelete(i)} startIcon={<DeleteIcon />}>
-                Удалить
-              </Button>
-            </Grid>
-          </Grid>
-          {defectForm.length > 1 ? <Divider sx={{ width: '100%', marginTop: '15px' }} /> : null}
-        </Grid>
-      ))}
-    </>
-  )
-
-  const submitFormHandler = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (form.products.length === 0) {
-      toast.error('Добавьте товары')
-    } else {
-      try {
-        const updatedForm = { ...form, products: productsForm, received_amount: receivedForm, defects: defectForm, arrival_price: Number(form.arrival_price) }
-        await dispatch(addArrival(updatedForm)).unwrap()
-        setForm({ ...initialState })
-        setProductsForm([])
-        setReceivedForm([])
-        setDefectForm([])
-        toast.success('Поставка успешно создана!')
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setForm(prevState => ({ ...prevState, [name]: value }))
-  }
-
-  const autoCompleteClients =
-    clients?.map(client => ({
-      label: client.name,
-      id: client._id,
-    })) || []
+  const {
+    products,
+    isLoading,
+    form,
+    setForm,
+    newItem,
+    setNewItem,
+    errors,
+    productsForm,
+    setProductsForm,
+    receivedForm,
+    setReceivedForm,
+    defectForm,
+    setDefectForm,
+    productsModalOpen,
+    setProductsModalOpen,
+    receivedModalOpen,
+    setReceivedModalOpen,
+    defectsModalOpen,
+    setDefectsModalOpen,
+    openModal,
+    addItem,
+    deleteItem,
+    handleBlur,
+    autoCompleteClients,
+    getProductNameById,
+    error,
+    submitFormHandler,
+  } = useArrivalForm()
 
   return (
-    <form onSubmit={submitFormHandler} style={{ marginTop: '3rem' }}>
+    <form onSubmit={submitFormHandler}>
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
-        {isLoading ?
+        {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
             <CircularProgress />
-          </Grid> : null
-        }
+          </Grid>
+        ) : null}
 
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
-            Добавить новую поставку
+          Добавить новую поставку
         </Typography>
 
         <Grid>
@@ -303,21 +66,9 @@ const ArrivalForm = () => {
               <TextField
                 {...params}
                 label="Клиент"
-                error={Boolean(errors.client)}
-                helperText={errors.client || getFieldError('client')}
-                onBlur={() => {
-                  if (!form.client) {
-                    setErrors(prevErrors => ({
-                      ...prevErrors,
-                      client: 'Выберите клиента',
-                    }))
-                  } else {
-                    setErrors(prevErrors => ({
-                      ...prevErrors,
-                      client: '',
-                    }))
-                  }
-                }}
+                error={Boolean(errors.client || getFieldError('client', error))}
+                helperText={errors.client || getFieldError('client', error)}
+                onBlur={e => handleBlur('client', e.target.value)}
               />
             )}
           />
@@ -325,13 +76,17 @@ const ArrivalForm = () => {
 
         <Grid>
           <Typography fontWeight="bold">Товары</Typography>
-          {renderProductsList(productsForm, i => deleteProduct(i, setProductsForm))}
-          <Button type="button" onClick={() => setModalOpen(true)}>
-              + Добавить товары
+          <ItemsList
+            items={productsForm}
+            onDelete={i => deleteItem(i, setProductsForm)}
+            getProductNameById={getProductNameById}
+          />
+          <Button type="button" onClick={() => openModal('products', initialItemState)}>
+            + Добавить товары
           </Button>
         </Grid>
 
-        {modalOpen && (
+        {productsModalOpen && (
           <Grid>
             <Typography sx={{ marginBottom: '15px' }}>Укажите товары</Typography>
             <Autocomplete
@@ -341,31 +96,20 @@ const ArrivalForm = () => {
               options={products ?? []}
               onChange={(_, newValue) => {
                 if (newValue) {
-                  setNewProduct(prev => ({ ...prev, product: newValue._id }))
+                  setNewItem(prev => ({ ...prev, product: newValue._id }))
                 }
               }}
               getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
               isOptionEqualToValue={(option, value) => option._id === value._id}
-              renderInput={params =>
+              renderInput={params => (
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
-                  helperText={errors.product || getFieldError('product')}
-                  onBlur={() => {
-                    if (!newProduct.product) {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: 'Выберите товар',
-                      }))
-                    } else {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: '',
-                      }))
-                    }
-                  }}
-                />}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
+                  onBlur={e => handleBlur('product', e.target.value)}
+                />
+              )}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -375,11 +119,11 @@ const ArrivalForm = () => {
               size="small"
               name="amount"
               label="Количество товара"
-              value={newProduct.amount}
-              onChange={e => setNewProduct(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
-              helperText={errors.amount || getFieldError('amount')}
-              onBlur={handleBlur}
+              value={newItem.amount || ''}
+              onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
+              onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -388,18 +132,23 @@ const ArrivalForm = () => {
               fullWidth
               size="small"
               name="description"
-              value={newProduct.description}
-              onChange={e => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
+              value={(newItem as ProductArrival).description || ''}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               sx={{ marginBottom: '15px' }}
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addProduct(newProduct, false)}>
-                  Добавить
+              <Button type="button" variant="outlined" onClick={() => addItem('products')}>
+                Добавить
               </Button>
 
-              <Button type="button" variant="outlined" onClick={() => setModalOpen(false)}>
-                  Закрыть
+              <Button type="button" variant="outlined" onClick={() => setProductsModalOpen(false)}>
+                Закрыть
               </Button>
             </Grid>
           </Grid>
@@ -408,9 +157,13 @@ const ArrivalForm = () => {
         <Grid>
           <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Полученные товары</Typography>
-          {renderProductsList(receivedForm, i => deleteProduct(i, setReceivedForm))}
-          <Button type="button" onClick={() => setReceivedModalOpen(true)}>
-              + Добавить полученные товары
+          <ItemsList
+            items={receivedForm}
+            onDelete={i => deleteItem(i, setReceivedForm)}
+            getProductNameById={getProductNameById}
+          />
+          <Button type="button" onClick={() => openModal('received_amount', initialItemState)}>
+            + Добавить полученные товары
           </Button>
         </Grid>
 
@@ -424,31 +177,20 @@ const ArrivalForm = () => {
               options={products ?? []}
               onChange={(_, newValue) => {
                 if (newValue) {
-                  setNewReceived(prev => ({ ...prev, product: newValue._id }))
+                  setNewItem(prev => ({ ...prev, product: newValue._id }))
                 }
               }}
-              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
               isOptionEqualToValue={(option, value) => option._id === value._id}
-              renderInput={params =>
+              renderInput={params => (
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
-                  helperText={errors.product || getFieldError('product')}
-                  onBlur={() => {
-                    if (!newReceived.product) {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: 'Выберите товар',
-                      }))
-                    } else {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: '',
-                      }))
-                    }
-                  }}
-                />}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
+                  onBlur={e => handleBlur('product', e.target.value)}
+                />
+              )}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -458,11 +200,11 @@ const ArrivalForm = () => {
               size="small"
               name="amount"
               label="Количество товара"
-              value={newReceived.amount}
-              onChange={e => setNewReceived(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
-              helperText={errors.amount || getFieldError('amount')}
-              onBlur={handleBlur}
+              value={newItem.amount || ''}
+              onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
+              onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -471,17 +213,22 @@ const ArrivalForm = () => {
               fullWidth
               size="small"
               name="description"
-              value={newReceived.description}
-              onChange={e => setNewReceived(prev => ({ ...prev, description: e.target.value }))}
+              value={(newItem as ProductArrival).description || ''}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               sx={{ marginBottom: '15px' }}
             />
 
-            <Button type="button" onClick={() => addProduct(newReceived, true)}>
-                Добавить
+            <Button type="button" onClick={() => addItem('received_amount')}>
+              Добавить
             </Button>
 
             <Button type="button" onClick={() => setReceivedModalOpen(false)}>
-                Закрыть
+              Закрыть
             </Button>
           </Grid>
         )}
@@ -489,13 +236,17 @@ const ArrivalForm = () => {
         <Grid>
           <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Дефекты</Typography>
-          {renderDefectsList(defectForm, i => deleteDefect(i, setDefectForm))}
-          <Button type="button" onClick={() => setDefectModalOpen(true)}>
-              + Добавить дефекты
+          <ItemsList
+            items={defectForm}
+            onDelete={i => deleteItem(i, setDefectForm)}
+            getProductNameById={getProductNameById}
+          />
+          <Button type="button" onClick={() => openModal('defects', initialItemState)}>
+            + Добавить дефекты
           </Button>
         </Grid>
 
-        {defectModalOpen && (
+        {defectsModalOpen && (
           <Grid>
             <Typography sx={{ marginBottom: '15px' }}>Укажите дефекты</Typography>
             <Autocomplete
@@ -505,31 +256,20 @@ const ArrivalForm = () => {
               options={products ?? []}
               onChange={(_, newValue) => {
                 if (newValue) {
-                  setNewDefect(prev => ({ ...prev, product: newValue._id }))
+                  setNewItem(prev => ({ ...prev, product: newValue._id }))
                 }
               }}
-              getOptionLabel={option => `${ option.title } артикул: ${ option.article }`}
+              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
               isOptionEqualToValue={(option, value) => option._id === value._id}
-              renderInput={params =>
+              renderInput={params => (
                 <TextField
                   {...params}
                   label="Товар"
-                  error={Boolean(errors.product)}
-                  helperText={errors.product || getFieldError('product')}
-                  onBlur={() => {
-                    if (!newDefect.product) {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: 'Выберите товар',
-                      }))
-                    } else {
-                      setErrors(prevErrors => ({
-                        ...prevErrors,
-                        product: '',
-                      }))
-                    }
-                  }}
-                />}
+                  error={Boolean(errors.product || getFieldError('product', error))}
+                  helperText={errors.product || getFieldError('product', error)}
+                  onBlur={e => handleBlur('product', e.target.value)}
+                />
+              )}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -539,11 +279,11 @@ const ArrivalForm = () => {
               size="small"
               label="Количество дефектного товара"
               name="amount"
-              value={newDefect.amount}
-              onChange={e => setNewDefect(prev => ({ ...prev, amount: +e.target.value }))}
-              error={Boolean(errors.amount)}
-              helperText={errors.amount || getFieldError('amount')}
-              onBlur={handleBlur}
+              value={newItem.amount || ''}
+              onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}
+              error={Boolean(errors.amount || getFieldError('amount', error))}
+              helperText={errors.amount || getFieldError('amount', error)}
+              onBlur={e => handleBlur('amount', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
 
@@ -552,20 +292,25 @@ const ArrivalForm = () => {
               fullWidth
               size="small"
               name="defect_description"
-              value={newDefect.defect_description}
-              onChange={e => setNewDefect(prev => ({ ...prev, defect_description: e.target.value }))}
-              error={Boolean(errors.defect_description)}
-              helperText={errors.defect_description || getFieldError('defect_description')}
-              onBlur={handleBlur}
+              value={(newItem as Defect).defect_description || ''}
+              onChange={e =>
+                setNewItem(prev => ({
+                  ...prev,
+                  defect_description: e.target.value,
+                }))
+              }
+              error={Boolean(errors.defect_description || getFieldError('defect_description', error))}
+              helperText={errors.defect_description || getFieldError('defect_description', error)}
+              onBlur={e => handleBlur('defect_description', e.target.value)}
               sx={{ marginBottom: '15px' }}
             />
 
-            <Button type="button" onClick={() => addDefect(newDefect)}>
-                Добавить
+            <Button type="button" onClick={() => addItem('defects')}>
+              Добавить
             </Button>
 
-            <Button type="button" onClick={() => setDefectModalOpen(false)}>
-                Закрыть
+            <Button type="button" onClick={() => setDefectsModalOpen(false)}>
+              Закрыть
             </Button>
           </Grid>
         )}
@@ -576,19 +321,24 @@ const ArrivalForm = () => {
             id="arrival_price"
             name="arrival_price"
             label="Цена доставки"
-            value={form.arrival_price}
-            onChange={inputChangeHandler}
+            value={form.arrival_price || ''}
+            onChange={e =>
+              setForm(prev => ({
+                ...prev,
+                arrival_price: Number(e.target.value),
+              }))
+            }
             size="small"
-            error={Boolean(errors.arrival_price)}
-            helperText={errors.arrival_price || getFieldError('arrival_price')}
-            onBlur={handleBlur}
+            error={Boolean(errors.arrival_price || getFieldError('arrival_price', error))}
+            helperText={errors.arrival_price || getFieldError('arrival_price', error)}
+            onBlur={e => handleBlur('arrival_price', e.target.value)}
             fullWidth
           />
         </Grid>
 
         <Grid>
           <InputLabel htmlFor="arrival_date" style={{ fontSize: '15px', marginLeft: '12px' }}>
-              Дата прибытия
+            Дата прибытия
           </InputLabel>
           <TextField
             id="arrival_date"
@@ -596,10 +346,10 @@ const ArrivalForm = () => {
             size={'small'}
             type="date"
             value={form.arrival_date}
-            onChange={inputChangeHandler}
-            error={Boolean(errors.arrival_date)}
-            helperText={errors.arrival_date || getFieldError('arrival_date')}
-            onBlur={handleBlur}
+            onChange={e => inputChangeHandler(e, setForm)}
+            error={Boolean(errors.arrival_date || getFieldError('arrival_date', error))}
+            helperText={errors.arrival_date || getFieldError('arrival_date', error)}
+            onBlur={e => handleBlur('arrival_date', e.target.value)}
             fullWidth
           />
         </Grid>
@@ -610,18 +360,18 @@ const ArrivalForm = () => {
             name="sent_amount"
             label="Количество отправленного товара (шт/мешков/коробов)"
             value={form.sent_amount}
-            onChange={inputChangeHandler}
+            onChange={e => inputChangeHandler(e, setForm)}
             size="small"
-            error={Boolean(errors.sent_amount)}
-            helperText={errors.sent_amount || getFieldError('sent_amount')}
-            onBlur={handleBlur}
+            error={Boolean(errors.sent_amount || getFieldError('sent_amount', error))}
+            helperText={errors.sent_amount || getFieldError('sent_amount', error)}
+            onBlur={e => handleBlur('sent_amount', e.target.value)}
             fullWidth
           />
         </Grid>
 
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
-            {isLoading ?  <CircularProgress size={24} color="inherit" /> : 'Создать поставку'}
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Создать поставку'}
           </Button>
         </Grid>
       </Grid>

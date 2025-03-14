@@ -9,8 +9,19 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 export class ArrivalsService {
   constructor(@InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>) {}
 
-  async getAll() {
-    return this.arrivalModel.find()
+  async getAllByClient(clientId: string, populate: boolean) {
+    if (populate) {
+      return (await this.arrivalModel.find({ client: clientId }).populate('client')).reverse()
+    } else {
+      return (await this.arrivalModel.find({ client: clientId })).reverse()
+    }
+  }
+
+  async getAll(populate: boolean) {
+    if (populate) {
+      return (await this.arrivalModel.find().populate('client')).reverse()
+    }
+    return (await this.arrivalModel.find()).reverse()
   }
 
   async getOne(id: string, populate: boolean) {

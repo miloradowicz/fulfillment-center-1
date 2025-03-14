@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
 import { GlobalError, Product, ProductMutation, ProductWithPopulate } from '../../types'
-import { isAxiosError } from 'axios'
+import axios, { isAxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk<Product[]>(
   'products/fetchProducts',
@@ -35,17 +35,26 @@ export const fetchProductsWithPopulate = createAsyncThunk<ProductWithPopulate[]>
   },
 )
 
-export const addProduct = createAsyncThunk<void, ProductMutation, { rejectValue: GlobalError }
->('products/addProduct', async (data: ProductMutation, { rejectWithValue }) => {
-  try {
-    await axiosAPI.post('/products', data)
-  } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, { rejectValue: GlobalError }>(
+  'products/addProduct',
+  async (productData, { rejectWithValue }) => {
+    try {
+      const response = await axiosAPI.post('/products', productData, {
+        headers: productData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
+      })
+      return response.data
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const err: GlobalError = {
+          message: error.response?.data?.message || 'Ошибка сервера',
+        }
+        return rejectWithValue(err)
+      }
     }
-    throw e
-  }
-})
+  },
+)
+
+
 
 
 

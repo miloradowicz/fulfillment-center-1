@@ -13,8 +13,12 @@ export class OrdersService {
     return this.orderModel.find()
   }
 
+  async getAllWithClient() {
+    return this.orderModel.find().populate('client').exec()
+  }
+
   async getById(id: string) {
-    const order = await this.orderModel.findById(id)
+    const order = await this.orderModel.findById(id).populate('products.product').exec()
     if (!order) throw new NotFoundException('Заказ не найден')
     return order
   }

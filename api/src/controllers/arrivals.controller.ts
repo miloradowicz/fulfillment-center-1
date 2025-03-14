@@ -5,11 +5,15 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 
 @Controller('arrivals')
 export class ArrivalsController {
-  constructor(private arrivalsService: ArrivalsService) {}
+  constructor(private readonly arrivalsService: ArrivalsService) {}
 
   @Get()
-  async getAllArrivals() {
-    return this.arrivalsService.getAll()
+  async getAllArrivals(@Query('client') clientId: string, @Query('populate') populate?: string) {
+    if (clientId) {
+      return await this.arrivalsService.getAllByClient(clientId, populate === '1')
+    } else {
+      return await this.arrivalsService.getAll(populate === '1')
+    }
   }
 
   @Get(':id')

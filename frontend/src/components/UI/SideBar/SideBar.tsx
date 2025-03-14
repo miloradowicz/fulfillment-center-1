@@ -28,11 +28,16 @@ export default function Sidebar() {
     setOpen(state)
   }
 
-  const drawerWidth = isSmallScreen ? 200 : 250
+  enum DrawerWidth {
+    Small = 200,
+    Default = 250,
+  }
+
+  const drawerWidth = isSmallScreen ? DrawerWidth.Small : DrawerWidth.Default
 
   return (
-    <Box position="absolute" top={'12px'} left={'30px'}>
-      <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white', marginRight: '50px', zIndex: 100  }}>
+    <Box className="absolute top-[12px] left-[30px]">
+      <IconButton onClick={toggleDrawer(true)} className="!text-white mr-[50px] z-[100]">
         <MenuIcon />
       </IconButton>
 

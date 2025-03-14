@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Order, OrderMutation, ValidationError } from '../../types'
+import { GlobalError, Order, OrderMutation, OrderWithClient, OrderWithProducts, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchOrders = createAsyncThunk<Order[]>(
@@ -11,10 +11,18 @@ export const fetchOrders = createAsyncThunk<Order[]>(
   },
 )
 
-export const fetchOrderById = createAsyncThunk<Order, string>(
+export const fetchOrdersWithClient = createAsyncThunk<OrderWithClient[]>(
+  'orders/fetchOrdersWithClient',
+  async () => {
+    const response = await axiosAPI.get('/orders?client=1')
+    return response.data
+  },
+)
+
+export const fetchOrderById = createAsyncThunk<OrderWithProducts, string>(
   'orders/fetchOrderById',
   async (orderId: string) => {
-    const response = await axiosAPI.get(`/orders/?=${ orderId }`)
+    const response = await axiosAPI.get(`/orders/${ orderId }`)
     return response.data
   },
 )
@@ -35,7 +43,7 @@ export const addOrder= createAsyncThunk<void, OrderMutation, { rejectValue: Vali
 export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('orders/deleteOrder', async (orderId: string, { rejectWithValue }) => {
   try {
-    await axiosAPI.delete(`/orders/?=${ orderId }`)
+    await axiosAPI.delete(`/orders/${ orderId }`)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return rejectWithValue(e.response.data as GlobalError)

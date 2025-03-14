@@ -1,146 +1,30 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, InputLabel, MenuItem, Select, TextField, Typography, Box } from '@mui/material'
-import { DynamicField, ProductMutation } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { toast } from 'react-toastify'
-import { addProduct } from '../../../store/thunks/productThunk.ts'
-import { selectLoadingAddProduct } from '../../../store/slices/productSlice.ts'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { isAxiosError } from 'axios'
-
-const initialState: ProductMutation = {
-  client: '',
-  title: '',
-  amount: 0,
-  barcode: '',
-  article: '',
-  documents: [],
-  dynamic_fields: [],
-}
+import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
+import useProductForm from '../../../hooks/useProductForm.ts'
 
 const ProductForm = () => {
-  const [form, setForm] = useState<ProductMutation>(initialState)
-  const [selectedClient, setSelectedClient] = useState('')
-  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>([])
-  const [newField, setNewField] = useState<DynamicField>({ key: '', label: '', value: '' })
-  const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
 
-  const dispatch = useAppDispatch()
-  const loading = useAppSelector(selectLoadingAddProduct)
-  const clients = useAppSelector(selectAllClients)
-
-  useEffect(() => {
-    dispatch(fetchClients())
-  }, [dispatch])
-
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-
-    if (!form.client) {
-      toast.warn('Поле "Клиент" обязательно для заполнения!')
-      return
-    }
-    if (!form.title.trim() || !form.title) {
-      toast.warn('Поле "Название" обязательно для заполнения!')
-      return
-    }
-    if (!form.amount) {
-      toast.warn('Поле "Количество" обязательно для заполнения!')
-      return
-    }
-    if (!form.barcode.trim() || !form.barcode ) {
-      toast.warn('Поле "Баркод" обязательно для заполнения!')
-      return
-    }
-    if (!form.article.trim() || !form.article) {
-      toast.warn('Поле "Артикул" обязательно для заполнения!')
-      return
-    }
-
-
-
-    try {
-      const productData: ProductMutation = {
-        ...form,
-        dynamic_fields: dynamicFields,
-        documents: file ? [{ document: await convertFileToBase64(file) }] : [],
-      }
-
-      await dispatch(addProduct(productData)).unwrap()
-      toast.success('Продукт успешно создан.')
-
-      setForm(initialState)
-      setDynamicFields([])
-      setSelectedClient('')
-      setFile(null)
-    } catch (e) {
-      if (isAxiosError(e) && e.response) {
-        console.error('Ошибки валидации:', e.response.data)
-      }
-      console.error('Ошибка сервера:', e)
-      toast.error('Не удалось создать продукт.')
-    }
-  }
-
-  const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-
-    if (name === 'amount') {
-      const amountValue = value === '' ? 0 : Number(value)
-      if (amountValue < 0 || isNaN(amountValue)) return
-      setForm(prevState => ({
-        ...prevState,
-        [name]: amountValue,
-      }))
-    } else {
-      setForm(prevState => ({
-        ...prevState,
-        [name]: value,
-      }))
-    }
-  }
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null
-    if (selectedFile) {
-      const maxFileSize = 10 * 1024 * 1024
-      if (selectedFile.size > maxFileSize) {
-        toast.warn('Размер файла слишком большой. Максимальный размер: 10MB')
-        setFile(null)
-        return
-      }
-      setFile(selectedFile)
-    }
-  }
-
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (reader.result) {
-          resolve(reader.result.toString())
-        }
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
-
-  const addDynamicField = () => {
-    if (!newField.key.trim() || !newField.label.trim()) return
-
-    setDynamicFields(prev => [...prev, newField])
-    setNewField({ key: '', label: '', value: '' })
-    setShowNewFieldInputs(false)
-  }
-
-  const onChangeDynamicFieldValue = (index: number, e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = e.target.value
-    setDynamicFields(prev => prev.map((field, i) => (i === index ? { ...field, value } : field)))
-  }
+  const {
+    form,
+    selectedClient,
+    dynamicFields,
+    newField,
+    showNewFieldInputs,
+    file,
+    clients,
+    loading,
+    inputChangeHandler,
+    handleFileChange,
+    addDynamicField,
+    onChangeDynamicFieldValue,
+    onSubmit,
+    setForm,
+    setSelectedClient,
+    setNewField,
+    setShowNewFieldInputs,
+    setErrors,
+    errors,
+  } = useProductForm()
 
   return (
     <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
@@ -149,25 +33,27 @@ const ProductForm = () => {
       </Typography>
       <Grid container direction="column" spacing={2}>
         <Grid>
-          <InputLabel id="client-select-label">Клиент</InputLabel>
-          <Select
-            labelId="client-select-label"
-            id="client-select"
-            value={selectedClient}
-            onChange={e => {
-              const clientId = e.target.value
+          <Autocomplete
+            options={clients || []}
+            getOptionLabel={option => option.name}
+            value={clients?.find(client => client._id === selectedClient) || null}
+            onChange={(_event, newValue) => {
+              const clientId = newValue ? newValue._id : ''
               setSelectedClient(clientId)
+              setErrors(prevErrors => ({ ...prevErrors, client: '' }))
               setForm(prevState => ({ ...prevState, client: clientId }))
             }}
-            fullWidth
-            size="small"
-          >
-            {clients?.map(client => (
-              <MenuItem key={client._id} value={client._id}>
-                {client.name}
-              </MenuItem>
-            ))}
-          </Select>
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Клиент"
+                fullWidth
+                size="small"
+                error={!!errors.client}
+                helperText={errors.client}
+              />
+            )}
+          />
         </Grid>
 
         <Grid>
@@ -178,6 +64,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.title}
+            helperText={errors.title}
           />
         </Grid>
         <Grid>
@@ -189,6 +77,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.amount}
+            helperText={errors.amount}
           />
         </Grid>
         <Grid>
@@ -199,6 +89,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.barcode}
+            helperText={errors.barcode}
           />
         </Grid>
         <Grid>
@@ -209,6 +101,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
+            error={!!errors.article}
+            helperText={errors.article}
           />
         </Grid>
 
@@ -266,7 +160,7 @@ const ProductForm = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button variant="outlined" component="label" sx={{ mr: 2 }}>
               Выбрать файл
-              <input type="file" accept=".pdf,.docx" hidden onChange={handleFileChange} />
+              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange} />
             </Button>
             {file && <Typography variant="body2">{file.name}</Typography>}
           </Box>

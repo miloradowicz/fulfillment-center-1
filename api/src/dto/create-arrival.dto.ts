@@ -6,10 +6,11 @@ class ProductDto {
   product: string
 
   @IsOptional({ message: 'Заполните описание товара.' })
+  @IsOptional()
   description: string
 
   @IsNotEmpty({ message: 'Заполните количество товара.' })
-  @IsPositive({ message: 'Количество товара быть больше 0.' })
+  @IsPositive({ message: 'Количество товара должно быть больше 0.' })
   amount: number
 }
 
@@ -32,7 +33,7 @@ class DefectDto {
   defect_description: string
 
   @IsNotEmpty({ message: 'Заполните количество дефектных товаров.' })
-  @IsPositive({ message: 'Количество дефектных товаров быть больше 0.' })
+  @IsPositive({ message: 'Количество дефектных товаров должно быть больше 0.' })
   amount: number
 }
 
@@ -41,10 +42,11 @@ class ReceivedProductDto {
   product: string
 
   @IsOptional({ message: 'Заполните описание товара.' })
+  @IsOptional()
   description: string
 
   @IsNotEmpty({ message: 'Заполните количество товара.' })
-  @IsPositive({ message: 'Количество товара быть больше 0.' })
+  @IsPositive({ message: 'Количество товара должно быть больше 0.' })
   amount: number
 }
 
@@ -69,10 +71,10 @@ export class CreateArrivalDto {
   sent_amount: string
 
   @IsOptional()
-  @IsEnum(['Ожидается доставка', 'Получен', 'Отсортирован'], {
-    message: 'Статус должен быть одним из: "ожидается доставка", "получен", "отсортирован"',
+  @IsEnum(['ожидается доставка', 'получена', 'отсортирована'], {
+    message: 'Статус должен быть одним из: "ожидается доставка", "получена", "отсортирована"',
   })
-  arrival_status: 'Ожидается доставка' | 'Получен' | 'Отсортирован'
+  arrival_status: 'ожидается доставка' | 'получена' | 'отсортирована'
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })

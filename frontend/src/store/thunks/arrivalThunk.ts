@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { Arrival, ArrivalMutation, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
+import { Arrival, ArrivalMutation, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
@@ -24,6 +24,22 @@ export const fetchArrivalByIdWithPopulate = createAsyncThunk<ArrivalWithPopulate
   },
 )
 
+export const fetchArrivalsByClientId = createAsyncThunk<Arrival[], string>(
+  'arrivals/fetchArrivalsByClientId',
+  async (clientId: string) => {
+    const response = await axiosAPI.get(`/arrivals?client=${ clientId }`)
+    return response.data
+  },
+)
+
+export const fetchPopulatedArrivals = createAsyncThunk<ArrivalWithClient[]>(
+  'arrivals/fetchArrivalsWithPopulate',
+  async () => {
+    const response = await axiosAPI.get('/arrivals?populate=1')
+    return response.data
+  },
+)
+
 export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue: ValidationError }>(
   'arrivals/addArrival',
   async (data: ArrivalMutation, { rejectWithValue }) => {
@@ -43,7 +59,7 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
   'arrivals/deleteArrival',
   async (arrivalId: string, { rejectWithValue }) => {
     try {
-      await axiosAPI.delete(`/arrivals/${arrivalId}`)
+      await axiosAPI.delete(`/arrivals/${ arrivalId }`)
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)
@@ -56,9 +72,7 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 export const updateArrival = createAsyncThunk<
   void,
   { arrivalId: string; data: ArrivalMutation },
-  {
-    rejectValue: GlobalError
-  }
+  { rejectValue: GlobalError }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
     await axiosAPI.put(`/arrivals/${arrivalId}`, data)
