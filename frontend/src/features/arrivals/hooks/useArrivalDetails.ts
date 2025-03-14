@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { selectArrivalWithPopulate, selectLoadingFetchArrival, selectArrivalError } from '../../../store/slices/arrivalSlice'
+import {
+  selectArrivalError,
+  selectArrivalWithPopulate,
+  selectLoadingFetchArrival,
+} from '../../../store/slices/arrivalSlice'
 import { deleteArrival, fetchArrivalByIdWithPopulate } from '../../../store/thunks/arrivalThunk'
 import { toast } from 'react-toastify'
 import { hasMessage } from '../../../utils/helpers'
@@ -35,7 +39,10 @@ const useArrivalDetails = () => {
         setIsDeleted(true)
       } catch (e) {
         if (hasMessage(e)) {
-          toast.error(error?.message)
+          toast.error(e.message || 'Ошибка удаления')
+        } else {
+          console.error(e)
+          toast.error('Неизвестная ошибка')
         }
       }
     }
