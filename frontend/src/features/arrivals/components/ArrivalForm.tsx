@@ -2,15 +2,15 @@ import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
-import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { ArrivalWithClient, Defect, ProductArrival } from '../../../types'
+import { ArrivalData, useArrivalForm } from '../hooks/useArrivalForm.ts'
+import { Defect, ProductArrival } from '../../../types'
 import { initialItemState } from '../state/arrivalState.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import React from 'react'
 
 interface Props {
-  initialData?: ArrivalWithClient
+  initialData?: ArrivalData
   onSuccess?: () => void
 }
 
