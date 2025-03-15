@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectLoadingFetchOrder, selectOrder } from '../../../store/slices/orderSlice.ts'
-import { fetchOrderById } from '../../../store/thunks/orderThunk.ts'
+import { fetchOrderById, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
 import { useParams } from 'react-router-dom'
 import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import { selectClient } from '../../../store/slices/clientSlice.ts'
@@ -18,6 +18,7 @@ export const useOrderDetails = () => {
   useEffect(() => {
     if (id) {
       dispatch(fetchOrderById(id))
+      dispatch(fetchOrderByIdWithPopulate(id))
     }
   }, [dispatch, id])
 
