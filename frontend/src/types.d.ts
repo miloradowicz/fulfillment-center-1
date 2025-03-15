@@ -244,3 +244,12 @@ export interface TaskWithPopulate {
   logs?: Log[]
 }
 export type TaskMutation = Omit<Task, '_id'>
+
+export interface Service {
+  _id: string,
+  name: string,
+  dynamic_fields: DynamicField[],
+  logs?: Log[]
+}
+
+export type ServiceMutation = Omit<Service, '_id'>
