@@ -12,6 +12,7 @@ import OrderPage from './features/orders/containers/OrderPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import TaskBoard from './features/tasks/components/TaskBoard.tsx'
+import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -25,6 +26,7 @@ const App = () => {
             <Route path="/clients" element={<ClientPage />} />
             <Route path="/clients/:clientId" element={<ClientDetail />} />
             <Route path="/arrivals" element={<ArrivalPage />} />
+            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
             <Route path="/products" element={<ProductPage />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:id" element={<OrderDetails />} />
