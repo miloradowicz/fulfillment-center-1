@@ -30,8 +30,7 @@ const UseOrderPage = () => {
 
   const handleOpen = () => setOpen(true)
 
-  const handleClose = async () => {
-    await dispatch(fetchOrdersWithClient())
+  const handleClose = () => {
     setOpen(false)
   }
 

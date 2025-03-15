@@ -2,7 +2,11 @@ import React from 'react'
 import { Product } from '../../../types'
 
 export const addArrayItemInForm = (
+  // TODO fix any https://botsmannatashaa.atlassian.net/browse/JE2-96
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newField: any,
+  // TODO fix any https://botsmannatashaa.atlassian.net/browse/JE2-96
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setForm: React.Dispatch<React.SetStateAction<any[]>>,
   setArrayData: () => void,
   clientProducts: Product[] | null,

@@ -21,10 +21,18 @@ import { validationRules } from './ValidationRulesForBlur.ts'
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addOrder, updateOrder } from '../../../store/thunks/orderThunk.ts'
+import {
+  addOrder,
+  fetchOrderById,
+  fetchOrderByIdWithPopulate,
+  fetchOrdersWithClient,
+  updateOrder,
+} from '../../../store/thunks/orderThunk.ts'
 import { deleteItem } from './deleteItem.ts'
 import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
+import { useParams } from 'react-router-dom'
+
 
 export const useOrderForm = ( onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
@@ -56,6 +64,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
   const loadingFetchClient = useAppSelector(selectLoadingFetchClient)
   const [isButtonVisible, setButtonVisible] = useState(true)
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
+  const params = useParams()
 
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -132,25 +141,42 @@ export const useOrderForm = ( onSuccess?: () => void) => {
           })),
         }
 
-        if ( updatedForm.products.length === 0) {
-          toast.error('Добавьте товары')}
+        if (updatedForm.products.length === 0) {
+          toast.error('Добавьте товары')
+          return
+        }
+
         await dispatch(updateOrder({ orderId: initialData._id, data: updatedForm })).unwrap()
+
+        if (params.id) {
+          onSuccess?.()
+          await dispatch(fetchOrderById(params.id))
+          await dispatch(fetchOrderByIdWithPopulate(params.id))
+
+        } else {
+          await dispatch(fetchOrdersWithClient())
+          onSuccess?.()
+        }
         toast.success('Заказ успешно обновлен!')
+        return
       } else {
         if (form.products.length === 0) {
-          toast.error('Добавьте товары')}
+          toast.error('Добавьте товары')
+          return
+        }
+
         await dispatch(addOrder(form)).unwrap()
         toast.success('Заказ успешно создан!')
+        setForm({ ...initialStateOrder })
+        setProductsForm([])
+        setDefectForm([])
+        onSuccess?.()
       }
-      setForm({ ...initialStateOrder })
-      setProductsForm([])
-      setDefectForm([])
-      onSuccess?.()
-    }catch (e) {
+
+    } catch (e) {
       console.error(e)
     }
   }
-
 
   const deleteProduct = (index: number) => {
     deleteItem(index, setProductsForm, setForm, 'products')
@@ -159,10 +185,11 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     deleteItem(index, setDefectForm, setForm, 'defects')
   }
 
-
   const handleBlurAutoComplete = (
     field: string,
     setErrors: React.Dispatch<React.SetStateAction<ErrorForOrder>>,
+    // TODO fix any https://botsmannatashaa.atlassian.net/browse/JE2-96
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formData: any,
     errorMessage: string,
   ) => {

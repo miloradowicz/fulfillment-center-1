@@ -23,6 +23,7 @@ interface OrderState {
   populateOrder: OrderWithProductsAndClients | null
   ordersWithClient: OrderWithClient[] | null
   loadingFetch : boolean
+  loadingFetchPopulate: boolean
   loadingAdd: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
@@ -36,6 +37,7 @@ const initialState: OrderState = {
   populateOrder: null,
   ordersWithClient: null,
   loadingFetch: false,
+  loadingFetchPopulate:false,
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
@@ -48,6 +50,7 @@ export const selectAllOrders = (state: RootState) => state.orders.orders
 export const selectPopulateOrder = (state: RootState) => state.orders.populateOrder
 export const selectAllOrdersWithClient = (state: RootState) => state.orders.ordersWithClient
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
+export const selectLoadingFetchOrderPopulate = (state: RootState) => state.orders.loadingFetchPopulate
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
 export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
 export const selectLoadingUpdateOrder = (state: RootState) => state.orders.loadingUpdate
@@ -91,14 +94,14 @@ const orderSlice = createSlice({
       state.loadingFetch = false
     })
     builder.addCase(fetchOrderByIdWithPopulate.pending, state => {
-      state.loadingFetch = true
+      state.loadingFetchPopulate = true
     })
     builder.addCase(fetchOrderByIdWithPopulate.fulfilled, (state, action) => {
-      state.loadingFetch = false
+      state.loadingFetchPopulate = false
       state.populateOrder= action.payload
     })
     builder.addCase(fetchOrderByIdWithPopulate.rejected, state => {
-      state.loadingFetch = false
+      state.loadingFetchPopulate = false
     })
     builder.addCase(addOrder.pending, state => {
       state.loadingAdd = true

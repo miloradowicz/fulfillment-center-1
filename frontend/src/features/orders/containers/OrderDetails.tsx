@@ -16,6 +16,12 @@ import { useOrderDetails } from '../hooks/useOrderDetails.ts'
 import DefectsTable from '../components/DefectsTable.tsx'
 import OrderLogs from '../components/OrderLogs.tsx'
 import { DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { useAppDispatch } from '../../../app/hooks.ts'
+import { deleteOrder } from '../../../store/thunks/orderThunk.ts'
+import { toast } from 'react-toastify'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import OrderForm from '../components/OrderForm.tsx'
+import { useNavigate } from 'react-router-dom'
 
 enum OrderStatus {
   InAssembly = 'в сборке',
@@ -26,6 +32,9 @@ enum OrderStatus {
 const OrderDetails = () => {
   const { order, client, defects, loading } = useOrderDetails()
   const [tabValue, setTabValue] = useState(0)
+  const dispatch = useAppDispatch()
+  const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
 
   const statuses = Object.values(OrderStatus)
   const activeStep = order ? statuses.indexOf(order.status as OrderStatus) : 0
@@ -36,6 +45,25 @@ const OrderDetails = () => {
     { field: 'barcode', headerName: 'Штрихкод', width: 180 },
     { field: 'article', headerName: 'Артикул', width: 150 },
   ]
+
+  const handleDelete = async (id: string) => {
+    try {
+      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
+        await dispatch(deleteOrder(id))
+        navigate('/orders')
+
+      } else {
+        toast.info('Вы отменили удаление заказа')
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+
+  const handleOpenEdit = () => {
+    setOpen(true)
+  }
 
   if (loading) {
     return (
@@ -106,7 +134,7 @@ const OrderDetails = () => {
             article: item.product.article,
           }))}
           columns={orderColumns}
-          pageSizeOptions={[5, 10, 20]}
+          pageSizeOptions={[5, 10, 20, 100]}
           disableRowSelectionOnClick
         />
       </Box>
@@ -128,6 +156,7 @@ const OrderDetails = () => {
         justifyContent: 'flex-end',
       }}>
         <Button
+          type={'button'}
           variant="contained"
           startIcon={<EditOutlined />}
           sx={{
@@ -135,10 +164,12 @@ const OrderDetails = () => {
             borderRadius: 2,
             textTransform: 'none',
           }}
+          onClick={()=>handleOpenEdit()}
         >
           Редактировать
         </Button>
         <Button
+          type={'button'}
           variant="contained"
           color="error"
           startIcon={<DeleteOutline />}
@@ -147,20 +178,11 @@ const OrderDetails = () => {
             borderRadius: 2,
             textTransform: 'none',
           }}
-          // onClick={async () => {
-          //   // if (clientId) {
-          //   //   try {
-          //   //     await deleteOneClient(clientId)
-          //   //     toast.success('Клиент успешно удалён!')
-          //   //     navigate('/clients')
-          //   //   } catch {
-          //   //     toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
-          //   //   }
-          //   }
-          // }}
+          onClick={()=>handleDelete(order._id)}
         >
           Удалить
         </Button>
+        <Modal handleClose={()=> setOpen(false)} open={open}><OrderForm  onSuccess={()=> setOpen(false)}/></Modal>
       </Box>
     </Card>
   )

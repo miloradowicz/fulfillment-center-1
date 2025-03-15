@@ -14,28 +14,26 @@ const OrderPage = () => {
         <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
           <CircularProgress />
         </Grid>
-      ) : null}
-
-      <Modal handleClose={handleClose} open={open}><OrderForm  onSuccess={ handleClose}/></Modal>
-      <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
-        <Typography className="flex-grow text-[20px]">Заказы</Typography>
-        <Button
-          sx={{
-            color: '#32363F',
-            borderColor: '#32363F',
-            backgroundColor: 'white',
-            '&:hover': {
-              backgroundColor: '#f8f9fa',
-              borderColor: '#5a6268',
-            },
-          }}
-          variant="outlined" onClick={handleOpen}>Добавить заказ</Button>
-      </Box>
-      <OrdersList
-        onEdit={handleOpenEdit}
-        orders={orders || []}
-        handleDelete={handleDelete}
-      />
+      ) : <>      <Modal handleClose={handleClose} open={open}><OrderForm  onSuccess={ handleClose}/></Modal>
+        <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
+          <Typography className="flex-grow text-[20px]">Заказы</Typography>
+          <Button
+            sx={{
+              color: '#32363F',
+              borderColor: '#32363F',
+              backgroundColor: 'white',
+              '&:hover': {
+                backgroundColor: '#f8f9fa',
+                borderColor: '#5a6268',
+              },
+            }}
+            variant="outlined" onClick={handleOpen}>Добавить заказ</Button>
+        </Box>
+        <OrdersList
+          onEdit={handleOpenEdit}
+          orders={orders || []}
+          handleDelete={handleDelete}
+        /></>}
     </>
   )
 }
