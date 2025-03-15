@@ -8,7 +8,7 @@ export const useClientPage = () => {
 
   const handleOpen = () => setOpen(true)
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setOpen(false)
   }
 

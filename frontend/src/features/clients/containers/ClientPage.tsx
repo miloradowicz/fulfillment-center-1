@@ -16,7 +16,7 @@ const ClientsPage = () => {
       )}
 
       <Modal handleClose={handleClose} open={open}>
-        <ClientForm />
+        <ClientForm onClose={handleClose} />
       </Modal>
       <Box
         display={'flex'}

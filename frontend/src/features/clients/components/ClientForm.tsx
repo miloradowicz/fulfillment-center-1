@@ -1,15 +1,17 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
+import { Client } from '../../../types'
 import { useClientForm } from '../hooks/useClientForm.ts'
 
-const ClientForm = () => {
-
-  const { form, loading, inputChangeHandler, onSubmit, getFieldError } = useClientForm()
+const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () => void }) => {
+  const { form, loading, inputChangeHandler, onSubmit, getFieldError } = useClientForm(client?._id, onClose)
 
   return (
     <>
       <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-        <Typography variant='h4' sx={{ mb: 2 }}>Добавить нового клиента</Typography>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          {client ? 'Редактировать клиента' : 'Добавить нового клиента'}
+        </Typography>
         <Grid container direction="column" spacing={2}>
           <Grid>
             <TextField
@@ -105,7 +107,7 @@ const ClientForm = () => {
 
           <Grid>
             <Button type="submit" disabled={loading}>
-              {loading ? <CircularProgress size={24}/> : 'Создать клиента'}
+              {loading ? <CircularProgress size={24}/> : client ? 'Сохранить клиента' : 'Создать клиента'}
             </Button>
           </Grid>
         </Grid>
