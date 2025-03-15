@@ -28,16 +28,19 @@ const UseOrderPage = () => {
     }
   }
 
-  const handleOpenEdit = async (order: OrderWithClient) => {
-    await dispatch(fetchOrderByIdWithPopulate(order._id))
-    setOpen(true)
-  }
   const handleOpen = () => setOpen(true)
 
   const handleClose = async () => {
     await dispatch(fetchOrdersWithClient())
     setOpen(false)
   }
+
+  const handleOpenEdit = async (order: OrderWithClient) => {
+    await dispatch(fetchOrderByIdWithPopulate(order._id))
+    console.log('order')
+    setOpen(true)
+  }
+
 
   return {
     orders,

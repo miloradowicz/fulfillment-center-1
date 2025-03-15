@@ -5,21 +5,16 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
-import OrderForm from './OrderForm.tsx'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 
 interface Props {
   orders: OrderWithClient[] | [];
   handleDelete: (id: string) => void
-  open: boolean
-  handleOpen: () => void
-  handleClose: () => void
   onEdit: (data:OrderWithClient) => void
 }
 
-const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, handleClose, onEdit }) => {
+const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
 
   const columns: GridColDef<OrderWithClient>[] = [
     {
@@ -87,7 +82,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, h
         <>
           <IconButton onClick={() => {
             onEdit(row)
-            handleOpen()
           }}
           >
             <EditIcon fontSize="inherit" />
@@ -131,7 +125,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, open, handleOpen, h
           <Typography className="text-center mt-5">Заказы не найдены.</Typography>
         )
       }
-      <Modal handleClose={handleClose} open={open}><OrderForm/></Modal>
     </Box>
   )
 }

@@ -8,13 +8,14 @@ import {
   Step,
   StepLabel,
   Tabs,
-  Tab,
+  Tab, Button,
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
 import DefectsTable from '../components/DefectsTable.tsx'
 import OrderLogs from '../components/OrderLogs.tsx'
+import { DeleteOutline, EditOutlined } from '@mui/icons-material'
 
 enum OrderStatus {
   InAssembly = 'в сборке',
@@ -119,6 +120,47 @@ const OrderDetails = () => {
         ) : (
           <DefectsTable defects={defects} />
         )}
+      </Box>
+      <Box sx={{
+        mt: 4,
+        display: 'flex',
+        gap: 2,
+        justifyContent: 'flex-end',
+      }}>
+        <Button
+          variant="contained"
+          startIcon={<EditOutlined />}
+          sx={{
+            px: 3,
+            borderRadius: 2,
+            textTransform: 'none',
+          }}
+        >
+          Редактировать
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<DeleteOutline />}
+          sx={{
+            px: 3,
+            borderRadius: 2,
+            textTransform: 'none',
+          }}
+          // onClick={async () => {
+          //   // if (clientId) {
+          //   //   try {
+          //   //     await deleteOneClient(clientId)
+          //   //     toast.success('Клиент успешно удалён!')
+          //   //     navigate('/clients')
+          //   //   } catch {
+          //   //     toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
+          //   //   }
+          //   }
+          // }}
+        >
+          Удалить
+        </Button>
       </Box>
     </Card>
   )

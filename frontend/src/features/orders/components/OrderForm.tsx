@@ -8,6 +8,7 @@ import React from 'react'
 
 interface Props {
   onSuccess?: () => void
+  handleClose?:  () => void
 }
 const OrderForm: React.FC<Props> = ({ onSuccess }) => {
   const {
@@ -42,9 +43,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     addArrayProductInForm,
     addArrayDefectInForm,
     onSubmit,
-    initialData1,
-  } = useOrderForm(onSuccess)
-  console.log(initialData1)
+    initialData,
+  } = useOrderForm( onSuccess)
+
 
   return (
     <>
@@ -53,7 +54,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
       ) : (
         <form onSubmit={onSubmit} style={{ width: '60%', margin: '20px auto' }}>
           <Typography variant="h5" sx={{ mb: 2 }}>
-            {initialData1 ? 'Редактировать данные заказа' : 'Добавить новый заказ'}
+            {initialData ? 'Редактировать данные заказа' : 'Добавить новый заказ'}
           </Typography>
           <Grid container direction="column" spacing={2}>
             {clients && clients?.length > 0 && (
@@ -372,7 +373,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               <Button type="submit" disabled={loading}>
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
-                ) : initialData1 ? (
+                ) : initialData? (
                   'Обновить заказ'
                 ) : (
                   'Создать заказ'

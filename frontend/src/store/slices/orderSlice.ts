@@ -74,6 +74,7 @@ const orderSlice = createSlice({
     })
     builder.addCase(fetchOrdersWithClient.fulfilled, (state, action) => {
       state.loadingFetch = false
+      state.populateOrder = null
       state.ordersWithClient = action.payload
     })
     builder.addCase(fetchOrdersWithClient.rejected, state => {

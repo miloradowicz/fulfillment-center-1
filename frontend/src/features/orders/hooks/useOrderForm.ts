@@ -21,28 +21,27 @@ import { validationRules } from './ValidationRulesForBlur.ts'
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addOrder, fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderThunk.ts'
+import { addOrder, updateOrder } from '../../../store/thunks/orderThunk.ts'
 import { deleteItem } from './deleteItem.ts'
 import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 
 export const useOrderForm = ( onSuccess?: () => void) => {
-  const initialData1 = useAppSelector(selectPopulateOrder)
-
-  const [form, setForm] = useState<OrderMutation>(initialData1
+  const initialData = useAppSelector(selectPopulateOrder)
+  const [form, setForm] = useState<OrderMutation>((initialData)
     ? {
-      client: initialData1.client._id,
-      sent_at: dayjs(initialData1.sent_at).format('YYYY-MM-DD'),
-      delivered_at: dayjs(initialData1.sent_at).format('YYYY-MM-DD'),
-      price: initialData1.price,
+      client: initialData.client._id,
+      sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
+      delivered_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
+      price: initialData.price,
       products: [],
       defects: [],
-      comment: initialData1.comment?initialData1.comment:'',
+      comment: initialData.comment?initialData.comment:'',
     }
     : { ...initialStateOrder })
 
-  const [productsForm, setProductsForm] = useState<ProductForOrderForm[]>(initialData1?initialData1.products:[])
-  const [defectForm, setDefectForm] = useState<DefectForOrderForm[]>(initialData1?initialData1.defects:[])
+  const [productsForm, setProductsForm] = useState<ProductForOrderForm[]>((initialData)?initialData.products:[])
+  const [defectForm, setDefectForm] = useState<DefectForOrderForm[]>((initialData)?initialData.defects:[])
   const [newFieldDefects, setNewFieldDefects] = useState<Defect>(initialStateDefectForOrder)
   const [modalOpenDefects, setModalOpenDefects] = useState(false)
   const [isButtonDefectVisible, setButtonDefectVisible] = useState(true)
@@ -113,50 +112,44 @@ export const useOrderForm = ( onSuccess?: () => void) => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (form.products.length === 0) {
-      toast.error('Добавьте товары')}
-    else { try {
-      const transformToProductOrder = (
-        productsForOrder: ProductForOrderForm[],
-      ): ProductOrder[] => {
-        return productsForOrder.map(item => ({
-          product: item.product._id,
-          description: item.description,
-          amount: item.amount,
-        }))
+    try {
+      const transformToOrder = <T, R>(items: T[], mapFn: (item: T) => R): R[] => {
+        return items.map(mapFn)
       }
-      const transformToDefectOrder = (
-        defectsForOrder: DefectForOrderForm[],
-      ): Defect[] => {
-        return defectsForOrder.map(item => ({
-          product: item.product._id,
-          defect_description: item.defect_description,
-          amount: item.amount,
-        }))
-      }
-      const productOrders: ProductOrder[] = transformToProductOrder(productsForm)
-      const defectOrders: Defect[] = transformToDefectOrder(defectForm)
-      const updatedForm = {
-        ...form,
-        products: productOrders,
-        defects: defectOrders,
-      }
-      if (initialData1) {
-        await dispatch(updateOrder({ orderId: initialData1._id, data: updatedForm })).unwrap()
-        onSuccess?.()
+
+      if (initialData) {
+        const updatedForm = {
+          ...form,
+          products: transformToOrder(productsForm, item => ({
+            product: item.product._id,
+            description: item.description,
+            amount: item.amount,
+          })),
+          defects: transformToOrder(defectForm, item => ({
+            product: item.product._id,
+            defect_description: item.defect_description,
+            amount: item.amount,
+          })),
+        }
+
+        if ( updatedForm.products.length === 0) {
+          toast.error('Добавьте товары')}
+        await dispatch(updateOrder({ orderId: initialData._id, data: updatedForm })).unwrap()
         toast.success('Заказ успешно обновлен!')
       } else {
+        if (form.products.length === 0) {
+          toast.error('Добавьте товары')}
         await dispatch(addOrder(form)).unwrap()
         toast.success('Заказ успешно создан!')
       }
       setForm({ ...initialStateOrder })
       setProductsForm([])
       setDefectForm([])
-      await dispatch(fetchOrdersWithClient())
+      onSuccess?.()
     }catch (e) {
       console.error(e)
     }
-    }}
+  }
 
 
   const deleteProduct = (index: number) => {
@@ -266,6 +259,6 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     addArrayProductInForm,
     addArrayDefectInForm,
     onSubmit,
-    initialData1,
+    initialData,
   }
 }
