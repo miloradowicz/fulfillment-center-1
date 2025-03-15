@@ -40,7 +40,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     ? {
       client: initialData.client._id,
       sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
-      delivered_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
+      delivered_at: dayjs(initialData.delivered_at).format('YYYY-MM-DD'),
       price: initialData.price,
       products: [],
       defects: [],
