@@ -99,6 +99,13 @@ export default function Sidebar() {
               <ListItemText primary="Отчеты" />
             </ListItemButton>
           </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/services">
+              <ListItemIcon><LocalShippingIcon  /></ListItemIcon>
+              <ListItemText primary="Услуги" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
     </Box>
