@@ -22,6 +22,7 @@
     "@reduxjs/toolkit": "^2.6.0",
     "@tailwindcss/vite": "^4.0.10",
     "axios": "^1.8.1",
+    "check-password-strength": "^3.0.0",
     "dayjs": "^1.11.13",
     "notistack": "^3.0.2",
     "react": "^19.0.0",

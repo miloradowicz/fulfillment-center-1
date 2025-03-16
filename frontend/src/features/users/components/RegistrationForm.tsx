@@ -6,8 +6,9 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { toast } from 'react-toastify'
 import { clearCreateError, selectCreateError, selectLoadingRegisterUser } from '../../../store/slices/userSlice.ts'
 import SelectField from '../../../components/SelectField/SelectField.tsx'
-import { emailRegex, roles } from '../../../constants.ts'
+import { allowedPasswordSymbols, emailRegex, passwordStrengthOptions, roles } from '../../../constants.ts'
 import { registerUser } from '../../../store/thunks/userThunk.ts'
+import { defaultOptions, passwordStrength } from 'check-password-strength'
 
 type FormType = UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: ''})
 
@@ -34,10 +35,20 @@ const RegistrationForm = () => {
     e.preventDefault()
 
     if (!isUserRegistrationMutation(form)) {
-      return void validateField('role')
+      return void validateFields('role')
     } else {
       try {
         setForm(data => ({ ...data, displayName: data.displayName.trim() }))
+
+        const strength = passwordStrength(
+          (form as UserRegistrationMutation).password,
+          passwordStrengthOptions,
+        )
+        if (strength.id < 1)
+        {
+          return void toast.error('Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латниские буквы, одну цифру, и один знак')
+        }
+
         await dispatch(registerUser(form)).unwrap()
 
         setForm(initialState)
@@ -72,30 +83,32 @@ const RegistrationForm = () => {
     setForm(data => ({ ...data, [e.target.name]: value }))
   }
 
-  const validateField = (fieldName: string) => {
+  const validateFields = (...fieldNames: string[]) => {
     const _error = { ...frontendError }
-    delete _error[fieldName]
+    fieldNames.forEach(x => delete _error[x])
     setFrontendError(_error)
 
-    switch (fieldName) {
-    case 'email':
-      if(!emailRegex.test(form.email)) {
-        setFrontendError(error => ({ ...error, [fieldName]: 'Недействительная почта' }))
-      }
-      break
+    fieldNames.forEach(x => {
+      switch (x) {
+      case 'email':
+        if(!emailRegex.test(form.email)) {
+          setFrontendError(error => ({ ...error, [x]: 'Недействительная почта' }))
+        }
+        break
 
-    case 'confirmPassword':
-      if (form.password !== confirmPassword) {
-        setFrontendError(error => ({ ...error, [fieldName]: 'Пароли не совпадают' }))
-      }
-      break
+      case 'confirmPassword':
+        if (form.password !== confirmPassword) {
+          setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают' }))
+        }
+        break
 
-    case 'role':
-      if (!roles.map(x => x.name).includes(form.role)) {
-        setFrontendError(error => ({ ...error, [fieldName]: 'Укажите роль' }))
+      case 'role':
+        if (!roles.map(x => x.name).includes(form.role)) {
+          setFrontendError(error => ({ ...error, [x]: 'Укажите роль' }))
+        }
+        break
       }
-      break
-    }
+    })
   }
 
   const getFieldError = (fieldName: string) => {
@@ -125,7 +138,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               error={!!getFieldError('email')}
               helperText={getFieldError('email')}
-              onBlur={() => validateField('email')}
+              onBlur={() => validateFields('email')}
             />
           </Grid>
 
@@ -157,7 +170,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               error={!!getFieldError('password')}
               helperText={getFieldError('password')}
-              onBlur={() => validateField('confirmPassword')}
+              onBlur={() => validateFields('confirmPassword')}
             />
           </Grid>
 
@@ -174,7 +187,7 @@ const RegistrationForm = () => {
               onChange={handleConfirmPasswordChange}
               error={!!getFieldError('confirmPassword')}
               helperText={getFieldError('confirmPassword')}
-              onBlur={() => validateField('confirmPassword')}
+              onBlur={() => validateFields('confirmPassword')}
             />
           </Grid>
 
@@ -191,7 +204,7 @@ const RegistrationForm = () => {
               onChange={handleChange}
               error={!!getFieldError('role')}
               helperText={getFieldError('role')}
-              onBlur={() => validateField('role')}
+              onBlur={() => validateFields('role')}
             >
               {roles.map((x, i) => (
                 <MenuItem key={i} value={x.name}>
