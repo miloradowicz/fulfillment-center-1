@@ -8,8 +8,15 @@ import { useAppSelector } from '../../../app/hooks.ts'
 const Link = styled(NavLink)({
   color: 'inherit',
   textDecoration: 'none',
+  display: 'inline-block',
+  padding: '8px 16px',
+  borderRadius: '12px',
+  border: '2px solid transparent',
+  transition: 'all 0.3s ease',
   '&:hover': {
-    color: 'inherit',
+    backgroundColor: '#ffffff',
+    color: '#32363F',
+    borderColor: '#32363F',
   },
 })
 
@@ -22,11 +29,19 @@ const AppToolbar = () => {
       <Container>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/">
+            <NavLink to="/">
               <img src={'logo.jpeg'} alt="logo" className="h-[43px] rounded-[7px] xl:ms-0 ms-10" />
-            </Link>
+            </NavLink>
           </Typography>
-          {user ? <UserMenu user={user} /> : null}
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <Link to="/login">
+              <Typography variant="button" color="inherit">
+                Login
+              </Typography>
+            </Link>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
