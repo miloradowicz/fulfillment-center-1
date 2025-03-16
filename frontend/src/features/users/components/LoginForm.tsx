@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { toast } from 'react-toastify'
 import { clearLoginError, selectLoginError, selectLoadingLoginUser } from '../../../store/slices/userSlice.ts'
 import { loginUser } from '../../../store/thunks/userThunk.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
 
 const LoginForm = () => {
   const dispatch = useAppDispatch()
@@ -12,7 +13,6 @@ const LoginForm = () => {
   const sending = useAppSelector(selectLoadingLoginUser)
   const backendError = useAppSelector(selectLoginError)
   const [form, setForm] = useState({ email: '', password: '' })
-  const [frontendError, setFrontendError] = useState<{ [key: string]: string }>({})
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,10 +20,14 @@ const LoginForm = () => {
       await dispatch(loginUser(form)).unwrap()
       setForm({ email: '', password: '' })
       dispatch(clearLoginError())
-      setFrontendError({})
       toast.success('Вы успешно вошли!')
-    } catch {
-      toast.error('Ошибка входа')
+    } catch (error) {
+      if (error && Array.isArray(error)) {
+        const errorMessages = error.join('; ')
+        toast.error(errorMessages)
+      } else {
+        toast.error('Ошибка входа')
+      }
     }
   }
 
@@ -32,18 +36,12 @@ const LoginForm = () => {
     setForm(data => ({ ...data, [e.target.name]: e.target.value.trim() }))
   }
 
-  const getFieldError = (fieldName: string) => {
-    try {
-      return frontendError[fieldName] || (backendError)?.errors[fieldName].messages.join('; ')
-    } catch {
-      return undefined
-    }
-  }
+  const isFormValid = form.email.trim() !== '' && form.password.trim() !== ''
 
   return (
-    <Box noValidate component="form" onSubmit={onSubmit} style={{ width: '50%', margin: '0 auto' }}>
+    <Box noValidate component="form" onSubmit={onSubmit} style={{ maxWidth: '20%', margin: '0 auto' }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
-        Вход в систему
+          Вход в систему
       </Typography>
       <Grid container spacing={2}>
         <Grid size={12}>
@@ -56,8 +54,8 @@ const LoginForm = () => {
             label="Email"
             value={form.email}
             onChange={handleChange}
-            error={!!getFieldError('email')}
-            helperText={getFieldError('email')}
+            error={!!getFieldError('email', backendError)}
+            helperText={getFieldError('email', backendError)}
           />
         </Grid>
 
@@ -72,8 +70,8 @@ const LoginForm = () => {
             label="Пароль"
             value={form.password}
             onChange={handleChange}
-            error={!!getFieldError('password')}
-            helperText={getFieldError('password')}
+            error={!!getFieldError('password', backendError)}
+            helperText={getFieldError('password', backendError)}
           />
         </Grid>
 
@@ -82,9 +80,9 @@ const LoginForm = () => {
             type="submit"
             loading={sending}
             variant="outlined"
-            disabled={!!backendError && !!Object.keys(backendError.errors).length}
+            disabled={!isFormValid}
           >
-            Войти
+              Войти
           </Button>
         </Grid>
       </Grid>
