@@ -29,7 +29,7 @@ async function bootstrap() {
   )
   app.enableCors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: config.csrf.origin,
   })
   app.useGlobalPipes(
     new ValidationPipe({

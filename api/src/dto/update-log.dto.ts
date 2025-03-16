@@ -10,10 +10,6 @@ export class UpdateLogDto {
   @IsMongoId({ message: 'Поле документ должно быть идентификатором Монго.' })
   document: string
 
-  @IsNotEmpty({ message: 'Поле пользователь обязательно.' })
-  @IsString({ message: 'Поле пользователь должно быть строкой.' })
-  user: string
-
   @IsNotEmpty({ message: 'Поле изменения обязательно.' })
   @IsString({ message: 'Поле изменения должно быть строкой.' })
   change: string

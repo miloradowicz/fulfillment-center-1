@@ -6,6 +6,9 @@ import { Arrival } from 'src/schemas/arrival.schema'
 import { Order } from 'src/schemas/order.schema'
 import { Product } from 'src/schemas/product.schema'
 import { LogsService } from 'src/services/logs.service'
+import { User } from 'src/decorators/user.param-decorator'
+import { Roles } from 'src/decorators/roles.decorator'
+import { HydratedUser } from 'src/types'
 
 @Controller('logs')
 export class LogsController {
@@ -14,9 +17,13 @@ export class LogsController {
     private readonly logsService: LogsService
   ) {}
 
+  @Roles()
   @Post()
-  async addLogEntry(@Body() logDto: UpdateLogDto) {
-    const { collection, document: id, ...rest } = logDto
+  async addLogEntry(
+    @Body() logDto: UpdateLogDto,
+    @User() user: HydratedUser,
+  ) {
+    const { collection, document: id, ...rest } = { ...logDto, user: user._id }
 
     let modelName: string
 
