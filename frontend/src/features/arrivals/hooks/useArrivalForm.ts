@@ -146,11 +146,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       id: client._id,
     })) || []
 
-  const getProductNameById = (productId: string): string => {
-    const product = products?.find(p => p._id === productId)
-    return product ? product.title : 'Неизвестный товар'
-  }
-
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -212,7 +207,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     deleteItem,
     handleBlur,
     autoCompleteClients,
-    getProductNameById,
     error,
     submitFormHandler,
   }

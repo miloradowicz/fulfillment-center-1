@@ -6,7 +6,7 @@ import { ArrivalWithClient } from '../../../types'
 export const useArrivalPage = () => {
   const [open, setOpen] = useState(false)
   const isLoading = useAppSelector(selectLoadingFetchArrival)
-  const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined | null>(undefined)
+  const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined>(undefined)
 
   const handleOpen = () => setOpen(true)
 
