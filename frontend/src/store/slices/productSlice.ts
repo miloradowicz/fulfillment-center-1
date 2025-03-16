@@ -6,12 +6,13 @@ import {
   fetchProductsByClientId,
   fetchProductById,
   fetchProducts,
-  updateProduct, fetchProductsWithPopulate,
+  updateProduct, fetchProductsWithPopulate, fetchProductByIdWithPopulate,
 } from '../thunks/productThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ProductState {
   product: Product | null;
+  productWithPopulate: ProductWithPopulate | null
   productsWithPopulate: ProductWithPopulate[] | null;
   products: Product[] | null;
   loadingFetch : boolean;
@@ -25,6 +26,7 @@ interface ProductState {
 
 const initialState: ProductState = {
   product: null,
+  productWithPopulate: null,
   productsWithPopulate:null,
   products: null,
   loadingFetch: false,
@@ -33,11 +35,11 @@ const initialState: ProductState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
-
 }
 
 export const selectProduct = (state: RootState) => state.products.product
 export const selectAllProducts = (state: RootState) => state.products.products
+export const selectProductWithPopulate = (state: RootState) => state.products.productWithPopulate
 export const selectProductsWithPopulate = (state: RootState) => state.products.productsWithPopulate
 export const selectLoadingFetchProduct = (state: RootState) => state.products.loadingFetch
 export const selectLoadingAddProduct = (state: RootState) => state.products.loadingAdd
@@ -78,6 +80,16 @@ const productSlice = createSlice({
       state.product = action.payload
     })
     builder.addCase(fetchProductById.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchProductByIdWithPopulate.pending, state => {
+      state.loadingFetch = true
+    })
+    builder.addCase(fetchProductByIdWithPopulate.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.productWithPopulate = action.payload
+    })
+    builder.addCase(fetchProductByIdWithPopulate.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(fetchProductsByClientId.pending, state => {

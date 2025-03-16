@@ -44,8 +44,11 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async getProduct(@Param('id') id: string) {
-    return await this.productsService.getById(id)
+  async getProduct(
+    @Param('id') id: string,
+    @Query('populate') populate?: string
+  ) {
+    return await this.productsService.getById(id, populate === '1')
   }
 
   @Delete(':id')

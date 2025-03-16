@@ -63,8 +63,8 @@ export interface ProductWithPopulate {
   amount: number
   barcode: string
   article: string
-  documents?: { document: string }[]
-  dynamic_fields?: DynamicField[]
+  documents: { document: string }[]
+  dynamic_fields: DynamicField[]
   logs?: Log[]
 }
 

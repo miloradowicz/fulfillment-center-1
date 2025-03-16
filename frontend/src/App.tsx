@@ -12,6 +12,8 @@ import OrderPage from './features/orders/containers/OrderPage.tsx'
 import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import TaskBoard from './features/tasks/components/TaskBoard.tsx'
+import ProductDetails from './features/products/containers/ProductDetails.tsx'
+import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ServicesPage from './features/services/containers/ServicesPage.tsx'
 
 const App = () => {
@@ -26,7 +28,9 @@ const App = () => {
             <Route path="/clients" element={<ClientPage />} />
             <Route path="/clients/:clientId" element={<ClientDetail />} />
             <Route path="/arrivals" element={<ArrivalPage />} />
+            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
             <Route path="/products" element={<ProductPage />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/reports" element={<ReportPage />} />
