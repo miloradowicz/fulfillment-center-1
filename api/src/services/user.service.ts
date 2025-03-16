@@ -47,7 +47,7 @@ export class UsersService {
     user.clearToken()
     await user.save()
 
-    return null
+    return { message: 'Вы вышли из системы.' }
   }
 
   async getAll() {

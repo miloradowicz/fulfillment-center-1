@@ -51,7 +51,7 @@ UserSchema.methods.checkPassword = function (this: UserDocument, password: strin
 }
 
 UserSchema.methods.generateToken = function (this: UserDocument) {
-  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret, { expiresIn: '30d' })
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret)
 }
 
 UserSchema.methods.clearToken = function (this: UserDocument) {
