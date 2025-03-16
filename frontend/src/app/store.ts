@@ -5,6 +5,7 @@ import { arrivalReducer } from '../store/slices/arrivalSlice.ts'
 import { orderReducer } from '../store/slices/orderSlice.ts'
 import { userReducer } from '../store/slices/userSlice.ts'
 import { taskReducer } from '../store/slices/taskSlice.ts'
+import { stockReducer } from '../store/slices/stocksSlice.ts'
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     orders: orderReducer,
     users: userReducer,
     tasks: taskReducer,
+    stocks: stockReducer,
   },
 })
 
