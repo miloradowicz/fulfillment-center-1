@@ -13,6 +13,7 @@ interface UserState {
   loadingDelete: boolean
   error: GlobalError | null
   createError: ValidationError | null
+  loginError: ValidationError | null
 }
 
 const initialState: UserState = {
@@ -25,6 +26,7 @@ const initialState: UserState = {
   loadingDelete: false,
   error: null,
   createError: null,
+  loginError: null,
 }
 
 export const selectUser = (state: RootState) => state.users.user
@@ -36,6 +38,7 @@ export const selectLoadingUpdateUser = (state: RootState) => state.users.loading
 export const selectLoadingDeleteUser = (state: RootState) => state.users.loadingDelete
 export const selectUserError = (state: RootState) => state.users.error
 export const selectCreateError = (state: RootState) => state.users.createError
+export const selectLoginError = (state: RootState) => state.users.loginError
 
 const userSlice = createSlice({
   name: 'users',
@@ -47,6 +50,17 @@ const userSlice = createSlice({
 
         if (!Object.keys(state.createError.errors).length) {
           state.createError = null
+        }
+      } else {
+        state.error = null
+      }
+    },
+    clearLoginError: (state, { payload }: PayloadAction<string | undefined>) => {
+      if (state.loginError && payload) {
+        delete state.loginError.errors[payload]
+
+        if (!Object.keys(state.loginError.errors).length) {
+          state.loginError = null
         }
       } else {
         state.error = null
@@ -119,6 +133,6 @@ const userSlice = createSlice({
   },
 })
 
-export const { clearCreateError } = userSlice.actions
+export const { clearCreateError, clearLoginError } = userSlice.actions
 
 export const userReducer = userSlice.reducer
