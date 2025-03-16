@@ -5,21 +5,20 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import MenuIcon from '@mui/icons-material/Menu'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import DescriptionIcon from '@mui/icons-material/Description'
-import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
 import {
-  Box,
   Drawer,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Theme,
+  IconButton,
   useMediaQuery,
-} from '@mui/material'
+  Theme,
+  Box } from '@mui/material'
 import { NavLink } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment'
+import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
@@ -48,8 +47,8 @@ export default function Sidebar() {
         open={open}
         onClose={toggleDrawer(false)}
         sx={{
-          'flexShrink': 0,
-          'mt': '75px',
+          flexShrink: 0,
+          mt: '75px' ,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
@@ -61,55 +60,50 @@ export default function Sidebar() {
         <List sx={{ width: drawerWidth }}>
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/clients">
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
+              <ListItemIcon><PeopleIcon/></ListItemIcon>
               <ListItemText primary="Клиенты" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/products">
-              <ListItemIcon>
-                <InventoryIcon />
-              </ListItemIcon>
+              <ListItemIcon><InventoryIcon /></ListItemIcon>
               <ListItemText primary="Товары" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/arrivals">
-              <ListItemIcon>
-                <LocalShippingIcon />
-              </ListItemIcon>
+              <ListItemIcon><LocalShippingIcon /></ListItemIcon>
               <ListItemText primary="Поставки" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/orders">
-              <ListItemIcon>
-                <ReceiptLongIcon />
-              </ListItemIcon>
+              <ListItemIcon><ReceiptLongIcon/></ListItemIcon>
               <ListItemText primary="Заказы" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/tasks">
-              <ListItemIcon>
-                <AssignmentIcon />
-              </ListItemIcon>
+              <ListItemIcon><AssignmentIcon/></ListItemIcon>
               <ListItemText primary="Задачи" />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
             <ListItemButton component={NavLink} to="/reports">
-              <ListItemIcon>
-                <DescriptionIcon />
-              </ListItemIcon>
+              <ListItemIcon><DescriptionIcon /></ListItemIcon>
               <ListItemText primary="Отчеты" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/services">
+              <ListItemIcon><LocalShippingIcon  /></ListItemIcon>
+              <ListItemText primary="Услуги" />
             </ListItemButton>
           </ListItem>
 

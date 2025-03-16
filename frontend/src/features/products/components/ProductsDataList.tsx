@@ -1,34 +1,15 @@
-import { useCallback, useEffect } from 'react'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, IconButton, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { deleteProduct, fetchProductsWithPopulate } from '../../../store/thunks/productThunk.ts'
-import { selectProductsWithPopulate } from '../../../store/slices/productSlice.ts'
 import { ProductWithPopulate } from '../../../types'
 import EditIcon from '@mui/icons-material/Edit'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
+import useProductActions from '../hooks/useProductActions.ts'
 
 const ProductsDataList = () => {
-  const dispatch = useAppDispatch()
+  const { products, deleteOneProduct } = useProductActions(true)
 
-  const fetchAllProducts = useCallback(() => {
-    dispatch(fetchProductsWithPopulate())
-  }, [dispatch])
-
-
-  useEffect(() => {
-    void fetchAllProducts()
-  }, [dispatch, fetchAllProducts])
-
-
-  const deleteOneProduct = async (id: string) => {
-    await dispatch(deleteProduct(id))
-    void fetchAllProducts()
-  }
-
-  const products = useAppSelector(selectProductsWithPopulate)
   const columns: GridColDef<ProductWithPopulate>[] = [
     {
       field: 'title',

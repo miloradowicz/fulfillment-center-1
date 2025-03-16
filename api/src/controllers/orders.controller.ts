@@ -16,7 +16,10 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async getOrderById(@Param('id') id: string) {
+  async getOrderById(@Param('id') id: string, @Query('populate') populate: string) {
+    if (populate === 'true') {
+      return this.ordersService.getByIdWithPopulate(id)
+    }
     return this.ordersService.getById(id)
   }
 

@@ -14,7 +14,15 @@ export const fetchProducts = createAsyncThunk<Product[]>(
 export const fetchProductById = createAsyncThunk<Product, string>(
   'products/fetchProductById',
   async (productId: string) => {
-    const response = await axiosAPI.get(`/products/?=${ productId }`)
+    const response = await axiosAPI.get(`/products/${ productId }`)
+    return response.data
+  },
+)
+
+export const fetchProductByIdWithPopulate = createAsyncThunk<ProductWithPopulate, string>(
+  'products/fetchProductByIdWithPopulate',
+  async (productId: string) => {
+    const response = await axiosAPI.get(`/products/${ productId }?populate=1`)
     return response.data
   },
 )

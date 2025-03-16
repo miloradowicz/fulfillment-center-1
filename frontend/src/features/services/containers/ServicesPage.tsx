@@ -1,17 +1,22 @@
 import { Box, Button, Typography } from '@mui/material'
-import ProductsDataList from '../components/ProductsDataList.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import ProductForm from '../components/ProductForm.tsx'
-import useProductActions from '../hooks/useProductActions.ts'
+import { useState } from 'react'
+import ServiceForm from '../components/ServiceForm.tsx'
 
-const ProductPage = () => {
-  const { open, handleOpen, handleClose } = useProductActions(true)
+const ServicesPage = () => {
+  const [open, setOpen] = useState(false)
+
+  const handleOpen = () => setOpen(true)
+
+  const handleClose = () => {
+    setOpen(false)
+  }
 
   return (
     <>
-      <Modal handleClose={handleClose} open={open}><ProductForm/></Modal>
+      <Modal handleClose={handleClose} open={open}><ServiceForm onClose={handleClose}/></Modal>
       <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
-        <Typography className="flex-grow text-[20px]">Товары</Typography>
+        <Typography className="flex-grow text-[20px]">Услуги</Typography>
         <Button
           sx={{
             color: '#32363F',
@@ -25,11 +30,10 @@ const ProductPage = () => {
             },
           }}
           variant="outlined"
-          onClick={handleOpen} >Добавить товар</Button>
+          onClick={handleOpen} >Добавить услугу</Button>
       </Box>
-      <Box><ProductsDataList/></Box>
     </>
   )
 }
 
-export default ProductPage
+export default ServicesPage
