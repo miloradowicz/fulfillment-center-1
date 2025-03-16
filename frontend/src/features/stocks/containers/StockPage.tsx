@@ -20,7 +20,7 @@ const StockPage = () => {
         <StockForm onSuccess={handleClose} />
       </Modal>
 
-      <Box display={'flex'} className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
+      <Box display={'flex'} className="text-center mb-5 mt-7 text-[20px]">
         <Typography className="flex-grow" variant={'h5'}>
           Склады
         </Typography>
@@ -43,12 +43,12 @@ const StockPage = () => {
         </Button>
       </Box>
 
-      {stocks &&
-        stocks.map(stock => (
-          <Box key={stock._id} className="my-8">
-            <StockCard stock={stock} />
-          </Box>
-        ))}
+      <div className="max-w-[1040px] mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-10">
+        {stocks &&
+          stocks.map(stock => (
+            <StockCard key={stock._id} stock={stock} />
+          ))}
+      </div>
     </>
   )
 }

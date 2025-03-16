@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Card, CardActions, CardContent, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { StockPopulate } from '../../../types'
 import { NavLink } from 'react-router-dom'
 import { useStockCard } from '../hooks/useStockCard.ts'
@@ -14,29 +14,32 @@ const StockCard: React.FC<Props> = ({ stock }) => {
   const { isOpen, handleClose } = useStockCard()
 
   return (
-    <Box>
-      <Card className="mb-6 max-w-1/2" variant="outlined">
-        <CardContent>
-          <Typography variant="h4">{stock.name}</Typography>
+    <div className="p-6 bg-gray-100 rounded-lg shadow-md flex flex-col">
+      <div className="mb-8">
+        <Typography variant="h5" className="whitespace-normal break-words">
+          {stock.name}
+        </Typography>
 
-          <Typography variant="h5" component="div">
-            {stock.address}
-          </Typography>
-        </CardContent>
+        <Typography variant="h6" component="div" className="whitespace-normal break-words">
+          {stock.address}
+        </Typography>
+      </div>
 
-        <CardActions>
-          <NavLink className="text-gray-500 hover:text-gray-700 ml-2" to={`/stocks/${ stock._id }`}>
-            Подробнее
-          </NavLink>
-        </CardActions>
-      </Card>
+      <div className="mt-auto">
+        <NavLink
+          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:bg-gray-700 dark:border-gray-700"
+          to={`/stocks/${ stock._id }`}
+        >
+          Подробнее
+        </NavLink>
+      </div>
 
-      <Box className="my-8">
+      <div>
         <Modal handleClose={handleClose} open={isOpen}>
           <StockForm />
         </Modal>
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
 

@@ -59,20 +59,20 @@ const StockDetails = () => {
         </Grid>
       </Modal>
 
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+      <div className="flex items-center gap-3">
         <IconButton onClick={() => navigateBack()}>
           <ArrowBack />
         </IconButton>
-        <Typography variant="h5" fontWeight={700}>
+        <Typography variant="h5" fontWeight={700} className="whitespace-normal break-words">
           Назад
         </Typography>
-      </Box>
+      </div>
 
-      <Box className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8">
         <Box className="text-center mb-8 p-4 bg-gray-100 rounded-lg shadow-md">
-          <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937' }}>📦 Склад: {stock?.name}</Typography>
+          <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937' }} className="whitespace-normal break-words">📦 Склад: {stock?.name}</Typography>
 
-          <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937', marginTop: '8px' }}>
+          <Typography sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937', marginTop: '8px' }} className="whitespace-normal break-words">
             📍 Адрес: {stock?.address}
           </Typography>
         </Box>
@@ -93,6 +93,7 @@ const StockDetails = () => {
             columns={stockColumns}
             localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
             pageSizeOptions={[5, 10, 20, 100]}
+            className="mt-4"
             disableRowSelectionOnClick
           />
         </Box>
@@ -124,7 +125,7 @@ const StockDetails = () => {
             Удалить
           </Button>
         </Box>
-      </Box>
+      </div>
     </>
   )
 }
