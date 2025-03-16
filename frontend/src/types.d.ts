@@ -151,6 +151,12 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
   products: ProductOrderMutation[]
 }
 
+export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
+  products: ProductForOrderForm[]
+  defects: DefectForOrderForm[]
+  client: Client
+}
+
 export type OrderWithClient = Omit<Order, 'client'> & {
   client: Client
 }
@@ -203,13 +209,13 @@ export interface ErrorForOrder {
   delivered_at: string
 }
 
-export interface DefectForOrderForm {
+export interface ProductForOrderForm {
   product: Product
   description: string
   amount: number
 }
 
-export interface ProductForOrderForm {
+export interface DefectForOrderForm {
   product: Product
   defect_description: string
   amount: number
@@ -238,3 +244,12 @@ export interface TaskWithPopulate {
   logs?: Log[]
 }
 export type TaskMutation = Omit<Task, '_id'>
+
+export interface Service {
+  _id: string,
+  name: string,
+  dynamic_fields: DynamicField[],
+  logs?: Log[]
+}
+
+export type ServiceMutation = Omit<Service, '_id'>
