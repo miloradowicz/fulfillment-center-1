@@ -2,12 +2,14 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
+import { Roles } from 'src/decorators/roles.decorator'
 
 @Controller('arrivals')
 export class ArrivalsController {
   constructor(private readonly arrivalsService: ArrivalsService) {}
 
   @Get()
+  @Roles('stock-worker')
   async getAllArrivals(@Query('client') clientId: string, @Query('populate') populate?: string) {
     if (clientId) {
       return await this.arrivalsService.getAllByClient(clientId, populate === '1')
@@ -16,6 +18,7 @@ export class ArrivalsController {
     }
   }
 
+  @Roles()
   @Get(':id')
   async getOneArrival(
     @Param('id') id: string,
