@@ -31,9 +31,6 @@ export const loginUser = createAsyncThunk<User, LoginMutation, { rejectValue: st
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const errorMessage = error.response.data.message
-        if (error.response.status === 401) {
-          return rejectWithValue(['Пользователь не зарегистрирован или неверный пароль'])
-        }
         return rejectWithValue(Array.isArray(errorMessage) ? errorMessage : [errorMessage])
       }
       throw error

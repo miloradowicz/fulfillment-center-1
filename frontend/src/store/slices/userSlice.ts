@@ -106,9 +106,9 @@ const userSlice = createSlice({
       state.loadingLogin = false
       state.user = action.payload
     })
-    builder.addCase(loginUser.rejected, (state, { payload: error }) => {
+    builder.addCase(loginUser.rejected, state => {
       state.loadingLogin = false
-      state.createError = error || null
+      state.createError = null
     })
     builder.addCase(updateUser.pending, state => {
       state.loadingUpdate = true
