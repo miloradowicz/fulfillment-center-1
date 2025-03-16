@@ -14,6 +14,7 @@ import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import TaskBoard from './features/tasks/components/TaskBoard.tsx'
 import ProductDetails from './features/products/containers/ProductDetails.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
+import ServicesPage from './features/services/containers/ServicesPage.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -35,6 +36,7 @@ const App = () => {
             <Route path="/reports" element={<ReportPage />} />
             <Route path="/tasks" element={<TaskBoard />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/services" element={<ServicesPage />} />
             <Route path="/add-new-client" element={<ClientForm />} />
             <Route path="/add-new-user" element={<RegistrationForm />} />
             <Route
