@@ -38,7 +38,7 @@ const AppToolbar = () => {
           ) : (
             <Link to="/login">
               <Typography variant="button" color="inherit">
-                Login
+                Войти
               </Typography>
             </Link>
           )}
