@@ -76,7 +76,6 @@ export interface Defect {
   amount: number
 }
 
-
 export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
 }
@@ -119,7 +118,6 @@ export interface Arrival {
   logs?: Log[]
 }
 
-
 export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount'> & {
   client: Client
   products: ProductArrivalWithPopulate[]
@@ -129,7 +127,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
 }
 
 export interface ArrivalWithClient extends Omit<Arrival, 'client'> {
-  client: Client;
+  client: Client
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>
@@ -227,14 +225,46 @@ export interface Task {
 export interface TaskWithPopulate {
   _id: string
   user: {
-      '_id': string,
-      'email': string,
-      'displayName': string,
-      'role': string,
-     }
+    _id: string
+    email: string
+    displayName: string
+    role: string
+  }
   title: string
   description: string
-  status:string
+  status: string
   logs?: Log[]
 }
+
 export type TaskMutation = Omit<Task, '_id'>
+
+export interface ProductStock {
+  product: string
+  description: string
+  amount: number
+}
+
+export type ProductStockMutation = Omit<ProductStock, 'product'> & {
+  _id: string
+  product: ProductWithPopulate
+}
+
+export interface Stock {
+  _id: string
+  name: string
+  address: string
+  products: ProductStock[]
+}
+
+export interface StockError {
+  name: string
+  address: string
+  product: string
+  amount: string
+}
+
+export type StockMutation = Omit<Stock, '_id'>
+
+export type StockPopulate = Omit<Stock, 'products'> & {
+  products: ProductStockMutation[]
+}
