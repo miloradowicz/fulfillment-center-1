@@ -30,6 +30,7 @@ const RegistrationForm = () => {
   const [form, setForm] = useState(initialState)
   const [confirmPassword, setConfirmPassword] = useState('')
 
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -69,7 +70,13 @@ const RegistrationForm = () => {
       value = value.trim()
     }
 
-    setForm(data => ({ ...data, [e.target.name]: value }))
+    setForm(data => {
+      const updatedForm = { ...data, [e.target.name]: value }
+      if (e.target.name === 'password') {
+        validateField('password')
+      }
+      return updatedForm
+    })
   }
 
   const validateField = (fieldName: string) => {
@@ -84,6 +91,15 @@ const RegistrationForm = () => {
       }
       break
 
+    case 'password':
+      if (form.password.length < 6) {
+        setFrontendError(error => ({ ...error, [fieldName]: 'Пароль должен быть не менее 6 символов' }))
+      } else {
+        delete _error[fieldName]
+        setFrontendError(_error)
+      }
+      break
+
     case 'confirmPassword':
       if (form.password !== confirmPassword) {
         setFrontendError(error => ({ ...error, [fieldName]: 'Пароли не совпадают' }))
@@ -95,6 +111,7 @@ const RegistrationForm = () => {
         setFrontendError(error => ({ ...error, [fieldName]: 'Укажите роль' }))
       }
       break
+
     }
   }
 
