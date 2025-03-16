@@ -30,7 +30,7 @@ export const passwordStrengthOptions: Options<string> = [
   {
     id: 1,
     value: 'Alright',
-    minDiversity: 4,
+    minDiversity: 2,
     minLength: 8,
   },
 ]

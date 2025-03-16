@@ -1,123 +1,22 @@
 import Grid from '@mui/material/Grid2'
-import { Box, Button, MenuItem, SelectChangeEvent, TextField, Typography } from '@mui/material'
-import React, { ChangeEvent, useState } from 'react'
-import {  UserRegistrationMutation } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { toast } from 'react-toastify'
-import { clearCreateError, selectCreateError, selectLoadingRegisterUser } from '../../../store/slices/userSlice.ts'
+import { Box, Button, MenuItem, TextField, Typography } from '@mui/material'
 import SelectField from '../../../components/SelectField/SelectField.tsx'
-import { allowedPasswordSymbols, emailRegex, passwordStrengthOptions, roles } from '../../../constants.ts'
-import { registerUser } from '../../../store/thunks/userThunk.ts'
-import { defaultOptions, passwordStrength } from 'check-password-strength'
+import {  roles } from '../../../constants.ts'
+import { useRegistrationForm } from '../hooks/useRegistrationForm.ts'
 
-type FormType = UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: ''})
-
-const isUserRegistrationMutation = (type: FormType): type is UserRegistrationMutation =>
-  roles.map(x => x.name).includes(type.role)
-
-const initialState: UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: ''}) = {
-  email: '',
-  password: '',
-  displayName: '',
-  role: '',
-}
 
 const RegistrationForm = () => {
-  const dispatch = useAppDispatch()
-
-  const sending = useAppSelector(selectLoadingRegisterUser)
-  const backendError = useAppSelector(selectCreateError)
-  const [frontendError, setFrontendError] = useState<{ [key: string]: string }>({})
-  const [form, setForm] = useState(initialState)
-  const [confirmPassword, setConfirmPassword] = useState('')
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!isUserRegistrationMutation(form)) {
-      return void validateFields('role')
-    } else {
-      try {
-        setForm(data => ({ ...data, displayName: data.displayName.trim() }))
-
-        const strength = passwordStrength(
-          (form as UserRegistrationMutation).password,
-          passwordStrengthOptions,
-        )
-        if (strength.id < 1)
-        {
-          return void toast.error('Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латниские буквы, одну цифру, и один знак')
-        }
-
-        await dispatch(registerUser(form)).unwrap()
-
-        setForm(initialState)
-        setConfirmPassword('')
-        dispatch(clearCreateError())
-        setFrontendError({})
-        toast.success('Пользователь успешно создан!')
-      } catch {
-        toast.error('Пользователь не создан')
-      }
-    }
-  }
-
-  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const _error = { ...frontendError }
-    delete _error.confirmPassword
-    setFrontendError(_error)
-
-    setConfirmPassword(e.target.value)
-  }
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<unknown>) => {
-    dispatch(clearCreateError(e.target.name))
-
-    let value = e.target.value as string
-
-    if (e.target.name !== 'displayName')
-    {
-      value = value.trim()
-    }
-
-    setForm(data => ({ ...data, [e.target.name]: value }))
-  }
-
-  const validateFields = (...fieldNames: string[]) => {
-    const _error = { ...frontendError }
-    fieldNames.forEach(x => delete _error[x])
-    setFrontendError(_error)
-
-    fieldNames.forEach(x => {
-      switch (x) {
-      case 'email':
-        if(!emailRegex.test(form.email)) {
-          setFrontendError(error => ({ ...error, [x]: 'Недействительная почта' }))
-        }
-        break
-
-      case 'confirmPassword':
-        if (form.password !== confirmPassword) {
-          setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают' }))
-        }
-        break
-
-      case 'role':
-        if (!roles.map(x => x.name).includes(form.role)) {
-          setFrontendError(error => ({ ...error, [x]: 'Укажите роль' }))
-        }
-        break
-      }
-    })
-  }
-
-  const getFieldError = (fieldName: string) => {
-    try {
-      return frontendError[fieldName] || (backendError)?.errors[fieldName].messages.join('; ')
-    } catch {
-      return undefined
-    }
-  }
+  const {
+    sending,
+    backendError,
+    form,
+    confirmPassword,
+    onSubmit,
+    handleConfirmPasswordChange,
+    handleChange,
+    validateFields,
+    getFieldError,
+  } = useRegistrationForm()
 
   return (
     <>
