@@ -23,8 +23,14 @@ export class ProductsService {
     private readonly filesService: FilesService
   ) {}
 
-  async getById(id: string) {
-    const product = await this.productModel.findById(id)
+  async getById(id: string, populate?: boolean) {
+    let product: ProductDocument | null
+
+    if (populate) {
+      product = await this.productModel.findById(id).populate('client').exec()
+    } else {
+      product = await this.productModel.findById(id).exec()
+    }
 
     if (!product) {
       throw new NotFoundException('Товар не найден')
