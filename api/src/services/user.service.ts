@@ -37,6 +37,19 @@ export class UsersService {
     return user
   }
 
+  async logout(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) {
+      throw new UnauthorizedException('Неверный email')
+    }
+
+    user.clearToken()
+    await user.save()
+
+    return null
+  }
+
   async getAll() {
     return this.userModel.find()
   }

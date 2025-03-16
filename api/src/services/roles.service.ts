@@ -30,6 +30,10 @@ export class RolesService {
     const request = context.switchToHttp().getRequest<RequestWithUser>()
     const _user = request.user
 
+    if (!_user) {
+      return false
+    }
+
     const user = await this.userModel.findById(_user._id)
     return !!user && requiredRoles.includes(user.role)
   }

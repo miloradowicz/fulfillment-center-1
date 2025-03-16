@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from '@nestjs/common'
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { User } from 'src/schemas/user.schema'
@@ -22,9 +22,8 @@ export class TokenAuthService {
 
     const jwtToken = bearerRegex.exec(header)!.groups!['token']
 
-    const token = jwt.verify(jwtToken, config.jwt.secret) as JwtToken
-
     try {
+      const token = jwt.verify(jwtToken, config.jwt.secret) as JwtToken
       const user = await this.userModel.findById(token.id)
 
       if (user && user.token === jwtToken) {
@@ -32,9 +31,9 @@ export class TokenAuthService {
         return true
       }
 
-      return false
+      throw new UnauthorizedException('Недействительный токен')
     } catch {
-      return false
+      throw new UnauthorizedException('Недействительный токен')
     }
   }
 }

@@ -3,19 +3,28 @@ import { CreateUserDto } from '../dto/create-user.dto'
 import { UsersService } from '../services/user.service'
 import { UpdateUserDto } from '../dto/update-user.dto'
 import { LoginDto } from '../dto/auth-user.dto'
+import { User } from 'src/decorators/user.param-decorator'
+import { HydratedUser } from 'src/types'
+import { Roles } from 'src/decorators/roles.decorator'
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
-  async createUser(@Body() createUserDto: CreateUserDto){
+  async createUser(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto)
   }
 
   @Post('sessions')
-  async login(@Body() loginDto: LoginDto){
+  async login(@Body() loginDto: LoginDto) {
     return await this.usersService.login(loginDto)
+  }
+
+  @Roles('super-admin', 'admin', 'manager', 'stock-worker')
+  @Delete('sessions')
+  async logout(@User() user: HydratedUser) {
+    return await this.usersService.logout(String(user._id))
   }
 
   @Get()

@@ -13,6 +13,7 @@ export interface UserDocument extends Document {
   role: string;
   token: string;
   generateToken: () => void;
+  clearToken: () => void;
   checkPassword: (password: string) => Promise<boolean>;
 }
 
@@ -49,8 +50,12 @@ UserSchema.methods.checkPassword = function (this: UserDocument, password: strin
   return bcrypt.compare(password, this.password)
 }
 
-UserSchema.methods.generateToken =  function (this: UserDocument) {
-  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret)
+UserSchema.methods.generateToken = function (this: UserDocument) {
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret, { expiresIn: '30d' })
+}
+
+UserSchema.methods.clearToken = function (this: UserDocument) {
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret, { expiresIn: '0s' })
 }
 
 UserSchema.pre('save', async function(next) {
