@@ -5,10 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { Service, ServiceSchema } from '../schemas/service.schema'
 import { DbModule } from './db.module'
 import { FilesModule } from './file-upload.module'
+import { AuthModule } from './auth.module'
 
 @Module({
   imports: [
     DbModule,
+    AuthModule,
     FilesModule,
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
   ],
