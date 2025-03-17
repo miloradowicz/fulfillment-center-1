@@ -1,5 +1,5 @@
-import { Grid2 as Grid, Skeleton, Typography } from "@mui/material"
-import { FC } from "react"
+import { Grid2 as Grid, Skeleton, Typography } from '@mui/material'
+import { FC } from 'react'
 
 interface Props {
   label: string,

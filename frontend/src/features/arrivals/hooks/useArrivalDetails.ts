@@ -20,6 +20,7 @@ const useArrivalDetails = () => {
   const error = useAppSelector(selectArrivalError)
   const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (arrivalId) {
@@ -50,14 +51,6 @@ const useArrivalDetails = () => {
     hideConfirmDeleteModal()
   }
 
-  const handleEdit = () => {
-    if (arrivalId) {
-      navigate(`/arrivals/${ arrivalId }/edit`)
-    }
-
-    navigate('/not-found')
-  }
-
   const showConfirmDeleteModal = () => {
     setConfirmDeleteModalOpen(true)
   }
@@ -76,8 +69,9 @@ const useArrivalDetails = () => {
     showConfirmDeleteModal,
     hideConfirmDeleteModal,
     handleDelete,
-    handleEdit,
     navigateBack,
+    editModalOpen,
+    setEditModalOpen,
   }
 }
 

@@ -9,12 +9,14 @@ import ClientPage from './features/clients/containers/ClientPage.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
 import OrderDetails from './features/orders/containers/OrderDetails.tsx'
 import OrderPage from './features/orders/containers/OrderPage.tsx'
-import RegistrationForm from './features/users/components/RegistrationForm.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import TaskBoard from './features/tasks/components/TaskBoard.tsx'
 import ProductDetails from './features/products/containers/ProductDetails.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ServicesPage from './features/services/containers/ServicesPage.tsx'
+import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
+import StockPage from './features/stocks/containers/StockPage.tsx'
+import StockDetails from './features/stocks/containers/StockDetails.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -23,8 +25,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <Layout>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<ClientPage />} />
             <Route path="/clients" element={<ClientPage />} />
             <Route path="/clients/:clientId" element={<ClientDetail />} />
             <Route path="/arrivals" element={<ArrivalPage />} />
@@ -35,10 +36,12 @@ const App = () => {
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/reports" element={<ReportPage />} />
             <Route path="/tasks" element={<TaskBoard />} />
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/add-new-client" element={<ClientForm />} />
-            <Route path="/add-new-user" element={<RegistrationForm />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegistrationPage />} />
+            <Route path="/stocks" element={<StockPage/>}/>
+            <Route path="/stocks/:stockId" element={<StockDetails/>}/>
             <Route
               path="/*"
               element={

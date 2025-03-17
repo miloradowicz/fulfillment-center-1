@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { ArrivalError, ArrivalMutation, ArrivalWithClient, Defect, ProductArrival } from '../../../types'
+import {
+  ArrivalError,
+  ArrivalMutation,
+  ArrivalWithClient,
+  ArrivalWithPopulate,
+  Defect,
+  ProductArrival,
+} from '../../../types'
 import { initialErrorState, initialItemState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
@@ -11,7 +18,9 @@ import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
 import dayjs from 'dayjs'
 
-export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () => void) => {
+export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
+
+export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
@@ -21,7 +30,7 @@ export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () =
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
       ? {
-        client: initialData.client._id,
+        client: typeof initialData.client === 'string' ? initialData.client : initialData.client._id,
         arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
         arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
@@ -32,9 +41,21 @@ export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () =
       : { ...initialState },
   )
 
-  const [productsForm, setProductsForm] = useState<ProductArrival[]>(initialData?.products || [])
-  const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(initialData?.received_amount || [])
-  const [defectsForm, setDefectForm] = useState<Defect[]>(initialData?.defects || [])
+  const normalizeProductField = <T extends { product: string | { _id: string } }>(items?: T[]): T[] =>
+    items?.map(item => ({
+      ...item,
+      product: typeof item.product === 'string' ? item.product : item.product._id,
+    })) || []
+
+  const [productsForm, setProductsForm] = useState<ProductArrival[]>(
+    normalizeProductField((initialData?.products as ProductArrival[]) || []),
+  )
+  const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(
+    normalizeProductField((initialData?.received_amount as ProductArrival[]) || []),
+  )
+  const [defectsForm, setDefectForm] = useState<Defect[]>(
+    normalizeProductField((initialData?.defects as Defect[]) || []),
+  )
 
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
   const [errors, setErrors] = useState<ArrivalError>({ ...initialErrorState })
@@ -125,11 +146,6 @@ export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () =
       id: client._id,
     })) || []
 
-  const getProductNameById = (productId: string): string => {
-    const product = products?.find(p => p._id === productId)
-    return product ? product.title : 'Неизвестный товар'
-  }
-
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -191,7 +207,6 @@ export const useArrivalForm = (initialData?: ArrivalWithClient, onSuccess?: () =
     deleteItem,
     handleBlur,
     autoCompleteClients,
-    getProductNameById,
     error,
     submitFormHandler,
   }

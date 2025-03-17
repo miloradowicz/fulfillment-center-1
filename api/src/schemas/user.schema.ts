@@ -51,8 +51,12 @@ UserSchema.methods.checkPassword = function (this: UserDocument, password: strin
   return bcrypt.compare(password, this.password)
 }
 
-UserSchema.methods.generateToken =  function (this: UserDocument) {
-  this.token = jwt.sign({ id: this._id }, JWT_SECRET)
+UserSchema.methods.generateToken = function (this: UserDocument) {
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret)
+}
+
+UserSchema.methods.clearToken = function (this: UserDocument) {
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret, { expiresIn: '0s' })
 }
 
 UserSchema.pre('save', async function(next) {
