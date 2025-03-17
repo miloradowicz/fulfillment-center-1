@@ -3,10 +3,9 @@ import { ArrivalsController } from 'src/controllers/arrivals.controller'
 import { ArrivalsService } from 'src/services/arrivals.service'
 import { DbModule } from './db.module'
 import { ValidatorsModule } from './validators.module'
-import { AuthModule } from './auth.module'
 
 @Module({
-  imports: [DbModule, AuthModule, ValidatorsModule],
+  imports: [DbModule, ValidatorsModule],
   controllers: [ArrivalsController],
   providers: [ArrivalsService],
 })

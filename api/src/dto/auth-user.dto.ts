@@ -1,8 +1,9 @@
 import { IsNotEmpty, Matches, MinLength } from 'class-validator'
+import { Regex } from 'src/enums'
 
 export class LoginDto {
   @IsNotEmpty({ message: 'Поле эл. почты не должно быть пустым.' })
-  @Matches(/^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/, {
+  @Matches(Regex.email, {
     message: 'Неверный формат эл. почты',
   })
   email: string

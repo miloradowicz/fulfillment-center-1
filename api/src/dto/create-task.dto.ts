@@ -36,9 +36,8 @@ export class CreateTaskDto {
   status: 'к выполнению' | 'в работе' | 'готово'
 
   @IsOptional()
-  @IsArray({ message: 'Список логов должен быть массивом.' })
+  @IsArray({ message: 'Заполните список логов.' })
   @ValidateNested({ each: true })
   @Type(() => LogDto)
   logs?: LogDto[]
-
 }

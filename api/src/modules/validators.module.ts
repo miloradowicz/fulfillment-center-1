@@ -5,6 +5,5 @@ import { IsMongoDocumentRule } from 'src/validators/mongo-document-exists.rule'
 @Module({
   imports: [DbModule],
   providers: [IsMongoDocumentRule],
-  exports: [IsMongoDocumentRule],
 })
 export class ValidatorsModule {}

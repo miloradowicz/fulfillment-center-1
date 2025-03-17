@@ -54,7 +54,7 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'Поле клиент обязательно для заполнения' })
   client: string
 
-  @IsArray({ message: 'Список товаров должен быть массивом' })
+  @IsArray({ message: 'Заполните список товаров.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ArrayNotEmpty({ message: 'Список товаров не может быть пустым' })
   @ValidateNested({ each: true })
   @Type(() => ProductDto)
@@ -62,7 +62,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'Поле сумма заказа обязательно для заполнения' })
   @IsInt({ message: 'Поле сумма заказа должно являться числом' })
-  @IsPositive( { message: 'Поле сумма заказа не может равняться 0' })
+  @IsPositive({ message: 'Поле сумма заказа не может равняться 0' })
   price: number
 
   @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' }) sent_at: Date
@@ -79,13 +79,13 @@ export class CreateOrderDto {
   status?: 'в сборке' | 'в пути' | 'доставлен'
 
   @IsOptional()
-  @IsArray({ message: 'Список логов должен быть массивом.' })
+  @IsArray({ message: 'Заполните список логов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ValidateNested({ each: true })
   @Type(() => LogDto)
   logs?: LogDto[]
 
   @IsOptional()
-  @IsArray({ message: 'Список дефектов должен быть массивом.' })
+  @IsArray({ message: 'Заполните список дефектов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ValidateNested({ each: true })
   @Type(() => DefectDto)
   defects?: DefectDto[]

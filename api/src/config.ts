@@ -11,6 +11,9 @@ const config = {
   jwt: {
     secret: process.env.JWT_SECRET as string,
   },
+  csrf: {
+    origin: process.env.ORIGIN as string,
+  },
   saltWorkFactor: 10,
   rootPath: join(__dirname, '..'),
   publicPath: 'public',
