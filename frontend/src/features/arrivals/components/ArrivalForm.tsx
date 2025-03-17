@@ -2,15 +2,16 @@ import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
-import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { ArrivalWithClient, Defect, ProductArrival } from '../../../types'
+import { ArrivalData, useArrivalForm } from '../hooks/useArrivalForm.ts'
+import { Defect, ProductArrival } from '../../../types'
 import { initialItemState } from '../state/arrivalState.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import React from 'react'
+import { getProductNameById } from '../../../utils/getProductName.ts'
 
 interface Props {
-  initialData?: ArrivalWithClient
+  initialData?: ArrivalData | undefined
   onSuccess?: () => void
 }
 
@@ -40,7 +41,6 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     deleteItem,
     handleBlur,
     autoCompleteClients,
-    getProductNameById,
     error,
     submitFormHandler,
   } = useArrivalForm(initialData, onSuccess)
@@ -85,7 +85,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           <ItemsList
             items={productsForm}
             onDelete={i => deleteItem(i, setProductsForm)}
-            getProductNameById={getProductNameById}
+            getProductNameById={i => getProductNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal('products', initialItemState)}>
             + Добавить товары
@@ -166,7 +166,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           <ItemsList
             items={receivedForm}
             onDelete={i => deleteItem(i, setReceivedForm)}
-            getProductNameById={getProductNameById}
+            getProductNameById={i => getProductNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal('received_amount', initialItemState)}>
             + Добавить полученные товары
@@ -229,13 +229,15 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               sx={{ marginBottom: '15px' }}
             />
 
-            <Button type="button" onClick={() => addItem('received_amount')}>
-              Добавить
-            </Button>
+            <Grid container spacing={2}>
+              <Button type="button" variant="outlined" onClick={() => addItem('received_amount')}>
+                Добавить
+              </Button>
 
-            <Button type="button" onClick={() => setReceivedModalOpen(false)}>
-              Закрыть
-            </Button>
+              <Button type="button" variant="outlined" onClick={() => setReceivedModalOpen(false)}>
+                Закрыть
+              </Button>
+            </Grid>
           </Grid>
         )}
 
@@ -245,7 +247,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           <ItemsList
             items={defectsForm}
             onDelete={i => deleteItem(i, setDefectForm)}
-            getProductNameById={getProductNameById}
+            getProductNameById={i => getProductNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal('defects', initialItemState)}>
             + Добавить дефекты
@@ -311,13 +313,15 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               sx={{ marginBottom: '15px' }}
             />
 
-            <Button type="button" onClick={() => addItem('defects')}>
-              Добавить
-            </Button>
+            <Grid container spacing={2}>
+              <Button type="button" variant="outlined" onClick={() => addItem('defects')}>
+                Добавить
+              </Button>
 
-            <Button type="button" onClick={() => setDefectsModalOpen(false)}>
-              Закрыть
-            </Button>
+              <Button type="button" variant="outlined" onClick={() => setDefectsModalOpen(false)}>
+                Закрыть
+              </Button>
+            </Grid>
           </Grid>
         )}
 

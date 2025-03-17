@@ -154,8 +154,8 @@ export const useOrderForm = ( onSuccess?: () => void) => {
           await dispatch(fetchOrderByIdWithPopulate(params.id))
 
         } else {
-          await dispatch(fetchOrdersWithClient())
           onSuccess?.()
+          await dispatch(fetchOrdersWithClient())
         }
         toast.success('Заказ успешно обновлен!')
         return
@@ -166,11 +166,12 @@ export const useOrderForm = ( onSuccess?: () => void) => {
         }
 
         await dispatch(addOrder(form)).unwrap()
+        onSuccess?.()
         toast.success('Заказ успешно создан!')
         setForm({ ...initialStateOrder })
         setProductsForm([])
         setDefectForm([])
-        onSuccess?.()
+        await dispatch(fetchOrdersWithClient())
       }
 
     } catch (e) {
@@ -185,26 +186,32 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     deleteItem(index, setDefectForm, setForm, 'defects')
   }
 
+  type FormData = OrderMutation | ProductOrder | Defect;
+
   const handleBlurAutoComplete = (
     field: string,
     setErrors: React.Dispatch<React.SetStateAction<ErrorForOrder>>,
-    // TODO fix any https://botsmannatashaa.atlassian.net/browse/JE2-96
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formData: any,
+    formData: FormData,
     errorMessage: string,
   ) => {
-    if (!formData[field]) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [field]: errorMessage,
-      }))
-    } else {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [field]: '',
-      }))
+    if ('client' in formData || 'products' in formData || 'product' in formData) {
+      const keys = Object.keys(formData) as (keyof FormData)[]
+      if (keys.includes(field as keyof FormData)) {
+        if (!formData[field as keyof FormData]) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            [field]: errorMessage,
+          }))
+        } else {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            [field]: '',
+          }))
+        }
+      }
     }
   }
+
 
   const setFormArrayData = () => {
     setForm(prev => ({
@@ -223,6 +230,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     setButtonDefectVisible(true)
     setButtonVisible(true)
   }
+
 
   const addArrayProductInForm = () => {
     addArrayItemInForm(
@@ -247,6 +255,8 @@ export const useOrderForm = ( onSuccess?: () => void) => {
       'product',
     )
   }
+
+
   return{
     form,
     setForm,

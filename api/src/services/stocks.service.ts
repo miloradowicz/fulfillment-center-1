@@ -14,7 +14,13 @@ export class StocksService {
   }
 
   async getOne(id: string) {
-    const stock = await this.stockModel.findById(id)
+    const stock = await this.stockModel
+      .findById(id)
+      .populate({
+        path: 'products.product',
+        populate: { path: 'client' },
+      })
+      .exec()
     if (!stock) throw new NotFoundException('Склад не найден.')
     return stock
   }
