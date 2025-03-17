@@ -61,10 +61,21 @@ export const useStockForm = (initialData?: StockPopulate, onSuccess?: () => void
     setProductsForm(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleBlur = (field: keyof StockError, value: string) => {
+  const handleBlur = (field: keyof StockError, value: string | number) => {
+    type ErrorMessages = {
+      [key in keyof StockError]: string
+    }
+
+    const errorMessages: ErrorMessages = {
+      name: !value ? 'Заполните название склада.' : '',
+      address: !value ? 'Укажите адрес склада.' : '',
+      product: !value ? 'Выберите товар.' : '',
+      amount: Number(value) <= 0 ? 'Количество должно быть больше 0.' : '',
+    }
+
     setErrors(prev => ({
       ...prev,
-      [field]: !value ? 'Это поле обязательно для заполнения' : '',
+      [field]: errorMessages[field] || '',
     }))
   }
 
