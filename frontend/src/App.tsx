@@ -15,6 +15,8 @@ import ProductDetails from './features/products/containers/ProductDetails.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ServicesPage from './features/services/containers/ServicesPage.tsx'
 import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
+import StockPage from './features/stocks/containers/StockPage.tsx'
+import StockDetails from './features/stocks/containers/StockDetails.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -38,6 +40,8 @@ const App = () => {
             <Route path="/add-new-client" element={<ClientForm />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegistrationPage />} />
+            <Route path="/stocks" element={<StockPage/>}/>
+            <Route path="/stocks/:stockId" element={<StockDetails/>}/>
             <Route
               path="/*"
               element={

@@ -18,7 +18,7 @@ import {
   Box } from '@mui/material'
 import { NavLink } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment'
-
+import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
@@ -104,6 +104,15 @@ export default function Sidebar() {
             <ListItemButton component={NavLink} to="/services">
               <ListItemIcon><LocalShippingIcon  /></ListItemIcon>
               <ListItemText primary="Услуги" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/stocks">
+              <ListItemIcon>
+                <WarehouseOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Склады" />
             </ListItemButton>
           </ListItem>
         </List>
