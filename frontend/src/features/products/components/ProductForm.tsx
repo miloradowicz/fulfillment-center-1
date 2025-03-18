@@ -1,9 +1,15 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
 import useProductForm from '../../../hooks/useProductForm.ts'
+import { ProductWithPopulate } from '../../../types'
+import React from 'react'
 
-const ProductForm = () => {
+interface Props {
+  initialData?: ProductWithPopulate
+  onSuccess?: () => void
+}
 
+const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     form,
     selectedClient,
@@ -13,6 +19,7 @@ const ProductForm = () => {
     file,
     clients,
     loading,
+    loadingUpdate,
     inputChangeHandler,
     handleFileChange,
     addDynamicField,
@@ -24,12 +31,12 @@ const ProductForm = () => {
     setShowNewFieldInputs,
     setErrors,
     errors,
-  } = useProductForm()
+  } = useProductForm(initialData, onSuccess)
 
   return (
     <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
       <Typography variant="h5" sx={{ mb: 1 }}>
-        Добавить новый продукт
+        { initialData? 'Редактировать данные товара' : 'Добавить новый товар'}
       </Typography>
       <Grid container direction="column" spacing={2}>
         <Grid>
@@ -167,8 +174,8 @@ const ProductForm = () => {
         </Grid>
 
         <Grid>
-          <Button type="submit" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Создать продукт'}
+          <Button type="submit" fullWidth variant="contained" disabled={loading || loadingUpdate}>
+            {loading || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
           </Button>
         </Grid>
       </Grid>

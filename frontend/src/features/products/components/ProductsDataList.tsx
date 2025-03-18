@@ -6,9 +6,11 @@ import EditIcon from '@mui/icons-material/Edit'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ProductForm from './ProductForm.tsx'
 
 const ProductsDataList = () => {
-  const { products, deleteOneProduct } = useProductActions(true)
+  const { products, selectedProduct, deleteOneProduct, open, handleClose, handleOpen, fetchAllProducts } = useProductActions(true)
 
   const columns: GridColDef<ProductWithPopulate>[] = [
     {
@@ -58,7 +60,7 @@ const ProductsDataList = () => {
       filterable: false,
       renderCell: ({ row }) => (
         <>
-          <IconButton>
+          <IconButton onClick={() => handleOpen(row)}>
             <EditIcon />
           </IconButton>
           <IconButton onClick={() => deleteOneProduct(row._id)}>
@@ -74,7 +76,14 @@ const ProductsDataList = () => {
     },
   ]
   return (
+
     <Box className="max-w-[1000px] mx-auto w-full">
+      <Modal handleClose={handleClose} open={open}>
+        <ProductForm
+          initialData={selectedProduct || undefined}
+          onSuccess={() => fetchAllProducts()}
+        />
+      </Modal>
       {products ? (
         <DataGrid
           getRowId={row => row._id}

@@ -78,7 +78,7 @@ export const deleteProduct = createAsyncThunk<void, string, { rejectValue: Globa
   }
 })
 
-export const updateProduct = createAsyncThunk<void, { productId: string; data: ProductMutation }, { rejectValue: GlobalError }>(
+export const updateProduct = createAsyncThunk<void, { productId: string; data: FormData }, { rejectValue: GlobalError }>(
   'products/updateProduct',
   async ({ productId, data }, { rejectWithValue }) => {
     try {
