@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { DbModule } from './modules/db.module'
 import { ClientsModule } from './modules/clients.module'
 import { ProductsModule } from './modules/products.module'
@@ -9,7 +9,6 @@ import { UsersModule } from './modules/users.module'
 import { LogsModule } from './modules/logs.module'
 import { ValidatorsModule } from './modules/validators.module'
 import { TasksModule } from './modules/tasks.module'
-import { APP_PIPE } from '@nestjs/core'
 import { ServicesModule } from './modules/services.module'
 import { StocksModule } from './modules/stocks.module'
 import { AuthModule } from './modules/auth.module'
@@ -31,14 +30,6 @@ import { AuthModule } from './modules/auth.module'
     StocksModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-      }),
-    },
-  ],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }
