@@ -31,14 +31,6 @@ import { AuthModule } from './modules/auth.module'
     StocksModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-      }),
-    },
-  ],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }

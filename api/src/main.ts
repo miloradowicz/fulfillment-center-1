@@ -42,6 +42,7 @@ async function bootstrap() {
         throw new DtoValidationError(validationErrors)
       },
       transform: true,
+      transformOptions: { enableImplicitConversion: true },
     }),
   )
   app.useGlobalFilters(new DtoValidationErrorFilter(), new CastErrorFilter())
