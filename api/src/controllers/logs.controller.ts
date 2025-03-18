@@ -15,9 +15,9 @@ export class LogsController {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly logsService: LogsService
-  ) {}
+  ) { }
 
-  @Roles()
+  @Roles('stock-worker', 'super-admin', 'admin', 'manager')
   @Post()
   async addLogEntry(
     @Body() logDto: UpdateLogDto,
@@ -28,20 +28,20 @@ export class LogsController {
     let modelName: string
 
     switch (collection) {
-    case 'arrivals':
-      modelName = Arrival.name
-      break
+      case 'arrivals':
+        modelName = Arrival.name
+        break
 
-    case 'orders':
-      modelName = Order.name
-      break
+      case 'orders':
+        modelName = Order.name
+        break
 
-    case 'products':
-      modelName = Product.name
-      break
+      case 'products':
+        modelName = Product.name
+        break
 
-    default:
-      throw new BadRequestException('Модель не поддерживает логирование.')
+      default:
+        throw new BadRequestException('Модель не поддерживает логирование.')
     }
 
     const model = this.connection.models[modelName]
@@ -60,21 +60,21 @@ export class LogsController {
 
     let modelName: string
 
-    switch(collection) {
-    case 'arrivals':
-      modelName = Arrival.name
-      break
+    switch (collection) {
+      case 'arrivals':
+        modelName = Arrival.name
+        break
 
-    case 'orders':
-      modelName = Order.name
-      break
+      case 'orders':
+        modelName = Order.name
+        break
 
-    case 'products':
-      modelName = Product.name
-      break
+      case 'products':
+        modelName = Product.name
+        break
 
-    default:
-      throw new BadRequestException('Модель не поддерживает логирование.')
+      default:
+        throw new BadRequestException('Модель не поддерживает логирование.')
     }
 
     const model = this.connection.models[modelName]

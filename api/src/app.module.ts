@@ -12,11 +12,13 @@ import { TasksModule } from './modules/tasks.module'
 import { APP_PIPE } from '@nestjs/core'
 import { ServicesModule } from './modules/services.module'
 import { StocksModule } from './modules/stocks.module'
+import { AuthModule } from './modules/auth.module'
 
 @Module({
   imports: [
     CsrfModule,
     DbModule,
+    AuthModule,
     ClientsModule,
     ProductsModule,
     ArrivalsModule,

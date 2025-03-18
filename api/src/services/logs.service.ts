@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { Document, Model, ObjectId } from 'mongoose'
+import { Document, Model, Types } from 'mongoose'
 import { NotFoundError } from 'rxjs'
 
 @Injectable()
 export class LogsService {
-  async addLogEntry<T extends Document>(model: Model<T>, id: string, logEntry: {user: ObjectId, change: string}) {
+  async addLogEntry<T extends Document>(model: Model<T>, id: string, logEntry: { user: Types.ObjectId, change: string }) {
     const document = await model.findById(id)
 
     if (!document) {
