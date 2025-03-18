@@ -15,9 +15,9 @@ export class LogsController {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly logsService: LogsService
-  ) {}
+  ) { }
 
-  @Roles()
+  @Roles('stock-worker', 'super-admin', 'admin', 'manager')
   @Post()
   async addLogEntry(
     @Body() logDto: UpdateLogDto,
@@ -60,7 +60,7 @@ export class LogsController {
 
     let modelName: string
 
-    switch(collection) {
+    switch (collection) {
     case 'arrivals':
       modelName = Arrival.name
       break

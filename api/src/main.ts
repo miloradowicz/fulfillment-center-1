@@ -10,6 +10,10 @@ import * as csurf from 'csurf'
 import { useContainer } from 'class-validator'
 import * as express from 'express'
 import { join } from 'path'
+import { TokenAuthGuard } from './guards/token-auth.guard'
+import { TokenAuthService } from './services/token-auth.service'
+import { RolesGuard } from './guards/roles.guard'
+import { RolesService } from './services/roles.service'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -31,6 +35,7 @@ async function bootstrap() {
     credentials: true,
     origin: config.csrf.origin,
   })
+  app.useGlobalGuards(new TokenAuthGuard(app.get(TokenAuthService)), new RolesGuard(app.get(RolesService)))
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (validationErrors: ValidationError[]) => {

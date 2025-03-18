@@ -5,10 +5,12 @@ import { DbModule } from './db.module'
 import { FilesModule } from './file-upload.module'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Product, ProductSchema } from '../schemas/product.schema'
+import { AuthModule } from './auth.module'
 
 @Module({
   imports: [
     DbModule,
+    AuthModule,
     FilesModule,
     MongooseModule.forFeature([
       { name: Product.name, schema: ProductSchema },

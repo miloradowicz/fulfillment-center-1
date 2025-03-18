@@ -2,6 +2,8 @@ import { Document } from 'mongoose'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
+import config from 'src/config'
+import { JwtToken } from 'src/types'
 
 export interface UserDocument extends Document {
   email: string;
@@ -11,12 +13,9 @@ export interface UserDocument extends Document {
   role: string;
   token: string;
   generateToken: () => void;
+  clearToken: () => void;
   checkPassword: (password: string) => Promise<boolean>;
 }
-
-const SALT_WORK_FACTOR = 10
-
-const JWT_SECRET = 'example-jwt-secret'
 
 @Schema()
 export class User {
@@ -62,7 +61,7 @@ UserSchema.methods.clearToken = function (this: UserDocument) {
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next()
 
-  const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
+  const salt = await bcrypt.genSalt(config.saltWorkFactor)
   this.password = await bcrypt.hash(this.password, salt)
   next()
 })
