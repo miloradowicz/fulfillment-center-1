@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography, CircularProgress } from '@mui/material'
+import { Box, IconButton, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Client } from '../../../types'
@@ -26,12 +26,15 @@ const ClientsDataList = () => {
     setSelectedClient(null)
   }
 
+  const theme = useTheme()
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+
   const columns: GridColDef<Client>[] = [
     {
       field: 'name',
       headerName: 'Имя',
       flex: 1,
-      minWidth: 120,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
       editable: false,
@@ -41,7 +44,7 @@ const ClientsDataList = () => {
       field: 'phone_number',
       headerName: 'Телефон',
       flex: 1,
-      minWidth: 120,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
       editable: false,
@@ -51,7 +54,7 @@ const ClientsDataList = () => {
       field: 'email',
       headerName: 'Email',
       flex: 1,
-      minWidth: 150,
+      minWidth: isMediumScreen ? 220 : 150,
       align: 'left',
       headerAlign: 'left',
       sortable: true,
@@ -62,7 +65,7 @@ const ClientsDataList = () => {
       field: 'inn',
       headerName: 'ИНН',
       flex: 1,
-      minWidth: 100,
+      minWidth: isMediumScreen ? 220 : 100,
       align: 'left',
       headerAlign: 'left',
       sortable: true,
@@ -73,7 +76,7 @@ const ClientsDataList = () => {
       field: 'address',
       headerName: 'Адрес',
       flex: 1,
-      minWidth: 160,
+      minWidth: isMediumScreen ? 220 : 160,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
@@ -83,8 +86,7 @@ const ClientsDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      type: 'number',
-      minWidth: 160,
+      minWidth: isMediumScreen ? 220 : 160,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
@@ -103,7 +105,7 @@ const ClientsDataList = () => {
             style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
             className="text-gray-500 hover:text-gray-700"
           >
-              Подробнее
+            Подробнее
           </NavLink>
         </Box>
       ),

@@ -1,6 +1,6 @@
 import { OrderWithClient } from '../../../types'
 import React from 'react'
-import { Box, Chip, IconButton, Typography } from '@mui/material'
+import { Box, Chip, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
@@ -16,12 +16,15 @@ interface Props {
 
 const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
 
+  const theme = useTheme()
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+
   const columns: GridColDef<OrderWithClient>[] = [
     {
       field: 'client',
       headerName: 'Клиент',
       flex: 0.1,
-      minWidth: 120,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
       editable: false,
@@ -31,7 +34,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'sent_at',
       headerName: 'Отправлен',
       flex: 0.1,
-      minWidth: 100,
+      minWidth: isMediumScreen ? 220 : 100,
       align: 'left',
       headerAlign: 'left',
       valueGetter: (_value: string, row: OrderWithClient) => new Date(row.sent_at),
@@ -41,7 +44,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'delivered_at',
       headerName: 'Доставлен',
       flex: 0.1,
-      minWidth: 100,
+      minWidth: isMediumScreen ? 220 : 100,
       align: 'left',
       headerAlign: 'left',
       valueGetter: (_value: string, row: OrderWithClient) => new Date(row.delivered_at),
@@ -51,7 +54,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'price',
       headerName: 'Стоимость',
       flex: 0.1,
-      minWidth: 80,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
     },
@@ -59,7 +62,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'defects',
       headerName: 'Дефекты',
       flex: 0.1,
-      minWidth: 80,
+      minWidth: isMediumScreen ? 220 : 100,
       align: 'left',
       headerAlign: 'left',
       valueGetter: (_value: string, row: OrderWithClient) => row.defects.length,
@@ -69,7 +72,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'status',
       headerName: 'Статус',
       flex: 0.1,
-      minWidth: 100,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
       renderCell: ({ row }) => {
@@ -90,7 +93,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'products',
       headerName: 'Товаров',
       flex: 0.1,
-      minWidth: 80,
+      minWidth: isMediumScreen ? 220 : 120,
       align: 'left',
       headerAlign: 'left',
       valueGetter: (_value: string, row: OrderWithClient) => row.products.length,
@@ -99,7 +102,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       field: 'actions',
       headerName: '',
       flex: 0.2,
-      minWidth: 160,
+      minWidth: isMediumScreen ? 220 : 160,
       align: 'left',
       headerAlign: 'left',
       renderCell: ({ row } ) => (
