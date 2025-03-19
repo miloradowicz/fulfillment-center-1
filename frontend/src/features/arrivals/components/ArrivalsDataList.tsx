@@ -66,16 +66,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount,
     },
     {
-      field: 'defects',
-      headerName: 'Дефекты',
-      flex: 1,
-      minWidth: isMediumScreen ? 120 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.defects.length,
-      filterable: false,
-    },
-    {
       field: 'arrival_status',
       headerName: 'Статус',
       flex: 1,

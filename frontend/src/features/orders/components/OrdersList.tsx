@@ -59,16 +59,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       headerAlign: 'left',
     },
     {
-      field: 'defects',
-      headerName: 'Дефекты',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => row.defects.length,
-      filterable: false,
-    },
-    {
       field: 'status',
       headerName: 'Статус',
       flex: 0.1,

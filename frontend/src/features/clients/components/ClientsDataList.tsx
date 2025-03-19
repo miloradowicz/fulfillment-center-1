@@ -86,7 +86,7 @@ const ClientsDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      minWidth: isMediumScreen ? 220 : 160,
+      minWidth: isMediumScreen ? 220 : 180,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
