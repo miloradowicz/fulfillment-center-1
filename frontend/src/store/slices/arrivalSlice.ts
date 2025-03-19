@@ -22,7 +22,7 @@ interface ArrivalState {
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: boolean;
-  createError: ValidationError | null;
+  createAndUpdateError: ValidationError | null;
 }
 
 const initialState: ArrivalState = {
@@ -35,7 +35,7 @@ const initialState: ArrivalState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: false,
-  createError: null,
+  createAndUpdateError: null,
 }
 
 export const selectArrival = (state: RootState) => state.arrivals.arrival
@@ -47,12 +47,16 @@ export const selectLoadingAddArrival = (state: RootState) => state.arrivals.load
 export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
 export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
 export const selectArrivalError = (state: RootState) => state.arrivals.error
-export const selectCreateError = (state: RootState) => state.arrivals.createError
+export const selectCreateError = (state: RootState) => state.arrivals.createAndUpdateError
 
 const arrivalSlice = createSlice({
   name: 'arrivals',
   initialState,
-  reducers: {},
+  reducers: {
+    clearErrorArrival: state => {
+      state.createAndUpdateError = null
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchArrivals.pending, state => {
@@ -115,14 +119,14 @@ const arrivalSlice = createSlice({
       })
       .addCase(addArrival.pending, state => {
         state.loadingAdd = true
-        state.createError = null
+        state.createAndUpdateError = null
       })
       .addCase(addArrival.fulfilled, state => {
         state.loadingAdd = false
       })
       .addCase(addArrival.rejected, (state, { payload }) => {
         state.loadingAdd = false
-        state.createError = payload || null
+        state.createAndUpdateError = payload || null
       })
       .addCase(deleteArrival.pending, state => {
         state.loadingDelete = true
@@ -138,15 +142,17 @@ const arrivalSlice = createSlice({
       .addCase(updateArrival.pending, state => {
         state.loadingUpdate = true
         state.error = false
+        state.createAndUpdateError = null
       })
       .addCase(updateArrival.fulfilled, state => {
         state.loadingUpdate = false
       })
-      .addCase(updateArrival.rejected, state => {
+      .addCase(updateArrival.rejected,  (state, { payload }) => {
         state.loadingUpdate = false
-        state.error = true
+        state.createAndUpdateError = payload || null
       })
   },
 })
 
 export const arrivalReducer = arrivalSlice.reducer
+export const { clearErrorArrival } = arrivalSlice.actions

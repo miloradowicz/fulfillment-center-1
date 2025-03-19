@@ -22,4 +22,5 @@ export const initialErrorState = {
   amount: 0,
   sent_amount: '',
   defect_description: '',
+  arrival_status: '',
 }

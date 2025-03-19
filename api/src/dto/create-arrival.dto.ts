@@ -1,4 +1,13 @@
-import { ArrayNotEmpty, IsArray, IsEnum, IsNotEmpty, IsOptional, IsPositive, ValidateNested } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  ValidateNested,
+} from 'class-validator'
 import { Type } from 'class-transformer'
 
 class ProductDto {
@@ -64,7 +73,8 @@ export class CreateArrivalDto {
   @IsPositive({ message: 'Цена доставки должна быть больше 0.' })
   arrival_price: number
 
-  @IsNotEmpty({ message: 'Заполните дату прибытия.' })
+  @IsNotEmpty({ message: 'Заполните дату прибытия' })
+  @IsDate({ message: 'Заполните дату прибытия' })@Type(() => Date)
   arrival_date: Date
 
   @IsNotEmpty({ message: 'Заполните количество отправленного товара.' })

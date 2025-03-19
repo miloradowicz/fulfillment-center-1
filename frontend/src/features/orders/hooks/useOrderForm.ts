@@ -44,6 +44,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
       price: initialData.price,
       products: [],
       defects: [],
+      status:initialData.status,
       comment: initialData.comment?initialData.comment:'',
     }
     : { ...initialStateOrder })
@@ -65,6 +66,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
   const [isButtonVisible, setButtonVisible] = useState(true)
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
+  const status = ['в сборке', 'в пути', 'доставлен']
 
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -212,7 +214,6 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     }
   }
 
-
   const setFormArrayData = () => {
     setForm(prev => ({
       ...prev,
@@ -260,6 +261,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
   return{
     form,
     setForm,
+    status,
     productsForm,
     setProductsForm,
     defectForm,

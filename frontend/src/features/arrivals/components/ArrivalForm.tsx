@@ -43,6 +43,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     autoCompleteClients,
     error,
     submitFormHandler,
+    status,
   } = useArrivalForm(initialData, onSuccess)
 
   return (
@@ -363,7 +364,27 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             fullWidth
           />
         </Grid>
-
+        {initialData?
+          <Grid>
+            <Autocomplete
+              id="arrival_status"
+              value={status.find(option => option === form.arrival_status) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, arrival_status: newValue|| '' }))}
+              size="small"
+              fullWidth
+              disablePortal
+              options={status}
+              sx={{ width: '100%' }}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Статус"
+                  error={Boolean(errors.arrival_status || getFieldError('arrival_status', error))}
+                  helperText={errors.arrival_status || getFieldError('arrival_status', error)}
+                />
+              )}
+            />
+          </Grid>:null}
         <Grid>
           <TextField
             id="sent_amount"

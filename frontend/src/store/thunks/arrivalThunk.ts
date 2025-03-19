@@ -11,7 +11,7 @@ export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals
 export const fetchArrivalById = createAsyncThunk<Arrival, string>(
   'arrivals/fetchArrivalById',
   async (arrivalId: string) => {
-    const response = await axiosAPI.get(`/arrivals/?=${arrivalId}`)
+    const response = await axiosAPI.get(`/arrivals/?=${ arrivalId }`)
     return response.data
   },
 )
@@ -19,7 +19,7 @@ export const fetchArrivalById = createAsyncThunk<Arrival, string>(
 export const fetchArrivalByIdWithPopulate = createAsyncThunk<ArrivalWithPopulate, string>(
   'arrivals/fetchArrivalByIdWithPopulate',
   async (arrivalId: string) => {
-    const response = await axiosAPI.get(`/arrivals/${arrivalId}`, { params: { populate: '1' } })
+    const response = await axiosAPI.get(`/arrivals/${ arrivalId }`, { params: { populate: '1' } })
     return response.data
   },
 )
@@ -47,7 +47,6 @@ export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue:
       await axiosAPI.post('/arrivals', data)
     } catch (error) {
       if (isAxiosError(error) && error.response && error.response.status === 400) {
-        console.log(error)
         return rejectWithValue(error.response.data as ValidationError)
       }
       throw error
@@ -72,13 +71,13 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 export const updateArrival = createAsyncThunk<
   void,
   { arrivalId: string; data: ArrivalMutation },
-  { rejectValue: GlobalError }
+  {  rejectValue: ValidationError  }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
-    await axiosAPI.put(`/arrivals/${arrivalId}`, data)
+    await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
   } catch (e) {
     if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+      return rejectWithValue(e.response.data as ValidationError)
     }
     throw e
   }

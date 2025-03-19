@@ -140,7 +140,7 @@ export interface Order {
   sent_at: string
   delivered_at: string
   comment?: string
-  status?: 'в сборке' | 'в пути' | 'доставлен'
+  status?: string
   logs?: Log[]
   defects: Defect[]
 }
@@ -195,6 +195,7 @@ export interface ArrivalError {
   sent_amount: string
   amount: number
   defect_description: string
+  arrival_status?:string
 }
 
 export interface ErrorForOrder {
@@ -205,6 +206,7 @@ export interface ErrorForOrder {
   defect_description: string
   sent_at: string
   delivered_at: string
+  status?:string
 }
 
 export interface ProductForOrderForm {
