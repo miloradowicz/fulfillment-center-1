@@ -9,6 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import mongoose from 'mongoose'
 
 class ProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
@@ -61,7 +62,10 @@ class ReceivedProductDto {
 
 export class CreateArrivalDto {
   @IsNotEmpty({ message: 'Заполните поле клиента.' })
-  client: string
+  client: mongoose.Schema.Types.ObjectId
+
+  @IsNotEmpty({ message: 'Заполните склад, на который прибыла поставка.' })
+  stock: mongoose.Schema.Types.ObjectId
 
   @ArrayNotEmpty({ message: 'Заполните список товаров' })
   @IsArray({ message: 'Заполните список товаров.' })

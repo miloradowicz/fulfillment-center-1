@@ -51,6 +51,13 @@ export class Arrival {
   sent_amount: string
 
   @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+    required: true,
+  })
+  stock: mongoose.Schema.Types.ObjectId
+
+  @Prop({
     type: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
