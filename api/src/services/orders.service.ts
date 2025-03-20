@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Order, OrderDocument } from '../schemas/order.schema'
@@ -10,21 +10,26 @@ export class OrdersService {
   constructor(@InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>) {}
 
   async getAll() {
-    return this.orderModel.find()
+    return this.orderModel.find({ isArchived: false })
   }
 
   async getAllWithClient() {
-    return this.orderModel.find().populate('client').exec()
+    return this.orderModel.find({ isArchived: false }).populate('client').exec()
   }
 
   async getById(id: string) {
-    const order = await this.orderModel.findById(id).populate('products.product').exec()
+    const order = await this.orderModel.find({ isArchived: false }).findById(id).populate('products.product').exec()
+
     if (!order) throw new NotFoundException('Заказ не найден')
+
+    if (order.isArchived) throw new ForbiddenException('Заказ в архиве')
+
     return order
   }
 
-  async getByIdWithPopulate (id: string){
-    const order = await this.orderModel.findById(id)
+  async getByIdWithPopulate(id: string) {
+    const order = await this.orderModel
+      .findById(id)
       .populate('client')
       .populate('products.product')
       .populate('defects.product')
@@ -32,7 +37,6 @@ export class OrdersService {
     if (!order) throw new NotFoundException('Заказ не найден')
     return order
   }
-
 
   async create(orderDto: CreateOrderDto) {
     return await this.orderModel.create(orderDto)
@@ -44,6 +48,16 @@ export class OrdersService {
       throw new NotFoundException('Заказ не найден')
     }
     return order
+  }
+
+  async archive(id: string) {
+    const order = await this.orderModel.findByIdAndUpdate(id, { isArchived: true })
+
+    if (!order) throw new NotFoundException('Заказ не найден')
+
+    if (order.isArchived) throw new ForbiddenException('Заказ уже в архиве')
+
+    return { message: 'Заказ перемещен в архив' }
   }
 
   async delete(id: string) {

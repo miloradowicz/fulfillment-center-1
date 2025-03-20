@@ -6,6 +6,12 @@ export type ArrivalDocument = Arrival & Document
 @Schema({ timestamps: true })
 export class Arrival {
   @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
+  @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
     required: true,

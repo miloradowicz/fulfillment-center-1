@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
@@ -32,6 +32,11 @@ export class ArrivalsController {
   @Put(':id')
   async updateArrival(@Param('id') id: string, @Body() arrivalDto: UpdateArrivalDto) {
     return await this.arrivalsService.update(id, arrivalDto)
+  }
+
+  @Patch(':id/archive')
+  async archiveArrival(@Param('id') id: string) {
+    return await this.arrivalsService.archive(id)
   }
 
   @Delete(':id')

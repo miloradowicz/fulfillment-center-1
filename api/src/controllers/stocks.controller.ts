@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common'
 import { StocksService } from '../services/stocks.service'
 import { CreateStockDto } from '../dto/create-stock.dto'
 import { UpdateStockDto } from '../dto/update-stock.dto'
@@ -25,6 +25,11 @@ export class StocksController {
   @Put(':id')
   async updateStock(@Param('id') id: string, @Body() stockDto: UpdateStockDto) {
     return await this.stocksService.update(id, stockDto)
+  }
+
+  @Patch(':id/archive')
+  async archiveStock(@Param('id') id: string) {
+    return await this.stocksService.archive(id)
   }
 
   @Delete(':id')

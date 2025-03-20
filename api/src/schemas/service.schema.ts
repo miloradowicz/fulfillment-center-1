@@ -5,6 +5,12 @@ export type ServiceDocument = Service & Document
 
 @Schema()
 export class Service {
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
   @Prop({ required: true })
   name: string
 

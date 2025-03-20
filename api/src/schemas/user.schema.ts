@@ -6,6 +6,7 @@ import config from 'src/config'
 import { JwtToken } from 'src/types'
 
 export interface UserDocument extends Document {
+  isArchived: boolean;
   email: string;
   password: string;
   __confirmPassword: string;
@@ -19,29 +20,35 @@ export interface UserDocument extends Document {
 
 @Schema()
 export class User {
-@Prop({
-  required: true,
-  unique: true,
-})
-email: string
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
 
-@Prop({
-  required: true,
-})
-password: string
+  @Prop({
+    required: true,
+    unique: true,
+  })
+  email: string
 
-@Prop({
-  required: true,
-})
-displayName: string
+  @Prop({
+    required: true,
+  })
+  password: string
 
-@Prop({ required: true, enum: ['super-admin', 'admin', 'manager', 'stock-worker'] })
-role: string
+  @Prop({
+    required: true,
+  })
+  displayName: string
 
-@Prop({
-  required: true,
-})
-token: string
+  @Prop({ required: true, enum: ['super-admin', 'admin', 'manager', 'stock-worker'] })
+  role: string
+
+  @Prop({
+    required: true,
+  })
+  token: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
