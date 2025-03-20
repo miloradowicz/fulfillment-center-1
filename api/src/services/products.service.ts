@@ -26,17 +26,15 @@ export class ProductsService {
   async getById(id: string, populate?: boolean) {
     let product: ProductDocument | null
 
-    const unarchived = this.productModel.find({ isArchived: false })
-
     if (populate) {
-      product = await unarchived.findById(id).populate('client').exec()
+      product = await this.productModel.findById(id).populate('client').exec()
     } else {
-      product = await unarchived.findById(id).exec()
+      product = await this.productModel.findById(id).exec()
     }
 
-    if (!product) {
-      throw new NotFoundException('Товар не найден')
-    }
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    if (product.isArchived) throw new ForbiddenException('Товар в архиве')
 
     return product
   }

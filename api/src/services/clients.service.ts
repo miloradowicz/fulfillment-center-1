@@ -14,9 +14,11 @@ export class ClientsService {
   }
 
   async getById(id: string) {
-    const client = await this.clientModel.find({ isArchived: false }).findById(id)
+    const client = await this.clientModel.findById(id)
 
     if (!client) throw new NotFoundException('Клиент не найден')
+
+    if (client.isArchived) throw new ForbiddenException('Клиент в архиве')
 
     return client
   }
