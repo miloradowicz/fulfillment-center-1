@@ -31,7 +31,7 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
 
   const handleClose = async (newStatus?: string) => {
     setAnchorEl(null)
-    if (newStatus) {
+    if (newStatus && newStatus !== row.arrival_status) {
       const updatedData = {
         ...row,
         client: row.client._id,

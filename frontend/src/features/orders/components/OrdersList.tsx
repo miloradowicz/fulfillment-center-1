@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
-import OrderStatusCell from './OrderStatusCell.tsx'
+import StatusOrderCell from './StatusOrderCell.tsx'
 
 interface Props {
   orders: OrderWithClient[] | [];
@@ -65,7 +65,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       width: 145,
       align: 'left',
       headerAlign: 'left',
-      renderCell: params => <OrderStatusCell row={params.row} />,
+      renderCell: params => <StatusOrderCell row={params.row} />,
     },
     {
       field: 'products',

@@ -9,7 +9,7 @@ export interface Props  {
   row: OrderWithClient,
 }
 
-const OrderStatusCell:React.FC<Props> =({ row })  => {
+const StatusOrderCell:React.FC<Props> =({ row })  => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
@@ -27,7 +27,7 @@ const OrderStatusCell:React.FC<Props> =({ row })  => {
 
   const handleClose = async (newStatus?: string) => {
     setAnchorEl(null)
-    if (newStatus) {
+    if (newStatus && newStatus !== row.status) {
       const updatedData = {
         ...row,
         client: row.client._id,
@@ -64,4 +64,4 @@ const OrderStatusCell:React.FC<Props> =({ row })  => {
   )
 }
 
-export default OrderStatusCell
+export default StatusOrderCell
