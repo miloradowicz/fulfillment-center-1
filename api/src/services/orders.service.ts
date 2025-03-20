@@ -18,7 +18,7 @@ export class OrdersService {
   }
 
   async getById(id: string) {
-    const order = await this.orderModel.find({ isArchived: false }).findById(id).populate('products.product').exec()
+    const order = await this.orderModel.findById(id).populate('products.product').exec()
 
     if (!order) throw new NotFoundException('Заказ не найден')
 
@@ -35,6 +35,9 @@ export class OrdersService {
       .populate('defects.product')
       .exec()
     if (!order) throw new NotFoundException('Заказ не найден')
+
+    if (order.isArchived) throw new ForbiddenException('Заказ в архиве')
+
     return order
   }
 
