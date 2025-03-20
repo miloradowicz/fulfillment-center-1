@@ -11,9 +11,11 @@ interface Props {
   handleClose?:  () => void
 }
 const OrderForm: React.FC<Props> = ({ onSuccess }) => {
+
   const {
     form,
     setForm,
+    status,
     productsForm,
     defectForm,
     newField,
@@ -244,7 +246,35 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 onBlur={handleBlur}
               />
             </Grid>
-
+            <Grid container direction="column" spacing={2}>
+              {status && status?.length > 0 && (
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      size={'small'}
+                      fullWidth
+                      disablePortal
+                      options={status}
+                      onChange={(_, newValue) => {
+                        if (newValue) {
+                          setForm(prevState => ({ ...prevState, status: newValue|| '' }))
+                        }
+                      }}
+                      value={status.find(option => option === form.status) || status[0] || null}
+                      getOptionLabel={option => option || ''}
+                      isOptionEqualToValue={(option, value) => option === value}
+                      renderInput={params => (
+                        <TextField
+                          {...params}
+                          label="Статус заказа"
+                          error={Boolean(errors.status || getFieldError('status',createError))}
+                          helperText={errors.status || getFieldError('status',createError)}
+                        />
+                      )}
+                    />
+                  </FormControl>
+                </Grid>
+              )} </Grid>
             <Grid>
               <TextField
                 id="comment"

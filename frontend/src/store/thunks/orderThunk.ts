@@ -67,14 +67,14 @@ export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalE
   }
 })
 
-export const updateOrder = createAsyncThunk<void, { orderId: string; data: OrderMutation }, { rejectValue: GlobalError }>(
+export const updateOrder = createAsyncThunk<void, { orderId: string; data: OrderMutation }, { rejectValue: ValidationError }>(
   'orders/updateOrder',
   async ({ orderId, data }, { rejectWithValue }) => {
     try {
       await axiosAPI.put(`/orders/${ orderId }`, data)
     } catch (e) {
       if (isAxiosError(e) && e.response) {
-        return rejectWithValue(e.response.data as GlobalError)
+        return rejectWithValue(e.response.data as ValidationError)
       }
       throw e
     }

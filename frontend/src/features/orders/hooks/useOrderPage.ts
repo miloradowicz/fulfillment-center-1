@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllOrdersWithClient, selectLoadingFetchOrder } from '../../../store/slices/orderSlice.ts'
+import {
+  clearErrorOrder,
+  clearPopulateOrder,
+  selectAllOrdersWithClient,
+  selectLoadingFetchOrder,
+} from '../../../store/slices/orderSlice.ts'
 import { deleteOrder, fetchOrderByIdWithPopulate, fetchOrdersWithClient } from '../../../store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { OrderWithClient } from '../../../types'
@@ -32,6 +37,8 @@ const UseOrderPage = () => {
 
   const handleClose = () => {
     setOpen(false)
+    dispatch(clearPopulateOrder())
+    dispatch( clearErrorOrder ())
   }
 
   const handleOpenEdit = async (order: OrderWithClient) => {

@@ -1,6 +1,6 @@
 import {
   ArrayNotEmpty,
-  IsArray,
+  IsArray, IsDate,
   IsEnum,
   IsInt,
   IsMongoId,
@@ -65,9 +65,13 @@ export class CreateOrderDto {
   @IsPositive({ message: 'Поле сумма заказа не может равняться 0' })
   price: number
 
-  @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' }) sent_at: Date
+  @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' })
+  @IsDate({ message: 'Заполните дату отправки' })@Type(() => Date)
+  sent_at: Date
 
-  @IsNotEmpty({ message: 'Поле дата доставки обязательно для заполнения' }) delivered_at: Date
+  @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' })
+  @IsDate({ message: 'Заполните дату доставки' })@Type(() => Date)
+  delivered_at: Date
 
   @IsOptional()
   comment?: string

@@ -26,6 +26,8 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const products = useAppSelector(selectAllProducts)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
+  const status = [ 'ожидается доставка' , 'получена' , 'отсортирована']
+
 
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
@@ -37,6 +39,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         products: [],
         defects: [],
         received_amount: [],
+        arrival_status:initialData.arrival_status,
       }
       : { ...initialState },
   )
@@ -209,5 +212,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     autoCompleteClients,
     error,
     submitFormHandler,
+    status,
   }
 }
