@@ -255,33 +255,15 @@ export interface Service {
 
 export type ServiceMutation = Omit<Service, '_id'>
 
-export interface ProductStock {
-  product: string
-  description: string
-  amount: number
-}
-
-export type ProductStockMutation = Omit<ProductStock, 'product'> & {
-  _id: string
-  product: ProductWithPopulate
-}
-
 export interface Stock {
   _id: string
   name: string
   address: string
-  products: ProductStock[]
 }
 
 export interface StockError {
   name: string
   address: string
-  product: string
-  amount: string
 }
 
 export type StockMutation = Omit<Stock, '_id'>
-
-export type StockPopulate = Omit<Stock, 'products'> & {
-  products: ProductStockMutation[]
-}
