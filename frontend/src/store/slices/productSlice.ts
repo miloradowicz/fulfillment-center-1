@@ -1,4 +1,4 @@
-import { GlobalError, Product, ProductWithPopulate } from '../../types'
+import { GlobalError, Product, ProductWithPopulate, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import {
   addProduct,
@@ -21,7 +21,7 @@ interface ProductState {
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
-
+  createAndUpdateError: ValidationError | null
 }
 
 const initialState: ProductState = {
@@ -35,6 +35,7 @@ const initialState: ProductState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+  createAndUpdateError: null,
 }
 
 export const selectProduct = (state: RootState) => state.products.product
@@ -46,6 +47,7 @@ export const selectLoadingAddProduct = (state: RootState) => state.products.load
 export const selectLoadingDeleteProduct = (state: RootState) => state.products.loadingDelete
 export const selectLoadingUpdateProduct = (state: RootState) => state.products.loadingUpdate
 export const selectProductError = (state: RootState) => state.products.error
+export const selectCreateProductError = (state: RootState) => state.products.createAndUpdateError
 
 const productSlice = createSlice({
   name: 'products',
@@ -104,13 +106,14 @@ const productSlice = createSlice({
     })
     builder.addCase(addProduct.pending, state => {
       state.loadingAdd = true
+      state.createAndUpdateError = null
     })
     builder.addCase(addProduct.fulfilled, state => {
       state.loadingAdd = false
     })
-    builder.addCase(addProduct.rejected, (state, action) => {
+    builder.addCase(addProduct.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
-      state.error = action.payload ?? { message: 'Ошибка создания продукта' }
+      state.createAndUpdateError = error || null
     })
     builder.addCase(deleteProduct.pending, state => {
       state.loadingDelete = true
@@ -126,15 +129,14 @@ const productSlice = createSlice({
     })
     builder.addCase(updateProduct.pending, state => {
       state.loadingUpdate = true
-      state.error = null
+      state.createAndUpdateError = null
     })
     builder.addCase(updateProduct.fulfilled, state => {
       state.loadingUpdate = false
-      state.error = null
     })
     builder.addCase(updateProduct.rejected, (state, { payload: error }) => {
       state.loadingUpdate = false
-      state.error = error || null
+      state.createAndUpdateError = error || null
     })
   },
 })

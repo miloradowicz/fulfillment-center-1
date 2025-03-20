@@ -1,8 +1,9 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
-import useProductForm from '../../../hooks/useProductForm.ts'
+import useProductForm from '../hooks/useProductForm.ts'
 import { ProductWithPopulate } from '../../../types'
 import React from 'react'
+import { getFieldError } from '../../../utils/getFieldError.ts'
 
 interface Props {
   initialData?: ProductWithPopulate
@@ -18,7 +19,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     showNewFieldInputs,
     file,
     clients,
-    loading,
+    loadingAdd,
     loadingUpdate,
     inputChangeHandler,
     handleFileChange,
@@ -31,6 +32,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     setShowNewFieldInputs,
     setErrors,
     errors,
+    createError,
   } = useProductForm(initialData, onSuccess)
 
   return (
@@ -56,8 +58,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 label="Клиент"
                 fullWidth
                 size="small"
-                error={!!errors.client}
-                helperText={errors.client}
+                error={Boolean(errors.client || getFieldError('client',createError))}
+                helperText={errors.client || getFieldError('client',createError)}
               />
             )}
           />
@@ -71,8 +73,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.title}
-            helperText={errors.title}
+            error={Boolean(errors.title || getFieldError('title',createError))}
+            helperText={errors.title || getFieldError('title',createError)}
           />
         </Grid>
         <Grid>
@@ -84,8 +86,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.amount}
-            helperText={errors.amount}
+            error={Boolean(errors.amount || getFieldError('amount',createError))}
+            helperText={errors.amount || getFieldError('amount',createError)}
           />
         </Grid>
         <Grid>
@@ -96,8 +98,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.barcode}
-            helperText={errors.barcode}
+            error={Boolean(errors.barcode || getFieldError('barcode',createError))}
+            helperText={errors.barcode || getFieldError('barcode',createError)}
           />
         </Grid>
         <Grid>
@@ -108,8 +110,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.article}
-            helperText={errors.article}
+            error={Boolean(errors.article || getFieldError('article',createError))}
+            helperText={errors.article || getFieldError('article',createError)}
           />
         </Grid>
 
@@ -174,8 +176,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Grid>
 
         <Grid>
-          <Button type="submit" fullWidth variant="contained" disabled={loading || loadingUpdate}>
-            {loading || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
+          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate}>
+            {loadingAdd || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
           </Button>
         </Grid>
       </Grid>

@@ -40,7 +40,7 @@ const ProductDetails = () => {
         ) : !product ? (
           <Box textAlign="center" mt={4}>
             <Typography variant="body1" textAlign="center">
-              Продукт не найден
+              Товар не найден
             </Typography>
           </Box>
         ) : (

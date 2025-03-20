@@ -1,12 +1,16 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { toast } from 'react-toastify'
 import { isAxiosError } from 'axios'
-import { DynamicField, ProductMutation, ProductWithPopulate } from '../types'
-import { useAppDispatch, useAppSelector } from '../app/hooks.ts'
-import { selectAllClients } from '../store/slices/clientSlice.ts'
-import { fetchClients } from '../store/thunks/clientThunk.ts'
-import { addProduct, updateProduct } from '../store/thunks/productThunk.ts'
-import { selectLoadingAddProduct, selectLoadingUpdateProduct } from '../store/slices/productSlice.ts'
+import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { selectAllClients } from '../../../store/slices/clientSlice.ts'
+import { fetchClients } from '../../../store/thunks/clientThunk.ts'
+import { addProduct, updateProduct } from '../../../store/thunks/productThunk.ts'
+import {
+  selectCreateProductError,
+  selectLoadingAddProduct,
+  selectLoadingUpdateProduct,
+} from '../../../store/slices/productSlice.ts'
 
 const initialState: ProductMutation = {
   client: '',
@@ -54,8 +58,9 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
 
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
-  const loading = useAppSelector(selectLoadingAddProduct)
+  const loadingAdd = useAppSelector(selectLoadingAddProduct)
   const loadingUpdate = useAppSelector(selectLoadingUpdateProduct)
+  const createError = useAppSelector(selectCreateProductError)
 
   useEffect(() => {
     dispatch(fetchClients())
@@ -135,10 +140,11 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
       if (initialData) {
         await dispatch(updateProduct({ productId: initialData._id, data: formData })).unwrap()
         onSuccess?.()
-        toast.success('Продукт успешно обновлен.')
+        toast.success('Товар успешно обновлен.')
       } else {
         await dispatch(addProduct(formData)).unwrap()
-        toast.success('Продукт успешно создан.')
+        onSuccess?.()
+        toast.success('Товар успешно создан.')
         setForm(initialState)
         setDynamicFields([])
         setSelectedClient('')
@@ -150,7 +156,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
         console.error('Ошибки валидации:', e.response.data)
       } else {
         console.error('Ошибка сервера:', e)
-        toast.error('Не удалось создать продукт.')
+        toast.error('Не удалось создать Товар.')
       }
     }
   }
@@ -186,7 +192,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     showNewFieldInputs,
     file,
     clients,
-    loading,
+    loadingAdd,
     loadingUpdate,
     inputChangeHandler,
     handleFileChange,
@@ -201,6 +207,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     setShowNewFieldInputs,
     setErrors,
     errors,
+    createError,
   }
 }
 

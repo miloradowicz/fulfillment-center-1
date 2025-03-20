@@ -5,11 +5,15 @@ import ProductForm from '../components/ProductForm.tsx'
 import useProductActions from '../hooks/useProductActions.ts'
 
 const ProductPage = () => {
-  const { open, handleOpen, handleClose } = useProductActions(true)
+  const { open, handleOpen, handleClose, fetchAllProducts } = useProductActions(true)
 
   return (
     <>
-      <Modal handleClose={handleClose} open={open}><ProductForm/></Modal>
+      <Modal handleClose={handleClose} open={open}>
+        <ProductForm
+          onSuccess={fetchAllProducts}
+        />
+      </Modal>
       <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
         <Typography className="flex-grow text-[20px]">Товары</Typography>
         <Button
@@ -25,7 +29,7 @@ const ProductPage = () => {
             },
           }}
           variant="outlined"
-          onClick={handleOpen} >Добавить товар</Button>
+          onClick={() => handleOpen()} >Добавить товар</Button>
       </Box>
       <Box><ProductsDataList/></Box>
     </>

@@ -59,16 +59,16 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
 
   const deleteOneProduct = async (id: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот продукт?')) {
+      if (confirm('Вы уверены, что хотите удалить этот товар?')) {
         await dispatch(deleteProduct(id))
         if (fetchOnDelete) {
           fetchAllProducts()
         } else {
           navigate('/products')
         }
-        toast.success('Продукт успешно удален.')
+        toast.success('Товар успешно удален.')
       } else {
-        toast.info('Вы отменили удаление продукта.')
+        toast.info('Вы отменили удаление товара.')
       }
     } catch (e) {
       console.error(e)
