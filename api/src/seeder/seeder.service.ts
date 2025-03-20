@@ -181,29 +181,45 @@ export class SeederService {
       },
     ])
 
+    const [_stock1, _stock2] = await this.stockModel.create([
+      {
+        name: 'Склад Бишкек',
+        address: 'Ул. Малдыбаева 7/1',
+        products: [{ product: _product1._id, description: '', amount: 20 }],
+      },
+      {
+        name: 'Склад Москва',
+        address: 'Ул. Гагарина 102',
+        products: [{ product: _product2._id, description: '', amount: 20 }],
+      },
+    ])
+
     await this.arrivalModel.create([
       {
-        client: _clients,
-        products: [{ product: _product1, description: '', amount: 20 }],
+        client: _clients._id,
+        products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
         arrival_date: new Date().toISOString(),
         sent_amount: '2 короба',
+        stock: _stock1._id,
       },
       {
-        client: _clients,
-        products: [{ product: _product2, description: '', amount: 100 }],
+        client: _clients._id,
+        products: [{ product: _product2._id, description: '', amount: 100 }],
         arrival_price: 2500,
         arrival_status: 'получена',
         arrival_date: new Date().toISOString(),
         sent_amount: '2 мешка',
+        stock: _stock2._id,
       },
       {
-        client: _clients,
-        products: [{ product: _product3, description: '', amount: 30 }],
+        client: _clients._id,
+        products: [{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
         arrival_status: 'отсортирована',
         arrival_date: new Date().toISOString(),
         sent_amount: '5 коробов',
+        stock: _stock1._id,
       },
     ])
 
@@ -223,11 +239,5 @@ export class SeederService {
         ],
       },
     ])
-
-    await this.stockModel.create({
-      name: 'Склад Бишкек',
-      address: 'Ул. Малдыбаева 7/1',
-      products: [{ product: _product1, description: '', amount: 20 }],
-    })
   }
 }
