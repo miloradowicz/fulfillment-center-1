@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography, CircularProgress } from '@mui/material'
+import { Box, IconButton, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Client } from '../../../types'
@@ -26,11 +26,17 @@ const ClientsDataList = () => {
     setSelectedClient(null)
   }
 
+  const theme = useTheme()
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+
   const columns: GridColDef<Client>[] = [
     {
       field: 'name',
       headerName: 'Имя',
       flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
       editable: false,
       sortable: true,
     },
@@ -38,6 +44,9 @@ const ClientsDataList = () => {
       field: 'phone_number',
       headerName: 'Телефон',
       flex: 1,
+      minWidth: isMediumScreen ? 140 : 120,
+      align: 'left',
+      headerAlign: 'left',
       editable: false,
       filterable: true,
     },
@@ -45,6 +54,9 @@ const ClientsDataList = () => {
       field: 'email',
       headerName: 'Email',
       flex: 1,
+      minWidth: isMediumScreen ? 170 : 150,
+      align: 'left',
+      headerAlign: 'left',
       sortable: true,
       editable: false,
       filterable: true,
@@ -53,6 +65,9 @@ const ClientsDataList = () => {
       field: 'inn',
       headerName: 'ИНН',
       flex: 1,
+      minWidth: isMediumScreen ? 170 : 100,
+      align: 'left',
+      headerAlign: 'left',
       sortable: true,
       editable: false,
       filterable: true,
@@ -61,6 +76,9 @@ const ClientsDataList = () => {
       field: 'address',
       headerName: 'Адрес',
       flex: 1,
+      minWidth: isMediumScreen ? 220 : 160,
+      align: 'left',
+      headerAlign: 'left',
       sortable: false,
       editable: false,
       filterable: true,
@@ -68,8 +86,9 @@ const ClientsDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      type: 'number',
-      width: 200,
+      minWidth: isMediumScreen ? 220 : 180,
+      align: 'left',
+      headerAlign: 'left',
       sortable: false,
       editable: false,
       filterable: false,
@@ -86,7 +105,7 @@ const ClientsDataList = () => {
             style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
             className="text-gray-500 hover:text-gray-700"
           >
-              Подробнее
+            Подробнее
           </NavLink>
         </Box>
       ),

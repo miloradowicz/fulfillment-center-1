@@ -1,6 +1,6 @@
 import { useArrivalsList } from '../hooks/useArrivalsList.ts'
 import { ArrivalWithClient } from '../../../types'
-import { Box, Chip, IconButton, Typography } from '@mui/material'
+import { Box, Chip, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import { NavLink } from 'react-router-dom'
@@ -18,11 +18,18 @@ interface Props {
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
   const { arrivals, deleteOneArrival, handleClose, isOpen } = useArrivalsList()
 
+  const theme = useTheme()
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+
+
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
       field: 'client',
       headerName: 'Клиент',
       flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
       editable: false,
       filterable: true,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.client?.name ?? 'Неизвестный клиент',
@@ -31,6 +38,9 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       field: 'arrival_date',
       headerName: 'Дата поставки',
       flex: 1,
+      minWidth: isMediumScreen ? 140 : 100,
+      align: 'left',
+      headerAlign: 'left',
       editable: false,
       type: 'date',
       valueGetter: (_value: string, row: ArrivalWithClient) => new Date(row.arrival_date),
@@ -40,26 +50,28 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       field: 'arrival_price',
       headerName: 'Стоимость доставки',
       flex: 1,
+      minWidth: isMediumScreen ? 170 : 140,
+      align: 'left',
+      headerAlign: 'left',
       type: 'number',
     },
     {
       field: 'sent_amount',
       headerName: 'Отправлено',
       flex: 1,
+      minWidth: isMediumScreen ? 160 : 100,
+      align: 'left',
+      headerAlign: 'left',
       filterable: true,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount,
-    },
-    {
-      field: 'defects',
-      headerName: 'Дефекты',
-      flex: 1,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.defects.length,
-      filterable: false,
     },
     {
       field: 'arrival_status',
       headerName: 'Статус',
       flex: 1,
+      minWidth: isMediumScreen ? 160 : 140,
+      align: 'left',
+      headerAlign: 'left',
       renderCell: ({ row }) => {
         const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
           'ожидается доставка': 'warning',
@@ -77,12 +89,18 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       field: 'products',
       headerName: 'Товаров',
       flex: 1,
+      minWidth: isMediumScreen ? 120 : 80,
+      align: 'left',
+      headerAlign: 'left',
       valueGetter: (_value: string, row: ArrivalWithClient) => row.products.length,
     },
     {
       field: 'Actions',
       headerName: '',
       flex: 2,
+      minWidth: isMediumScreen ? 220 : 160,
+      align: 'left',
+      headerAlign: 'left',
       sortable: false,
       filterable: false,
       renderCell: ({ row }) => {

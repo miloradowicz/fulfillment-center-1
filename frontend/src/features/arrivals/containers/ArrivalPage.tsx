@@ -1,5 +1,5 @@
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import { Box, Button, CircularProgress, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useArrivalPage } from '../hooks/useArrivalPage.ts'
 import ArrivalsDataList from '../components/ArrivalsDataList.tsx'
 import ArrivalForm from '../components/ArrivalForm.tsx'
@@ -15,6 +15,9 @@ const ArrivalPage = () => {
     handleOpenEdit,
   } = useArrivalPage()
 
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
   return (
     <>
       {isLoading ? (
@@ -27,14 +30,21 @@ const ArrivalPage = () => {
         <ArrivalForm initialData={arrivalToEdit} onSuccess={handleClose} />
       </Modal>
 
-      <Box display={'flex'} className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
-        <Typography className="flex-grow text-[20px]">Поставки</Typography>
+      <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
+        <Typography
+          variant={isSmallScreen ? 'h6' : 'h5'}
+          className="flex-grow"
+        >
+          Поставки
+        </Typography>
         <Button
           sx={{
             'color': '#32363F',
             'marginLeft': 'auto',
             'border': '1px solid #32363F',
             'transition': 'all 0.3s ease-in-out',
+            'padding': isSmallScreen ? '1px 3px' : '3px 6px',
+            'fontSize': isSmallScreen ? '10px' : '12px',
             '&:hover': {
               color: '#ffffff',
               backgroundColor: '#32363F',
