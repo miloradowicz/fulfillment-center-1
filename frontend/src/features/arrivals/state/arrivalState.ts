@@ -3,6 +3,7 @@ export const initialState = {
   arrival_price: 0,
   arrival_date: '',
   sent_amount: '',
+  stock: '',
   products: [],
   defects: [],
   received_amount: [],
@@ -21,6 +22,7 @@ export const initialErrorState = {
   arrival_date: '',
   amount: 0,
   sent_amount: '',
+  stock: '',
   defect_description: '',
   arrival_status: '',
 }
