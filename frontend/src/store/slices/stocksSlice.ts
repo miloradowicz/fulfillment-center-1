@@ -1,11 +1,11 @@
-import { StockPopulate, ValidationError } from '../../types'
+import { Stock, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { addStock, deleteStock, fetchStockById, fetchStocks, updateStock } from '../thunks/stocksThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface StockState {
-  stocks: StockPopulate[] | null
-  stock: StockPopulate | null
+  stocks: Stock[] | null
+  stock: Stock | null
   isFetching: boolean
   isCreating: boolean
   error: boolean
@@ -23,7 +23,7 @@ const initialState: StockState = {
 
 export const selectAllStocks = (state: RootState) => state.stocks.stocks
 export const selectOneStock = (state: RootState) => state.stocks.stock
-export const selectIsLoading = (state: RootState) => state.stocks.isFetching
+export const selectIsStocksLoading = (state: RootState) => state.stocks.isFetching
 export const selectIsStockCreating = (state: RootState) => state.stocks.isCreating
 export const selectStockCreateError = (state: RootState) => state.stocks.createError
 export const selectStockError = (state: RootState) => state.stocks.error
