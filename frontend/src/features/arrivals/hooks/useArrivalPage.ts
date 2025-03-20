@@ -1,13 +1,13 @@
 import { useAppSelector } from '../../../app/hooks.ts'
 import { useState } from 'react'
 import { clearErrorArrival, selectLoadingFetchArrival } from '../../../store/slices/arrivalSlice.ts'
-import { ArrivalWithPopulate } from '../../../types'
+import { ArrivalWithClient } from '../../../types'
 import { useDispatch } from 'react-redux'
 
 export const useArrivalPage = () => {
   const [open, setOpen] = useState(false)
   const isLoading = useAppSelector(selectLoadingFetchArrival)
-  const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithPopulate | undefined>(undefined)
+  const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined>(undefined)
   const dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true)
@@ -18,7 +18,7 @@ export const useArrivalPage = () => {
     dispatch(clearErrorArrival())
   }
 
-  const handleOpenEdit = (arrival: ArrivalWithPopulate) => {
+  const handleOpenEdit = (arrival: ArrivalWithClient) => {
     setArrivalToEdit(arrival)
     handleOpen()
   }
