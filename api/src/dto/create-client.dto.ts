@@ -5,13 +5,13 @@ export class CreateClientDto {
   @IsNotEmpty({ message: 'Заполните имя клиента.' }) name: string
 
   @IsNotEmpty({ message: 'Заполните номер телефона клиента.' })
-  @Matches(Regex.email, {
+  @Matches(Regex.phone, {
     message: 'Неверный формат номера телефона.',
   })
   phone_number: string
 
   @IsNotEmpty({ message: 'Заполните эл. почту клиента.' })
-  @Matches(Regex.phone, {
+  @Matches(Regex.email, {
     message: 'Неверный формат эл. почты, пример: client@gmail.com/client@mail.ru',
   })
   email: string
