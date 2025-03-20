@@ -60,6 +60,22 @@ export const onDragEnd = async ({
     description: description,
     status: container as string,
   }
+  if (container === 'к выполнению') {
+    setTodoItems(prev => [...prev, newItem])
+  } else if (container === 'готово') {
+    setDoneItems(prev => [...prev, newItem])
+  } else {
+    setInProgressItems(prev => [...prev, newItem])
+  }
+  setTimeout(() => {
+    if (parent === 'к выполнению') {
+      setTodoItems(prev => prev.filter(task => task._id !== id))
+    } else if (parent === 'готово') {
+      setDoneItems(prev => prev.filter(task => task._id !== id))
+    } else {
+      setInProgressItems(prev => prev.filter(task => task._id !== id))
+    }
+  }, 50)
 
   try {
     const taskData = {
@@ -71,16 +87,7 @@ export const onDragEnd = async ({
         status: container as string,
       },
     }
-
     await dispatch(updateTask(taskData))
-
-    if (container === 'к выполнению') {
-      setTodoItems(prev => [...prev, newItem])
-    } else if (container === 'готово') {
-      setDoneItems(prev => [...prev, newItem])
-    } else {
-      setInProgressItems(prev => [...prev, newItem])
-    }
   } catch (error) {
     console.error('Ошибка при обновлении задачи:', error)
     alert('Ошибка при обновлении задачи')

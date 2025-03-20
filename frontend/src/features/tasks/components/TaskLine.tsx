@@ -1,14 +1,16 @@
-import { FC } from 'react'
+import  { FC } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { Box, Typography, Paper } from '@mui/material'
 import { TaskLineProps } from '../hooks/TypesProps'
 import TaskCard from './TaskCard.tsx'
 
 
+
 const TaskLine: FC<TaskLineProps> = ({ title, items }) => {
   const { setNodeRef } = useDroppable({
     id: title,
   })
+
 
   return (
     <Box flex={3} p={2} display="flex" flexDirection="column" minHeight="10rem">
@@ -27,7 +29,7 @@ const TaskLine: FC<TaskLineProps> = ({ title, items }) => {
         }}
       >
         {items.map((task, key) => (
-          <TaskCard key={task._id} index={key} parent={title} task={task} />
+          <TaskCard  key={task._id} index={key} parent={title} task={task} />
         ))}
       </Paper>
     </Box>
