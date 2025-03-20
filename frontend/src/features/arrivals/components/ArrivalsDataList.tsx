@@ -1,6 +1,6 @@
 import { useArrivalsList } from '../hooks/useArrivalsList.ts'
 import { ArrivalWithClient } from '../../../types'
-import { Box, Chip, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import { NavLink } from 'react-router-dom'
@@ -10,6 +10,7 @@ import { ruRU } from '@mui/x-data-grid/locales'
 import React from 'react'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ArrivalForm from './ArrivalForm.tsx'
+import StatusArrivalCell from './StatusArrivalCell.tsx'
 
 interface Props {
   onEdit: (data: ArrivalWithClient) => void
@@ -72,19 +73,9 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       minWidth: isMediumScreen ? 160 : 140,
       align: 'left',
       headerAlign: 'left',
-      renderCell: ({ row }) => {
-        const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
-          'ожидается доставка': 'warning',
-          'получена': 'success',
-          'отсортирована': 'info',
-        }
-
-        const status = row.arrival_status || 'В обработке'
-        const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-
-        return <Chip label={capitalizeFirstLetter(status)} color={statusColors[status] ?? 'default'} />
-      },
+      renderCell: params => <StatusArrivalCell row={params.row} />,
     },
+
     {
       field: 'products',
       headerName: 'Товаров',

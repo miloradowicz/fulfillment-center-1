@@ -1,12 +1,13 @@
 import { OrderWithClient } from '../../../types'
 import React from 'react'
-import { Box, Chip, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
+import OrderStatusCell from './OrderStatusCell.tsx'
 
 interface Props {
   orders: OrderWithClient[] | [];
@@ -61,23 +62,10 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
     {
       field: 'status',
       headerName: 'Статус',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 120,
+      width: 145,
       align: 'left',
       headerAlign: 'left',
-      renderCell: ({ row }) => {
-        const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
-          'в сборке': 'warning',
-          'доставлен': 'success',
-          'в пути': 'info',
-        }
-
-        const status = row.status || 'В обработке'
-        const capitalizeFirstLetter = (text: string) =>
-          text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-
-        return <Chip label={capitalizeFirstLetter(status)} color={statusColors[status] ?? 'default'} />
-      },
+      renderCell: params => <OrderStatusCell row={params.row} />,
     },
     {
       field: 'products',
