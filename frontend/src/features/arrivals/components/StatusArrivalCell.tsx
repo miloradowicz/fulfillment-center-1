@@ -35,6 +35,7 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
       const updatedData = {
         ...row,
         client: row.client._id,
+        stock: row.stock._id,
         arrival_status: newStatus,
       }
       await dispatch(updateArrival({ arrivalId: row._id, data: updatedData })).unwrap()
