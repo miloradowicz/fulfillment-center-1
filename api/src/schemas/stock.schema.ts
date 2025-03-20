@@ -5,6 +5,12 @@ export type StockDocument = Stock & Document
 
 @Schema({ timestamps: true })
 export class Stock {
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
   @Prop({ required: true })
   name: string
 

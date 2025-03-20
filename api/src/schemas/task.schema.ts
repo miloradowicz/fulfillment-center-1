@@ -6,6 +6,12 @@ export type TaskDocument = Task & Document
 @Schema({ timestamps: true })
 export class Task {
   @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -21,9 +27,9 @@ export class Task {
   @Prop({
     type: String,
     enum: ['к выполнению', 'в работе', 'готово'],
-    default:'к выполнению',
+    default: 'к выполнению',
   })
-  status: 'к выполнению'| 'в работе'| 'готово'
+  status: 'к выполнению' | 'в работе' | 'готово'
 
   @Prop({
     type: [

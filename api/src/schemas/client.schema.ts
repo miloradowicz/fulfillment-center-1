@@ -5,6 +5,12 @@ export type ClientDocument = Client & Document
 
 @Schema()
 export class Client {
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
   @Prop({ required: true, unique: true }) name: string
 
   @Prop({ required: true }) phone_number: string

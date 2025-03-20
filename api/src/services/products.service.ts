@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { CreateProductDto } from '../dto/create-product.dto'
@@ -32,26 +32,31 @@ export class ProductsService {
       product = await this.productModel.findById(id).exec()
     }
 
-    if (!product) {
-      throw new NotFoundException('Товар не найден')
-    }
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    if (product.isArchived) throw new ForbiddenException('Товар в архиве')
 
     return product
   }
 
   async getAllByClient(clientId: string, populate: boolean) {
+    const unarchived = this.productModel.find({ isArchived: false })
+
     if (populate) {
-      return (await this.productModel.find({ client: clientId }).populate('client')).reverse()
-    } else {
-      return (await this.productModel.find({ client: clientId })).reverse()
+      return (await unarchived.find({ client: clientId }).populate('client')).reverse()
     }
+
+    return (await unarchived.find({ client: clientId })).reverse()
   }
 
   async getAll(populate: boolean) {
+    const unarchived = this.productModel.find({ isArchived: false })
+
     if (populate) {
-      return (await this.productModel.find().populate('client')).reverse()
+      return (await unarchived.populate('client')).reverse()
     }
-    return (await this.productModel.find()).reverse()
+
+    return (await unarchived).reverse()
   }
 
   async create(productDto: CreateProductDto, files: Array<Express.Multer.File> = []) {
@@ -96,6 +101,16 @@ export class ProductsService {
       }
       throw new BadRequestException('Произошла ошибка при создании продукта')
     }
+  }
+
+  async archive(id: string) {
+    const product = await this.productModel.findByIdAndUpdate(id, { isArchived: true })
+
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    if (product.isArchived) throw new ForbiddenException('Товар уже в архиве')
+
+    return { message: 'Товар перемещен в архив' }
   }
 
   async delete(id: string) {

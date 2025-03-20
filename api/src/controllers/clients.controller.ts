@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common'
 import { ClientsService } from '../services/clients.service'
 import { CreateClientDto } from '../dto/create-client.dto'
 import { UpdateClientDto } from '../dto/update-client.dto'
@@ -20,6 +20,11 @@ export class ClientsController {
   @Post()
   async createClient(@Body() clientDto: CreateClientDto) {
     return this.clientsService.create(clientDto)
+  }
+
+  @Patch(':id/archive')
+  async archiveClient(@Param('id') id: string) {
+    return this.clientsService.archive(id)
   }
 
   @Delete(':id')

@@ -6,6 +6,12 @@ export type OrderDocument = Order & Document
 @Schema({ timestamps: true })
 export class Order {
   @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
@@ -74,7 +80,7 @@ export class Order {
   @Prop({
     type: String,
     enum: ['в сборке', 'в пути', 'доставлен'],
-    default:'в сборке',
+    default: 'в сборке',
   })
   status: 'в сборке' | 'в пути' | 'доставлен'
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Stock, StockDocument } from '../schemas/stock.schema'
@@ -10,7 +10,7 @@ export class StocksService {
   constructor(@InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>) {}
 
   async getAll() {
-    return (await this.stockModel.find()).reverse()
+    return (await this.stockModel.find({ isArchived: false })).reverse()
   }
 
   async getOne(id: string) {
@@ -21,7 +21,11 @@ export class StocksService {
         populate: { path: 'client' },
       })
       .exec()
+
     if (!stock) throw new NotFoundException('Склад не найден.')
+
+    if (stock.isArchived) throw new ForbiddenException('Склад в архиве.')
+
     return stock
   }
 
@@ -33,6 +37,16 @@ export class StocksService {
     const stock = await this.stockModel.findByIdAndUpdate(id, stockDto, { new: true })
     if (!stock) throw new NotFoundException('Склад не найден.')
     return stock
+  }
+
+  async archive(id: string) {
+    const stock = await this.stockModel.findByIdAndUpdate(id, { isArchived: true })
+
+    if (!stock) throw new NotFoundException('Склад не найден.')
+
+    if (stock.isArchived) throw new ForbiddenException('Склад уже в архиве.')
+
+    return { message: 'Склад перемещен в архив.' }
   }
 
   async delete(id: string) {

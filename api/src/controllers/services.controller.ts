@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
 import { ServicesService } from '../services/services.service'
 import { CreateServiceDto } from '../dto/create-service.dto'
 import { UpdateServiceDto } from '../dto/update-service.dto'
@@ -28,6 +28,11 @@ export class ServicesController {
   @Put(':id')
   async updateService(@Param('id') id: string, @Body() serviceDto: UpdateServiceDto) {
     return this.servicesService.update(id, serviceDto)
+  }
+
+  @Patch(':id/archive')
+  async archiveService(@Param('id') id: string) {
+    return this.servicesService.archive(id)
   }
 
   @Delete(':id')

@@ -6,6 +6,12 @@ export type ProductDocument = Product & Document
 @Schema()
 export class Product {
   @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isArchived: boolean
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',

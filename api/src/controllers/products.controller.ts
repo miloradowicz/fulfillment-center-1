@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors, UploadedFiles, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors, UploadedFiles, Query, Patch } from '@nestjs/common'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { ProductsService } from '../services/products.service'
@@ -49,6 +49,11 @@ export class ProductsController {
     @Query('populate') populate?: string
   ) {
     return await this.productsService.getById(id, populate === '1')
+  }
+
+  @Patch(':id/archive')
+  async archiveProduct(@Param('id') id: string) {
+    return await this.productsService.archive(id)
   }
 
   @Delete(':id')

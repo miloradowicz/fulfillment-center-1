@@ -1,7 +1,7 @@
 import { User, UserDocument } from '../schemas/user.schema'
 import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
-import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { CreateUserDto } from '../dto/create-user.dto'
 import { UpdateUserDto } from '../dto/update-user.dto'
 import { LoginDto } from '../dto/auth-user.dto'
@@ -51,14 +51,16 @@ export class UsersService {
   }
 
   async getAll() {
-    return this.userModel.find()
+    return this.userModel.find({ isArchived: false })
   }
 
   async getById(id: string) {
     const user = await this.userModel.findById(id)
-    if (!user) {
-      throw new NotFoundException('Пользователь не найден')
-    }
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (user.isArchived) throw new ForbiddenException('Пользователь в архиве.')
+
     return user
   }
 
@@ -71,6 +73,16 @@ export class UsersService {
     user.generateToken()
     await user.save()
     return user
+  }
+
+  async archive(id: string) {
+    const user = await this.userModel.findByIdAndUpdate(id, { isArchived: true })
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (user.isArchived) throw new ForbiddenException('Пользователь уже в архиве')
+
+    return { message: 'Пользователь перемещен в архив' }
   }
 
   async delete(id: string) {
