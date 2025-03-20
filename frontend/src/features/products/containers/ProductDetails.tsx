@@ -4,12 +4,20 @@ import {
 } from '@mui/icons-material'
 import DescriptionIcon from '@mui/icons-material/Description'
 import useProductActions from '../hooks/useProductActions.ts'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ProductForm from '../components/ProductForm.tsx'
 
 const ProductDetails = () => {
-  const { navigate, product, error, loading, deleteOneProduct } = useProductActions(false)
+  const { navigate, id, product, error, loading, deleteOneProduct, open, handleClose, handleOpen, fetchProduct } = useProductActions(false)
 
   return (
     <>
+      <Modal handleClose={handleClose} open={open}>
+        <ProductForm
+          initialData={product || undefined}
+          onSuccess={() => id && fetchProduct(id)}
+        />
+      </Modal>
       <Box className="max-w-2xl mx-auto p-4 sm:p-8">
         <Box
           sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
@@ -32,7 +40,7 @@ const ProductDetails = () => {
         ) : !product ? (
           <Box textAlign="center" mt={4}>
             <Typography variant="body1" textAlign="center">
-              Продукт не найден
+              Товар не найден
             </Typography>
           </Box>
         ) : (
@@ -114,6 +122,7 @@ const ProductDetails = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                 }}
+                onClick={() => handleOpen()}
               >
                 Редактировать
               </Button>

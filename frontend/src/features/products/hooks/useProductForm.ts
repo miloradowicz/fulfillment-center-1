@@ -1,11 +1,16 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { toast } from 'react-toastify'
 import { isAxiosError } from 'axios'
-import { DynamicField, ProductMutation } from '../types'
-import { useAppDispatch, useAppSelector } from '../app/hooks.ts'
-import { selectAllClients } from '../store/slices/clientSlice.ts'
-import { fetchClients } from '../store/thunks/clientThunk.ts'
-import { addProduct } from '../store/thunks/productThunk.ts'
+import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { selectAllClients } from '../../../store/slices/clientSlice.ts'
+import { fetchClients } from '../../../store/thunks/clientThunk.ts'
+import { addProduct, updateProduct } from '../../../store/thunks/productThunk.ts'
+import {
+  selectCreateProductError,
+  selectLoadingAddProduct,
+  selectLoadingUpdateProduct,
+} from '../../../store/slices/productSlice.ts'
 
 const initialState: ProductMutation = {
   client: '',
@@ -17,18 +22,45 @@ const initialState: ProductMutation = {
   dynamic_fields: [],
 }
 
-const useProductForm = () => {
-  const [form, setForm] = useState<ProductMutation>(initialState)
-  const [selectedClient, setSelectedClient] = useState('')
-  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>([])
-  const [newField, setNewField] = useState<DynamicField>({ key: '', label: '', value: '' })
+const dynamicFieldState: DynamicField = {
+  key: '',
+  label: '',
+  value: '',
+}
+
+const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void) => {
+  const [form, setForm] = useState<ProductMutation>(
+    initialData? {
+      client: initialData.client._id,
+      title: initialData.title,
+      amount: initialData.amount,
+      barcode: initialData.barcode,
+      article: initialData.article,
+    } : { ...initialState },
+  )
+  const [selectedClient, setSelectedClient] = useState(
+    initialData?  initialData.client._id : '',
+  )
+
+  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(
+    initialData?.dynamic_fields
+      ? initialData.dynamic_fields.map(field => ({
+        key: field.key,
+        label: field.label,
+        value: field.value,
+      }))
+      : [],
+  )
+  const [newField, setNewField] = useState<DynamicField>(dynamicFieldState)
   const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
-  const loading = useAppSelector(state => state.products.loadingAdd)
+  const loadingAdd = useAppSelector(selectLoadingAddProduct)
+  const loadingUpdate = useAppSelector(selectLoadingUpdateProduct)
+  const createError = useAppSelector(selectCreateProductError)
 
   useEffect(() => {
     dispatch(fetchClients())
@@ -69,7 +101,7 @@ const useProductForm = () => {
     if (!newField.key.trim() || !newField.label.trim()) return
 
     setDynamicFields(prev => [...prev, newField])
-    setNewField({ key: '', label: '', value: '' })
+    setNewField(dynamicFieldState)
     setShowNewFieldInputs(false)
   }
 
@@ -105,12 +137,18 @@ const useProductForm = () => {
         formData.append('documents', file)
       }
 
-      await dispatch(addProduct(formData)).unwrap()
-      toast.success('Продукт успешно создан.')
-
-      setForm(initialState)
-      setDynamicFields([])
-      setSelectedClient('')
+      if (initialData) {
+        await dispatch(updateProduct({ productId: initialData._id, data: formData })).unwrap()
+        onSuccess?.()
+        toast.success('Товар успешно обновлен.')
+      } else {
+        await dispatch(addProduct(formData)).unwrap()
+        onSuccess?.()
+        toast.success('Товар успешно создан.')
+        setForm(initialState)
+        setDynamicFields([])
+        setSelectedClient('')
+      }
       setFile(null)
       setErrors({})
     } catch (e) {
@@ -118,7 +156,7 @@ const useProductForm = () => {
         console.error('Ошибки валидации:', e.response.data)
       } else {
         console.error('Ошибка сервера:', e)
-        toast.error('Не удалось создать продукт.')
+        toast.error('Не удалось создать Товар.')
       }
     }
   }
@@ -154,7 +192,8 @@ const useProductForm = () => {
     showNewFieldInputs,
     file,
     clients,
-    loading,
+    loadingAdd,
+    loadingUpdate,
     inputChangeHandler,
     handleFileChange,
     addDynamicField,
@@ -168,6 +207,7 @@ const useProductForm = () => {
     setShowNewFieldInputs,
     setErrors,
     errors,
+    createError,
   }
 }
 

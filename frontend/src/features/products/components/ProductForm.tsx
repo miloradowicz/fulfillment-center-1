@@ -1,9 +1,16 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
-import useProductForm from '../../../hooks/useProductForm.ts'
+import useProductForm from '../hooks/useProductForm.ts'
+import { ProductWithPopulate } from '../../../types'
+import React from 'react'
+import { getFieldError } from '../../../utils/getFieldError.ts'
 
-const ProductForm = () => {
+interface Props {
+  initialData?: ProductWithPopulate
+  onSuccess?: () => void
+}
 
+const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     form,
     selectedClient,
@@ -12,7 +19,8 @@ const ProductForm = () => {
     showNewFieldInputs,
     file,
     clients,
-    loading,
+    loadingAdd,
+    loadingUpdate,
     inputChangeHandler,
     handleFileChange,
     addDynamicField,
@@ -24,12 +32,13 @@ const ProductForm = () => {
     setShowNewFieldInputs,
     setErrors,
     errors,
-  } = useProductForm()
+    createError,
+  } = useProductForm(initialData, onSuccess)
 
   return (
     <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
       <Typography variant="h5" sx={{ mb: 1 }}>
-        Добавить новый продукт
+        { initialData? 'Редактировать данные товара' : 'Добавить новый товар'}
       </Typography>
       <Grid container direction="column" spacing={2}>
         <Grid>
@@ -49,8 +58,8 @@ const ProductForm = () => {
                 label="Клиент"
                 fullWidth
                 size="small"
-                error={!!errors.client}
-                helperText={errors.client}
+                error={Boolean(errors.client || getFieldError('client',createError))}
+                helperText={errors.client || getFieldError('client',createError)}
               />
             )}
           />
@@ -64,8 +73,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.title}
-            helperText={errors.title}
+            error={Boolean(errors.title || getFieldError('title',createError))}
+            helperText={errors.title || getFieldError('title',createError)}
           />
         </Grid>
         <Grid>
@@ -77,8 +86,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.amount}
-            helperText={errors.amount}
+            error={Boolean(errors.amount || getFieldError('amount',createError))}
+            helperText={errors.amount || getFieldError('amount',createError)}
           />
         </Grid>
         <Grid>
@@ -89,8 +98,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.barcode}
-            helperText={errors.barcode}
+            error={Boolean(errors.barcode || getFieldError('barcode',createError))}
+            helperText={errors.barcode || getFieldError('barcode',createError)}
           />
         </Grid>
         <Grid>
@@ -101,8 +110,8 @@ const ProductForm = () => {
             onChange={inputChangeHandler}
             fullWidth
             size="small"
-            error={!!errors.article}
-            helperText={errors.article}
+            error={Boolean(errors.article || getFieldError('article',createError))}
+            helperText={errors.article || getFieldError('article',createError)}
           />
         </Grid>
 
@@ -167,8 +176,8 @@ const ProductForm = () => {
         </Grid>
 
         <Grid>
-          <Button type="submit" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Создать продукт'}
+          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate}>
+            {loadingAdd || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
           </Button>
         </Grid>
       </Grid>

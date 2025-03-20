@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Product, ProductMutation, ProductWithPopulate } from '../../types'
-import axios, { isAxiosError } from 'axios'
+import { GlobalError, Product, ProductMutation, ProductWithPopulate, ValidationError } from '../../types'
+import { isAxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk<Product[]>(
   'products/fetchProducts',
@@ -43,7 +43,7 @@ export const fetchProductsWithPopulate = createAsyncThunk<ProductWithPopulate[]>
   },
 )
 
-export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, { rejectValue: GlobalError }>(
+export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, { rejectValue: ValidationError }>(
   'products/addProduct',
   async (productData, { rejectWithValue }) => {
     try {
@@ -51,20 +51,14 @@ export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, 
         headers: productData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
       })
       return response.data
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const err: GlobalError = {
-          message: error.response?.data?.message || 'Ошибка сервера',
-        }
-        return rejectWithValue(err)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as ValidationError)
       }
+      throw e
     }
   },
 )
-
-
-
-
 
 export const deleteProduct = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('products/deleteProduct', async (productId: string, { rejectWithValue }) => {
@@ -78,14 +72,14 @@ export const deleteProduct = createAsyncThunk<void, string, { rejectValue: Globa
   }
 })
 
-export const updateProduct = createAsyncThunk<void, { productId: string; data: ProductMutation }, { rejectValue: GlobalError }>(
+export const updateProduct = createAsyncThunk<void, { productId: string; data: FormData  }, { rejectValue: ValidationError }>(
   'products/updateProduct',
   async ({ productId, data }, { rejectWithValue }) => {
     try {
       await axiosAPI.put(`/products/${ productId }`, data)
     } catch (e) {
       if (isAxiosError(e) && e.response) {
-        return rejectWithValue(e.response.data as GlobalError)
+        return rejectWithValue(e.response.data as ValidationError)
       }
       throw e
     }

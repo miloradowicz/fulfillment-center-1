@@ -12,27 +12,37 @@ import {
   selectProductWithPopulate,
 } from '../../../store/slices/productSlice.ts'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ProductWithPopulate } from '../../../types'
 
 
 const UseProductActions = ( fetchOnDelete: boolean ) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const products = useAppSelector(selectProductsWithPopulate)
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
   const { id } = useParams()
   const navigate = useNavigate()
   const product = useAppSelector(selectProductWithPopulate)
   const loading = useAppSelector(selectLoadingFetchProduct)
   const error = useAppSelector(selectProductError)
 
-  const handleOpen = () => setOpen(true)
+  const handleOpen = (product?: ProductWithPopulate) => {
+    if (product) {
+      setSelectedProduct(product)
+    }
+    setOpen(true)
+  }
 
   const handleClose = () => {
     setOpen(false)
-    dispatch(fetchProductsWithPopulate())
   }
 
   const fetchAllProducts = useCallback(() => {
     dispatch(fetchProductsWithPopulate())
+  }, [dispatch])
+
+  const fetchProduct = useCallback((id: string) => {
+    dispatch(fetchProductByIdWithPopulate(id))
   }, [dispatch])
 
 
@@ -42,23 +52,23 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchProductByIdWithPopulate(id))
+      void fetchProduct(id)
     }
-  }, [dispatch, id])
+  }, [dispatch, id, fetchProduct])
 
 
   const deleteOneProduct = async (id: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот продукт?')) {
+      if (confirm('Вы уверены, что хотите удалить этот товар?')) {
         await dispatch(deleteProduct(id))
-        toast.success('Продукт успешно удален.')
         if (fetchOnDelete) {
           fetchAllProducts()
         } else {
           navigate('/products')
         }
+        toast.success('Товар успешно удален.')
       } else {
-        toast.info('Вы отменили удаление продукта.')
+        toast.info('Вы отменили удаление товара.')
       }
     } catch (e) {
       console.error(e)
@@ -68,7 +78,10 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
   return  {
     products,
     product,
+    selectedProduct,
     deleteOneProduct,
+    fetchAllProducts,
+    fetchProduct,
     open,
     handleOpen,
     handleClose,
