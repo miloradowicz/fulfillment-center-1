@@ -1,9 +1,10 @@
-import { Document } from 'mongoose'
+import { Document, HydratedDocument, Model } from 'mongoose'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import config from 'src/config'
 import { JwtToken } from 'src/types'
+import { Task } from './task.schema'
 
 export interface UserDocument extends Document {
   isArchived: boolean;
@@ -51,7 +52,7 @@ export class User {
   token: string
 }
 
-export const UserSchema = SchemaFactory.createForClass(User)
+const UserSchema = SchemaFactory.createForClass(User)
 
 UserSchema.methods.checkPassword = function (this: UserDocument, password: string) {
   return bcrypt.compare(password, this.password)
@@ -80,7 +81,64 @@ UserSchema.set('toJSON', {
   },
 })
 
+export const UserSchemaFactory = (taskModel: Model<Task>) => {
+  const cascadeArchive = async (user: HydratedDocument<User>) => {
+    const tasks = await taskModel.find({ user: user._id })
 
+    await Promise.all(tasks.map(x => x.updateOne({ isArchived: true })))
+  }
 
+  const cascadeDelete = async (user: HydratedDocument<User>) => {
+    const tasks = await taskModel.find({ user: user._id })
 
+    await Promise.all(tasks.map(x => x.deleteOne()))
+  }
 
+  UserSchema.post('findOneAndUpdate', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    const update = this.getUpdate()
+
+    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+      await cascadeArchive(user)
+    }
+  })
+
+  UserSchema.post('updateOne', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    const update = this.getUpdate()
+
+    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+      await cascadeArchive(user)
+    }
+  })
+
+  UserSchema.post('save', async function () {
+    if (this.isModified('isArchived') && this.isArchived) {
+      await cascadeArchive(this)
+    }
+  })
+
+  UserSchema.post('findOneAndDelete', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    await cascadeDelete(user)
+  })
+
+  UserSchema.post('deleteOne', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    await cascadeDelete(user)
+  })
+
+  return UserSchema
+}
