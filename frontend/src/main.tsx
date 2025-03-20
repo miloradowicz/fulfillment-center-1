@@ -8,10 +8,10 @@ import { BrowserRouter } from 'react-router-dom'
 import { addCsrf } from './utils/axiosAPI.ts'
 import './index.css'
 import dayjs from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 addCsrf()
-dayjs.extend(localizedFormat);
+dayjs.extend(localizedFormat)
 
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
