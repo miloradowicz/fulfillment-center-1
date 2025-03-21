@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectLoadingFetchTask, selectPopulatedTasks } from '../../../store/slices/taskSlice.ts'
 import { fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
 
+
 export const useTaskBoard = () => {
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
   const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
@@ -18,8 +19,6 @@ export const useTaskBoard = () => {
   useEffect(() => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
-
-
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
       return tasks?.filter(task => task.status === status)
@@ -42,5 +41,6 @@ export const useTaskBoard = () => {
     setDoneItems,
     setTodoItems,
     setInProgressItems,
+    open,
   }
 }
