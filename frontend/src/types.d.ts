@@ -119,7 +119,7 @@ export interface Arrival {
   logs?: Log[]
 }
 
-export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount'> & {
+export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock'> & {
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
