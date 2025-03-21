@@ -66,6 +66,15 @@ export const deleteTask = createAsyncThunk<void, string, { rejectValue: GlobalEr
   },
 )
 
+export const archiveTask = createAsyncThunk<{ id: string }, string>(
+  'tasks/archiveTask',
+  async taskId => {
+    const response = await axiosAPI.patch(`/tasks/${ taskId }/archive`)
+    return response.data
+  },
+)
+
+
 export const updateTask = createAsyncThunk<
   void,
   { taskId: string; data: TaskMutation },
@@ -80,3 +89,5 @@ export const updateTask = createAsyncThunk<
     throw e
   }
 })
+
+

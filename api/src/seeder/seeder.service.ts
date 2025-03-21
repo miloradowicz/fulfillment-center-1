@@ -11,6 +11,7 @@ import { Service, ServiceDocument } from '../schemas/service.schema'
 import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { Counter, CounterDocument } from '../schemas/counter.schema'
+import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
 
 
 @Injectable()
@@ -34,6 +35,8 @@ export class SeederService {
     private readonly stockModel: Model<StockDocument>,
     @InjectModel(Counter.name)
     private readonly counterModel: Model<CounterDocument>,
+    @InjectModel(Counterparty.name)
+    private readonly counterpartyModel: Model<CounterpartyDocument>,
   ) {}
 
   async seed() {
@@ -46,6 +49,7 @@ export class SeederService {
     await this.serviceModel.deleteMany({})
     await this.stockModel.deleteMany({})
     await this.counterModel.deleteMany({})
+    await this.counterpartyModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -259,6 +263,24 @@ export class SeederService {
           { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
           { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
         ],
+      },
+    ])
+
+    const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
+      {
+        name: 'ООО "Фулфилмент Партнер"',
+        phone_number: '+7 999 123-45-67',
+        address: 'Москва, ул. Достоевского, д. 10',
+      },
+      {
+        name: 'ИП Осмонов',
+        phone_number: '+996 700 456-789',
+        address: 'Бишкек, пр. Чуй, д. 55',
+      },
+      {
+        name: 'OОО "Складской Логистик"',
+        phone_number: '+996 500 789-456',
+        address: 'Бишкек, пр. Манаса, д. 30',
       },
     ])
   }

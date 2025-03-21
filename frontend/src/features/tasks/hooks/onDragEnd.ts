@@ -34,9 +34,10 @@ export const onDragEnd = async ({
   const userEmail = e.active?.data?.current?.user.email ?? ''
   const userRole = e.active?.data?.current?.user.role ?? 'stock-worker'
   const index = e.active?.data?.current?.index ?? 0
-  const parent = e.active?.data?.current?.parent ?? 'к выполнению'
+  const parent = e.active?.data?.current?.parent ?? 'К выполнению'
 
   let updatedItems
+
   if (parent === 'к выполнению') {
     updatedItems = todoItems.filter((_, i) => i !== index)
     setTodoItems(updatedItems)
@@ -61,28 +62,44 @@ export const onDragEnd = async ({
     status: container as string,
   }
 
-  try {
-    const taskData = {
-      taskId: id,
-      data: {
-        user: userID,
-        title: title,
-        description: description,
-        status: container as string,
-      },
-    }
 
-    await dispatch(updateTask(taskData))
+  if (container === 'к выполнению') {
+    setTodoItems(prev => [...prev, newItem])
+  } else if (container === 'готово') {
+    setDoneItems(prev => [...prev, newItem])
+  } else if (container === 'в работе') {
+    setInProgressItems(prev => [...prev, newItem])
+  }
 
-    if (container === 'к выполнению') {
-      setTodoItems(prev => [...prev, newItem])
-    } else if (container === 'готово') {
-      setDoneItems(prev => [...prev, newItem])
-    } else {
-      setInProgressItems(prev => [...prev, newItem])
+  if (parent !== container) {
+    try {
+      const taskData = {
+        taskId: id,
+        data: {
+          user: userID,
+          title: title,
+          description: description,
+          status: container as string,
+        },
+      }
+
+      await dispatch(updateTask(taskData))
+    } catch (error) {
+      console.error('Ошибка при обновлении задачи:', error)
+      alert('Ошибка при обновлении задачи')
     }
-  } catch (error) {
-    console.error('Ошибка при обновлении задачи:', error)
-    alert('Ошибка при обновлении задачи')
+  }
+
+
+  if (!container) {
+    setTimeout(() => {
+      if (parent === 'к выполнению') {
+        setTodoItems(prev => [...prev, newItem])
+      } else if (parent === 'готово') {
+        setDoneItems(prev => [...prev, newItem])
+      } else if (parent === 'в работе') {
+        setInProgressItems(prev => [...prev, newItem])
+      }
+    }, 50)
   }
 }

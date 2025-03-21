@@ -2,7 +2,7 @@ import { Task, TaskWithPopulate, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import {
-  addTask,
+  addTask, archiveTask,
   deleteTask,
   fetchTaskById,
   fetchTasks, fetchTasksByUserId,
@@ -18,6 +18,7 @@ interface TaskState {
   loadingAdd: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
+  loadingArchive: boolean
   error: boolean
   createError: ValidationError | null
 }
@@ -30,6 +31,7 @@ const initialState: TaskState= {
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
+  loadingArchive: false,
   error: false,
   createError: null,
 }
@@ -41,6 +43,7 @@ export const selectLoadingFetchTask = (state: RootState) => state.tasks.loadingF
 export const selectLoadingAddTask = (state: RootState) => state.tasks.loadingAdd
 export const selectLoadingDeleteTask = (state: RootState) => state.tasks.loadingDelete
 export const selectLoadingUpdateTask = (state: RootState) => state.tasks.loadingUpdate
+export const selectLoadingArchiveTask = (state: RootState) => state.tasks.loadingArchive
 export const selectArrivalError = (state: RootState) => state.tasks.error
 export const selectCreateError = (state: RootState) => state.tasks.createError
 
@@ -131,6 +134,18 @@ const taskSlice = createSlice({
       })
       .addCase(updateTask.rejected, state => {
         state.loadingUpdate = false
+        state.error = true
+      })
+      .addCase(archiveTask.pending, state => {
+        state.loadingArchive = true
+        state.error = false
+      })
+      .addCase(archiveTask.fulfilled, state => {
+        state.loadingArchive = false
+        state.error = false
+      })
+      .addCase(archiveTask.rejected, state => {
+        state.loadingArchive = false
         state.error = true
       })
   },
