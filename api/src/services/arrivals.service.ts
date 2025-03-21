@@ -23,7 +23,7 @@ export class ArrivalsService {
     const unarchived = this.arrivalModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.populate('client').populate('stock').exec()).reverse()
+      return (await unarchived.populate('client stock shipping_agent').exec())
     }
 
     return (await unarchived).reverse()
@@ -35,7 +35,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
