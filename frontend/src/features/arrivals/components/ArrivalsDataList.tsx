@@ -67,16 +67,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       type: 'number',
     },
     {
-      field: 'sent_amount',
-      headerName: 'Отправлено',
-      flex: 1,
-      minWidth: isMediumScreen ? 160 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount ? row.sent_amount: '-',
-    },
-    {
       field: 'arrival_status',
       headerName: 'Статус',
       flex: 1,
@@ -85,7 +75,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       headerAlign: 'left',
       renderCell: params => <StatusArrivalCell row={params.row} />,
     },
-
     {
       field: 'products',
       headerName: 'Товаров',
