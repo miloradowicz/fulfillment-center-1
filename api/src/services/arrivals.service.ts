@@ -57,7 +57,7 @@ export class ArrivalsService {
       const newArrival = await this.arrivalModel.create(arrivalDto)
 
       const sequenceNumber = await this.counterService.getNextSequence('arrival')
-      newArrival.arrivalNumber  = `ARVL-${ sequenceNumber }`
+      newArrival.arrivalNumber  = `ARL-${ sequenceNumber }`
 
       return newArrival.save()
     } catch (error) {

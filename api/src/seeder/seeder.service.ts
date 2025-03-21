@@ -209,7 +209,7 @@ export class SeederService {
 
     await this.arrivalModel.create([
       {
-        arrivalNumber: 'ARVL-1',
+        arrivalNumber: 'ARL-1',
         client: _clients._id,
         products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
@@ -218,7 +218,7 @@ export class SeederService {
         stock: _stock1._id,
       },
       {
-        arrivalNumber: 'ARVL-2',
+        arrivalNumber: 'ARL-2',
         client: _clients._id,
         products: [{ product: _product2._id, description: '', amount: 100 }],
         arrival_price: 2500,
@@ -228,7 +228,7 @@ export class SeederService {
         stock: _stock2._id,
       },
       {
-        arrivalNumber: 'ARVL-3',
+        arrivalNumber: 'ARL-3',
         client: _clients._id,
         products: [{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
