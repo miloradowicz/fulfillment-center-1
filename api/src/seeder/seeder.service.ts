@@ -10,6 +10,7 @@ import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
 import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
+import { Counter, CounterDocument } from '../schemas/counter.schema'
 
 
 @Injectable()
@@ -31,6 +32,8 @@ export class SeederService {
     private readonly serviceModel: Model<ServiceDocument>,
     @InjectModel(Stock.name)
     private readonly stockModel: Model<StockDocument>,
+    @InjectModel(Counter.name)
+    private readonly counterModel: Model<CounterDocument>,
   ) {}
 
   async seed() {
@@ -42,6 +45,7 @@ export class SeederService {
     await this.arrivalModel.deleteMany({})
     await this.serviceModel.deleteMany({})
     await this.stockModel.deleteMany({})
+    await this.counterModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -91,6 +95,7 @@ export class SeederService {
 
     await this.orderModel.create([
       {
+        orderNumber: 'ORD-1',
         client: _clients._id,
         products: [
           { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
@@ -102,6 +107,7 @@ export class SeederService {
         status: 'в сборке',
       },
       {
+        orderNumber: 'ORD-2',
         client: _clients._id,
         products: [
           { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
@@ -113,6 +119,7 @@ export class SeederService {
         status: 'в пути',
       },
       {
+        orderNumber: 'ORD-3',
         client: _clients._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
@@ -124,6 +131,12 @@ export class SeederService {
         status: 'доставлен',
       },
     ])
+
+    await this.counterModel.findOneAndUpdate(
+      { name: 'order' },
+      { $set: { seq: 3 } },
+      { upsert: true }
+    )
 
     const [_User1, _User2, _admin] = await this.userModel.create([
       {
@@ -196,6 +209,7 @@ export class SeederService {
 
     await this.arrivalModel.create([
       {
+        arrivalNumber: 'ARVL-1',
         client: _clients._id,
         products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
@@ -204,6 +218,7 @@ export class SeederService {
         stock: _stock1._id,
       },
       {
+        arrivalNumber: 'ARVL-2',
         client: _clients._id,
         products: [{ product: _product2._id, description: '', amount: 100 }],
         arrival_price: 2500,
@@ -213,6 +228,7 @@ export class SeederService {
         stock: _stock2._id,
       },
       {
+        arrivalNumber: 'ARVL-3',
         client: _clients._id,
         products: [{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
@@ -222,6 +238,12 @@ export class SeederService {
         stock: _stock1._id,
       },
     ])
+
+    await this.counterModel.findOneAndUpdate(
+      { name: 'arrival' },
+      { $set: { seq: 3 } },
+      { upsert: true }
+    )
 
     await this.serviceModel.create([
       {
