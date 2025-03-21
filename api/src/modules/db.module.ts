@@ -9,6 +9,7 @@ import { User, UserSchema } from '../schemas/user.schema'
 import { Task, TaskSchema } from '../schemas/task.schema'
 import { Service, ServiceSchema } from '../schemas/service.schema'
 import { Stock, StockSchema } from '../schemas/stock.schema'
+import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Stock, StockSchema } from '../schemas/stock.schema'
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
+    MongooseModule.forFeature([{ name: Counterparty.name, schema: CounterpartySchema }]),
   ],
   exports: [MongooseModule],
 })
