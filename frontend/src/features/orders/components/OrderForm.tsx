@@ -8,10 +8,10 @@ import React from 'react'
 
 interface Props {
   onSuccess?: () => void
-  handleClose?:  () => void
+  handleClose?: () => void
 }
-const OrderForm: React.FC<Props> = ({ onSuccess }) => {
 
+const OrderForm: React.FC<Props> = ({ onSuccess }) => {
   const {
     form,
     setForm,
@@ -46,8 +46,8 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     addArrayDefectInForm,
     onSubmit,
     initialData,
-  } = useOrderForm( onSuccess)
-
+    availableDefects,
+  } = useOrderForm(onSuccess)
 
   return (
     <>
@@ -80,9 +80,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       <TextField
                         {...params}
                         label="Клиент"
-                        error={Boolean(errors.client || getFieldError('client',createError))}
-                        helperText={errors.client || getFieldError('client',createError)}
-                        onBlur={()=>handleBlurAutoComplete('client', setErrors, form, 'Выберите клиента')}
+                        error={Boolean(errors.client || getFieldError('client', createError))}
+                        helperText={errors.client || getFieldError('client', createError)}
+                        onBlur={() => handleBlurAutoComplete('client', setErrors, form, 'Выберите клиента')}
                       />
                     )}
                   />
@@ -157,9 +157,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       {...params}
                       label="Товар"
                       required={true}
-                      error={Boolean(errors.product||getFieldError('product', createError))}
+                      error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={()=>handleBlurAutoComplete('product', setErrors, newField, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newField, 'Выберите товар')}
                     />
                   )}
                 />
@@ -174,7 +174,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   value={newField.amount || ''}
                   onChange={e => setNewField({ ...newField, amount: Number(e.target.value) })}
                   error={Boolean(errors.amount || getFieldError('amount', createError))}
-                  helperText={errors.amount || getFieldError('amount' , createError)}
+                  helperText={errors.amount || getFieldError('amount', createError)}
                   onBlur={handleBlur}
                 />
                 <TextField
@@ -202,7 +202,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 size={'small'}
                 type={'number'}
                 label="Сумма заказа"
-                value={form.price || '' }
+                value={form.price || ''}
                 onChange={e => setForm({ ...form, price: Number(e.target.value) })}
                 error={Boolean(errors.price || getFieldError('price', createError))}
                 helperText={errors.price || getFieldError('price', createError)}
@@ -257,7 +257,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       options={status}
                       onChange={(_, newValue) => {
                         if (newValue) {
-                          setForm(prevState => ({ ...prevState, status: newValue|| '' }))
+                          setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
                       value={status.find(option => option === form.status) || status[0] || null}
@@ -267,14 +267,15 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                         <TextField
                           {...params}
                           label="Статус заказа"
-                          error={Boolean(errors.status || getFieldError('status',createError))}
-                          helperText={errors.status || getFieldError('status',createError)}
+                          error={Boolean(errors.status || getFieldError('status', createError))}
+                          helperText={errors.status || getFieldError('status', createError)}
                         />
                       )}
                     />
                   </FormControl>
                 </Grid>
-              )} </Grid>
+              )}{' '}
+            </Grid>
             <Grid>
               <TextField
                 id="comment"
@@ -346,7 +347,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   fullWidth
                   size={'small'}
                   disablePortal
-                  options={clientProducts}
+                  options={availableDefects}
                   onChange={(_, newValue) => {
                     if (newValue) {
                       setNewFieldDefects(prevState => ({ ...prevState, product: newValue._id }))
@@ -360,7 +361,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       label="Товар"
                       error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={()=>handleBlurAutoComplete('product', setErrors, newFieldDefects, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newFieldDefects, 'Выберите товар')}
                     />
                   )}
                 />
@@ -370,7 +371,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   label="количество дефектного товара"
                   style={{ marginBottom: '10px' }}
                   type="number"
-                  error={Boolean(errors.amount||getFieldError('amount', createError))}
+                  error={Boolean(errors.amount || getFieldError('amount', createError))}
                   name={'amount'}
                   helperText={errors.amount || getFieldError('amount', createError)}
                   onBlur={handleBlur}
@@ -384,7 +385,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   style={{ marginBottom: '10px' }}
                   type="text"
                   name={'defect_description'}
-                  error={Boolean(errors.defect_description||getFieldError('defect_description', createError))}
+                  error={Boolean(errors.defect_description || getFieldError('defect_description', createError))}
                   helperText={errors.defect_description || getFieldError('defect_description', createError)}
                   onBlur={handleBlur}
                   value={newFieldDefects.defect_description}
@@ -403,7 +404,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               <Button type="submit" disabled={loading}>
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
-                ) : initialData? (
+                ) : initialData ? (
                   'Обновить заказ'
                 ) : (
                   'Создать заказ'

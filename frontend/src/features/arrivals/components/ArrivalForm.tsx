@@ -9,6 +9,7 @@ import { getFieldError } from '../../../utils/getFieldError.ts'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import React from 'react'
 import { getProductNameById } from '../../../utils/getProductName.ts'
+import { getItemNameById } from '../../../utils/getItemNameById.ts'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -40,10 +41,12 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     addItem,
     deleteItem,
     handleBlur,
-    autoCompleteClients,
     error,
     submitFormHandler,
     status,
+    clients,
+    stocks,
+    availableItem,
   } = useArrivalForm(initialData, onSuccess)
 
   return (
@@ -62,12 +65,12 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Autocomplete
             id="client"
-            value={autoCompleteClients.find(option => option.id === form.client) || null}
+            value={getItemNameById(clients, 'name', '_id').find(option => option.id === form.client) || null}
             onChange={(_, newValue) => setForm(prevState => ({ ...prevState, client: newValue?.id || '' }))}
             size="small"
             fullWidth
             disablePortal
-            options={autoCompleteClients}
+            options={getItemNameById(clients, 'name', '_id')}
             sx={{ width: '100%' }}
             renderInput={params => (
               <TextField
@@ -82,7 +85,29 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Grid>
 
         <Grid>
-          <Typography fontWeight="bold">Товары</Typography>
+          <Autocomplete
+            id="stock"
+            value={getItemNameById(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={getItemNameById(stocks, 'name', '_id')}
+            sx={{ width: '100%' }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Склад, на который прибыла поставка"
+                error={Boolean(errors.stock || getFieldError('stock', error))}
+                helperText={errors.stock || getFieldError('stock', error)}
+                onBlur={e => handleBlur('stock', e.target.value)}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid>
+          <Typography fontWeight="bold">Отправленные товары</Typography>
           <ItemsList
             items={productsForm}
             onDelete={i => deleteItem(i, setProductsForm)}
@@ -181,7 +206,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               fullWidth
               size="small"
               disablePortal
-              options={products ?? []}
+              options={availableItem ?? []}
               onChange={(_, newValue) => {
                 if (newValue) {
                   setNewItem(prev => ({ ...prev, product: newValue._id }))
@@ -262,7 +287,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               fullWidth
               size="small"
               disablePortal
-              options={products ?? []}
+              options={availableItem ?? []}
               onChange={(_, newValue) => {
                 if (newValue) {
                   setNewItem(prev => ({ ...prev, product: newValue._id }))
@@ -364,6 +389,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             fullWidth
           />
         </Grid>
+
         <Grid>
           <Autocomplete
             id="arrival_status"
@@ -384,6 +410,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             )}
           />
         </Grid>
+
         <Grid>
           <TextField
             id="sent_amount"
@@ -392,9 +419,6 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             value={form.sent_amount}
             onChange={e => inputChangeHandler(e, setForm)}
             size="small"
-            error={Boolean(errors.sent_amount || getFieldError('sent_amount', error))}
-            helperText={errors.sent_amount || getFieldError('sent_amount', error)}
-            onBlur={e => handleBlur('sent_amount', e.target.value)}
             fullWidth
           />
         </Grid>

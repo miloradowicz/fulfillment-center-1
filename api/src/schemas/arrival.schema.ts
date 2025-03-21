@@ -47,7 +47,7 @@ export class Arrival {
   @Prop({ required: true })
   arrival_date: Date
 
-  @Prop({ required: true })
+  @Prop({ default: null })
   sent_amount: string
 
   @Prop({

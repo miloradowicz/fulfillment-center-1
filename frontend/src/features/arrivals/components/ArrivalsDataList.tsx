@@ -22,7 +22,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
-
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
       field: 'client',
@@ -34,6 +33,17 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       editable: false,
       filterable: true,
       valueGetter: (_value: string, row: ArrivalWithClient) => row.client?.name ?? 'Неизвестный клиент',
+    },
+    {
+      field: 'stock',
+      headerName: 'Склад',
+      flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
+      editable: false,
+      filterable: true,
+      valueGetter: (_value: string, row: ArrivalWithClient) => row.stock.name ?? 'Неизвестный склад',
     },
     {
       field: 'arrival_date',
@@ -49,7 +59,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
     },
     {
       field: 'arrival_price',
-      headerName: 'Стоимость доставки',
+      headerName: 'Цена доставки',
       flex: 1,
       minWidth: isMediumScreen ? 170 : 140,
       align: 'left',
@@ -64,7 +74,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       align: 'left',
       headerAlign: 'left',
       filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount,
+      valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount ? row.sent_amount: '-',
     },
     {
       field: 'arrival_status',

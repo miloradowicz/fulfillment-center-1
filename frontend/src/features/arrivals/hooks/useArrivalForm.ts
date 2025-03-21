@@ -6,6 +6,7 @@ import {
   ArrivalWithClient,
   ArrivalWithPopulate,
   Defect,
+  Product,
   ProductArrival,
 } from '../../../types'
 import { initialErrorState, initialItemState, initialState } from '../state/arrivalState'
@@ -17,6 +18,9 @@ import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
 import dayjs from 'dayjs'
+import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
+import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 
 export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
 
@@ -24,10 +28,10 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
+  const stocks = useAppSelector(selectAllStocks)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
-  const status = [ 'ожидается доставка' , 'получена' , 'отсортирована']
-
+  const status = ['ожидается доставка', 'получена', 'отсортирована']
 
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
@@ -36,10 +40,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
         arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
+        stock: typeof initialData.stock === 'string' ? initialData.stock : initialData.stock._id,
         products: [],
         defects: [],
         received_amount: [],
-        arrival_status:initialData.arrival_status,
+        arrival_status: initialData.arrival_status,
       }
       : { ...initialState },
   )
@@ -67,12 +72,31 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
   const [defectsModalOpen, setDefectsModalOpen] = useState(false)
 
+  const [availableItem, setAvailableItem] = useState<Product[]>([])
+
   useEffect(() => {
     dispatch(fetchClients())
+    dispatch(fetchStocks())
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
   }, [dispatch, form.client])
+
+  useEffect(() => {
+    if (productsForm.length !== 0 && products) {
+      const sentProducts = productsForm
+        .map(item => products.find(p => p._id === item.product))
+        .filter((p): p is Product => p !== undefined)
+
+      getAvailableItems(
+        products,
+        sentProducts.map(product => ({ product })),
+        availableItem,
+        setAvailableItem,
+        '_id',
+      )
+    }
+  }, [productsForm, products, availableItem])
 
   const openModal = (type: 'products' | 'received_amount' | 'defects', initialState: ProductArrival | Defect) => {
     setNewItem(initialState)
@@ -134,7 +158,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       defect_description: !value ? 'Заполните описание дефекта' : '',
       client: !value ? 'Выберите клиента' : '',
       arrival_date: !value ? 'Укажите дату прибытия' : '',
-      sent_amount: Number(value) <= 0 ? 'Количество должно быть больше 0' : '',
+      stock: !value ? 'Выберите склад' : '',
     }
 
     setErrors(prev => ({
@@ -142,12 +166,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       [field]: errorMessages[field] || '',
     }))
   }
-
-  const autoCompleteClients =
-    clients?.map(client => ({
-      label: client.name,
-      id: client._id,
-    })) || []
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -209,9 +227,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     addItem,
     deleteItem,
     handleBlur,
-    autoCompleteClients,
     error,
     submitFormHandler,
     status,
+    clients,
+    stocks,
+    availableItem,
   }
 }
