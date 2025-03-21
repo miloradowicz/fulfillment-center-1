@@ -19,6 +19,7 @@ interface CounterpartiesState {
   loadingAdd: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
+  loadingArchive: boolean;
   error: GlobalError | null;
 }
 
@@ -29,6 +30,7 @@ const initialState: CounterpartiesState = {
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
+  loadingArchive: false,
   error: null,
 }
 
@@ -128,14 +130,14 @@ const counterpartiesSlice = createSlice({
       })
 
       .addCase(archiveCounterparty.pending, state => {
-        state.loadingUpdate = true
+        state.loadingArchive = true
         state.error = null
       })
       .addCase(archiveCounterparty.fulfilled, state => {
-        state.loadingUpdate = false
+        state.loadingArchive = false
       })
       .addCase(archiveCounterparty.rejected, (state, action) => {
-        state.loadingUpdate = false
+        state.loadingArchive = false
         state.error = action.error.message ? { message: action.error.message } : null
       })
 
