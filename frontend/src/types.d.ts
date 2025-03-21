@@ -270,3 +270,13 @@ export interface StockError {
 }
 
 export type StockMutation = Omit<Stock, '_id'>
+
+export interface Counterparty  {
+  _id: string
+  name: string
+  address?: string
+  phone_number?: string
+  isArchived: boolean
+}
+
+export type CounterpartyMutation = Omit<Counterparty , '_id'>
