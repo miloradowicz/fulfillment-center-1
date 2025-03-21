@@ -40,6 +40,7 @@ export const selectLoadingFetchCounterparty = (state: RootState) => state.counte
 export const selectLoadingAddCounterparty = (state: RootState) => state.counterparties.loadingAdd
 export const selectLoadingDeleteCounterparty = (state: RootState) => state.counterparties.loadingDelete
 export const selectLoadingUpdateCounterparty = (state: RootState) => state.counterparties.loadingUpdate
+export const selectLoadingArchiveCounterparty = (state: RootState) => state.counterparties.loadingArchive
 export const selectCounterpartyError = (state: RootState) => state.counterparties.error
 
 const counterpartiesSlice = createSlice({
