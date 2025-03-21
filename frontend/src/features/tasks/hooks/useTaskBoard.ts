@@ -19,6 +19,7 @@ export const useTaskBoard = () => {
   useEffect(() => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
+
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
       return tasks?.filter(task => task.status === status)
