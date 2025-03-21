@@ -198,35 +198,6 @@ export class SeederService {
       },
     ])
 
-    await this.arrivalModel.create([
-      {
-        client: _clients._id,
-        products: [{ product: _product1._id, description: '', amount: 20 }],
-        arrival_price: 500,
-        arrival_date: new Date().toISOString(),
-        sent_amount: '2 короба',
-        stock: _stock1._id,
-      },
-      {
-        client: _clients._id,
-        products: [{ product: _product2._id, description: '', amount: 100 }],
-        arrival_price: 2500,
-        arrival_status: 'получена',
-        arrival_date: new Date().toISOString(),
-        sent_amount: '2 мешка',
-        stock: _stock2._id,
-      },
-      {
-        client: _clients._id,
-        products: [{ product: _product3._id, description: '', amount: 30 }],
-        arrival_price: 1000,
-        arrival_status: 'отсортирована',
-        arrival_date: new Date().toISOString(),
-        sent_amount: '5 коробов',
-        stock: _stock1._id,
-      },
-    ])
-
     await this.serviceModel.create([
       {
         name: 'Работа с товаром',
@@ -259,6 +230,39 @@ export class SeederService {
         name: 'OОО "Складской Логистик"',
         phone_number: '+996 500 789-456',
         address: 'Бишкек, пр. Манаса, д. 30',
+      },
+    ])
+
+    await this.arrivalModel.create([
+      {
+        client: _clients._id,
+        products: [{ product: _product1._id, description: '', amount: 20 }],
+        arrival_price: 500,
+        arrival_date: new Date().toISOString(),
+        sent_amount: '2 короба',
+        stock: _stock1._id,
+        shipping_agent: _counterparty2._id,
+        pickup_location: 'Ул. Пушкина, д. 67',
+      },
+      {
+        client: _clients._id,
+        products: [{ product: _product2._id, description: '', amount: 100 }],
+        arrival_price: 2500,
+        arrival_status: 'получена',
+        arrival_date: new Date().toISOString(),
+        sent_amount: '2 мешка',
+        stock: _stock2._id,
+      },
+      {
+        client: _clients._id,
+        products: [{ product: _product3._id, description: '', amount: 30 }],
+        arrival_price: 1000,
+        arrival_status: 'отсортирована',
+        arrival_date: new Date().toISOString(),
+        sent_amount: '5 коробов',
+        stock: _stock1._id,
+        shipping_agent: _counterparty1._id,
+        pickup_location: 'Ул. Авиаторов, д. 88',
       },
     ])
   }
