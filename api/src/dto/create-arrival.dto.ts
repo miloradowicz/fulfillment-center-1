@@ -78,11 +78,18 @@ export class CreateArrivalDto {
   arrival_price: number
 
   @IsNotEmpty({ message: 'Заполните дату прибытия' })
-  @IsDate({ message: 'Заполните дату прибытия' })@Type(() => Date)
+  @IsDate({ message: 'Заполните дату прибытия' })
+  @Type(() => Date)
   arrival_date: Date
 
   @IsOptional()
   sent_amount: string
+
+  @IsOptional()
+  pickup_location: string
+
+  @IsOptional()
+  shipping_agent: mongoose.Schema.Types.ObjectId
 
   @IsOptional()
   @IsEnum(['ожидается доставка', 'получена', 'отсортирована'], {

@@ -50,6 +50,16 @@ export class Arrival {
   @Prop({ default: null })
   sent_amount: string
 
+  @Prop({ default: null })
+  pickup_location: string
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Counterparty',
+    default: null,
+  })
+  shipping_agent: mongoose.Schema.Types.ObjectId
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Stock',
