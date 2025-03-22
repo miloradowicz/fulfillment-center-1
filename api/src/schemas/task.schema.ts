@@ -32,6 +32,25 @@ export class Task {
   status: 'к выполнению' | 'в работе' | 'готово'
 
   @Prop({
+    type: String,
+    enum: ['поставка', 'заказ', 'другое'],
+    default: 'другое',
+  })
+  type: 'поставка' | 'заказ' | 'другое'
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order',
+  })
+  associated_order: string
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Arrival',
+  })
+  associated_arrival: string
+
+  @Prop({
     type: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
