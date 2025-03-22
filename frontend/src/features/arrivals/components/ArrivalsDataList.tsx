@@ -76,15 +76,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       renderCell: params => <StatusArrivalCell row={params.row} />,
     },
     {
-      field: 'products',
-      headerName: 'Товаров',
-      flex: 1,
-      minWidth: isMediumScreen ? 120 : 80,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.products.length,
-    },
-    {
       field: 'Actions',
       headerName: '',
       flex: 2,
