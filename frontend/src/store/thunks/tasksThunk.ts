@@ -31,6 +31,13 @@ export const fetchTasksByUserId = createAsyncThunk<Task[], string>(
     return response.data
   },
 )
+export const fetchTasksByUserIdWithPopulate = createAsyncThunk<TaskWithPopulate[], string>(
+  'arrivals/fetchTasksByUserIdWithPopulate',
+  async (userId: string) => {
+    const response = await axiosAPI.get(`/tasks?user=${ userId }&populate=1`)
+    return response.data
+  },
+)
 
 export const fetchTaskById = createAsyncThunk<Task, string>(
   'tasks/fetchTaskById',

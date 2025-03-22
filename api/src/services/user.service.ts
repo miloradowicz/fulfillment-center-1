@@ -51,7 +51,7 @@ export class UsersService {
   }
 
   async getAll() {
-    return this.userModel.find({ isArchived: false })
+    return this.userModel.find({ isArchived: false }).select('-token')
   }
 
   async getById(id: string) {
