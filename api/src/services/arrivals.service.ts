@@ -27,7 +27,7 @@ export class ArrivalsService {
     const unarchived = this.arrivalModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.populate('client stock shipping_agent').exec())
+      return (await unarchived.populate('client stock shipping_agent').exec()).reverse()
     }
 
     return (await unarchived).reverse()
