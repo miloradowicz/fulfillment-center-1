@@ -1,6 +1,5 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { toast } from 'react-toastify'
-import { isAxiosError } from 'axios'
 import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
@@ -152,12 +151,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
       setFile(null)
       setErrors({})
     } catch (e) {
-      if (isAxiosError(e) && e.response) {
-        console.error('Ошибки валидации:', e.response.data)
-      } else {
-        console.error('Ошибка сервера:', e)
-        toast.error('Не удалось создать Товар.')
-      }
+      console.error(e)
     }
   }
 

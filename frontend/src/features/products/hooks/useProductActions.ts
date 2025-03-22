@@ -7,6 +7,7 @@ import {
 } from '../../../store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
 import {
+  clearErrorProduct,
   selectLoadingFetchProduct, selectProductError,
   selectProductsWithPopulate,
   selectProductWithPopulate,
@@ -35,6 +36,7 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
 
   const handleClose = () => {
     setOpen(false)
+    dispatch(clearErrorProduct())
   }
 
   const fetchAllProducts = useCallback(() => {
