@@ -10,17 +10,55 @@ import dayjs from 'dayjs'
 import StatusOrderCell from './StatusOrderCell.tsx'
 
 interface Props {
-  orders: OrderWithClient[] | [];
+  orders: OrderWithClient[] | []
   handleDelete: (id: string) => void
-  onEdit: (data:OrderWithClient) => void
+  onEdit: (data: OrderWithClient) => void
 }
 
 const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
-
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   const columns: GridColDef<OrderWithClient>[] = [
+    {
+      field: 'orderNumber',
+      headerName: 'Номер заказа',
+      flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
+      editable: false,
+      filterable: true,
+      renderCell: ({ row }) => (
+        <NavLink
+          to={`/orders/${ row._id }`}
+          className="
+        py-2 px-3
+        bg-blue-50
+        text-blue-700
+        rounded-md
+        text-sm
+        font-medium
+        hover:bg-blue-100
+        transition-colors
+        duration-150
+        border
+        border-blue-200
+        hover:border-blue-300
+        whitespace-nowrap
+      "
+          style={{
+            lineHeight: '1.25rem',
+            maxWidth: '120px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {row.orderNumber}
+        </NavLink>
+      ),
+      valueGetter: (_value: string, row: OrderWithClient) => row.orderNumber,
+    },
     {
       field: 'client',
       headerName: 'Клиент',
@@ -30,7 +68,8 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       headerAlign: 'left',
       editable: false,
       filterable: true,
-      valueGetter: (_value: string, row: OrderWithClient) => row.client.name },
+      valueGetter: (_value: string, row: OrderWithClient) => row.client.name,
+    },
     {
       field: 'sent_at',
       headerName: 'Отправлен',
@@ -83,24 +122,18 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       minWidth: isMediumScreen ? 220 : 160,
       align: 'left',
       headerAlign: 'left',
-      renderCell: ({ row } ) => (
+      renderCell: ({ row }) => (
         <>
-          <IconButton onClick={() => {
-            onEdit(row)
-          }}
+          <IconButton
+            onClick={() => {
+              onEdit(row)
+            }}
           >
             <EditIcon fontSize="inherit" />
           </IconButton>
-          <IconButton
-            onClick={() => handleDelete(row._id)}
-          >
+          <IconButton onClick={() => handleDelete(row._id)}>
             <ClearIcon fontSize="inherit" />
           </IconButton>
-          <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
-            to={`/orders/${ row._id }`}
-          >
-            Подробнее
-          </NavLink>
         </>
       ),
     },
@@ -125,11 +158,9 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
           checkboxSelection
           disableRowSelectionOnClick
         />
-      ) :
-        (
-          <Typography className="text-center mt-5">Заказы не найдены.</Typography>
-        )
-      }
+      ) : (
+        <Typography className="text-center mt-5">Заказы не найдены.</Typography>
+      )}
     </Box>
   )
 }
