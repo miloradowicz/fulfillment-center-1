@@ -1,7 +1,5 @@
 import { IsInt, IsMongoId, IsNotEmpty, IsOptional, Min, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
-import { MongoDocumentExists } from 'src/validators/mongo-document-exists'
-import { Product } from 'src/schemas/product.schema'
 
 class DynamicFieldDto {
   @IsNotEmpty({ message: 'Поле ключ обязательно для заполнения' })
@@ -29,11 +27,9 @@ export class CreateProductDto {
   amount: number
 
   @IsNotEmpty({ message: 'Поле штрих-код обязательно для заполнения' })
-  @MongoDocumentExists(Product, 'barcode', { message: 'Штрих-код должен быть уникальным' }, true)
   barcode: string
 
   @IsNotEmpty({ message: 'Поле артикул обязательно для заполнения' })
-  @MongoDocumentExists(Product, 'article', { message: 'Aртикул должен быть уникальным' }, true)
   article: string
 
   @IsOptional()

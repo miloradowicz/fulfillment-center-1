@@ -60,6 +60,29 @@ export class ProductsService {
   }
 
   async create(productDto: CreateProductDto, files: Array<Express.Multer.File> = []) {
+
+    const barcode = await this.productModel.findOne({ barcode: productDto.barcode })
+    if (barcode) {
+      throw new BadRequestException({
+        errors: {
+          barcode: {
+            messages: ['Продукт с таким штрихкодом уже существует'],
+          },
+        },
+      })
+    }
+
+    const article = await this.productModel.findOne({ article: productDto.article })
+    if (article) {
+      throw new BadRequestException({
+        errors: {
+          article: {
+            messages: ['Продукт с таким артикулом уже существует'],
+          },
+        },
+      })
+    }
+
     try {
       if (productDto.dynamic_fields && typeof productDto.dynamic_fields === 'string') {
         try {
@@ -132,9 +155,34 @@ export class ProductsService {
   }
 
   async update(id: string, productDto: UpdateProductDto, files: Array<Express.Multer.File> = []) {
-    try {
-      const existingProduct = await this.getById(id)
+    const existingProduct = await this.getById(id)
+    if (!existingProduct){
+      throw new NotFoundException('Товар не найден')
+    }
 
+    if (productDto.barcode !== existingProduct.barcode) {
+      const barcodeExists = await this.productModel.findOne({ barcode: productDto.barcode })
+      if (barcodeExists) {
+        throw new BadRequestException({
+          errors: {
+            barcode: { messages: ['Продукт с таким штрихкодом уже существует'] },
+          },
+        })
+      }
+    }
+
+    if (productDto.article !== existingProduct.article) {
+      const articleExists = await this.productModel.findOne({ article: productDto.article })
+      if (articleExists) {
+        throw new BadRequestException({
+          errors: {
+            article: { messages: ['Продукт с таким артикулом уже существует'] },
+          },
+        })
+      }
+    }
+
+    try {
       if (productDto.dynamic_fields && typeof productDto.dynamic_fields === 'string') {
         try {
           productDto.dynamic_fields = JSON.parse(productDto.dynamic_fields) as DynamicFieldDto[]
@@ -152,17 +200,11 @@ export class ProductsService {
         productDto.documents = [...existingDocs, ...documentPaths]
       }
 
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
+      return this.productModel.findByIdAndUpdate(
         id,
         productDto,
         { new: true }
       )
-
-      if (!updatedProduct) {
-        throw new NotFoundException('Товар не найден')
-      }
-
-      return updatedProduct
     } catch (error: unknown) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error
