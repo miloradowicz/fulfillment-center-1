@@ -4,38 +4,15 @@ import { useDroppable } from '@dnd-kit/core'
 import { Box, Typography, Paper } from '@mui/material'
 import { TaskLineProps } from '../hooks/TypesProps'
 import TaskCard from './TaskCard.tsx'
+import { getStatusStyles } from '../utils/statusStyle.ts'
 
-const getStatusStyles = (status: string) => {
-  switch (status) {
-  case 'к выполнению':
-    return {
-      backgroundColor: '#D1D3D8',
-      color: '#6B7280',
-    }
-  case 'в работе':
-    return {
-      backgroundColor: '#0052CC',
-      color: '#FFFFFF',
-    }
-  case 'готово':
-    return {
-      backgroundColor: '#36B37E',
-      color: '#FFFFFF',
-    }
-  default:
-    return {
-      backgroundColor: '#f7f7f7',
-      color: '#000000',
-    }
-  }
-}
 
-const TaskLine: FC<TaskLineProps> = ({ title, items }) => {
+const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
   const { setNodeRef } = useDroppable({
     id: title,
   })
 
-  const statusStyles = getStatusStyles(title) // Получаем стиль для статуса
+  const statusStyles = getStatusStyles(title)
 
   return (
     <Box
@@ -78,7 +55,7 @@ const TaskLine: FC<TaskLineProps> = ({ title, items }) => {
         }}
       >
         {items.map((task, key) => (
-          <TaskCard key={task._id} index={key} parent={title} task={task} />
+          <TaskCard selectedUser={selectedUser} key={task._id} index={key} parent={title} task={task} />
         ))}
       </Paper>
     </Box>
