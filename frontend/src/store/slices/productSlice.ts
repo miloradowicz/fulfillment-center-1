@@ -52,7 +52,11 @@ export const selectCreateProductError = (state: RootState) => state.products.cre
 const productSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    clearErrorProduct: state => {
+      state.createAndUpdateError = null
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchProducts.pending, state => {
       state.loadingFetch = true
@@ -142,3 +146,4 @@ const productSlice = createSlice({
 })
 
 export const productReducer = productSlice.reducer
+export const { clearErrorProduct } = productSlice.actions
