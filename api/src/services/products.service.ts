@@ -234,7 +234,7 @@ export class ProductsService {
         const existingDocs = existingProduct.documents || []
         productDto.documents = [...existingDocs, ...documentPaths]
       }
-Л
+
       return this.productModel.findByIdAndUpdate(
         id,
         productDto,
