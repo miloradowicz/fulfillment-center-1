@@ -119,31 +119,31 @@ export const UserSchemaFactory = (
     await Promise.all(tasks.map(x => x.deleteOne()))
   }
 
-  UserSchema.post('findOneAndUpdate', async function () {
+  UserSchema.pre('findOneAndUpdate', async function () {
     const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
 
     if (!user) return
 
     const update = this.getUpdate()
 
-    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+    if (update && 'isArchived' in update && update.isArchived) {
       await cascadeArchive(user)
     }
   })
 
-  UserSchema.post('updateOne', async function () {
+  UserSchema.pre('updateOne', async function () {
     const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
 
     if (!user) return
 
     const update = this.getUpdate()
 
-    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+    if (update && 'isArchived' in update && update.isArchived) {
       await cascadeArchive(user)
     }
   })
 
-  UserSchema.post('save', async function () {
+  UserSchema.pre('save', async function () {
     if (this.isModified('isArchived') && this.isArchived) {
       await cascadeArchive(this)
     }

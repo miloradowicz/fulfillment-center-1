@@ -60,31 +60,31 @@ export const ClientSchemaFactory = (
     ])
   }
 
-  ClientSchema.post('findOneAndUpdate', async function () {
+  ClientSchema.pre('findOneAndUpdate', async function () {
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return
 
     const update = this.getUpdate()
 
-    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+    if (update && 'isArchived' in update && update.isArchived) {
       await cascadeArchive(client)
     }
   })
 
-  ClientSchema.post('updateOne', async function () {
+  ClientSchema.pre('updateOne', async function () {
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return
 
     const update = this.getUpdate()
 
-    if (update && '$set' in update && update['$set'] && 'isArchived' in update['$set'] && update['$set'].isArchived) {
+    if (update && 'isArchived' in update && update.isArchived) {
       await cascadeArchive(client)
     }
   })
 
-  ClientSchema.post('save', async function () {
+  ClientSchema.pre('save', async function () {
     if (this.isModified('isArchived') && this.isArchived) {
       await cascadeArchive(this)
     }
