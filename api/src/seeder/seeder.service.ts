@@ -142,6 +142,7 @@ export class SeederService {
       { upsert: true }
     )
 
+
     const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
         email: 'test@gmail.com',

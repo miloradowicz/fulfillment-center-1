@@ -1,10 +1,10 @@
-export function getItemNameById<T>(
+export function getItemNameById<T extends object>(
   items: T[] | null,
   labelKey: keyof T,
   idKey: keyof T,
-): { label: T[keyof T]; id: T[keyof T] }[] {
-  return items ? items.map(item => ({
-    label: item[labelKey],
-    id: item[idKey],
-  })) : []
+): { label: string; id: string }[] {
+  return items?.map(item => ({
+    label: String(item[labelKey]),
+    id: String(item[idKey]),
+  })) || []
 }

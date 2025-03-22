@@ -12,6 +12,12 @@ export class Order {
   isArchived: boolean
 
   @Prop({
+    type: String,
+    unique: true,
+  })
+  orderNumber: string
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',

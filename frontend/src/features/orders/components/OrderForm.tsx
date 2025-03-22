@@ -67,6 +67,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                     fullWidth
                     disablePortal
                     options={clients}
+                    getOptionKey={option => option._id}
                     onChange={(_, newValue) => {
                       if (newValue) {
                         setForm(prevState => ({ ...prevState, client: newValue._id }))
@@ -145,6 +146,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   size={'small'}
                   disablePortal
                   options={clientProducts}
+                  getOptionKey={option => option._id}
                   onChange={(_, newValue) => {
                     if (newValue) {
                       setNewField(prevState => ({ ...prevState, product: newValue._id }))
@@ -348,6 +350,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   size={'small'}
                   disablePortal
                   options={availableDefects}
+                  getOptionKey={option => option._id}
                   onChange={(_, newValue) => {
                     if (newValue) {
                       setNewFieldDefects(prevState => ({ ...prevState, product: newValue._id }))
