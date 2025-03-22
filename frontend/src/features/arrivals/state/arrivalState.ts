@@ -9,6 +9,7 @@ export const initialState = {
   products: [],
   defects: [],
   received_amount: [],
+  arrival_status: '',
 }
 
 export const initialItemState = {
