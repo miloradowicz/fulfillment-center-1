@@ -97,6 +97,14 @@ const ArrivalDetails = () => {
                 </Grid>
               </Box>
 
+              <Box sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid>
+                    <ClientInfoItem loading={loading} label="Склад" value={arrival?.stock.name || '—'} />
+                  </Grid>
+                </Grid>
+              </Box>
+
               <Divider sx={{ my: 3 }} />
 
               <ArrivalDetailsTextItem label="Цена" value={arrival?.arrival_price} loading={loading} />

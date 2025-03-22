@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { useEffect, useState } from 'react'
 import { deleteStock, fetchStockById } from '../../../store/thunks/stocksThunk.ts'
-import { selectIsLoading, selectOneStock } from '../../../store/slices/stocksSlice.ts'
+import { selectIsStocksLoading, selectOneStock } from '../../../store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
 import { hasMessage } from '../../../utils/helpers.ts'
 
@@ -10,7 +10,7 @@ export const useStockDetails = () => {
   const { stockId } = useParams()
   const dispatch = useAppDispatch()
   const stock = useAppSelector(selectOneStock)
-  const isLoading = useAppSelector(selectIsLoading)
+  const isLoading = useAppSelector(selectIsStocksLoading)
   const navigate = useNavigate()
 
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)

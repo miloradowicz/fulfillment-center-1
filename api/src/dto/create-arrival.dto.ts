@@ -81,7 +81,7 @@ export class CreateArrivalDto {
   @IsDate({ message: 'Заполните дату прибытия' })@Type(() => Date)
   arrival_date: Date
 
-  @IsNotEmpty({ message: 'Заполните количество отправленного товара.' })
+  @IsOptional()
   sent_amount: string
 
   @IsOptional()

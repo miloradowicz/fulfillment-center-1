@@ -1,13 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
-import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
+import { CounterService } from './counter.service'
+import { CreateArrivalDto } from '../dto/create-arrival.dto'
 
 @Injectable()
 export class ArrivalsService {
-  constructor(@InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>) {}
+  constructor(
+    @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
+    private counterService: CounterService
+  ) {}
 
   async getAllByClient(clientId: string, populate: boolean) {
     const unarchived = this.arrivalModel.find({ isArchived: false })
@@ -23,7 +27,7 @@ export class ArrivalsService {
     const unarchived = this.arrivalModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.populate('client')).reverse()
+      return (await unarchived.populate('client').populate('stock').exec()).reverse()
     }
 
     return (await unarchived).reverse()
@@ -35,7 +39,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product')
+        .populate('client products.product defects.product received_amount.product stock')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
@@ -49,7 +53,22 @@ export class ArrivalsService {
   }
 
   async create(arrivalDto: CreateArrivalDto) {
-    return await this.arrivalModel.create(arrivalDto)
+    try {
+      const newArrival = await this.arrivalModel.create(arrivalDto)
+
+      const sequenceNumber = await this.counterService.getNextSequence('arrival')
+      newArrival.arrivalNumber  = `ARL-${ sequenceNumber }`
+
+      return newArrival.save()
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error
+      }
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message)
+      }
+      throw new BadRequestException('Произошла ошибка при создании поставки')
+    }
   }
 
   async update(id: string, arrivalDto: UpdateArrivalDto) {

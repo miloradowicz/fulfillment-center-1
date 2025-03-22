@@ -112,6 +112,7 @@ export interface Arrival {
   arrival_price: number
   arrival_date: string
   sent_amount: string
+  stock: string
   defects: Defect[]
   arrival_status?: string
   received_amount?: ProductArrival[]
@@ -124,10 +125,12 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   defects: DefectWithPopulate[]
   received_amount?: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
+  stock: Stock
 }
 
-export interface ArrivalWithClient extends Omit<Arrival, 'client'> {
+export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock'> {
   client: Client
+  stock: Stock
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>
@@ -192,7 +195,7 @@ export interface ArrivalError {
   product: string
   arrival_price: number
   arrival_date: string
-  sent_amount: string
+  stock: string
   amount: number
   defect_description: string
   arrival_status?:string
@@ -267,3 +270,13 @@ export interface StockError {
 }
 
 export type StockMutation = Omit<Stock, '_id'>
+
+export interface Counterparty  {
+  _id: string
+  name: string
+  address?: string
+  phone_number?: string
+  isArchived: boolean
+}
+
+export type CounterpartyMutation = Omit<Counterparty , '_id'>

@@ -4,6 +4,7 @@ import {
   DefectForOrderForm,
   ErrorForOrder,
   OrderMutation,
+  Product,
   ProductForOrderForm,
   ProductOrder,
 } from '../../../types'
@@ -32,25 +33,27 @@ import { deleteItem } from './deleteItem.ts'
 import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
+import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 
-
-export const useOrderForm = ( onSuccess?: () => void) => {
+export const useOrderForm = (onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
-  const [form, setForm] = useState<OrderMutation>((initialData)
-    ? {
-      client: initialData.client._id,
-      sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
-      delivered_at: dayjs(initialData.delivered_at).format('YYYY-MM-DD'),
-      price: initialData.price,
-      products: [],
-      defects: [],
-      status:initialData.status,
-      comment: initialData.comment?initialData.comment:'',
-    }
-    : { ...initialStateOrder })
+  const [form, setForm] = useState<OrderMutation>(
+    initialData
+      ? {
+        client: initialData.client._id,
+        sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
+        delivered_at: dayjs(initialData.delivered_at).format('YYYY-MM-DD'),
+        price: initialData.price,
+        products: [],
+        defects: [],
+        status: initialData.status,
+        comment: initialData.comment ? initialData.comment : '',
+      }
+      : { ...initialStateOrder },
+  )
 
-  const [productsForm, setProductsForm] = useState<ProductForOrderForm[]>((initialData)?initialData.products:[])
-  const [defectForm, setDefectForm] = useState<DefectForOrderForm[]>((initialData)?initialData.defects:[])
+  const [productsForm, setProductsForm] = useState<ProductForOrderForm[]>(initialData ? initialData.products : [])
+  const [defectForm, setDefectForm] = useState<DefectForOrderForm[]>(initialData ? initialData.defects : [])
   const [newFieldDefects, setNewFieldDefects] = useState<Defect>(initialStateDefectForOrder)
   const [modalOpenDefects, setModalOpenDefects] = useState(false)
   const [isButtonDefectVisible, setButtonDefectVisible] = useState(true)
@@ -68,10 +71,18 @@ export const useOrderForm = ( onSuccess?: () => void) => {
   const params = useParams()
   const status = ['в сборке', 'в пути', 'доставлен']
 
+  const [availableDefects, setAvailableDefects] = useState<Product[]>([])
+
+  useEffect(() => {
+    if (productsForm.length > 0 && clientProducts) {
+      getAvailableItems(clientProducts, productsForm, availableDefects, setAvailableDefects, '_id')
+    }
+  }, [productsForm, clientProducts, availableDefects])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const errorMessage = validationRules[name]?.(value) || (value.trim() === '' ? 'Это поле обязательно для заполнения' : '')
+    const errorMessage =
+      validationRules[name]?.(value) || (value.trim() === '' ? 'Это поле обязательно для заполнения' : '')
     setErrors(prevErrors => ({
       ...prevErrors,
       [name]: errorMessage,
@@ -154,7 +165,6 @@ export const useOrderForm = ( onSuccess?: () => void) => {
           onSuccess?.()
           await dispatch(fetchOrderById(params.id))
           await dispatch(fetchOrderByIdWithPopulate(params.id))
-
         } else {
           onSuccess?.()
           await dispatch(fetchOrdersWithClient())
@@ -175,7 +185,6 @@ export const useOrderForm = ( onSuccess?: () => void) => {
         setDefectForm([])
         await dispatch(fetchOrdersWithClient())
       }
-
     } catch (e) {
       console.error(e)
     }
@@ -188,7 +197,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     deleteItem(index, setDefectForm, setForm, 'defects')
   }
 
-  type FormData = OrderMutation | ProductOrder | Defect;
+  type FormData = OrderMutation | ProductOrder | Defect
 
   const handleBlurAutoComplete = (
     field: string,
@@ -232,17 +241,8 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     setButtonVisible(true)
   }
 
-
   const addArrayProductInForm = () => {
-    addArrayItemInForm(
-      newField,
-      setProductsForm,
-      setFormArrayData,
-      clientProducts,
-      'amount',
-      'description',
-      'product',
-    )
+    addArrayItemInForm(newField, setProductsForm, setFormArrayData, clientProducts, 'amount', 'description', 'product')
   }
 
   const addArrayDefectInForm = () => {
@@ -257,8 +257,7 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     )
   }
 
-
-  return{
+  return {
     form,
     setForm,
     status,
@@ -299,5 +298,6 @@ export const useOrderForm = ( onSuccess?: () => void) => {
     addArrayDefectInForm,
     onSubmit,
     initialData,
+    availableDefects,
   }
 }

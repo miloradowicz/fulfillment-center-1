@@ -12,6 +12,7 @@ import { TasksModule } from './modules/tasks.module'
 import { ServicesModule } from './modules/services.module'
 import { StocksModule } from './modules/stocks.module'
 import { AuthModule } from './modules/auth.module'
+import { CounterpartiesModule } from './modules/counterparties.module'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthModule } from './modules/auth.module'
     ValidatorsModule,
     ServicesModule,
     StocksModule,
+    CounterpartiesModule,
   ],
   controllers: [],
   providers: [],

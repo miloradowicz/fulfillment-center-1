@@ -10,6 +10,8 @@ import { randomUUID } from 'node:crypto'
 import { Service, ServiceDocument } from '../schemas/service.schema'
 import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
+import { Counter, CounterDocument } from '../schemas/counter.schema'
+import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
 
 @Injectable()
 export class SeederService {
@@ -30,6 +32,10 @@ export class SeederService {
     private readonly serviceModel: Model<ServiceDocument>,
     @InjectModel(Stock.name)
     private readonly stockModel: Model<StockDocument>,
+    @InjectModel(Counter.name)
+    private readonly counterModel: Model<CounterDocument>,
+    @InjectModel(Counterparty.name)
+    private readonly counterpartyModel: Model<CounterpartyDocument>,
   ) {}
 
   async seed() {
@@ -41,6 +47,8 @@ export class SeederService {
     await this.arrivalModel.deleteMany({})
     await this.serviceModel.deleteMany({})
     await this.stockModel.deleteMany({})
+    await this.counterModel.deleteMany({})
+    await this.counterpartyModel.deleteMany({})
 
     const [_User1, _User2, _admin] = await this.userModel.create([
       {
@@ -123,6 +131,7 @@ export class SeederService {
 
     await this.orderModel.create([
       {
+        orderNumber: 'ORD-1',
         client: _clients._id,
         products: [
           { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
@@ -134,6 +143,7 @@ export class SeederService {
         status: 'в сборке',
       },
       {
+        orderNumber: 'ORD-2',
         client: _clients._id,
         products: [
           { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
@@ -145,6 +155,7 @@ export class SeederService {
         status: 'в пути',
       },
       {
+        orderNumber: 'ORD-3',
         client: _clients._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
@@ -154,6 +165,39 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'доставлен',
+      },
+    ])
+
+    await this.counterModel.findOneAndUpdate(
+      { name: 'order' },
+      { $set: { seq: 3 } },
+      { upsert: true }
+    )
+
+    const [_User1, _User2, _admin] = await this.userModel.create([
+      {
+        email: 'test@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Мария',
+        role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'test1@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Вася',
+        role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Admin',
+        role: 'super-admin',
+        token: randomUUID(),
       },
     ])
 
@@ -201,6 +245,7 @@ export class SeederService {
 
     await this.arrivalModel.create([
       {
+        arrivalNumber: 'ARL-1',
         client: _clients._id,
         products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
@@ -209,6 +254,7 @@ export class SeederService {
         stock: _stock1._id,
       },
       {
+        arrivalNumber: 'ARL-2',
         client: _clients._id,
         products: [{ product: _product2._id, description: '', amount: 100 }],
         arrival_price: 2500,
@@ -224,6 +270,7 @@ export class SeederService {
         ],
       },
       {
+        arrivalNumber: 'ARL-3',
         client: _clients._id,
         products: [{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
@@ -233,6 +280,12 @@ export class SeederService {
         stock: _stock1._id,
       },
     ])
+
+    await this.counterModel.findOneAndUpdate(
+      { name: 'arrival' },
+      { $set: { seq: 3 } },
+      { upsert: true }
+    )
 
     await this.serviceModel.create([
       {
@@ -248,6 +301,24 @@ export class SeederService {
           { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
           { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
         ],
+      },
+    ])
+
+    const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
+      {
+        name: 'ООО "Фулфилмент Партнер"',
+        phone_number: '+7 999 123-45-67',
+        address: 'Москва, ул. Достоевского, д. 10',
+      },
+      {
+        name: 'ИП Осмонов',
+        phone_number: '+996 700 456-789',
+        address: 'Бишкек, пр. Чуй, д. 55',
+      },
+      {
+        name: 'OОО "Складской Логистик"',
+        phone_number: '+996 500 789-456',
+        address: 'Бишкек, пр. Манаса, д. 30',
       },
     ])
   }
