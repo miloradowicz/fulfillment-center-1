@@ -113,24 +113,28 @@ export interface Arrival {
   arrival_date: string
   sent_amount: string
   stock: string
+  shipping_agent: string
+  pickup_location: string
   defects: Defect[]
   arrival_status?: string
   received_amount?: ProductArrival[]
   logs?: Log[]
 }
 
-export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock'> & {
+export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent'> & {
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
   received_amount?: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
   stock: Stock
+  shipping_agent: Counterparty
 }
 
-export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock'> {
+export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock' | 'shipping_agent'> {
   client: Client
   stock: Stock
+  shipping_agent: Counterparty
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>

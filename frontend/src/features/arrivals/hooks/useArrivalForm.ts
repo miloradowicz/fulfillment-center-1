@@ -21,6 +21,8 @@ import dayjs from 'dayjs'
 import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
+import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
+import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
 
 export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
 
@@ -29,6 +31,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
   const stocks = useAppSelector(selectAllStocks)
+  const counterparties = useAppSelector(selectAllCounterparties)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const status = ['ожидается доставка', 'получена', 'отсортирована']
@@ -36,11 +39,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
       ? {
-        client: typeof initialData.client === 'string' ? initialData.client : initialData.client._id,
+        client: initialData.client._id,
         arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
         arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
-        stock: typeof initialData.stock === 'string' ? initialData.stock : initialData.stock._id,
+        stock: initialData.stock._id,
+        shipping_agent: initialData.shipping_agent._id,
+        pickup_location: '',
         products: [],
         defects: [],
         received_amount: [],
@@ -77,6 +82,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
+    dispatch(fetchCounterparties())
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
@@ -232,6 +238,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     status,
     clients,
     stocks,
+    counterparties,
     availableItem,
   }
 }

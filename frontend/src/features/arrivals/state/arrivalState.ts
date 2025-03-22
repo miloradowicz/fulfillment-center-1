@@ -4,6 +4,8 @@ export const initialState = {
   arrival_date: '',
   sent_amount: '',
   stock: '',
+  pickup_location: '',
+  shipping_agent: '',
   products: [],
   defects: [],
   received_amount: [],
