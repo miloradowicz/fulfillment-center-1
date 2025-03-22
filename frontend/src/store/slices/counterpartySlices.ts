@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { Counterparty, GlobalError } from '../../types'
 import {
   fetchCounterparties,
   fetchAllCounterparties,
@@ -9,39 +8,44 @@ import {
   updateCounterparty,
   archiveCounterparty,
   deleteCounterparty,
-} from '../thunks/counterpartyThunk.ts'
-import { RootState } from '../../app/store.ts'
+} from '../thunks/counterpartyThunk'
+import { Counterparty, ValidationError } from '../../types'
+import { RootState } from '../../app/store'
 
-interface CounterpartiesState {
-  counterparties: Counterparty[];
-  counterparty: Counterparty | null;
-  loadingFetch: boolean;
-  loadingAdd: boolean;
-  loadingDelete: boolean;
-  loadingUpdate: boolean;
-  loadingArchive: boolean;
-  error: GlobalError | null;
+interface CounterpartyState {
+  counterparties: Counterparty[] | null
+  counterparty: Counterparty | null
+  loadingFetch: boolean
+  loadingAdd: boolean
+  loadingDelete: boolean
+  loadingUpdate: boolean
+  loadingArchive: boolean
+  error: boolean
+  createError: ValidationError | null
 }
 
-const initialState: CounterpartiesState = {
-  counterparties: [],
+const initialState: CounterpartyState = {
+  counterparties: null,
   counterparty: null,
   loadingFetch: false,
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
   loadingArchive: false,
-  error: null,
+  error: false,
+  createError: null,
 }
 
-export const selectCounterparty = (state: RootState) => state.counterparties.counterparty
 export const selectAllCounterparties = (state: RootState) => state.counterparties.counterparties
-export const selectLoadingFetchCounterparty = (state: RootState) => state.counterparties.loadingFetch
-export const selectLoadingAddCounterparty = (state: RootState) => state.counterparties.loadingAdd
-export const selectLoadingDeleteCounterparty = (state: RootState) => state.counterparties.loadingDelete
-export const selectLoadingUpdateCounterparty = (state: RootState) => state.counterparties.loadingUpdate
-export const selectLoadingArchiveCounterparty = (state: RootState) => state.counterparties.loadingArchive
+export const selectOneCounterparty = (state: RootState) => state.counterparties.counterparty
 export const selectCounterpartyError = (state: RootState) => state.counterparties.error
+export const selectCounterpartyCreateError = (state: RootState) => state.counterparties.createError
+
+export const selectLoadingFetch = (state: RootState) => state.counterparties.loadingFetch
+export const selectLoadingAdd = (state: RootState) => state.counterparties.loadingAdd
+export const selectLoadingDelete = (state: RootState) => state.counterparties.loadingDelete
+export const selectLoadingUpdate = (state: RootState) => state.counterparties.loadingUpdate
+export const selectLoadingArchive = (state: RootState) => state.counterparties.loadingArchive
 
 const counterpartiesSlice = createSlice({
   name: 'counterparties',
@@ -51,108 +55,103 @@ const counterpartiesSlice = createSlice({
     builder
       .addCase(fetchCounterparties.pending, state => {
         state.loadingFetch = true
-        state.error = null
+        state.error = false
       })
-      .addCase(fetchCounterparties.fulfilled, (state, action) => {
+      .addCase(fetchCounterparties.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
-        state.counterparties = action.payload
+        state.counterparties = payload
       })
-      .addCase(fetchCounterparties.rejected, (state, action) => {
+      .addCase(fetchCounterparties.rejected, state => {
         state.loadingFetch = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
 
       .addCase(fetchAllCounterparties.pending, state => {
         state.loadingFetch = true
-        state.error = null
+        state.error = false
       })
-      .addCase(fetchAllCounterparties.fulfilled, (state, action) => {
+      .addCase(fetchAllCounterparties.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
-        state.counterparties = action.payload
+        state.counterparties = payload
       })
-      .addCase(fetchAllCounterparties.rejected, (state, action) => {
+      .addCase(fetchAllCounterparties.rejected, state => {
         state.loadingFetch = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
 
       .addCase(fetchCounterpartyById.pending, state => {
         state.loadingFetch = true
-        state.error = null
+        state.error = false
       })
-      .addCase(fetchCounterpartyById.fulfilled, (state, action) => {
+      .addCase(fetchCounterpartyById.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
-        state.counterparty = action.payload
+        state.counterparty = payload
       })
-      .addCase(fetchCounterpartyById.rejected, (state, action) => {
+      .addCase(fetchCounterpartyById.rejected, state => {
         state.loadingFetch = false
-        state.error = action.error.message ? { message: action.error.message } : { message: 'Ошибка загрузки контрагента' }
+        state.error = true
       })
 
       .addCase(fetchCounterpartyByIdWithArchived.pending, state => {
         state.loadingFetch = true
-        state.error = null
+        state.error = false
       })
-      .addCase(fetchCounterpartyByIdWithArchived.fulfilled, (state, action) => {
+      .addCase(fetchCounterpartyByIdWithArchived.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
-        state.counterparty = action.payload
+        state.counterparty = payload
       })
-      .addCase(fetchCounterpartyByIdWithArchived.rejected, (state, action) => {
+      .addCase(fetchCounterpartyByIdWithArchived.rejected, state => {
         state.loadingFetch = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
 
       .addCase(createCounterparty.pending, state => {
         state.loadingAdd = true
-        state.error = null
+        state.createError = null
       })
-      .addCase(createCounterparty.fulfilled, (state, action) => {
+      .addCase(createCounterparty.fulfilled, state => {
         state.loadingAdd = false
-        state.counterparties.push(action.payload)
       })
-      .addCase(createCounterparty.rejected, (state, action) => {
+      .addCase(createCounterparty.rejected, (state, { payload: error }) => {
         state.loadingAdd = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.createError = error || null
       })
 
       .addCase(updateCounterparty.pending, state => {
         state.loadingUpdate = true
-        state.error = null
+        state.error = false
       })
-      .addCase(updateCounterparty.fulfilled, (state, action) => {
+      .addCase(updateCounterparty.fulfilled, state => {
         state.loadingUpdate = false
-        const index = state.counterparties.findIndex(counterparty => counterparty._id === action.payload._id)
-        if (index !== -1) {
-          state.counterparties[index] = action.payload
-        }
       })
-      .addCase(updateCounterparty.rejected, (state, action) => {
+      .addCase(updateCounterparty.rejected, state => {
         state.loadingUpdate = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
 
       .addCase(archiveCounterparty.pending, state => {
         state.loadingArchive = true
-        state.error = null
+        state.error = false
       })
       .addCase(archiveCounterparty.fulfilled, state => {
         state.loadingArchive = false
+        state.error = false
       })
-      .addCase(archiveCounterparty.rejected, (state, action) => {
+      .addCase(archiveCounterparty.rejected, state => {
         state.loadingArchive = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
 
       .addCase(deleteCounterparty.pending, state => {
         state.loadingDelete = true
-        state.error = null
+        state.error = false
       })
-      .addCase(deleteCounterparty.fulfilled, (state, action) => {
+      .addCase(deleteCounterparty.fulfilled, state => {
         state.loadingDelete = false
-        state.counterparties = state.counterparties.filter(counterparty => counterparty._id !== action.meta.arg)
       })
-      .addCase(deleteCounterparty.rejected, (state, action) => {
+      .addCase(deleteCounterparty.rejected, state => {
         state.loadingDelete = false
-        state.error = action.error.message ? { message: action.error.message } : null
+        state.error = true
       })
   },
 })
