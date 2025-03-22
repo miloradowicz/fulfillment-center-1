@@ -13,7 +13,12 @@ import { initialErrorState, initialItemState, initialState } from '../state/arri
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addArrival, fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
+import {
+  addArrival,
+  fetchArrivalByIdWithPopulate,
+  fetchPopulatedArrivals,
+  updateArrival,
+} from '../../../store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
@@ -44,8 +49,8 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
         stock: initialData.stock._id,
-        shipping_agent: initialData.shipping_agent._id,
-        pickup_location: '',
+        shipping_agent: initialData.shipping_agent?._id || '',
+        pickup_location: initialData.pickup_location,
         products: [],
         defects: [],
         received_amount: [],
@@ -87,7 +92,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       dispatch(fetchProductsByClientId(form.client))
     }
   }, [dispatch, form.client])
-  console.log(counterparties)
 
   useEffect(() => {
     if (productsForm.length !== 0 && products) {
@@ -182,6 +186,10 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       return
     }
 
+    if (!form.shipping_agent ) {
+      delete form.shipping_agent
+    }
+
     try {
       const updatedForm = {
         ...form,
@@ -194,17 +202,18 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       if (initialData) {
         await dispatch(updateArrival({ arrivalId: initialData._id, data: updatedForm })).unwrap()
         onSuccess?.()
+        await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
       } else {
         await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
+        await dispatch(fetchPopulatedArrivals())
       }
 
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
-      await dispatch(fetchPopulatedArrivals())
     } catch (e) {
       console.error(e)
     }
