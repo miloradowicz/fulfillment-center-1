@@ -68,9 +68,6 @@ export class ProductsService {
           barcode: {
             messages: ['Продукт с таким штрихкодом уже существует'],
           },
-          article: {
-            messages: ['Продукт с таким артикулом уже существует'],
-          },
         },
       })
     }
