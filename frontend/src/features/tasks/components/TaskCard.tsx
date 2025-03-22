@@ -7,10 +7,10 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useAppDispatch } from '../../../app/hooks.ts'
-import { archiveTask, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
+import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
     data: {
@@ -41,7 +41,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent }) => {
     try {
       if (confirm('Вы уверены, что хотите переместить в архив эту задачу?')) {
         await dispatch(archiveTask(id))
-        await dispatch(fetchTasksWithPopulate())
+        if(!selectedUser){
+          await dispatch(fetchTasksWithPopulate())
+        }
+        else {
+          await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+        }
         toast.success('Задача перемещена в архив.')
       } else {
         toast.info('Вы отменили перемещение задачи в архив.')

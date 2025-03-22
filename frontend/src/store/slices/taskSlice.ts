@@ -5,7 +5,7 @@ import {
   addTask, archiveTask,
   deleteTask,
   fetchTaskById,
-  fetchTasks, fetchTasksByUserId,
+  fetchTasks, fetchTasksByUserId, fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate,
   updateTask,
 } from '../thunks/tasksThunk.ts'
@@ -84,6 +84,17 @@ const taskSlice = createSlice({
         state.tasksPopulate = tasks
       })
       .addCase(fetchTasksWithPopulate.rejected, state => {
+        state.loadingFetch = false
+      })
+      .addCase(fetchTasksByUserIdWithPopulate.pending, state => {
+        state.loadingFetch = true
+        state.error = false
+      })
+      .addCase(fetchTasksByUserIdWithPopulate.fulfilled, (state, { payload: tasks }) => {
+        state.loadingFetch = false
+        state.tasksPopulate = tasks
+      })
+      .addCase(fetchTasksByUserIdWithPopulate.rejected, state => {
         state.loadingFetch = false
       })
 

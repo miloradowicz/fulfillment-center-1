@@ -1,7 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI'
 import { isAxiosError } from 'axios'
-import { GlobalError, LoginMutation, User, UserMutation, UserRegistrationMutation, ValidationError } from '../../types'
+import {
+  GlobalError,
+  LoginMutation,
+  User,
+  UserMutation,
+  UserRegistrationMutation,
+  UserStripped,
+  ValidationError,
+} from '../../types'
 
 export const registerUser = createAsyncThunk<
   User,
@@ -38,7 +46,7 @@ export const loginUser = createAsyncThunk<User, LoginMutation, { rejectValue: st
   },
 )
 
-export const fetchUsers = createAsyncThunk<User[]>(
+export const fetchUsers = createAsyncThunk< UserStripped[]>(
   'users/fetchUsers',
   async () => {
     const response = await axiosAPI.get('/users')

@@ -50,7 +50,7 @@ export class SeederService {
     await this.counterModel.deleteMany({})
     await this.counterpartyModel.deleteMany({})
 
-    const [_User1, _User2, _admin] = await this.userModel.create([
+    const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
         email: 'test@gmail.com',
         password: '1234567890',
@@ -63,7 +63,7 @@ export class SeederService {
         email: 'test1@gmail.com',
         password: '1234567890',
         confirmPassword: '1234567890',
-        displayName: 'Вася',
+        displayName: 'Оля Макарова',
         role: 'stock-worker',
         token: randomUUID(),
       },
@@ -72,6 +72,38 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Admin',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe1.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Артем Иванов',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe12.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Игорь',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john1234@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Кристина',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john123а4@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Саша',
         role: 'super-admin',
         token: randomUUID(),
       },
@@ -303,6 +335,16 @@ export class SeederService {
         title: 'Связаться с клиентом по заказу №556677',
         status: 'готово',
         type: 'другое',
+      },
+      {
+        user: _User5._id,
+        title: 'Связаться с клиентом ',
+        status: 'готово',
+      },
+      {
+        user: _User6._id,
+        title: 'Связаться с клиентом ',
+        status: 'к выполнению',
       },
     ])
 
