@@ -182,6 +182,41 @@ export class SeederService {
       },
     ])
 
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром',
+        dynamic_fields: [
+          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
+          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
+        ],
+      },
+      {
+        name: 'Забор товара',
+        dynamic_fields: [
+          { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
+      },
+    ])
+
+    const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
+      {
+        name: 'ООО "Фулфилмент Партнер"',
+        phone_number: '+7 999 123-45-67',
+        address: 'Москва, ул. Достоевского, д. 10',
+      },
+      {
+        name: 'ИП Осмонов',
+        phone_number: '+996 700 456-789',
+        address: 'Бишкек, пр. Чуй, д. 55',
+      },
+      {
+        name: 'OОО "Складской Логистик"',
+        phone_number: '+996 500 789-456',
+        address: 'Бишкек, пр. Манаса, д. 30',
+      },
+    ])
+
     const [_arrival1, _arrival2, _arrival3] = await this.arrivalModel.create([
       {
         arrivalNumber: 'ARL-1',
@@ -191,6 +226,8 @@ export class SeederService {
         arrival_date: new Date().toISOString(),
         sent_amount: '2 короба',
         stock: _stock1._id,
+        shipping_agent: _counterparty2._id,
+        pickup_location: 'Ул. Пушкина, д. 67',
       },
       {
         arrivalNumber: 'ARL-2',
@@ -211,6 +248,8 @@ export class SeederService {
         arrival_date: new Date().toISOString(),
         sent_amount: '5 коробов',
         stock: _stock1._id,
+        shipping_agent: _counterparty1._id,
+        pickup_location: 'Ул. Авиаторов, д. 88',
       },
     ])
 
@@ -260,34 +299,16 @@ export class SeederService {
       {
         name: 'Работа с товаром',
         dynamic_fields: [
-          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
-          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
+          { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
+          { key: '6', label: 'Маркировка двойная', value: '300 сом' },
         ],
       },
       {
         name: 'Забор товара',
         dynamic_fields: [
-          { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
+          { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
         ],
-      },
-    ])
-
-    const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
-      {
-        name: 'ООО "Фулфилмент Партнер"',
-        phone_number: '+7 999 123-45-67',
-        address: 'Москва, ул. Достоевского, д. 10',
-      },
-      {
-        name: 'ИП Осмонов',
-        phone_number: '+996 700 456-789',
-        address: 'Бишкек, пр. Чуй, д. 55',
-      },
-      {
-        name: 'OОО "Складской Логистик"',
-        phone_number: '+996 500 789-456',
-        address: 'Бишкек, пр. Манаса, д. 30',
       },
     ])
   }

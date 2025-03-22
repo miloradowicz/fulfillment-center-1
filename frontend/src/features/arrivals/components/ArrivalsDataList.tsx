@@ -24,6 +24,45 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
 
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
+      field: 'arrivalNumber',
+      headerName: 'Номер поставки',
+      flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
+      editable: false,
+      filterable: true,
+      renderCell: ({ row }) => (
+        <NavLink
+          to={`/arrivals/${ row._id }`}
+          className="
+        py-2 px-3
+        bg-blue-50
+        text-blue-700
+        rounded-md
+        text-sm
+        font-medium
+        hover:bg-blue-100
+        transition-colors
+        duration-150
+        border
+        border-blue-200
+        hover:border-blue-300
+        whitespace-nowrap
+      "
+          style={{
+            lineHeight: '1.25rem',
+            maxWidth: '120px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {row.arrivalNumber}
+        </NavLink>
+      ),
+      valueGetter: (_value: string, row: ArrivalWithClient) => row.arrivalNumber,
+    },
+    {
       field: 'client',
       headerName: 'Клиент',
       flex: 1,
@@ -67,16 +106,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       type: 'number',
     },
     {
-      field: 'sent_amount',
-      headerName: 'Отправлено',
-      flex: 1,
-      minWidth: isMediumScreen ? 160 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.sent_amount ? row.sent_amount: '-',
-    },
-    {
       field: 'arrival_status',
       headerName: 'Статус',
       flex: 1,
@@ -85,20 +114,10 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       headerAlign: 'left',
       renderCell: params => <StatusArrivalCell row={params.row} />,
     },
-
-    {
-      field: 'products',
-      headerName: 'Товаров',
-      flex: 1,
-      minWidth: isMediumScreen ? 120 : 80,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.products.length,
-    },
     {
       field: 'Actions',
-      headerName: '',
-      flex: 2,
+      headerName: 'Действия',
+      flex: 1,
       minWidth: isMediumScreen ? 220 : 160,
       align: 'left',
       headerAlign: 'left',
@@ -113,9 +132,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
             <IconButton onClick={() => deleteOneArrival(row._id)}>
               <ClearIcon />
             </IconButton>
-            <NavLink className="text-gray-500 hover:text-gray-700 ml-2" to={`/arrivals/${ row._id }`}>
-              Подробнее
-            </NavLink>
           </>
         )
       },

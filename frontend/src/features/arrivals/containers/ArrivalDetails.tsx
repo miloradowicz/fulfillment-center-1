@@ -42,7 +42,6 @@ const ArrivalDetails = () => {
           initialData={arrival || undefined}
           onSuccess={() => {
             setEditModalOpen(false)
-            navigateBack()
           }}
         />
       </Modal>
@@ -104,6 +103,24 @@ const ArrivalDetails = () => {
                   </Grid>
                 </Grid>
               </Box>
+
+              {arrival?.shipping_agent ?
+                <Box sx={{ mb: 3 }}>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid>
+                      <ClientInfoItem loading={loading} label="Компания-перевозчик" value={arrival?.shipping_agent.name} />
+                    </Grid>
+                  </Grid>
+                </Box> : null}
+
+              {arrival?.pickup_location ?
+                <Box sx={{ mb: 3 }}>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid>
+                      <ClientInfoItem loading={loading} label="Адрес доставки" value={arrival?.pickup_location} />
+                    </Grid>
+                  </Grid>
+                </Box> : null}
 
               <Divider sx={{ my: 3 }} />
 
