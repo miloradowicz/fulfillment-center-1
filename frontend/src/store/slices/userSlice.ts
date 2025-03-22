@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { registerUser, loginUser, fetchUsers, fetchUserById, updateUser, deleteUser } from '../thunks/userThunk.ts'
-import { User, ValidationError, GlobalError } from '../../types'
+import { User, ValidationError, GlobalError, UserStripped } from '../../types'
 
 interface UserState {
   user: User | null
-  users: User[] | null
+  users:  UserStripped[] | null
   loadingFetch: boolean
   loadingRegister: boolean
   loadingLogin: boolean
