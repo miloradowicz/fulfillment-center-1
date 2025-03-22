@@ -90,7 +90,7 @@ export const ClientSchemaFactory = (
     }
   })
 
-  ClientSchema.post('findOneAndDelete', async function () {
+  ClientSchema.pre('findOneAndDelete', async function () {
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return
@@ -98,7 +98,7 @@ export const ClientSchemaFactory = (
     await cascadeDelete(client)
   })
 
-  ClientSchema.post('deleteOne', async function () {
+  ClientSchema.pre('deleteOne', async function () {
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return

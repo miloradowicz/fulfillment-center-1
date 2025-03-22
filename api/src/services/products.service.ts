@@ -5,6 +5,8 @@ import { CreateProductDto } from '../dto/create-product.dto'
 import { UpdateProductDto } from '../dto/update-product.dto'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { FilesService } from './files.service'
+import { Arrival, ArrivalDocument } from 'src/schemas/arrival.schema'
+import { Order, OrderDocument } from 'src/schemas/order.schema'
 
 interface DocumentObject {
   document: string;
@@ -20,7 +22,9 @@ interface DynamicFieldDto {
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
-    private readonly filesService: FilesService
+    @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    private readonly filesService: FilesService,
   ) {}
 
   async getById(id: string, populate?: boolean) {
@@ -85,7 +89,8 @@ export class ProductsService {
 
         const formattedDocs = Array.isArray(productDto.documents)
           ? productDto.documents.map((doc: DocumentObject | string) =>
-            typeof doc === 'string' ? { document: doc } : doc)
+            typeof doc === 'string' ? { document: doc } : doc,
+          )
           : []
 
         productDto.documents = [...formattedDocs, ...documentPaths]
@@ -103,7 +108,34 @@ export class ProductsService {
     }
   }
 
+  async isLocked(id: string) {
+    const product = await this.productModel.findById(id)
+
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    const arrivals = await this.arrivalModel.find({
+      $or: [
+        { products: { $elemMatch: { product: product._id } } },
+        { received_amount: { $elemMatch: { product: product._id } } },
+        { defects: { $elemMatch: { product: product._id } } },
+      ],
+    })
+
+    if (arrivals.length) return true
+
+    const orders = await this.orderModel.find({
+      $or: [{ products: { $elemMatch: { product: product._id } } }],
+    })
+
+    if (orders.length) return true
+
+    return false
+  }
+
   async archive(id: string) {
+    if (await this.isLocked(id))
+      throw new ForbiddenException('Товар не может быть перемещен в архив, поскольку уже используется в поставках и/или заказах.')
+
     const product = await this.productModel.findByIdAndUpdate(id, { isArchived: true })
 
     if (!product) throw new NotFoundException('Товар не найден')
@@ -114,6 +146,9 @@ export class ProductsService {
   }
 
   async delete(id: string) {
+    if (await this.isLocked(id))
+      throw new ForbiddenException('Товар не может быть удален, поскольку уже используется в поставках и/или заказах.')
+
     try {
       const deletedProduct = await this.productModel.findByIdAndDelete(id)
 
@@ -152,11 +187,7 @@ export class ProductsService {
         productDto.documents = [...existingDocs, ...documentPaths]
       }
 
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        id,
-        productDto,
-        { new: true }
-      )
+      const updatedProduct = await this.productModel.findByIdAndUpdate(id, productDto, { new: true })
 
       if (!updatedProduct) {
         throw new NotFoundException('Товар не найден')

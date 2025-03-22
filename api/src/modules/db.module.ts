@@ -9,6 +9,7 @@ import { User, UserSchemaFactory } from '../schemas/user.schema'
 import { Task, TaskSchema } from '../schemas/task.schema'
 import { Service, ServiceSchema } from '../schemas/service.schema'
 import { Stock, StockSchema } from '../schemas/stock.schema'
+import { Counterparty, CounterpartySchema } from 'src/schemas/counterparty.schema'
 
 @Module({
   imports: [
@@ -29,12 +30,22 @@ import { Stock, StockSchema } from '../schemas/stock.schema'
         name: User.name,
         useFactory: UserSchemaFactory,
         imports: [DbModule],
-        inject: [getModelToken(Task.name)],
+        inject: [
+          getModelToken(Client.name),
+          getModelToken(Product.name),
+          getModelToken(Arrival.name),
+          getModelToken(Order.name),
+          getModelToken(Counterparty.name),
+          getModelToken(Service.name),
+          getModelToken(Stock.name),
+          getModelToken(Task.name),
+        ],
       },
     ]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
+    MongooseModule.forFeature([{ name: Counterparty.name, schema: CounterpartySchema }]),
   ],
   exports: [MongooseModule],
 })

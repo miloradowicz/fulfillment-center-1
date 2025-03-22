@@ -5,6 +5,13 @@ import * as jwt from 'jsonwebtoken'
 import config from 'src/config'
 import { JwtToken } from 'src/types'
 import { Task } from './task.schema'
+import { Arrival } from './arrival.schema'
+import { Client } from './client.schema'
+import { Product } from './product.schema'
+import { Order } from './order.schema'
+import { Counterparty } from './counterparty.schema'
+import { Service } from './service.schema'
+import { Stock } from './stock.schema'
 
 export interface UserDocument extends Document {
   isArchived: boolean;
@@ -81,7 +88,16 @@ UserSchema.set('toJSON', {
   },
 })
 
-export const UserSchemaFactory = (taskModel: Model<Task>) => {
+export const UserSchemaFactory = (
+  clientModel: Model<Client>,
+  productModel: Model<Product>,
+  arrivalModel: Model<Arrival>,
+  orderModel: Model<Order>,
+  counterpartyModel: Model<Counterparty>,
+  serviceModel: Model<Service>,
+  stockModel: Model<Stock>,
+  taskModel: Model<Task>
+) => {
   const cascadeArchive = async (user: HydratedDocument<User>) => {
     const tasks = await taskModel.find({ user: user._id })
 
@@ -89,6 +105,15 @@ export const UserSchemaFactory = (taskModel: Model<Task>) => {
   }
 
   const cascadeDelete = async (user: HydratedDocument<User>) => {
+    await clientModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await productModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await arrivalModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await orderModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await counterpartyModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await serviceModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await stockModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await taskModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+
     const tasks = await taskModel.find({ user: user._id })
 
     await Promise.all(tasks.map(x => x.deleteOne()))
@@ -124,7 +149,7 @@ export const UserSchemaFactory = (taskModel: Model<Task>) => {
     }
   })
 
-  UserSchema.post('findOneAndDelete', async function () {
+  UserSchema.pre('findOneAndDelete', async function () {
     const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
 
     if (!user) return
@@ -132,7 +157,7 @@ export const UserSchemaFactory = (taskModel: Model<Task>) => {
     await cascadeDelete(user)
   })
 
-  UserSchema.post('deleteOne', async function () {
+  UserSchema.pre('deleteOne', async function () {
     const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
 
     if (!user) return
