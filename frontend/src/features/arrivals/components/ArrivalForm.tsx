@@ -47,6 +47,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     clients,
     stocks,
     availableItem,
+    counterparties,
   } = useArrivalForm(initialData, onSuccess)
 
   return (
@@ -71,6 +72,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             fullWidth
             disablePortal
             options={getItemNameById(clients, 'name', '_id')}
+            getOptionKey={option => option.id}
             sx={{ width: '100%' }}
             renderInput={params => (
               <TextField
@@ -93,6 +95,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             fullWidth
             disablePortal
             options={getItemNameById(stocks, 'name', '_id')}
+            getOptionKey={option => option.id}
             sx={{ width: '100%' }}
             renderInput={params => (
               <TextField
@@ -103,6 +106,113 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 onBlur={e => handleBlur('stock', e.target.value)}
               />
             )}
+          />
+        </Grid>
+
+        <Grid>
+          <Autocomplete
+            id="shipping_agent"
+            value={
+              getItemNameById(counterparties, 'name', '_id').find(option => option.id === form.shipping_agent) || null
+            }
+            onChange={(_, newValue) => {
+              const value = newValue?.id || ''
+              setForm(prevState => ({
+                ...prevState,
+                shipping_agent: value,
+              }))
+            }}
+            size="small"
+            fullWidth
+            disablePortal
+            options={getItemNameById(counterparties, 'name', '_id')}
+            getOptionKey={option => option.id}
+            sx={{ width: '100%' }}
+            renderInput={params => <TextField {...params} label="Компания-перевозчик" />}
+          />
+        </Grid>
+
+        <Grid>
+          <TextField
+            id="pickup_location"
+            name="pickup_location"
+            label="Адрес доставки"
+            value={form.pickup_location}
+            onChange={e => inputChangeHandler(e, setForm)}
+            size="small"
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <TextField
+            type="number"
+            id="arrival_price"
+            name="arrival_price"
+            label="Цена доставки"
+            value={form.arrival_price || ''}
+            onChange={e =>
+              setForm(prev => ({
+                ...prev,
+                arrival_price: Number(e.target.value),
+              }))
+            }
+            size="small"
+            error={Boolean(errors.arrival_price || getFieldError('arrival_price', error))}
+            helperText={errors.arrival_price || getFieldError('arrival_price', error)}
+            onBlur={e => handleBlur('arrival_price', e.target.value)}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <Autocomplete
+            id="arrival_status"
+            value={ form.arrival_status && status.includes(form.arrival_status) ? form.arrival_status : null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, arrival_status: newValue || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={status}
+            sx={{ width: '100%' }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Статус доставки"
+                error={Boolean(errors.arrival_status || getFieldError('arrival_status', error))}
+                helperText={errors.arrival_status || getFieldError('arrival_status', error)}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid>
+          <InputLabel htmlFor="arrival_date" style={{ fontSize: '15px', marginLeft: '12px' }}>
+            Дата прибытия
+          </InputLabel>
+          <TextField
+            id="arrival_date"
+            name="arrival_date"
+            size={'small'}
+            type="date"
+            value={form.arrival_date}
+            onChange={e => inputChangeHandler(e, setForm)}
+            error={Boolean(errors.arrival_date || getFieldError('arrival_date', error))}
+            helperText={errors.arrival_date || getFieldError('arrival_date', error)}
+            onBlur={e => handleBlur('arrival_date', e.target.value)}
+            fullWidth
+          />
+        </Grid>
+
+        <Grid>
+          <TextField
+            id="sent_amount"
+            name="sent_amount"
+            label="Количество отправленного товара (шт/мешков/коробов)"
+            value={form.sent_amount}
+            onChange={e => inputChangeHandler(e, setForm)}
+            size="small"
+            fullWidth
           />
         </Grid>
 
@@ -350,78 +460,6 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             </Grid>
           </Grid>
         )}
-
-        <Grid>
-          <TextField
-            type="number"
-            id="arrival_price"
-            name="arrival_price"
-            label="Цена доставки"
-            value={form.arrival_price || ''}
-            onChange={e =>
-              setForm(prev => ({
-                ...prev,
-                arrival_price: Number(e.target.value),
-              }))
-            }
-            size="small"
-            error={Boolean(errors.arrival_price || getFieldError('arrival_price', error))}
-            helperText={errors.arrival_price || getFieldError('arrival_price', error)}
-            onBlur={e => handleBlur('arrival_price', e.target.value)}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid>
-          <InputLabel htmlFor="arrival_date" style={{ fontSize: '15px', marginLeft: '12px' }}>
-            Дата прибытия
-          </InputLabel>
-          <TextField
-            id="arrival_date"
-            name="arrival_date"
-            size={'small'}
-            type="date"
-            value={form.arrival_date}
-            onChange={e => inputChangeHandler(e, setForm)}
-            error={Boolean(errors.arrival_date || getFieldError('arrival_date', error))}
-            helperText={errors.arrival_date || getFieldError('arrival_date', error)}
-            onBlur={e => handleBlur('arrival_date', e.target.value)}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid>
-          <Autocomplete
-            id="arrival_status"
-            value={status.find(option => option === form.arrival_status) || status[0] || null}
-            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, arrival_status: newValue|| '' }))}
-            size="small"
-            fullWidth
-            disablePortal
-            options={status}
-            sx={{ width: '100%' }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Статус"
-                error={Boolean(errors.arrival_status || getFieldError('arrival_status', error))}
-                helperText={errors.arrival_status || getFieldError('arrival_status', error)}
-              />
-            )}
-          />
-        </Grid>
-
-        <Grid>
-          <TextField
-            id="sent_amount"
-            name="sent_amount"
-            label="Количество отправленного товара (шт/мешков/коробов)"
-            value={form.sent_amount}
-            onChange={e => inputChangeHandler(e, setForm)}
-            size="small"
-            fullWidth
-          />
-        </Grid>
 
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
