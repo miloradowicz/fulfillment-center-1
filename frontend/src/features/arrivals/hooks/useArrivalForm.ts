@@ -87,6 +87,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       dispatch(fetchProductsByClientId(form.client))
     }
   }, [dispatch, form.client])
+  console.log(counterparties)
 
   useEffect(() => {
     if (productsForm.length !== 0 && products) {

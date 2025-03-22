@@ -1,13 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { CreateOrderDto } from '../dto/create-order.dto'
 import { UpdateOrderDto } from '../dto/update-order.dto'
+import { CounterService } from './counter.service'
 
 @Injectable()
 export class OrdersService {
-  constructor(@InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>) {}
+  constructor(
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    private counterService: CounterService
+  ) {}
 
   async getAll() {
     return this.orderModel.find({ isArchived: false })
@@ -42,7 +46,22 @@ export class OrdersService {
   }
 
   async create(orderDto: CreateOrderDto) {
-    return await this.orderModel.create(orderDto)
+    try {
+      const newOrder = await this.orderModel.create(orderDto)
+
+      const sequenceNumber = await this.counterService.getNextSequence('order')
+      newOrder.orderNumber  = `ORD-${ sequenceNumber }`
+
+      return newOrder.save()
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error
+      }
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message)
+      }
+      throw new BadRequestException('Произошла ошибка при создании заказа')
+    }
   }
 
   async update(id: string, orderDto: UpdateOrderDto) {

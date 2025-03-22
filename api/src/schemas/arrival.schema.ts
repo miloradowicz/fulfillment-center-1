@@ -12,6 +12,12 @@ export class Arrival {
   isArchived: boolean
 
   @Prop({
+    type: String,
+    unique: true,
+  })
+  arrivalNumber: string
+
+  @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
     required: true,
@@ -117,3 +123,6 @@ export class Arrival {
 }
 
 export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
+
+
+

@@ -131,7 +131,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   shipping_agent: Counterparty
 }
 
-export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock' | 'shipping_agent'> {
+export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock'> {
   client: Client
   stock: Stock
   shipping_agent: Counterparty
