@@ -35,6 +35,17 @@ export class CreateTaskDto {
   })
   status: 'к выполнению' | 'в работе' | 'готово'
 
+  @IsEnum(['поставка', 'заказ', 'другое'], {
+    message: 'Тип задачи должен быть один из: "поставка", "заказ", "другое"',
+  })
+  type: 'поставка' | 'заказ' | 'другое'
+
+  @IsOptional()
+  associated_order?: string
+
+  @IsOptional()
+  associated_arrival?: string
+
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })
   @ValidateNested({ each: true })

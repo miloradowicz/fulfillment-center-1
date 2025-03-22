@@ -97,7 +97,7 @@ export class SeederService {
       },
     ])
 
-    await this.orderModel.create([
+    const [_order1, _order2, _order3] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
         client: _clients._id,
@@ -169,35 +169,6 @@ export class SeederService {
       },
     ])
 
-    await this.taskModel.create([
-      {
-        user: _User1._id,
-        title: 'Принять товар из поставки №2248239487',
-        description: 'Проверить товар на дефекты и внести информацию в базу',
-        status: 'к выполнению',
-      },
-      {
-        user: _User2._id,
-        title: 'Собрать заказ №12423424',
-        status: 'в работе',
-      },
-      {
-        user: _User1._id,
-        title: 'Упаковка товара для заказа №12423424',
-        status: 'готово',
-      },
-      {
-        user: _User2._id,
-        title: 'Проверить складские остатки',
-        status: 'в работе',
-      },
-      {
-        user: _User1._id,
-        title: 'Связаться с клиентом по заказу №556677',
-        status: 'готово',
-      },
-    ])
-
     const [_stock1, _stock2] = await this.stockModel.create([
       {
         name: 'Склад Бишкек',
@@ -211,7 +182,7 @@ export class SeederService {
       },
     ])
 
-    await this.arrivalModel.create([
+    const [_arrival1, _arrival2, _arrival3] = await this.arrivalModel.create([
       {
         arrivalNumber: 'ARL-1',
         client: _clients._id,
@@ -248,6 +219,42 @@ export class SeederService {
       { $set: { seq: 3 } },
       { upsert: true }
     )
+
+    await this.taskModel.create([
+      {
+        user: _User1._id,
+        title: 'Принять товар из поставки №2248239487',
+        description: 'Проверить товар на дефекты и внести информацию в базу',
+        status: 'к выполнению',
+        type: 'поставка',
+        associated_arrival: _arrival1._id,
+      },
+      {
+        user: _User2._id,
+        title: 'Собрать заказ №12423424',
+        status: 'в работе',
+        type: 'заказ',
+        associated_order: _order2._id,
+      },
+      {
+        user: _User1._id,
+        title: 'Упаковка товара для заказа №12423424',
+        status: 'готово',
+        type: 'другое',
+      },
+      {
+        user: _User2._id,
+        title: 'Проверить складские остатки',
+        status: 'в работе',
+        type: 'другое',
+      },
+      {
+        user: _User1._id,
+        title: 'Связаться с клиентом по заказу №556677',
+        status: 'готово',
+        type: 'другое',
+      },
+    ])
 
     await this.serviceModel.create([
       {
