@@ -113,7 +113,7 @@ export interface Arrival {
   arrival_date: string
   sent_amount: string
   stock: string
-  shipping_agent?: string
+  shipping_agent?: string | null
   pickup_location?: string
   defects?: Defect[]
   arrival_status?: string
@@ -135,7 +135,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
 export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock' | 'shipping_agent'> {
   client: Client
   stock: Stock
-  shipping_agent?: Counterparty
+  shipping_agent?: Counterparty | null
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>
@@ -146,7 +146,7 @@ export interface Order {
   products: ProductOrder[]
   price: number
   sent_at: string
-  delivered_at: string
+  delivered_at?: string | null
   comment?: string
   status?: string
   orderNumber?: string
@@ -214,7 +214,6 @@ export interface ErrorForOrder {
   amount: number
   defect_description: string
   sent_at: string
-  delivered_at: string
   status?:string
 }
 
