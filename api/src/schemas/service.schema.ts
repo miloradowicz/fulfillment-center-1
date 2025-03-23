@@ -15,6 +15,13 @@ export class Service {
   name: string
 
   @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ServiceCategory',
+    required: true,
+  })
+  serviceCategory: mongoose.Schema.Types.ObjectId
+
+  @Prop({
     type: [
       {
         key: { type: String, required: true, unique: true },

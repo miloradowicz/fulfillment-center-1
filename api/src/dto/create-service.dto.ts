@@ -4,6 +4,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import mongoose from 'mongoose'
 
 class LogDto {
   @IsNotEmpty({ message: 'Заполните поле пользователя.' })
@@ -30,6 +31,9 @@ class DynamicFieldDto {
 export class CreateServiceDto {
   @IsNotEmpty({ message: 'Поле наименование обязательно для заполнения.' })
   name: string
+
+  @IsNotEmpty({ message: 'Поле категория услуги обязательно для заполнения.' })
+  serviceCategory: mongoose.Schema.Types.ObjectId
 
   @ValidateNested({ each: true })
   @Type(() => DynamicFieldDto)
