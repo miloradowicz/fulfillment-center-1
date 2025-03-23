@@ -62,13 +62,15 @@ export const deleteClient = createAsyncThunk<void, string, { rejectValue: Global
   }
 })
 
-export const updateClient = createAsyncThunk<void, { clientId: string; data: ClientMutation }, { rejectValue: GlobalError }>(
+export const updateClient = createAsyncThunk<void, { clientId: string; data: ClientMutation }, { rejectValue: ValidationError | GlobalError }>(
   'clients/updateClient',
   async ({ clientId, data }, { rejectWithValue }) => {
     try {
       await axiosAPI.put(`/clients/${ clientId }`, data)
     } catch (e) {
-      if (isAxiosError(e) && e.response) {
+      if (isAxiosError(e) && e.response && e.response.status === 400) {
+        return rejectWithValue(e.response.data as ValidationError)
+      } else if (isAxiosError(e) && e.response && 'message' in e.response.data) {
         return rejectWithValue(e.response.data as GlobalError)
       }
       throw e

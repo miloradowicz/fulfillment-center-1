@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError } from '../../../store/slices/clientSlice.ts'
+import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError, clearCreationAndModificationError } from '../../../store/slices/clientSlice.ts'
 import { addClient, fetchClientById, fetchClients, updateClient } from '../../../store/thunks/clientThunk.ts'
 import { emailRegex, initialClientState, phoneNumberRegex } from '../../../constants.ts'
 import { ClientMutation } from '../../../types'
@@ -30,6 +30,10 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
       setForm(client)
     }
   }, [clientId, client])
+
+  useEffect(() => {
+    dispatch(clearCreationAndModificationError())
+  }, [dispatch])
 
   const validateField = (name: keyof ClientMutation, value: string): string => {
     if (!value.trim()) return 'Поле не может быть пустым'

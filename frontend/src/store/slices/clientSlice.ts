@@ -40,7 +40,11 @@ export const selectClientCreationAndModificationError = (state: RootState) => st
 export const clientSlice = createSlice({
   name: 'clients',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCreationAndModificationError: state => {
+      state.creationAndModificationError = null
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchClients.pending, state => {
       state.loadingFetch = true
@@ -107,15 +111,14 @@ export const clientSlice = createSlice({
       state.loadingUpdate = false
       state.error = null
     })
-    builder.addCase(updateClient.rejected, (state, { payload: error }) => {
+    builder.addCase(updateClient.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingUpdate = false
-      state.error = error || null
+      state.creationAndModificationError =
+        returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
   },
 })
 
+export const { clearCreationAndModificationError } = clientSlice.actions
+
 export const clientReducer = clientSlice.reducer
-
-
-
-

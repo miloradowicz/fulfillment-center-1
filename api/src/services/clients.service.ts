@@ -36,10 +36,15 @@ export class ClientsService {
   }
 
   async update(id: string, clientDto: UpdateClientDto) {
-    const client = await this.clientModel.findByIdAndUpdate(id, clientDto, { runValidators: true, new: true })
+    const client = await this.clientModel.findById(id)
+
     if (!client) {
       throw new NotFoundException('Клиент не найден')
     }
+
+    client.set(clientDto)
+    await client.save()
+
     return client
   }
 

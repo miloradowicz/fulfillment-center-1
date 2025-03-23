@@ -64,7 +64,6 @@ export const ClientSchemaFactory = (
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return
-
     const update = this.getUpdate()
 
     if (update && 'isArchived' in update && update.isArchived) {
