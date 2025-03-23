@@ -362,8 +362,6 @@ export class SeederService {
         isArchived: false,
       }]
     )
-    console.log('_serviceCat1:', _serviceCat1)
-    console.log('_serviceCat2:', _serviceCat2)
 
     await this.serviceModel.create([
       {
