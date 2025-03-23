@@ -4,7 +4,13 @@ import { Counterparty } from '../../../types'
 import { useCounterpartyForm } from '../hooks/useCounterpartyForm.ts'
 
 const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterparty | null; onClose?: () => void }) => {
-  const { form, loading, inputChangeHandler, onSubmit, getFieldError } = useCounterpartyForm(counterparty?._id, onClose)
+  const {
+    form,
+    loading,
+    inputChangeHandler,
+    onSubmit,
+    getFieldError,
+  } = useCounterpartyForm(counterparty?._id, onClose)
 
   return (
     <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>

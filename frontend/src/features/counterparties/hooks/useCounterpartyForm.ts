@@ -5,18 +5,29 @@ import { CounterpartyMutation } from '../../../types'
 import { phoneNumberRegex } from '../../../constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
 import { toast } from 'react-toastify'
-import { selectOneCounterparty, selectLoadingAdd } from '../../../store/slices/counterpartySlices.ts'
+import { selectOneCounterparty, selectLoadingAdd, selectLoadingUpdate, selectCounterpartyCreateError, selectCounterpartyUpdateError, clearErrors } from '../../../store/slices/counterpartySlices.ts'
 
 const requiredField: (keyof CounterpartyMutation)[] = ['name']
 
 export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => void) => {
-  const loading = useAppSelector(selectLoadingAdd)
+  const dispatch = useAppDispatch()
+  const loadingAdd = useAppSelector(selectLoadingAdd)
+  const loadingUpdate = useAppSelector(selectLoadingUpdate)
   const counterparty = useAppSelector(selectOneCounterparty)
+  const createError = useAppSelector(selectCounterpartyCreateError)
+  const updateError = useAppSelector(selectCounterpartyUpdateError)
+
   const [form, setForm] = useState<CounterpartyMutation>(initialState)
   const [errors, setErrors] = useState<{ [K in keyof CounterpartyMutation]?: string }>({})
   const [submitting, setSubmitting] = useState(false)
 
-  const dispatch = useAppDispatch()
+  const generalError = createError?.message || updateError?.message || ''
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearErrors())
+    }
+  }, [dispatch])
 
   useEffect(() => {
     if (counterpartyId) dispatch(fetchCounterpartyById(counterpartyId))
@@ -25,6 +36,29 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   useEffect(() => {
     if (counterpartyId && counterparty) setForm(counterparty)
   }, [counterpartyId, counterparty])
+
+  useEffect(() => {
+    const errors = createError || updateError
+    if (errors) {
+      const newErrors: { [K in keyof CounterpartyMutation]?: string } = {}
+
+      if (errors.message) {
+        toast.error(errors.message)
+      }
+
+      if (errors.errors) {
+        Object.entries(errors.errors).forEach(([field, messages]) => {
+          if (Array.isArray(messages) && messages.length > 0) {
+            newErrors[field as keyof CounterpartyMutation] = messages[0]
+          } else if (typeof messages === 'string') {
+            newErrors[field as keyof CounterpartyMutation] = messages
+          }
+        })
+      }
+
+      setErrors(prev => ({ ...prev, ...newErrors }))
+    }
+  }, [createError, updateError])
 
   const validate = (name: keyof CounterpartyMutation, value?: string): string | undefined => {
     if (name === 'name' && !value?.trim()) return 'Поле не может быть пустым'
@@ -101,5 +135,13 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     }
   }
 
-  return { form, loading: loading || submitting, inputChangeHandler, onSubmit, getFieldError }
+  return {
+    form,
+    loading: loadingAdd || loadingUpdate || submitting,
+    inputChangeHandler,
+    onSubmit,
+    getFieldError,
+    generalError,
+    hasErrors: Object.keys(errors).length > 0,
+  }
 }
