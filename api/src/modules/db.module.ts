@@ -11,6 +11,7 @@ import { Service, ServiceSchema } from '../schemas/service.schema'
 import { Stock, StockSchema } from '../schemas/stock.schema'
 import { Counter, CounterSchema } from '../schemas/counter.schema'
 import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema'
+import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-category.schema'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema
     MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
     MongooseModule.forFeature([{ name: Counter.name, schema: CounterSchema }]),
     MongooseModule.forFeature([{ name: Counterparty.name, schema: CounterpartySchema }]),
+    MongooseModule.forFeature([{ name: ServiceCategory.name, schema: ServiceCategorySchema }]),
   ],
   exports: [MongooseModule],
 })
