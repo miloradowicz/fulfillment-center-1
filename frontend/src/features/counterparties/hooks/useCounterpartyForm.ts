@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { createCounterparty, fetchAllCounterparties, fetchCounterpartyById, updateCounterparty } from '../../../store/thunks/counterpartyThunk.ts'
+import { createCounterparty, fetchCounterparties, fetchCounterpartyById, updateCounterparty } from '../../../store/thunks/counterpartyThunk.ts'
 import { CounterpartyMutation } from '../../../types'
 import { phoneNumberRegex } from '../../../constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
@@ -21,7 +21,9 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   const [errors, setErrors] = useState<{ [K in keyof CounterpartyMutation]?: string }>({})
   const [submitting, setSubmitting] = useState(false)
 
-  const generalError = createError?.message || updateError?.message || ''
+  const generalError =
+    (createError && typeof createError === 'object' && 'message' in createError ? createError.message : '') ||
+    (updateError && typeof updateError === 'object' && 'message' in updateError ? updateError.message : '')
 
   useEffect(() => {
     return () => {
@@ -46,11 +48,11 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     if (errors) {
       const newErrors: { [K in keyof CounterpartyMutation]?: string } = {}
 
-      if (errors.message) {
+      if ('message' in errors && typeof errors.message === 'string') {
         toast.error(errors.message)
       }
 
-      if (errors.errors) {
+      if ('errors' in errors && typeof errors.errors === 'object') {
         Object.entries(errors.errors).forEach(([field, messages]) => {
           if (Array.isArray(messages) && messages.length > 0) {
             newErrors[field as keyof CounterpartyMutation] = messages[0]
@@ -122,11 +124,11 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
 
       if (counterpartyId) {
         await dispatch(updateCounterparty({ id: counterpartyId, data: submissionData })).unwrap()
-        await dispatch(fetchCounterpartyById(counterpartyId))
+        await dispatch(fetchCounterparties())
         toast.success('Контрагент успешно обновлен!')
       } else {
         await dispatch(createCounterparty(submissionData)).unwrap()
-        await dispatch(fetchAllCounterparties())
+        await dispatch(fetchCounterparties())
         toast.success('Контрагент успешно создан!')
       }
 
