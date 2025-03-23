@@ -23,9 +23,6 @@ export interface ValidationError {
       messages: string[]
     }
   }
-  message: string
-  name: string
-  _message: string
 }
 
 export interface DynamicField {
@@ -276,7 +273,7 @@ export interface StockError {
 
 export type StockMutation = Omit<Stock, '_id'>
 
-export interface Counterparty  {
+export interface Counterparty {
   _id: string
   name: string
   address?: string

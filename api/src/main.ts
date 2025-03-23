@@ -14,6 +14,7 @@ import { TokenAuthGuard } from './guards/token-auth.guard'
 import { TokenAuthService } from './services/token-auth.service'
 import { RolesGuard } from './guards/roles.guard'
 import { RolesService } from './services/roles.service'
+import { ValidationErrorFilter } from './exception-filters/mongo-validation-error.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -45,7 +46,7 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   )
-  app.useGlobalFilters(new DtoValidationErrorFilter(), new CastErrorFilter())
+  app.useGlobalFilters(new DtoValidationErrorFilter(), new CastErrorFilter(), new ValidationErrorFilter)
   await app.listen(config.server.port)
 }
 bootstrap().catch(console.error)
