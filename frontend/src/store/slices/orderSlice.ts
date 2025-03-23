@@ -10,6 +10,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import {
   addOrder,
+  archiveOrder,
   deleteOrder,
   fetchOrderById, fetchOrderByIdWithPopulate,
   fetchOrders,
@@ -25,6 +26,7 @@ interface OrderState {
   loadingFetch : boolean
   loadingFetchPopulate: boolean
   loadingAdd: boolean
+  loadingArchive: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
   error: GlobalError | null
@@ -39,6 +41,7 @@ const initialState: OrderState = {
   loadingFetch: false,
   loadingFetchPopulate:false,
   loadingAdd: false,
+  loadingArchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -52,6 +55,7 @@ export const selectAllOrdersWithClient = (state: RootState) => state.orders.orde
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
 export const selectLoadingFetchOrderPopulate = (state: RootState) => state.orders.loadingFetchPopulate
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
+export const selectLoadingArchiveOrder = (state: RootState) => state.orders.loadingArchive
 export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
 export const selectLoadingUpdateOrder = (state: RootState) => state.orders.loadingUpdate
 export const selectOrderError = (state: RootState) => state.orders.error
@@ -121,6 +125,18 @@ const orderSlice = createSlice({
     builder.addCase(addOrder.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
       state.createAndUpdateError = error || null
+    })
+    builder.addCase(archiveOrder.pending, state => {
+      state.loadingArchive = true
+      state.error = null
+    })
+    builder.addCase(archiveOrder.fulfilled, state => {
+      state.loadingArchive = false
+      state.error = null
+    })
+    builder.addCase(archiveOrder.rejected, (state, { payload: error }) => {
+      state.loadingArchive = false
+      state.error = error || null
     })
     builder.addCase(deleteOrder.pending, state => {
       state.loadingDelete = true

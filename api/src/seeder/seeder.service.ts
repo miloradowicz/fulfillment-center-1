@@ -14,7 +14,6 @@ import { Counter, CounterDocument } from '../schemas/counter.schema'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
 import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-category.schema'
 
-
 @Injectable()
 export class SeederService {
   constructor(
@@ -54,6 +53,65 @@ export class SeederService {
     await this.counterModel.deleteMany({})
     await this.counterpartyModel.deleteMany({})
     await this.serviceCategoryModel.deleteMany({})
+
+    const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
+      {
+        email: 'test@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Мария',
+        role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'test1@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Оля Макарова',
+        role: 'stock-worker',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Admin',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe1.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Артем Иванов',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john@doe12.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Игорь',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john1234@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Кристина',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+      {
+        email: 'john123а4@doe.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Саша',
+        role: 'super-admin',
+        token: randomUUID(),
+      },
+    ])
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -97,6 +155,12 @@ export class SeederService {
         dynamic_fields: [
           { label: 'Размер', key: 'size', value: 'L' },
           { label: 'Цвет', key: 'color', value: 'Белый' },
+        ],
+        logs: [
+          { user: _User1, change: 'record #1', date: new Date().toISOString() },
+          { user: _User1, change: 'record #2', date: new Date().toISOString() },
+          { user: _User1, change: 'record #3', date: new Date().toISOString() },
+          { user: _User2, change: 'record #4', date: new Date().toISOString() },
         ],
       },
     ])
@@ -145,33 +209,6 @@ export class SeederService {
       { $set: { seq: 3 } },
       { upsert: true }
     )
-
-    const [_User1, _User2, _admin] = await this.userModel.create([
-      {
-        email: 'test@gmail.com',
-        password: '1234567890',
-        confirmPassword: '1234567890',
-        displayName: 'Мария',
-        role: 'stock-worker',
-        token: randomUUID(),
-      },
-      {
-        email: 'test1@gmail.com',
-        password: '1234567890',
-        confirmPassword: '1234567890',
-        displayName: 'Вася',
-        role: 'stock-worker',
-        token: randomUUID(),
-      },
-      {
-        email: 'john@doe.com',
-        password: '1234567890',
-        confirmPassword: '1234567890',
-        displayName: 'Admin',
-        role: 'super-admin',
-        token: randomUUID(),
-      },
-    ])
 
     const [_stock1, _stock2] = await this.stockModel.create([
       {
@@ -242,6 +279,12 @@ export class SeederService {
         arrival_date: new Date().toISOString(),
         sent_amount: '2 мешка',
         stock: _stock2._id,
+        logs: [
+          { user: _User2, change: 'record #1', date: new Date().toISOString() },
+          { user: _User1, change: 'record #2', date: new Date().toISOString() },
+          { user: _admin, change: 'record #3', date: new Date().toISOString() },
+          { user: _User2, change: 'record #4', date: new Date().toISOString() },
+        ],
       },
       {
         arrivalNumber: 'ARL-3',
@@ -296,6 +339,16 @@ export class SeederService {
         title: 'Связаться с клиентом по заказу №556677',
         status: 'готово',
         type: 'другое',
+      },
+      {
+        user: _User5._id,
+        title: 'Связаться с клиентом ',
+        status: 'готово',
+      },
+      {
+        user: _User6._id,
+        title: 'Связаться с клиентом ',
+        status: 'к выполнению',
       },
     ])
 

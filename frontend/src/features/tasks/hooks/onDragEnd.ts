@@ -26,42 +26,37 @@ export const onDragEnd = async ({
   dispatch,
 }: DragEndProps) => {
   const container = e.over?.id
-  const title = e.active?.data?.current?.title ?? ''
-  const id = e.active?.data?.current?._id ?? ''
-  const description = e.active?.data?.current?.description ?? ''
-  const userName = e.active?.data?.current?.user.displayName ?? ''
-  const userID = e.active?.data?.current?.user._id ?? ''
-  const userEmail = e.active?.data?.current?.user.email ?? ''
-  const userRole = e.active?.data?.current?.user.role ?? 'stock-worker'
-  const index = e.active?.data?.current?.index ?? 0
-  const parent = e.active?.data?.current?.parent ?? 'К выполнению'
+  const taskData = e.active?.data?.current
+  if (!taskData) return
 
-  let updatedItems
+  const { _id, title, description, user, parent } = taskData
+  const userID = user?._id ?? ''
+  const userEmail = user?.email ?? ''
+  const userName = user?.displayName ?? ''
+  const userRole = user?.role ?? 'stock-worker'
+
+  const removeTask = (items: TaskWithPopulate[]) => items.filter(item => item._id !== _id)
 
   if (parent === 'к выполнению') {
-    updatedItems = todoItems.filter((_, i) => i !== index)
-    setTodoItems(updatedItems)
+    setTodoItems(removeTask(todoItems))
   } else if (parent === 'готово') {
-    updatedItems = doneItems.filter((_, i) => i !== index)
-    setDoneItems(updatedItems)
+    setDoneItems(removeTask(doneItems))
   } else {
-    updatedItems = inProgressItems.filter((_, i) => i !== index)
-    setInProgressItems(updatedItems)
+    setInProgressItems(removeTask(inProgressItems))
   }
 
   const newItem: TaskWithPopulate = {
-    _id: id,
-    title: title,
+    _id,
+    title,
+    description,
     user: {
       _id: userID,
       email: userEmail,
       displayName: userName,
       role: userRole,
     },
-    description: description,
     status: container as string,
   }
-
 
   if (container === 'к выполнению') {
     setTodoItems(prev => [...prev, newItem])
@@ -73,33 +68,18 @@ export const onDragEnd = async ({
 
   if (parent !== container) {
     try {
-      const taskData = {
-        taskId: id,
+      await dispatch(updateTask({
+        taskId: _id,
         data: {
           user: userID,
-          title: title,
-          description: description,
+          title,
+          description,
           status: container as string,
         },
-      }
-
-      await dispatch(updateTask(taskData))
+      }))
     } catch (error) {
       console.error('Ошибка при обновлении задачи:', error)
       alert('Ошибка при обновлении задачи')
     }
-  }
-
-
-  if (!container) {
-    setTimeout(() => {
-      if (parent === 'к выполнению') {
-        setTodoItems(prev => [...prev, newItem])
-      } else if (parent === 'готово') {
-        setDoneItems(prev => [...prev, newItem])
-      } else if (parent === 'в работе') {
-        setInProgressItems(prev => [...prev, newItem])
-      }
-    }, 50)
   }
 }

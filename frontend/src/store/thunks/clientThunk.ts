@@ -31,6 +31,21 @@ export const addClient = createAsyncThunk<void, ClientMutation, { rejectValue: G
   }
 })
 
+export const archiveClient = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'clients/archiveClient',
+  async (clientId: string, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/clients/${ clientId }/archive`)
+      return { id: clientId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteClient = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('clients/deleteClient', async (clientId: string, { rejectWithValue }) => {
   try {

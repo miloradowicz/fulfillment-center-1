@@ -1,15 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
-import { registerUser, loginUser, fetchUsers, fetchUserById, updateUser, deleteUser } from '../thunks/userThunk.ts'
-import { User, ValidationError, GlobalError } from '../../types'
+import { registerUser, loginUser, fetchUsers, fetchUserById, updateUser, deleteUser, archiveUser } from '../thunks/userThunk.ts'
+import { User, ValidationError, GlobalError, UserStripped } from '../../types'
 
 interface UserState {
   user: User | null
-  users: User[] | null
+  users: UserStripped[] | null
   loadingFetch: boolean
   loadingRegister: boolean
   loadingLogin: boolean
   loadingUpdate: boolean
+  loadingArchive: boolean
   loadingDelete: boolean
   error: GlobalError | null
   createError: ValidationError | null
@@ -23,6 +24,7 @@ const initialState: UserState = {
   loadingRegister: false,
   loadingLogin: false,
   loadingUpdate: false,
+  loadingArchive: false,
   loadingDelete: false,
   error: null,
   createError: null,
@@ -35,6 +37,7 @@ export const selectLoadingFetchUser = (state: RootState) => state.users.loadingF
 export const selectLoadingRegisterUser = (state: RootState) => state.users.loadingRegister
 export const selectLoadingLoginUser = (state: RootState) => state.users.loadingLogin
 export const selectLoadingUpdateUser = (state: RootState) => state.users.loadingUpdate
+export const selectLoadingArchiveUser = (state: RootState) => state.users.loadingArchive
 export const selectLoadingDeleteUser = (state: RootState) => state.users.loadingDelete
 export const selectUserError = (state: RootState) => state.users.error
 export const selectCreateError = (state: RootState) => state.users.createError
@@ -118,6 +121,16 @@ const userSlice = createSlice({
     })
     builder.addCase(updateUser.rejected, (state, { payload: error }) => {
       state.loadingUpdate = false
+      state.error = error || null
+    })
+    builder.addCase(archiveUser.pending, state => {
+      state.loadingArchive = true
+    })
+    builder.addCase(archiveUser.fulfilled, state => {
+      state.loadingArchive = false
+    })
+    builder.addCase(archiveUser.rejected, (state, { payload: error }) => {
+      state.loadingArchive = false
       state.error = error || null
     })
     builder.addCase(deleteUser.pending, state => {
