@@ -12,6 +12,12 @@ export class Arrival {
   isArchived: boolean
 
   @Prop({
+    type: String,
+    unique: true,
+  })
+  arrivalNumber: string
+
+  @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
     required: true,
@@ -49,6 +55,16 @@ export class Arrival {
 
   @Prop({ default: null })
   sent_amount: string
+
+  @Prop({ default: null })
+  pickup_location: string
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Counterparty',
+    required: false,
+  })
+  shipping_agent: mongoose.Schema.Types.ObjectId
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -107,3 +123,6 @@ export class Arrival {
 }
 
 export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
+
+
+

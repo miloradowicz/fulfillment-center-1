@@ -13,7 +13,12 @@ import { initialErrorState, initialItemState, initialState } from '../state/arri
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
-import { addArrival, fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
+import {
+  addArrival,
+  fetchArrivalByIdWithPopulate,
+  fetchPopulatedArrivals,
+  updateArrival,
+} from '../../../store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { selectAllProducts } from '../../../store/slices/productSlice.ts'
 import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
@@ -21,6 +26,8 @@ import dayjs from 'dayjs'
 import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
+import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
+import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
 
 export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
 
@@ -29,6 +36,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const clients = useAppSelector(selectAllClients)
   const products = useAppSelector(selectAllProducts)
   const stocks = useAppSelector(selectAllStocks)
+  const counterparties = useAppSelector(selectAllCounterparties)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const status = ['ожидается доставка', 'получена', 'отсортирована']
@@ -36,11 +44,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
       ? {
-        client: typeof initialData.client === 'string' ? initialData.client : initialData.client._id,
+        client: initialData.client._id,
         arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
         arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
-        stock: typeof initialData.stock === 'string' ? initialData.stock : initialData.stock._id,
+        stock: initialData.stock._id,
+        shipping_agent: initialData.shipping_agent?._id || '',
+        pickup_location: initialData.pickup_location,
         products: [],
         defects: [],
         received_amount: [],
@@ -77,6 +87,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
+    dispatch(fetchCounterparties())
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
@@ -175,6 +186,10 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       return
     }
 
+    if (!form.shipping_agent ) {
+      delete form.shipping_agent
+    }
+
     try {
       const updatedForm = {
         ...form,
@@ -187,17 +202,18 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       if (initialData) {
         await dispatch(updateArrival({ arrivalId: initialData._id, data: updatedForm })).unwrap()
         onSuccess?.()
+        await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
       } else {
         await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
+        await dispatch(fetchPopulatedArrivals())
       }
 
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
-      await dispatch(fetchPopulatedArrivals())
     } catch (e) {
       console.error(e)
     }
@@ -232,6 +248,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     status,
     clients,
     stocks,
+    counterparties,
     availableItem,
   }
 }
