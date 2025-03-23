@@ -15,3 +15,5 @@ export const isValidationError = (obj: unknown): obj is ValidationError =>
 export const hasMessage = (obj: unknown): obj is { message: string } =>
   typeof obj === 'object' && obj !== null &&
   'message' in obj && typeof obj.message === 'string'
+
+export const isGlobalError = hasMessage

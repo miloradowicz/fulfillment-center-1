@@ -64,7 +64,6 @@ export const ClientSchemaFactory = (
     const client = await this.model.findOne<HydratedDocument<Client>>(this.getQuery())
 
     if (!client) return
-
     const update = this.getUpdate()
 
     if (update && 'isArchived' in update && update.isArchived) {
@@ -105,6 +104,15 @@ export const ClientSchemaFactory = (
 
     await cascadeDelete(client)
   })
+
+  ClientSchema.path('name').validate(
+    {
+      validator: async function (value: string) {
+        return !this.isModified('name') || !(await this.model().findOne({ name: value }))
+      },
+      message: 'Клиент с таким именем уже существует',
+    }
+  )
 
   return ClientSchema
 }
