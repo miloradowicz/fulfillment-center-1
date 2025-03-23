@@ -55,7 +55,7 @@ export const addOrder = createAsyncThunk<void, OrderMutation, { rejectValue: Val
 })
 
 export const archiveOrder = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
-  'orders/deleteOrder',
+  'orders/archiveOrder',
   async (orderId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/orders/${ orderId }/archive`)
