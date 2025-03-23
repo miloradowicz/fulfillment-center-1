@@ -1,9 +1,17 @@
-import { Document } from 'mongoose'
+import { Document, HydratedDocument, Model } from 'mongoose'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import config from 'src/config'
 import { JwtToken } from 'src/types'
+import { Task } from './task.schema'
+import { Arrival } from './arrival.schema'
+import { Client } from './client.schema'
+import { Product } from './product.schema'
+import { Order } from './order.schema'
+import { Counterparty } from './counterparty.schema'
+import { Service } from './service.schema'
+import { Stock } from './stock.schema'
 
 export interface UserDocument extends Document {
   isArchived: boolean;
@@ -51,7 +59,7 @@ export class User {
   token: string
 }
 
-export const UserSchema = SchemaFactory.createForClass(User)
+const UserSchema = SchemaFactory.createForClass(User)
 
 UserSchema.methods.checkPassword = function (this: UserDocument, password: string) {
   return bcrypt.compare(password, this.password)
@@ -80,7 +88,82 @@ UserSchema.set('toJSON', {
   },
 })
 
+export const UserSchemaFactory = (
+  clientModel: Model<Client>,
+  productModel: Model<Product>,
+  arrivalModel: Model<Arrival>,
+  orderModel: Model<Order>,
+  counterpartyModel: Model<Counterparty>,
+  serviceModel: Model<Service>,
+  stockModel: Model<Stock>,
+  taskModel: Model<Task>
+) => {
+  const cascadeArchive = async (user: HydratedDocument<User>) => {
+    const tasks = await taskModel.find({ user: user._id })
 
+    await Promise.all(tasks.map(x => x.updateOne({ isArchived: true })))
+  }
 
+  const cascadeDelete = async (user: HydratedDocument<User>) => {
+    await clientModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await productModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await arrivalModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await orderModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await counterpartyModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await serviceModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await stockModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
+    await taskModel.updateMany({}, { $pull: { logs: { user: user._id } } }, { multi: true })
 
+    const tasks = await taskModel.find({ user: user._id })
 
+    await Promise.all(tasks.map(x => x.deleteOne()))
+  }
+
+  UserSchema.pre('findOneAndUpdate', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(user)
+    }
+  })
+
+  UserSchema.pre('updateOne', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(user)
+    }
+  })
+
+  UserSchema.pre('save', async function () {
+    if (this.isModified('isArchived') && this.isArchived) {
+      await cascadeArchive(this)
+    }
+  })
+
+  UserSchema.pre('findOneAndDelete', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    await cascadeDelete(user)
+  })
+
+  UserSchema.pre('deleteOne', async function () {
+    const user = await this.model.findOne<HydratedDocument<User>>(this.getQuery())
+
+    if (!user) return
+
+    await cascadeDelete(user)
+  })
+
+  return UserSchema
+}
