@@ -5,16 +5,15 @@ import { CounterpartyMutation } from '../../../types'
 import { phoneNumberRegex } from '../../../constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
 import { toast } from 'react-toastify'
-import { selectAllCounterparties, selectCounterparty, selectLoadingAddCounterparty } from '../../../store/slices/counterpartySlices.ts'
+import { selectOneCounterparty, selectLoadingAdd } from '../../../store/slices/counterpartySlices.ts'
 
 const requiredField: (keyof CounterpartyMutation)[] = ['name']
 
 export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => void) => {
-  const loading = useAppSelector(selectLoadingAddCounterparty)
-  const counterparties = useAppSelector(selectAllCounterparties)
-  const counterparty = useAppSelector(selectCounterparty)
+  const loading = useAppSelector(selectLoadingAdd)
+  const counterparty = useAppSelector(selectOneCounterparty)
   const [form, setForm] = useState<CounterpartyMutation>(initialState)
-  const [errors, setErrors] = useState<{[K in keyof CounterpartyMutation]?: string}>({})
+  const [errors, setErrors] = useState<{ [K in keyof CounterpartyMutation]?: string }>({})
   const [submitting, setSubmitting] = useState(false)
 
   const dispatch = useAppDispatch()
@@ -27,10 +26,6 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     if (counterpartyId && counterparty) setForm(counterparty)
   }, [counterpartyId, counterparty])
 
-  useEffect(() => {
-    dispatch(fetchAllCounterparties())
-  }, [dispatch])
-
   const validate = (name: keyof CounterpartyMutation, value?: string): string | undefined => {
     if (name === 'name' && !value?.trim()) return 'Поле не может быть пустым'
     if (name === 'phone_number' && value && !phoneNumberRegex.test(value)) {
@@ -40,7 +35,7 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   }
 
   const validateFields = (): boolean => {
-    const newErrors: {[K in keyof CounterpartyMutation]?: string} = {}
+    const newErrors: { [K in keyof CounterpartyMutation]?: string } = {}
 
     requiredField.forEach(field => {
       const value = form[field] as string
@@ -52,27 +47,14 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     return Object.keys(newErrors).length > 0
   }
 
-  const checkCounterpartyNameExistence = (name: string) => {
-    const existing = counterparties.find(c =>
-      c.name.toLowerCase() === name.toLowerCase() &&
-      c._id !== counterpartyId,
-    )
-
-    if (existing) {
-      setErrors(prev => ({ ...prev, name: 'Контрагент с таким именем уже существует' }))
-      return true
-    }
-
-    setErrors(prev => ({ ...prev, name: '' }))
-    return false
-  }
-
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setForm(prev => ({
       ...prev,
       [name]: value || '',
     }))
+
+    setErrors(prev => ({ ...prev, [name]: '' }))
 
     if (name === 'phone_number') {
       setErrors(prev => ({
@@ -82,8 +64,6 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
           : '',
       }))
     }
-
-    if (name === 'name') checkCounterpartyNameExistence(value)
   }
 
   const getFieldError = (field: keyof CounterpartyMutation) => errors[field] || ''
@@ -92,9 +72,6 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     e.preventDefault()
 
     if (validateFields()) return
-
-    const isNameTaken = checkCounterpartyNameExistence(form.name)
-    if (isNameTaken) return
 
     setSubmitting(true)
 
