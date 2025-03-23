@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import {
   addArrival,
+  archiveArrival,
   deleteArrival,
   fetchArrivalById,
   fetchArrivalByIdWithPopulate,
@@ -19,6 +20,7 @@ interface ArrivalState {
   arrivals: Arrival[] | null;
   loadingFetch: boolean;
   loadingAdd: boolean;
+  loadingArchive: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: boolean;
@@ -32,6 +34,7 @@ const initialState: ArrivalState = {
   arrivals: null,
   loadingFetch: false,
   loadingAdd: false,
+  loadingArchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: false,
@@ -44,6 +47,7 @@ export const selectAllArrivals = (state: RootState) => state.arrivals.arrivals
 export const selectPopulatedArrivals = (state: RootState) => state.arrivals.arrivalsPopulate
 export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.loadingFetch
 export const selectLoadingAddArrival = (state: RootState) => state.arrivals.loadingAdd
+export const selectLoadingArchiveArrival = (state: RootState) => state.arrivals.loadingArchive
 export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
 export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
 export const selectArrivalError = (state: RootState) => state.arrivals.error
@@ -128,6 +132,17 @@ const arrivalSlice = createSlice({
         state.loadingAdd = false
         state.createAndUpdateError = payload || null
       })
+      .addCase(archiveArrival.pending, state => {
+        state.loadingArchive = true
+        state.error = false
+      })
+      .addCase(archiveArrival.fulfilled, state => {
+        state.loadingArchive = false
+      })
+      .addCase(archiveArrival.rejected, state => {
+        state.loadingArchive = false
+        state.error = true
+      })
       .addCase(deleteArrival.pending, state => {
         state.loadingDelete = true
         state.error = false
@@ -147,7 +162,7 @@ const arrivalSlice = createSlice({
       .addCase(updateArrival.fulfilled, state => {
         state.loadingUpdate = false
       })
-      .addCase(updateArrival.rejected,  (state, { payload }) => {
+      .addCase(updateArrival.rejected, (state, { payload }) => {
         state.loadingUpdate = false
         state.createAndUpdateError = payload || null
       })

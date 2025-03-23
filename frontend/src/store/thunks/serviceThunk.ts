@@ -63,6 +63,21 @@ export const updateService = createAsyncThunk<Service, { id: string; data: Servi
   },
 )
 
+export const archiveService = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'services/archive',
+  async (id, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/services/${ id }/archive`)
+      return { id }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data as GlobalError)
+      }
+      throw error
+    }
+  },
+)
+
 export const deleteService = createAsyncThunk<{ message: string }, string, { rejectValue: GlobalError }>(
   'services/delete',
   async (id, { rejectWithValue }) => {

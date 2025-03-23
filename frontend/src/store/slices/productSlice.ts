@@ -7,20 +7,22 @@ import {
   fetchProductById,
   fetchProducts,
   updateProduct, fetchProductsWithPopulate, fetchProductByIdWithPopulate,
+  archiveProduct,
 } from '../thunks/productThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ProductState {
-  product: Product | null;
+  product: Product | null
   productWithPopulate: ProductWithPopulate | null
-  productsWithPopulate: ProductWithPopulate[] | null;
-  products: Product[] | null;
-  loadingFetch : boolean;
-  loadingFetchOneClient : boolean;
-  loadingAdd: boolean;
-  loadingDelete: boolean;
-  loadingUpdate: boolean;
-  error: GlobalError | null;
+  productsWithPopulate: ProductWithPopulate[] | null
+  products: Product[] | null
+  loadingFetch: boolean
+  loadingFetchOneClient: boolean
+  loadingAdd: boolean
+  loadingArchive: boolean
+  loadingDelete: boolean
+  loadingUpdate: boolean
+  error: GlobalError | null
   createAndUpdateError: ValidationError | null
 }
 
@@ -32,6 +34,7 @@ const initialState: ProductState = {
   loadingFetch: false,
   loadingFetchOneClient:false,
   loadingAdd: false,
+  loadingArchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -44,6 +47,7 @@ export const selectProductWithPopulate = (state: RootState) => state.products.pr
 export const selectProductsWithPopulate = (state: RootState) => state.products.productsWithPopulate
 export const selectLoadingFetchProduct = (state: RootState) => state.products.loadingFetch
 export const selectLoadingAddProduct = (state: RootState) => state.products.loadingAdd
+export const selectLoadingArchiveProduct = (state: RootState) => state.products.loadingArchive
 export const selectLoadingDeleteProduct = (state: RootState) => state.products.loadingDelete
 export const selectLoadingUpdateProduct = (state: RootState) => state.products.loadingUpdate
 export const selectProductError = (state: RootState) => state.products.error
@@ -118,6 +122,18 @@ const productSlice = createSlice({
     builder.addCase(addProduct.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
       state.createAndUpdateError = error || null
+    })
+    builder.addCase(archiveProduct.pending, state => {
+      state.loadingArchive = true
+      state.error = null
+    })
+    builder.addCase(archiveProduct.fulfilled, state => {
+      state.loadingArchive = false
+      state.error = null
+    })
+    builder.addCase(archiveProduct.rejected, (state, { payload: error }) => {
+      state.loadingArchive = false
+      state.error = error || null
     })
     builder.addCase(deleteProduct.pending, state => {
       state.loadingDelete = true
