@@ -28,6 +28,21 @@ export const addStock = createAsyncThunk<void, StockMutation, { rejectValue: Val
   },
 )
 
+export const archiveStock = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'stocks/archiveStock',
+  async (stockId: string, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/stocks/${ stockId }/archive`)
+      return { id: stockId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteStock = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'stocks/deleteStock',
   async (stockId: string, { rejectWithValue }) => {

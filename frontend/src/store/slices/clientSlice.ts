@@ -1,13 +1,14 @@
 import { Client, GlobalError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
-import { addClient, deleteClient, fetchClientById, fetchClients, updateClient } from '../thunks/clientThunk.ts'
+import { addClient, archiveClient, deleteClient, fetchClientById, fetchClients, updateClient } from '../thunks/clientThunk.ts'
 
 interface ClientState {
   client: Client | null;
   clients: Client[] | null;
   loadingFetch : boolean;
   loadingAdd: boolean;
+  loadingArchive: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
@@ -18,6 +19,7 @@ const initialState: ClientState = {
   clients: null,
   loadingFetch: false,
   loadingAdd: false,
+  loadingArchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -27,6 +29,7 @@ export const selectClient = (state: RootState) => state.clients.client
 export const selectAllClients = (state: RootState) => state.clients.clients
 export const selectLoadingFetchClient = (state: RootState) => state.clients.loadingFetch
 export const selectLoadingAddClient = (state: RootState) => state.clients.loadingAdd
+export const selectLoadingArchiveClient = (state: RootState) => state.clients.loadingArchive
 export const selectLoadingDeleteClient = (state: RootState) => state.clients.loadingDelete
 export const selectLoadingUpdateClient = (state: RootState) => state.clients.loadingUpdate
 export const selectClientError = (state: RootState) => state.clients.error
@@ -66,6 +69,18 @@ export const clientSlice = createSlice({
     })
     builder.addCase(addClient.rejected, (state, { payload: error }) => {
       state.loadingAdd = false
+      state.error = error || null
+    })
+    builder.addCase(archiveClient.pending, state => {
+      state.loadingArchive = true
+      state.error = null
+    })
+    builder.addCase(archiveClient.fulfilled, state => {
+      state.loadingArchive = false
+      state.error = null
+    })
+    builder.addCase(archiveClient.rejected, (state, { payload: error }) => {
+      state.loadingArchive = false
       state.error = error || null
     })
     builder.addCase(deleteClient.pending, state => {
