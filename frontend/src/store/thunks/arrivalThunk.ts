@@ -54,6 +54,21 @@ export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue:
   },
 )
 
+export const archiveArrival = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'arrivals/archiveArrival',
+  async (arrivalId: string, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/arrivals/${ arrivalId }/archive`)
+      return { id: arrivalId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteArrival = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'arrivals/deleteArrival',
   async (arrivalId: string, { rejectWithValue }) => {

@@ -6,6 +6,7 @@ import {
   createService,
   updateService,
   deleteService,
+  archiveService,
 } from '../thunks/serviceThunk.ts'
 import { RootState } from '../../app/store.ts'
 
@@ -15,6 +16,7 @@ interface ServiceState {
   loadingFetch: boolean;
   loadingFetchOne: boolean;
   loadingAdd: boolean;
+  loadingArchive: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
@@ -26,6 +28,7 @@ const initialState: ServiceState = {
   loadingFetch: false,
   loadingFetchOne: false,
   loadingAdd: false,
+  loadingArchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -35,6 +38,7 @@ export const selectService = (state: RootState) => state.services.service
 export const selectAllServices = (state: RootState) => state.services.services
 export const selectLoadingFetchService = (state: RootState) => state.services.loadingFetch
 export const selectLoadingAddService = (state: RootState) => state.services.loadingAdd
+export const selectLoadingArchiveService = (state: RootState) => state.services.loadingArchive
 export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete
 export const selectLoadingUpdateService = (state: RootState) => state.services.loadingUpdate
 export const selectServiceError = (state: RootState) => state.services.error
@@ -85,6 +89,19 @@ const serviceSlice = createSlice({
     })
     builder.addCase(updateService.rejected, (state, { payload: error }) => {
       state.loadingUpdate = false
+      state.error = error || null
+    })
+
+    builder.addCase(archiveService.pending, state => {
+      state.loadingArchive = true
+      state.error = null
+    })
+    builder.addCase(archiveService.fulfilled, state => {
+      state.loadingArchive = false
+      state.error = null
+    })
+    builder.addCase(archiveService.rejected, (state, { payload: error }) => {
+      state.loadingArchive = false
       state.error = error || null
     })
 

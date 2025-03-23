@@ -60,6 +60,21 @@ export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, 
   },
 )
 
+export const archiveProduct = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'products/archiveProduct',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/products/${ productId }/archive`)
+      return { id: productId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteProduct = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('products/deleteProduct', async (productId: string, { rejectWithValue }) => {
   try {

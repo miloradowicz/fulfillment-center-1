@@ -80,6 +80,21 @@ export const updateUser = createAsyncThunk<
   },
 )
 
+export const archiveUser = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'users/archiveUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/users/${ userId }/archive`)
+      return { id: userId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteUser = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'users/deleteUser',
   async (userId, { rejectWithValue }) => {

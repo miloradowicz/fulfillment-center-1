@@ -1,6 +1,6 @@
 import { Stock, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
-import { addStock, deleteStock, fetchStockById, fetchStocks, updateStock } from '../thunks/stocksThunk.ts'
+import { addStock, archiveStock, deleteStock, fetchStockById, fetchStocks, updateStock } from '../thunks/stocksThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface StockState {
@@ -8,6 +8,7 @@ interface StockState {
   stock: Stock | null
   isFetching: boolean
   isCreating: boolean
+  isArchiving: boolean
   error: boolean
   createError: ValidationError | null
 }
@@ -17,6 +18,7 @@ const initialState: StockState = {
   stock: null,
   isFetching: false,
   isCreating: false,
+  isArchiving: false,
   error: false,
   createError: null,
 }
@@ -24,6 +26,7 @@ const initialState: StockState = {
 export const selectAllStocks = (state: RootState) => state.stocks.stocks
 export const selectOneStock = (state: RootState) => state.stocks.stock
 export const selectIsStocksLoading = (state: RootState) => state.stocks.isFetching
+export const selectIsStockArchiving = (state: RootState) => state.stocks.isArchiving
 export const selectIsStockCreating = (state: RootState) => state.stocks.isCreating
 export const selectStockCreateError = (state: RootState) => state.stocks.createError
 export const selectStockError = (state: RootState) => state.stocks.error
@@ -70,6 +73,18 @@ const stocksSlice = createSlice({
       .addCase(addStock.rejected, (state, { payload: error }) => {
         state.isCreating = false
         state.createError = error || null
+      })
+
+      .addCase(archiveStock.pending, state => {
+        state.isArchiving = true
+        state.error = false
+      })
+      .addCase(archiveStock.fulfilled, state => {
+        state.isArchiving = false
+      })
+      .addCase(archiveStock.rejected, state => {
+        state.isArchiving = false
+        state.error = true
       })
 
       .addCase(deleteStock.pending, state => {
