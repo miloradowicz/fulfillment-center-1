@@ -12,6 +12,7 @@ import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { Counter, CounterDocument } from '../schemas/counter.schema'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
+import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-category.schema'
 
 @Injectable()
 export class SeederService {
@@ -36,6 +37,8 @@ export class SeederService {
     private readonly counterModel: Model<CounterDocument>,
     @InjectModel(Counterparty.name)
     private readonly counterpartyModel: Model<CounterpartyDocument>,
+    @InjectModel(ServiceCategory.name)
+    private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
   ) {}
 
   async seed() {
@@ -49,6 +52,7 @@ export class SeederService {
     await this.stockModel.deleteMany({})
     await this.counterModel.deleteMany({})
     await this.counterpartyModel.deleteMany({})
+    await this.serviceCategoryModel.deleteMany({})
 
     const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
@@ -219,23 +223,6 @@ export class SeederService {
       },
     ])
 
-    await this.serviceModel.create([
-      {
-        name: 'Работа с товаром',
-        dynamic_fields: [
-          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
-          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
-        ],
-      },
-      {
-        name: 'Забор товара',
-        dynamic_fields: [
-          { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
-      },
-    ])
-
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
         name: 'ООО "Фулфилмент Партнер"',
@@ -348,19 +335,40 @@ export class SeederService {
       },
     ])
 
-    await this.serviceModel.create([
+    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
       {
         name: 'Работа с товаром',
+        isArchived: false,
+      },
+      {
+        name: 'Дополнительные услуги',
+        isArchived: false,
+      }]
+    )
+
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром по прибытию на склад',
+        serviceCategory: _serviceCat1._id,
         dynamic_fields: [
           { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
           { key: '6', label: 'Маркировка двойная', value: '300 сом' },
         ],
       },
       {
-        name: 'Забор товара',
+        name: 'Замена/установка бирки',
+        serviceCategory: _serviceCat1._id,
         dynamic_fields: [
           { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
           { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
+      },
+      {
+        name: 'Создание поставки в ЛК селлера (до 10 артикулов)',
+        serviceCategory: _serviceCat2._id,
+        dynamic_fields: [
+          { key: '9', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '10', label: 'Забор с другого адреса', value: '1000 сом' },
         ],
       },
     ])
