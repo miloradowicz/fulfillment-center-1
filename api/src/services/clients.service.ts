@@ -86,7 +86,7 @@ export class ClientsService {
 
     if (await this.isLocked(id))
       throw new ForbiddenException(
-        'Клиент не может быть удален, поскольку их товары уже используются в поставках и/или заказах.',
+        'Клиент не может быть удален, поскольку его товары уже используются в поставках и/или заказах.',
       )
 
     await client.deleteOne()
