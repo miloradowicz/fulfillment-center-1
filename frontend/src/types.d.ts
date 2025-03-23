@@ -146,7 +146,7 @@ export interface Order {
   products: ProductOrder[]
   price: number
   sent_at: string
-  delivered_at?: string | null
+  delivered_at?: string
   comment?: string
   status?: string
   orderNumber?: string
