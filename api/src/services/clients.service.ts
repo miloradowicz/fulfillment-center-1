@@ -56,6 +56,8 @@ export class ClientsService {
 
     const products = await this.productModel.find({ client: client._id })
 
+    if (!products.length) return false
+
     return await Promise.any(products.map(x => this.productsService.isLocked(String(x._id))))
   }
 
@@ -82,9 +84,7 @@ export class ClientsService {
 
     if (!client) throw new NotFoundException('Клиент не найден')
 
-    const products = await this.productModel.find({ client: client._id })
-
-    if (await Promise.any(products.map(x => this.productsService.isLocked(String(x._id)))))
+    if (await this.isLocked(id))
       throw new ForbiddenException(
         'Клиент не может быть удален, поскольку их товары уже используются в поставках и/или заказах.',
       )
