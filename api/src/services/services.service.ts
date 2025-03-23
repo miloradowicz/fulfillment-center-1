@@ -10,15 +10,15 @@ export class ServicesService {
   constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) {}
 
   async getAll() {
-    return this.serviceModel.find({ isArchived: false })
+    return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
   }
 
   async getAllByName(name: string) {
-    return this.serviceModel.find({ isArchived: false }).find({ name: { $regex: name, $options: 'i' } })
+    return this.serviceModel.find({ isArchived: false }).find({ name: { $regex: name, $options: 'i' } }).populate('serviceCategory').exec()
   }
 
   async getById(id: string) {
-    const service = await this.serviceModel.findById(id).exec()
+    const service = await this.serviceModel.findById(id).populate('serviceCategory').exec()
 
     if (!service) throw new NotFoundException('Услуга не найдена')
 
