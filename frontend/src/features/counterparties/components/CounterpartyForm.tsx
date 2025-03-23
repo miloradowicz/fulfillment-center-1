@@ -2,6 +2,7 @@ import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
 import { Counterparty } from '../../../types'
 import { useCounterpartyForm } from '../hooks/useCounterpartyForm.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
 
 const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterparty | null; onClose?: () => void }) => {
   const {
@@ -9,7 +10,9 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
     loading,
     inputChangeHandler,
     onSubmit,
-    getFieldError,
+    errors,
+    createError,
+    updateError,
   } = useCounterpartyForm(counterparty?._id, onClose)
 
   return (
@@ -25,8 +28,8 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
             label="Название контрагента *"
             value={form.name}
             onChange={inputChangeHandler}
-            error={Boolean(getFieldError('name'))}
-            helperText={getFieldError('name')}
+            error={Boolean(errors.name || getFieldError('name', createError || updateError))}
+            helperText={errors.name || getFieldError('name', createError || updateError)}
             fullWidth
             size="small"
             sx={{
@@ -47,8 +50,8 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
             label="Номер телефона"
             value={form.phone_number}
             onChange={inputChangeHandler}
-            error={Boolean(getFieldError('phone_number'))}
-            helperText={getFieldError('phone_number')}
+            error={Boolean(errors.phone_number || getFieldError('phone_number', createError || updateError))}
+            helperText={errors.phone_number || getFieldError('phone_number', createError || updateError)}
             fullWidth
             size="small"
           />
@@ -67,12 +70,7 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
         </Grid>
 
         <Grid>
-          <Button
-            type="submit"
-            disabled={loading}
-            variant="contained"
-            sx={{ mt: 2 }}
-          >
+          <Button type="submit" disabled={loading} variant="contained" sx={{ mt: 2 }}>
             {loading ? <CircularProgress size={24} /> : counterparty ? 'Сохранить' : 'Создать'}
           </Button>
         </Grid>

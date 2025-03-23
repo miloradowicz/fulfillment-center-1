@@ -7,7 +7,7 @@ import { initialState } from '../state/counterpartyState.ts'
 import { toast } from 'react-toastify'
 import { selectOneCounterparty, selectLoadingAdd, selectLoadingUpdate, selectCounterpartyCreateError, selectCounterpartyUpdateError, clearErrors } from '../../../store/slices/counterpartySlices.ts'
 
-const requiredField: (keyof CounterpartyMutation)[] = ['name']
+const requiredFields: (keyof CounterpartyMutation)[] = ['name']
 
 export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => void) => {
   const dispatch = useAppDispatch()
@@ -30,11 +30,15 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   }, [dispatch])
 
   useEffect(() => {
-    if (counterpartyId) dispatch(fetchCounterpartyById(counterpartyId))
+    if (counterpartyId) {
+      dispatch(fetchCounterpartyById(counterpartyId))
+    }
   }, [dispatch, counterpartyId])
 
   useEffect(() => {
-    if (counterpartyId && counterparty) setForm(counterparty)
+    if (counterpartyId && counterparty) {
+      setForm(counterparty)
+    }
   }, [counterpartyId, counterparty])
 
   useEffect(() => {
@@ -71,7 +75,7 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   const validateFields = (): boolean => {
     const newErrors: { [K in keyof CounterpartyMutation]?: string } = {}
 
-    requiredField.forEach(field => {
+    requiredFields.forEach(field => {
       const value = form[field] as string
       const errorMessage = validate(field, value)
       if (errorMessage) newErrors[field] = errorMessage
@@ -142,6 +146,9 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     onSubmit,
     getFieldError,
     generalError,
+    errors,
+    createError,
+    updateError,
     hasErrors: Object.keys(errors).length > 0,
   }
 }
