@@ -164,8 +164,6 @@ const ClientDetail = () => {
                   if (clientId) {
                     try {
                       await deleteOneClient(clientId)
-                      toast.success('Клиент успешно удалён!')
-                      navigate('/clients')
                     } catch {
                       toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
                     }
