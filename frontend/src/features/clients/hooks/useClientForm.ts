@@ -97,6 +97,7 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
       try {
         await dispatch(updateClient({ clientId, data: form })).unwrap()
         await dispatch(fetchClientById(clientId))
+        await dispatch(fetchClients())
         toast.success('Клиент успешно обновлен')
       } catch {
         return void toast.error('Не удалось обновить клиента')
