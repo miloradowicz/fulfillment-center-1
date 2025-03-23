@@ -12,6 +12,7 @@ import { Stock, StockDocument } from '../schemas/stock.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { Counter, CounterDocument } from '../schemas/counter.schema'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
+import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-category.schema'
 
 
 @Injectable()
@@ -37,6 +38,8 @@ export class SeederService {
     private readonly counterModel: Model<CounterDocument>,
     @InjectModel(Counterparty.name)
     private readonly counterpartyModel: Model<CounterpartyDocument>,
+    @InjectModel(ServiceCategory.name)
+    private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
   ) {}
 
   async seed() {
@@ -50,6 +53,7 @@ export class SeederService {
     await this.stockModel.deleteMany({})
     await this.counterModel.deleteMany({})
     await this.counterpartyModel.deleteMany({})
+    await this.serviceCategoryModel.deleteMany({})
 
     const _clients = await this.clientModel.create({
       name: 'CHAPSAN',
@@ -295,19 +299,42 @@ export class SeederService {
       },
     ])
 
-    await this.serviceModel.create([
+    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
       {
         name: 'Работа с товаром',
+        isArchived: false,
+      },
+      {
+        name: 'Дополнительные услуги',
+        isArchived: false,
+      }]
+    )
+    console.log('_serviceCat1:', _serviceCat1)
+    console.log('_serviceCat2:', _serviceCat2)
+
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром по прибытию на склад',
+        serviceCategory: _serviceCat1._id,
         dynamic_fields: [
           { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
           { key: '6', label: 'Маркировка двойная', value: '300 сом' },
         ],
       },
       {
-        name: 'Забор товара',
+        name: 'Замена/установка бирки',
+        serviceCategory: _serviceCat1._id,
         dynamic_fields: [
           { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
           { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
+      },
+      {
+        name: 'Создание поставки в ЛК селлера (до 10 артикулов)',
+        serviceCategory: _serviceCat2._id,
+        dynamic_fields: [
+          { key: '9', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '10', label: 'Забор с другого адреса', value: '1000 сом' },
         ],
       },
     ])
