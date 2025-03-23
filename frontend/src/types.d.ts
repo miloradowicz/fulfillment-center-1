@@ -23,9 +23,6 @@ export interface ValidationError {
       messages: string[]
     }
   }
-  message: string
-  name: string
-  _message: string
 }
 
 export interface DynamicField {

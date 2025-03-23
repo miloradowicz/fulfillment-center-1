@@ -32,17 +32,11 @@ export class ClientsService {
   }
 
   async create(clientDto: CreateClientDto) {
-    const existingClient = await this.clientModel.findOne({ name: clientDto.name })
-
-    if (existingClient) {
-      throw new ConflictException('Клиент с таким именем уже существует')
-    }
-
     return await this.clientModel.create(clientDto)
   }
 
   async update(id: string, clientDto: UpdateClientDto) {
-    const client = await this.clientModel.findByIdAndUpdate(id, clientDto, { new: true })
+    const client = await this.clientModel.findByIdAndUpdate(id, clientDto, { runValidators: true, new: true })
     if (!client) {
       throw new NotFoundException('Клиент не найден')
     }

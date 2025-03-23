@@ -106,6 +106,15 @@ export const ClientSchemaFactory = (
     await cascadeDelete(client)
   })
 
+  ClientSchema.path('name').validate(
+    {
+      validator: async function (value: string) {
+        return !this.isModified('name') || !(await this.model().findOne({ name: value }))
+      },
+      message: 'Клиент с таким именем уже существует',
+    }
+  )
+
   return ClientSchema
 }
 
