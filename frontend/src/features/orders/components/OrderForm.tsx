@@ -242,10 +242,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 value={form.delivered_at}
                 type="date"
                 onChange={e => inputChangeHandler(e, setForm)}
-                error={Boolean(errors.delivered_at || getFieldError('delivered_at', createError))}
-                helperText={errors.delivered_at || getFieldError('delivered_at', createError)}
                 fullWidth
-                onBlur={handleBlur}
               />
             </Grid>
             <Grid container direction="column" spacing={2}>
