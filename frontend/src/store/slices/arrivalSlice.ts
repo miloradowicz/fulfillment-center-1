@@ -1,0 +1,173 @@
+import { Arrival, ArrivalWithClient, ArrivalWithPopulate, ValidationError } from '../../types'
+import { createSlice } from '@reduxjs/toolkit'
+import { RootState } from '../../app/store.ts'
+import {
+  addArrival,
+  archiveArrival,
+  deleteArrival,
+  fetchArrivalById,
+  fetchArrivalByIdWithPopulate,
+  fetchArrivals,
+  fetchArrivalsByClientId,
+  fetchPopulatedArrivals,
+  updateArrival,
+} from '../thunks/arrivalThunk.ts'
+
+interface ArrivalState {
+  arrival: Arrival | null;
+  arrivalsPopulate: ArrivalWithClient[] | null;
+  arrivalWithPopulate: ArrivalWithPopulate | null;
+  arrivals: Arrival[] | null;
+  loadingFetch: boolean;
+  loadingAdd: boolean;
+  loadingArchive: boolean;
+  loadingDelete: boolean;
+  loadingUpdate: boolean;
+  error: boolean;
+  createAndUpdateError: ValidationError | null;
+}
+
+const initialState: ArrivalState = {
+  arrival: null,
+  arrivalWithPopulate: null,
+  arrivalsPopulate: null,
+  arrivals: null,
+  loadingFetch: false,
+  loadingAdd: false,
+  loadingArchive: false,
+  loadingDelete: false,
+  loadingUpdate: false,
+  error: false,
+  createAndUpdateError: null,
+}
+
+export const selectArrival = (state: RootState) => state.arrivals.arrival
+export const selectArrivalWithPopulate = (state: RootState) => state.arrivals.arrivalWithPopulate
+export const selectAllArrivals = (state: RootState) => state.arrivals.arrivals
+export const selectPopulatedArrivals = (state: RootState) => state.arrivals.arrivalsPopulate
+export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.loadingFetch
+export const selectLoadingAddArrival = (state: RootState) => state.arrivals.loadingAdd
+export const selectLoadingArchiveArrival = (state: RootState) => state.arrivals.loadingArchive
+export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
+export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
+export const selectArrivalError = (state: RootState) => state.arrivals.error
+export const selectCreateError = (state: RootState) => state.arrivals.createAndUpdateError
+
+const arrivalSlice = createSlice({
+  name: 'arrivals',
+  initialState,
+  reducers: {
+    clearErrorArrival: state => {
+      state.createAndUpdateError = null
+    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchArrivals.pending, state => {
+        state.loadingFetch = true
+      })
+      .addCase(fetchArrivals.fulfilled, (state, { payload }) => {
+        state.loadingFetch = false
+        state.arrivals = payload
+        state.error = false
+      })
+      .addCase(fetchArrivals.rejected, state => {
+        state.loadingFetch = false
+        state.error = true
+      })
+      .addCase(fetchArrivalById.pending, state => {
+        state.loadingFetch = true
+        state.error = false
+      })
+      .addCase(fetchArrivalById.fulfilled, (state, { payload }) => {
+        state.loadingFetch = false
+        state.arrival = payload
+      })
+      .addCase(fetchArrivalById.rejected, state => {
+        state.loadingFetch = false
+        state.error = true
+      })
+      .addCase(fetchArrivalByIdWithPopulate.pending, state => {
+        state.loadingFetch = true
+      })
+      .addCase(fetchArrivalByIdWithPopulate.fulfilled, (state, { payload }) => {
+        state.loadingFetch = false
+        state.arrivalWithPopulate = payload
+      })
+      .addCase(fetchArrivalByIdWithPopulate.rejected, state => {
+        state.loadingFetch = false
+      })
+      .addCase(fetchArrivalsByClientId.pending, state => {
+        state.loadingFetch = true
+        state.error = false
+      })
+      .addCase(fetchArrivalsByClientId.fulfilled, (state, { payload }) => {
+        state.loadingFetch = false
+        state.arrivals = payload
+      })
+      .addCase(fetchArrivalsByClientId.rejected, state => {
+        state.loadingFetch = false
+        state.error = true
+      })
+      .addCase(fetchPopulatedArrivals.pending, state => {
+        state.loadingFetch = true
+        state.error = false
+      })
+      .addCase(fetchPopulatedArrivals.fulfilled, (state, { payload }) => {
+        state.loadingFetch = false
+        state.arrivalsPopulate = payload
+      })
+      .addCase(fetchPopulatedArrivals.rejected, state => {
+        state.loadingFetch = false
+        state.error = true
+      })
+      .addCase(addArrival.pending, state => {
+        state.loadingAdd = true
+        state.createAndUpdateError = null
+      })
+      .addCase(addArrival.fulfilled, state => {
+        state.loadingAdd = false
+      })
+      .addCase(addArrival.rejected, (state, { payload }) => {
+        state.loadingAdd = false
+        state.createAndUpdateError = payload || null
+      })
+      .addCase(archiveArrival.pending, state => {
+        state.loadingArchive = true
+        state.error = false
+      })
+      .addCase(archiveArrival.fulfilled, state => {
+        state.loadingArchive = false
+      })
+      .addCase(archiveArrival.rejected, state => {
+        state.loadingArchive = false
+        state.error = true
+      })
+      .addCase(deleteArrival.pending, state => {
+        state.loadingDelete = true
+        state.error = false
+      })
+      .addCase(deleteArrival.fulfilled, state => {
+        state.loadingDelete = false
+      })
+      .addCase(deleteArrival.rejected, state => {
+        state.loadingDelete = false
+        state.error = true
+      })
+      .addCase(updateArrival.pending, state => {
+        state.loadingUpdate = true
+        state.error = false
+        state.createAndUpdateError = null
+      })
+      .addCase(updateArrival.fulfilled, state => {
+        state.loadingUpdate = false
+      })
+      .addCase(updateArrival.rejected, (state, { payload }) => {
+        state.loadingUpdate = false
+        state.createAndUpdateError = payload || null
+      })
+  },
+})
+
+export const arrivalReducer = arrivalSlice.reducer
+export const { clearErrorArrival } = arrivalSlice.actions

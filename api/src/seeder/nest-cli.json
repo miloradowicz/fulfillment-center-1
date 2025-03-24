@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src/seeder",
+  "entryFile": "seeder/seed",
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}

@@ -11,23 +11,30 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.1.1",
     "@mui/icons-material": "^6.4.6",
+    "@mui/material": "^6.4.7",
+    "@mui/x-data-grid": "^7.27.3",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.6.0",
+    "@tailwindcss/vite": "^4.0.10",
     "axios": "^1.8.1",
+    "check-password-strength": "^3.0.0",
     "dayjs": "^1.11.13",
     "notistack": "^3.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-toastify": "^11.0.5",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "tailwindcss": "^4.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@mui/x-data-grid": "^7.27.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",
@@ -36,6 +43,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "prettier": "^3.5.2",
+    "react-redux": "^9.2.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
