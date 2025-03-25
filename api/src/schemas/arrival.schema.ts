@@ -64,7 +64,7 @@ export class Arrival {
     ref: 'Counterparty',
     required: false,
   })
-  shipping_agent: mongoose.Schema.Types.ObjectId
+  shipping_agent?: mongoose.Schema.Types.ObjectId | null
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

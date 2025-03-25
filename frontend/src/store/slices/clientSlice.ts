@@ -1,4 +1,4 @@
-import { Client, GlobalError } from '../../types'
+import { Client, GlobalError, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
 import { addClient, archiveClient, deleteClient, fetchClientById, fetchClients, updateClient } from '../thunks/clientThunk.ts'
@@ -12,6 +12,7 @@ interface ClientState {
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
+  creationAndModificationError: ValidationError | GlobalError | null;
 }
 
 const initialState: ClientState = {
@@ -23,6 +24,7 @@ const initialState: ClientState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+  creationAndModificationError: null,
 }
 
 export const selectClient = (state: RootState) => state.clients.client
@@ -33,11 +35,16 @@ export const selectLoadingArchiveClient = (state: RootState) => state.clients.lo
 export const selectLoadingDeleteClient = (state: RootState) => state.clients.loadingDelete
 export const selectLoadingUpdateClient = (state: RootState) => state.clients.loadingUpdate
 export const selectClientError = (state: RootState) => state.clients.error
+export const selectClientCreationAndModificationError = (state: RootState) => state.clients.creationAndModificationError
 
 export const clientSlice = createSlice({
   name: 'clients',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCreationAndModificationError: state => {
+      state.creationAndModificationError = null
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchClients.pending, state => {
       state.loadingFetch = true
@@ -61,15 +68,16 @@ export const clientSlice = createSlice({
     })
     builder.addCase(addClient.pending, state => {
       state.loadingAdd = true
-      state.error = null
+      state.creationAndModificationError = null
     })
     builder.addCase(addClient.fulfilled, state => {
       state.loadingAdd = false
-      state.error = null
+      state.creationAndModificationError = null
     })
-    builder.addCase(addClient.rejected, (state, { payload: error }) => {
+    builder.addCase(addClient.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingAdd = false
-      state.error = error || null
+      state.creationAndModificationError =
+        returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
     builder.addCase(archiveClient.pending, state => {
       state.loadingArchive = true
@@ -103,15 +111,14 @@ export const clientSlice = createSlice({
       state.loadingUpdate = false
       state.error = null
     })
-    builder.addCase(updateClient.rejected, (state, { payload: error }) => {
+    builder.addCase(updateClient.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingUpdate = false
-      state.error = error || null
+      state.creationAndModificationError =
+        returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
   },
 })
 
+export const { clearCreationAndModificationError } = clientSlice.actions
+
 export const clientReducer = clientSlice.reducer
-
-
-
-

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { Client, ClientMutation, GlobalError } from '../../types'
+import { Client, ClientMutation, GlobalError, ValidationError } from '../../types'
 import axiosAPI from '../../utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
@@ -19,17 +19,21 @@ export const fetchClientById = createAsyncThunk<Client, string>(
   },
 )
 
-export const addClient = createAsyncThunk<void, ClientMutation, { rejectValue: GlobalError }
->('clients/addClient', async (data: ClientMutation, { rejectWithValue }) => {
-  try {
-    await axiosAPI.post('/clients', data)
-  } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+export const addClient = createAsyncThunk<void, ClientMutation, { rejectValue: ValidationError | GlobalError }>(
+  'clients/addClient',
+  async (data: ClientMutation, { rejectWithValue }) => {
+    try {
+      await axiosAPI.post('/clients', data)
+    } catch (e) {
+      if (isAxiosError(e) && e.response && e.response.status === 400) {
+        return rejectWithValue(e.response.data as ValidationError)
+      } else if (isAxiosError(e) && e.response && 'message' in e.response.data) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
     }
-    throw e
-  }
-})
+  },
+)
 
 export const archiveClient = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'clients/archiveClient',
@@ -58,13 +62,15 @@ export const deleteClient = createAsyncThunk<void, string, { rejectValue: Global
   }
 })
 
-export const updateClient = createAsyncThunk<void, { clientId: string; data: ClientMutation }, { rejectValue: GlobalError }>(
+export const updateClient = createAsyncThunk<void, { clientId: string; data: ClientMutation }, { rejectValue: ValidationError | GlobalError }>(
   'clients/updateClient',
   async ({ clientId, data }, { rejectWithValue }) => {
     try {
       await axiosAPI.put(`/clients/${ clientId }`, data)
     } catch (e) {
-      if (isAxiosError(e) && e.response) {
+      if (isAxiosError(e) && e.response && e.response.status === 400) {
+        return rejectWithValue(e.response.data as ValidationError)
+      } else if (isAxiosError(e) && e.response && 'message' in e.response.data) {
         return rejectWithValue(e.response.data as GlobalError)
       }
       throw e
