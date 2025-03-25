@@ -89,7 +89,7 @@ export class CreateArrivalDto {
   pickup_location: string
 
   @IsOptional()
-  shipping_agent: mongoose.Schema.Types.ObjectId
+  shipping_agent?: mongoose.Schema.Types.ObjectId | null
 
   @IsOptional()
   @IsEnum(['ожидается доставка', 'получена', 'отсортирована'], {

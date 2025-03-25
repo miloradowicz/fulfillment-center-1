@@ -42,7 +42,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
       ? {
         client: initialData.client._id,
         sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
-        delivered_at: dayjs(initialData.delivered_at).format('YYYY-MM-DD'),
+        delivered_at: initialData.delivered_at ? dayjs(initialData.delivered_at).format('YYYY-MM-DD') : '',
         price: initialData.price,
         products: [],
         defects: [],
@@ -139,9 +139,18 @@ export const useOrderForm = (onSuccess?: () => void) => {
         return items.map(mapFn)
       }
 
+      let updated_delivered_at: string = ''
+
+      if (form.delivered_at) {
+        updated_delivered_at = form.delivered_at
+      } else if (form.delivered_at === '') {
+        updated_delivered_at = ''
+      }
+
       if (initialData) {
         const updatedForm = {
           ...form,
+          delivered_at: updated_delivered_at,
           products: transformToOrder(productsForm, item => ({
             product: item.product._id,
             description: item.description,
@@ -177,7 +186,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           return
         }
 
-        await dispatch(addOrder(form)).unwrap()
+        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at })).unwrap()
         onSuccess?.()
         toast.success('Заказ успешно создан!')
         setForm({ ...initialStateOrder })
