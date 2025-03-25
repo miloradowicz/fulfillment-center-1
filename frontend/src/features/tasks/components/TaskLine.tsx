@@ -5,9 +5,13 @@ import { Box, Typography, Paper } from '@mui/material'
 import { TaskLineProps } from '../hooks/TypesProps'
 import TaskCard from './TaskCard.tsx'
 import { getStatusStyles } from '../utils/statusStyle.ts'
+import TaskCardSceleton from './TaskCardSceleton.tsx'
+import { useAppSelector } from '../../../app/hooks.ts'
+import { selectLoadingFetchTask } from '../../../store/slices/taskSlice.ts'
 
 
 const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
+  const loadingFetchTask = useAppSelector(selectLoadingFetchTask)
   const { setNodeRef } = useDroppable({
     id: title,
   })
@@ -20,7 +24,7 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
       p={2}
       display="flex"
       flexDirection="column"
-      minHeight="10rem"
+      minHeight="300px"
       height="100%"
     >
       <Box style={{ display:'flex', alignItems:'center', justifyContent:'flex-start' }}>
@@ -54,9 +58,11 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        {items.map((task, key) => (
+        {loadingFetchTask?<>
+          <TaskCardSceleton /></>:<> {items.map((task, key) => (
           <TaskCard selectedUser={selectedUser} key={task._id} index={key} parent={title} task={task} />
-        ))}
+        ))}</>}
+
       </Paper>
     </Box>
   )
