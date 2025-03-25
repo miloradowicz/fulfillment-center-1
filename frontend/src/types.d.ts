@@ -247,6 +247,8 @@ export interface TaskWithPopulate {
   description: string
   status: string
   logs?: Log[]
+  createdAt: Date,
+  updatedAt: Date,
 }
 
 export type TaskMutation = Omit<Task, '_id'>

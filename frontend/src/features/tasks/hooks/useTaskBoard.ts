@@ -3,8 +3,10 @@ import { TaskWithPopulate } from '../../../types'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectLoadingFetchTask, selectPopulatedTasks } from '../../../store/slices/taskSlice.ts'
 import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
-import { selectAllUsers } from '../../../store/slices/userSlice.ts'
+import { selectAllUsers, selectLoadingFetchUser } from '../../../store/slices/userSlice.ts'
 import { fetchUsers } from '../../../store/thunks/userThunk.ts'
+import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import dayjs from 'dayjs'
 
 export const useTaskBoard = () => {
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
@@ -12,19 +14,40 @@ export const useTaskBoard = () => {
   const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
   const dispatch = useAppDispatch()
   const tasks = useAppSelector(selectPopulatedTasks)
-  const fetchLoading = useAppSelector(selectLoadingFetchTask)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUser, setSelectedUser] = useState<string | null>(null) // ID выбранного пользователя
   const inputRef = useRef<HTMLInputElement | null>(null)
   const users = useAppSelector(selectAllUsers)
+  const selectFetchUser = useAppSelector(selectLoadingFetchUser)
+  const loading = useAppSelector(selectLoadingFetchTask)
 
-  const fetchAllTasks = useCallback(() => {
-    dispatch(fetchTasksWithPopulate())
+  const fetchAllTasks = useCallback(async () => {
+    setTodoItems([])
+    setInProgressItems([])
+    setDoneItems([])
+    await dispatch(fetchTasksWithPopulate())
   }, [dispatch])
 
   useEffect(() => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
+
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  )
+
+  useEffect(() => {
+    if(selectFetchUser || loading){
+      setDoneItems([])
+      setInProgressItems([])
+      setTodoItems([])
+    }
+  }, [dispatch, fetchAllTasks, loading, selectFetchUser])
 
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
@@ -36,9 +59,18 @@ export const useTaskBoard = () => {
   const filterTasks = (items: TaskWithPopulate[]) =>
     items
       .filter(item =>
-        (searchQuery === '' || item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))))
-      .map(item => ({ ...item, key: item._id }))
+        (searchQuery === '' ||
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (item.createdAt && dayjs(item.createdAt).format('DD.MM.YYYY HH:mm').includes(searchQuery)) ||
+          (item.updatedAt && dayjs(item.updatedAt).format('DD.MM.YYYY HH:mm').includes(searchQuery))),
+      )
+      .map(item => ({
+        ...item,
+        key: item._id,
+        createdAtFormatted: item.createdAt ? dayjs(item.createdAt).format('DD.MM.YYYY HH:mm') : '',
+        updatedAtFormatted: item.updatedAt ? dayjs(item.updatedAt).format('DD.MM.YYYY HH:mm') : '',
+      }))
 
   useEffect(() => {
     if(tasks){
@@ -49,8 +81,8 @@ export const useTaskBoard = () => {
   }, [filterTasksByStatus, tasks])
 
 
-  const fetchAllUsers = useCallback(() => {
-    dispatch(fetchUsers())
+  const fetchAllUsers = useCallback(async () => {
+    await dispatch(fetchUsers())
   }, [dispatch])
 
   useEffect(() => {
@@ -61,6 +93,9 @@ export const useTaskBoard = () => {
     setSearchQuery('')
     setSelectedUser(null)
     inputRef.current?.focus()
+    setTodoItems([])
+    setInProgressItems([])
+    setDoneItems([])
     await dispatch(fetchTasksWithPopulate())
   }
 
@@ -68,6 +103,9 @@ export const useTaskBoard = () => {
     setSearchQuery('')
     inputRef.current?.focus()
     if (selectedUser) {
+      setTodoItems([])
+      setInProgressItems([])
+      setDoneItems([])
       await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
     } else {
       await dispatch(fetchTasksWithPopulate())
@@ -77,7 +115,6 @@ export const useTaskBoard = () => {
     todoItems,
     doneItems,
     inProgressItems,
-    fetchLoading,
     setDoneItems,
     setTodoItems,
     setInProgressItems,
@@ -91,5 +128,7 @@ export const useTaskBoard = () => {
     inputRef,
     selectedUser,
     setSelectedUser,
+    sensors,
+    selectFetchUser,
   }
 }

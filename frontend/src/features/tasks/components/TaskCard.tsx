@@ -9,6 +9,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
+import dayjs from 'dayjs'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -25,6 +26,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
   const dispatch = useAppDispatch()
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
 
@@ -32,19 +34,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     setAnchorEl(null)
   }
 
-  const handleEdit = () => {
+  const handleEdit = (event: React.MouseEvent) => {
+    event.stopPropagation()
     console.log('Редактирование')
     handleMenuClose()
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, event: React.MouseEvent) => {
+    event.stopPropagation()
     try {
       if (confirm('Вы уверены, что хотите переместить в архив эту задачу?')) {
         await dispatch(archiveTask(id))
-        if(!selectedUser){
+        if (!selectedUser) {
           await dispatch(fetchTasksWithPopulate())
-        }
-        else {
+        } else {
           await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
         }
         toast.success('Задача перемещена в архив.')
@@ -59,7 +62,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
 
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
-    zIndex: isDragging ? 1000 : 'auto',
+    zIndex: isDragging ? 9999 : 'auto',
+    opacity: isDragging ? 0.9 : 1,
   }
 
   return (
@@ -72,25 +76,50 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         marginBottom: 2,
         transform: style.transform,
         position: 'relative',
+        cursor: 'grab',
         willChange: 'transform',
         zIndex: style.zIndex,
+        opacity: style.opacity,
       }}
       {...attributes}
+      onClick={e => {
+        e.stopPropagation()
+        e.preventDefault()
+      }}
     >
-      <CardContent {...listeners}>
-        <Typography marginTop={'10px'} variant="body1">
-          Исполнитель: <strong>{task.user.displayName}</strong>
-        </Typography>
-        <Typography variant="body1">{task.title}</Typography>
-        {task.description ? (
-          <Typography variant="body2" color="textSecondary">
-            {task.description}
+      <div
+        {...listeners}
+        style={{ padding: 16 }}
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <CardContent>
+          <Typography marginTop={'10px'} variant="body1">
+            Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
-        ) : null}
-      </CardContent>
+          <Typography variant="body1">{task.title}</Typography>
+          {task.description && (
+            <Typography variant="body2" color="textSecondary">
+              {task.description}
+            </Typography>
+          )}
+          {task.createdAt && (
+            <Typography variant="body2" color="textSecondary" marginTop={'5px'}>
+              Создано: {dayjs(task.createdAt).format('DD.MM.YYYY HH:mm')}
+            </Typography>
+          )}
+          {task.updatedAt && (
+            <Typography variant="body2" color="textSecondary">
+              Обновлено: {dayjs(task.updatedAt).format('DD.MM.YYYY HH:mm')}
+            </Typography>
+          )}
+        </CardContent>
+      </div>
+
       <IconButton
-        type={'button'}
-        style={{ position: 'absolute', top: '0', right: '0', zIndex: 1000 }}
+        style={{ position: 'absolute', top: 0, right: 0, zIndex: 1000 }}
         onClick={handleMenuOpen}
       >
         <MoreHorizIcon />
@@ -99,7 +128,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         <MenuItem onClick={handleEdit}>
           <EditIcon style={{ marginRight: 8 }} /> Редактировать
         </MenuItem>
-        <MenuItem onClick={() => handleDelete(task._id)}>
+        <MenuItem onClick={e => handleDelete(task._id, e)}>
           <DeleteIcon style={{ marginRight: 8 }} /> Удалить
         </MenuItem>
       </Menu>

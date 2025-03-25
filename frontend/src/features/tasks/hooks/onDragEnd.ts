@@ -3,6 +3,7 @@ import { TaskWithPopulate } from '../../../types'
 import { AppDispatch } from '../../../app/store'
 import { updateTask } from '../../../store/thunks/tasksThunk.ts'
 import { DragEndEvent } from '@dnd-kit/core'
+import dayjs from 'dayjs'
 
 interface DragEndProps {
   e: DragEndEvent;
@@ -25,11 +26,13 @@ export const onDragEnd = async ({
   setInProgressItems,
   dispatch,
 }: DragEndProps) => {
+  if (!e.over) return
+  if (e.active.id === e.over.id) return
   const container = e.over?.id
   const taskData = e.active?.data?.current
   if (!taskData) return
 
-  const { _id, title, description, user, parent } = taskData
+  const { _id, title, description, createdAt, user, parent } = taskData
   const userID = user?._id ?? ''
   const userEmail = user?.email ?? ''
   const userName = user?.displayName ?? ''
@@ -41,11 +44,16 @@ export const onDragEnd = async ({
     setTodoItems(removeTask(todoItems))
   } else if (parent === 'готово') {
     setDoneItems(removeTask(doneItems))
-  } else {
+  } else if (parent === 'в работе') {
     setInProgressItems(removeTask(inProgressItems))
   }
 
+
+  const currentTime = dayjs().toDate()
+
   const newItem: TaskWithPopulate = {
+    createdAt,
+    updatedAt: currentTime,
     _id,
     title,
     description,

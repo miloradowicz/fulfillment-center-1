@@ -8,20 +8,23 @@ import TaskLine from './TaskLine.tsx'
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import UserList from './UserList'
-
+import { useEffect, useState } from 'react'
 
 const TaskBoard = () => {
   const dispatch = useAppDispatch()
+  const [loading, setLoading] = useState(true)
+
+
   const {
     todoItems,
     doneItems,
     inProgressItems,
-    fetchLoading,
     setDoneItems,
     setTodoItems,
     setInProgressItems,
     searchQuery,
     users,
+    selectFetchUser,
     clearAllFilters,
     clearSearch,
     filterTasks,
@@ -29,10 +32,17 @@ const TaskBoard = () => {
     inputRef,
     selectedUser,
     setSelectedUser,
+    sensors,
   } = useTaskBoard()
 
+  useEffect(() => {
+    if (selectFetchUser) {
+      setLoading(false)
+    }
+  }, [selectFetchUser])
   return (
     <DndContext
+      sensors={sensors}
       collisionDetection={rectIntersection}
       onDragEnd={e =>
         onDragEnd({
@@ -46,7 +56,7 @@ const TaskBoard = () => {
           dispatch,
         })}
     >
-      {fetchLoading ? (
+      {selectFetchUser || loading ? (
         <Box textAlign={'center'} mt={5}>
           <CircularProgress />
         </Box>

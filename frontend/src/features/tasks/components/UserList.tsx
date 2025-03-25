@@ -3,7 +3,7 @@ import { IconButton, Stack, Tooltip, Menu, MenuItem, TextField, InputAdornment }
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import SearchIcon from '@mui/icons-material/Search'
 import ClearIcon from '@mui/icons-material/Clear'
-import { User } from '../../../types'
+import { UserStripped } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import {
   fetchTasksByUserIdWithPopulate,
@@ -16,8 +16,8 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const dispatch = useAppDispatch()
-  const [topUsers, setTopUsers] = useState<User[]>(users.slice(0, 4))
-  const [remainingUsers, setRemainingUsers] = useState<User[]>(users.slice(4))
+  const [topUsers, setTopUsers] = useState<UserStripped[]>(users.slice(0, 4))
+  const [remainingUsers, setRemainingUsers] = useState<UserStripped[]>(users.slice(4))
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -32,6 +32,7 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
       await dispatch(fetchTasksByUserIdWithPopulate(userId))
     }
   }
+
 
   const user = remainingUsers.find(u => u._id === selectedUser)
 
