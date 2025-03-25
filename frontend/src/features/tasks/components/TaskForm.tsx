@@ -93,8 +93,8 @@ const TaskForm = () => {
           {form.type === 'заказ' && (
             <Autocomplete
               id="order"
-              value={getItemNameById(orders, 'orderNumber', '_id').find(option => option.id === form.associatedOrder) || null}
-              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associatedOrder: newValue?.id || '' }))}
+              value={getItemNameById(orders, 'orderNumber', '_id').find(option => option.id === form.associated_order) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_order: newValue?.id || '' }))}
               size="small"
               fullWidth
               disablePortal
@@ -104,8 +104,8 @@ const TaskForm = () => {
                 <TextField
                   {...params}
                   label="Заказ"
-                  error={Boolean(errors.associatedOrder || getFieldError('associatedOrder', error))}
-                  helperText={errors.associatedOrder || getFieldError('associatedOrder', error)}
+                  error={Boolean(errors.associated_order || getFieldError('associated_order', error))}
+                  helperText={errors.associated_order || getFieldError('associated_order', error)}
                 />
               )}
             />
@@ -116,8 +116,8 @@ const TaskForm = () => {
           {form.type === 'поставка' && (
             <Autocomplete
               id="arrival"
-              value={getItemNameById(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associatedArrival) || null}
-              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associatedArrival: newValue?.id || '' }))}
+              value={getItemNameById(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associated_arrival) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_arrival: newValue?.id || '' }))}
               size="small"
               fullWidth
               disablePortal
@@ -127,8 +127,8 @@ const TaskForm = () => {
                 <TextField
                   {...params}
                   label="Поставка"
-                  error={Boolean(errors.associatedArrival || getFieldError('associatedArrival', error))}
-                  helperText={errors.associatedArrival || getFieldError('associatedArrival', error)}
+                  error={Boolean(errors.associated_arrival || getFieldError('associated_arrival', error))}
+                  helperText={errors.associated_arrival || getFieldError('associated_arrival', error)}
                 />
               )}
             />

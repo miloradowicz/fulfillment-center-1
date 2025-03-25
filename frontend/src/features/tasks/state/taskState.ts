@@ -3,8 +3,8 @@ export const initialState = {
   title: '',
   description: '',
   type: '',
-  associatedOrder: '',
-  associatedArrival: '',
+  associated_order: null,
+  associated_arrival: null,
   status: 'к выполнению',
 }
 

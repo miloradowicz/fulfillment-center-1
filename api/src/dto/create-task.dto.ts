@@ -7,11 +7,12 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import mongoose from 'mongoose'
 
 class LogDto {
   @IsNotEmpty({ message: 'Поле пользователь не должно быть пустым.' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  user: string
+  user: mongoose.Schema.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле описание изменения не должно быть пустым.' })
   change: string
@@ -22,7 +23,8 @@ class LogDto {
 
 export class CreateTaskDto {
   @IsNotEmpty({ message: 'Поле исполнитель обязательно для заполнения' })
-  user: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  user: mongoose.Schema.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле заголовок задачи обязательно для заполнения' }) title: string
 
@@ -35,16 +37,19 @@ export class CreateTaskDto {
   })
   status: 'к выполнению' | 'в работе' | 'готово'
 
+  @IsOptional()
   @IsEnum(['поставка', 'заказ', 'другое'], {
     message: 'Тип задачи должен быть один из: "поставка", "заказ", "другое"',
   })
   type: 'поставка' | 'заказ' | 'другое'
 
   @IsOptional()
-  associated_order?: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  associated_order?: mongoose.Schema.Types.ObjectId | null
 
   @IsOptional()
-  associated_arrival?: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  associated_arrival?: mongoose.Schema.Types.ObjectId | null
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })
