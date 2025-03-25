@@ -234,6 +234,9 @@ export interface Task {
   _id: string
   user: string
   title: string
+  type: string
+  associatedOrder: string
+  associatedArrival: string
   description: string
   status: string
   logs?: Log[]

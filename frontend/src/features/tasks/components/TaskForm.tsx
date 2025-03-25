@@ -1,144 +1,164 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
 import {
   Autocomplete,
   TextField,
-  Select,
-  MenuItem,
   Button,
-  FormControl,
-  InputLabel,
-  SelectChangeEvent,
+  Typography, CircularProgress,
 } from '@mui/material'
-import { Arrival, Order, UserStripped } from '../../../types'
-import { selectAllUsers } from '../../../store/slices/userSlice.ts'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllOrders } from '../../../store/slices/orderSlice.ts'
-import { selectAllArrivals } from '../../../store/slices/arrivalSlice.ts'
-import { fetchUsers } from '../../../store/thunks/userThunk.ts'
-import { fetchOrders } from '../../../store/thunks/orderThunk.ts'
-import { fetchArrivals } from '../../../store/thunks/arrivalThunk.ts'
-
-interface TaskInterface {
-  user: UserStripped | null;
-  title: string;
-  type: string;
-  associatedOrder: Order | null;
-  associatedArrival: Arrival | null;
-}
-
-const initialState = {
-  user: null,
-  title: '',
-  type: 'другое',
-  associatedOrder: null,
-  associatedArrival: null,
-}
+import { getItemNameById } from '../../../utils/getItemNameById.ts'
+import { getFieldError } from '../../../utils/getFieldError.ts'
+import Grid from '@mui/material/Grid2'
+import { taskStatus, taskType } from '../state/taskState.ts'
+import useTaskForm from '../hooks/useTaskForm.ts'
 
 const TaskForm = () => {
-  const [form, setForm] = useState<TaskInterface>(initialState)
-  const users = useAppSelector(selectAllUsers)
-  const orders = useAppSelector(selectAllOrders)
-  const arrivals = useAppSelector(selectAllArrivals)
-
-  const dispatch = useAppDispatch()
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(form)
-  }
-
-  useEffect(() => {
-    dispatch(fetchUsers())
-    if (form.type === 'заказ'){
-      dispatch(fetchOrders())
-    }  else if (form.type === 'поставка'){
-      dispatch(fetchArrivals())
-    }
-  }, [dispatch, form.type])
-
-  const handleAutocompleteChange = (field: keyof TaskInterface, value: UserStripped | Order | Arrival | null) => {
-    setForm(prevForm => ({
-      ...prevForm,
-      [field]: value,
-    }))
-  }
-
-  const handleInputChange = (
-    e:
-      | SelectChangeEvent
-      | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target
-
-    setForm(prevForm => ({
-      ...prevForm,
-      [name]: value,
-    }))
-  }
+  const { users, form, orders, arrivals, error, errors, addLoading, handleInputChange, handleSubmit, handleBlur, setForm } = useTaskForm()
 
   return (
     <form onSubmit={handleSubmit}>
-      {users &&
-        <Autocomplete
-          options={users}
-          getOptionLabel={option => option.displayName}
-          value={users.find(user => user._id === form.user?._id) || null}
-          onChange={(_, newValue) => handleAutocompleteChange('user', newValue)}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          renderInput={params => <TextField {...params} label="Пользователь" required />}
-          size="small"
-        />
-      }
+      <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
+        <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
+          Добавить новую задачу
+        </Typography>
 
-      <TextField
-        label="Название"
-        name="title"
-        value={form.title}
-        onChange={e => handleInputChange(e)}
-        fullWidth
-        size="small"
-      />
+        <Grid>
+          <Autocomplete
+            id="user"
+            value={getItemNameById(users, 'displayName', '_id').find(option => option.id === form.user) || null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, user: newValue?.id || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={getItemNameById(users, 'displayName', '_id')}
+            getOptionKey={option => option.id}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Пользователь"
+                error={Boolean(errors.user || getFieldError('user', error))}
+                helperText={errors.user || getFieldError('user', error)}
+                onBlur={e => handleBlur('user', e.target.value)}
+              />
+            )}
+          />
+        </Grid>
 
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Тип задачи</InputLabel>
-        <Select
-          name="type"
-          value={form.type}
-          onChange={e => handleInputChange(e)}
-          label="Тип задачи"
-          size="small"
-        >
-          <MenuItem value="поставка">Поставка</MenuItem>
-          <MenuItem value="заказ">Заказ</MenuItem>
-          <MenuItem value="другое">Другое</MenuItem>
-        </Select>
-      </FormControl>
+        <Grid>
+          <TextField
+            label="Название"
+            name="title"
+            value={form.title}
+            onChange={handleInputChange}
+            fullWidth
+            size="small"
+            error={Boolean(errors.title || getFieldError('title', error))}
+            helperText={errors.title || getFieldError('title', error)}
+            onBlur={e => handleBlur('title', e.target.value)}
+          />
+        </Grid>
 
-      {orders && form.type === 'заказ' && (
-        <Autocomplete
-          options={orders}
-          getOptionLabel={option => option.orderNumber}
-          value={form.associatedOrder}
-          onChange={(_, newValue) => handleAutocompleteChange('associatedOrder', newValue)}
-          renderInput={params => <TextField {...params} label="Заказ" />}
-          size="small"
-        />
-      )}
+        <Grid>
+          <TextField
+            label="Описание задачи"
+            name="description"
+            value={form.description}
+            onChange={handleInputChange}
+            multiline
+            fullWidth
+            size="small"
+          />
+        </Grid>
 
-      {arrivals && form.type === 'поставка' && (
-        <Autocomplete
-          options={arrivals}
-          getOptionLabel={option => option.arrivalNumber}
-          value={form.associatedArrival}
-          onChange={(_, newValue) => handleAutocompleteChange('associatedArrival', newValue)}
-          renderInput={params => <TextField {...params} label="Поставка" />}
-          size="small"
-        />
-      )}
+        <Grid>
+          <Autocomplete
+            id="type"
+            value={ form.type && taskType.includes(form.type) ? form.type : null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, type: newValue || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={taskType}
+            sx={{ width: '100%' }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Тип задачи"
+                error={Boolean(errors.type || getFieldError('type', error))}
+                helperText={errors.type || getFieldError('type', error)}
+              />
+            )}
+          />
+        </Grid>
 
-      <Button type="submit" variant="contained" color="primary">
-        Создать задачу
-      </Button>
+        <Grid>
+          {form.type === 'заказ' && (
+            <Autocomplete
+              id="order"
+              value={getItemNameById(orders, 'orderNumber', '_id').find(option => option.id === form.associatedOrder) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associatedOrder: newValue?.id || '' }))}
+              size="small"
+              fullWidth
+              disablePortal
+              options={getItemNameById(orders, 'orderNumber', '_id')}
+              getOptionKey={option => option.id}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Заказ"
+                  error={Boolean(errors.associatedOrder || getFieldError('associatedOrder', error))}
+                  helperText={errors.associatedOrder || getFieldError('associatedOrder', error)}
+                />
+              )}
+            />
+          )}
+        </Grid>
+
+        <Grid>
+          {form.type === 'поставка' && (
+            <Autocomplete
+              id="arrival"
+              value={getItemNameById(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associatedArrival) || null}
+              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associatedArrival: newValue?.id || '' }))}
+              size="small"
+              fullWidth
+              disablePortal
+              options={getItemNameById(arrivals, 'arrivalNumber', '_id')}
+              getOptionKey={option => option.id}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Поставка"
+                  error={Boolean(errors.associatedArrival || getFieldError('associatedArrival', error))}
+                  helperText={errors.associatedArrival || getFieldError('associatedArrival', error)}
+                />
+              )}
+            />
+          )}
+        </Grid>
+
+        <Grid>
+          <Autocomplete
+            id="status"
+            value={ form.status && taskStatus.includes(form.status) ? form.status : null}
+            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, status: newValue || '' }))}
+            size="small"
+            fullWidth
+            disablePortal
+            options={taskStatus}
+            sx={{ width: '100%' }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Статус задачи"
+                error={Boolean(errors.status || getFieldError('status', error))}
+                helperText={errors.status || getFieldError('status', error)}
+              />
+            )}
+          />
+        </Grid>
+        <Button type="submit" variant="contained" color="primary" disabled={addLoading}>
+          {addLoading ? <CircularProgress size={24} /> : ' Создать задачу'}
+        </Button>
+      </Grid>
     </form>
   )
 }
