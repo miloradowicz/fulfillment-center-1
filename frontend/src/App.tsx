@@ -17,8 +17,7 @@ import ServicesPage from './features/services/containers/ServicesPage.tsx'
 import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
-import CounterpartyForm from './features/counterparties/components/CounterpartyForm.tsx'
-import TaskForm from './features/tasks/components/TaskForm.tsx'
+import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 
 const App = () => {
   const theme = createTheme()
@@ -38,10 +37,9 @@ const App = () => {
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/reports" element={<ReportPage />} />
             <Route path="/tasks" element={<TaskBoard />} />
-            <Route path="/tasks/add-new-task" element={<TaskForm />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/add-new-client" element={<ClientForm />} />
-            <Route path="/add-new-counterparty" element={<CounterpartyForm />} />
+            <Route path="/counterparties" element={<CounterpartiesPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/stocks" element={<StockPage/>}/>

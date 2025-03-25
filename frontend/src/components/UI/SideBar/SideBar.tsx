@@ -5,6 +5,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import MenuIcon from '@mui/icons-material/Menu'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import DescriptionIcon from '@mui/icons-material/Description'
+import GroupIcon from '@mui/icons-material/Group'
 import {
   Drawer,
   List,
@@ -115,6 +116,17 @@ export default function Sidebar() {
               <ListItemText primary="Склады" />
             </ListItemButton>
           </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/counterparties">
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary="Контрагенты" />
+            </ListItemButton>
+          </ListItem>
+
+
         </List>
       </Drawer>
     </Box>
