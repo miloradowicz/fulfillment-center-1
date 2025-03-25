@@ -29,4 +29,5 @@ export const initialStateErrorForOrder = {
   sent_at: '',
   amount: 0,
   defect_description: '',
+  delivered_at: '',
 }

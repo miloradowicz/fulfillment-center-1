@@ -46,8 +46,8 @@ export class Order {
   @Prop({ required: true })
   sent_at: Date
 
-  @Prop({ type: String, required: false, default: null })
-  delivered_at?: string
+  @Prop({ required: true })
+  delivered_at: Date
 
   @Prop()
   comment: string

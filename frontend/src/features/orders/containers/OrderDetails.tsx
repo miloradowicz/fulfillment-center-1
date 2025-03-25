@@ -1,5 +1,15 @@
 import { useState } from 'react'
-import { Box, Button, Card, CircularProgress, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material'
+import {
+  Card,
+  Typography,
+  CircularProgress,
+  Box,
+  Stepper,
+  Step,
+  StepLabel,
+  Tabs,
+  Tab, Button,
+} from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
@@ -16,7 +26,7 @@ import { useNavigate } from 'react-router-dom'
 enum OrderStatus {
   InAssembly = 'в сборке',
   InTransit = 'в пути',
-  Delivered = 'доставлен',
+  Delivered = 'доставлен'
 }
 
 const OrderDetails = () => {
@@ -41,6 +51,7 @@ const OrderDetails = () => {
       if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
         await dispatch(deleteOrder(id))
         navigate('/orders')
+
       } else {
         toast.info('Вы отменили удаление заказа')
       }
@@ -48,6 +59,7 @@ const OrderDetails = () => {
       console.error(e)
     }
   }
+
 
   const handleOpenEdit = () => {
     setOpen(true)
@@ -72,21 +84,13 @@ const OrderDetails = () => {
           Заказ #{order._id}
         </Typography>
         <Box className="text-right">
-          <Typography variant="body2" className="text-gray-600 text-sm">
+          <Typography variant='body2' className="text-gray-600 text-sm">
             Отправлен: <span className="font-bold">{dayjs(order.sent_at).format('DD.MM.YYYY HH:mm')}</span>
           </Typography>
-
-          <Typography variant="body2" className="text-gray-600 text-sm">
-            {order.delivered_at ? (
-              <>
-                Доставлен: <span className="font-bold">{dayjs(order.delivered_at).format('DD.MM.YYYY HH:mm')}</span>
-              </>
-            ) : (
-              'Не доставлен'
-            )}
+          <Typography variant='body2' className="text-gray-600 text-sm">
+            Доставлен: <span className="font-bold">{dayjs(order.delivered_at).format('DD.MM.YYYY HH:mm')}</span>
           </Typography>
-
-          <Typography variant="h6" className="text-sky-700" sx={{ fontWeight: 600, fontSize: '18px' }}>
+          <Typography variant='h6' className="text-sky-700" sx={{ fontWeight: 600, fontSize: '18px' }}>
             Стоимость: {order.price}
           </Typography>
         </Box>
@@ -139,16 +143,18 @@ const OrderDetails = () => {
         <Tab label="Дефекты" />
       </Tabs>
       <Box className="mt-4 bg-gray-50 p-4 rounded-lg">
-        {tabValue === 0 ? <OrderLogs logs={order.logs || []} /> : <DefectsTable defects={defects} />}
+        {tabValue === 0 ? (
+          <OrderLogs logs={order.logs || []} />
+        ) : (
+          <DefectsTable defects={defects} />
+        )}
       </Box>
-      <Box
-        sx={{
-          mt: 4,
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end',
-        }}
-      >
+      <Box sx={{
+        mt: 4,
+        display: 'flex',
+        gap: 2,
+        justifyContent: 'flex-end',
+      }}>
         <Button
           type={'button'}
           variant="contained"
@@ -158,7 +164,7 @@ const OrderDetails = () => {
             borderRadius: 2,
             textTransform: 'none',
           }}
-          onClick={() => handleOpenEdit()}
+          onClick={()=>handleOpenEdit()}
         >
           Редактировать
         </Button>
@@ -172,13 +178,11 @@ const OrderDetails = () => {
             borderRadius: 2,
             textTransform: 'none',
           }}
-          onClick={() => handleDelete(order._id)}
+          onClick={()=>handleDelete(order._id)}
         >
           Удалить
         </Button>
-        <Modal handleClose={() => setOpen(false)} open={open}>
-          <OrderForm onSuccess={() => setOpen(false)} />
-        </Modal>
+        <Modal handleClose={()=> setOpen(false)} open={open}><OrderForm  onSuccess={()=> setOpen(false)}/></Modal>
       </Box>
     </Card>
   )

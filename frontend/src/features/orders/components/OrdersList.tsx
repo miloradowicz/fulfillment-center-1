@@ -87,8 +87,8 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       minWidth: isMediumScreen ? 120 : 100,
       align: 'left',
       headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => row.delivered_at && new Date(row.delivered_at),
-      valueFormatter: (value: Date | null) => (value ? dayjs(value).format('DD.MM.YYYY') : 'Не доставлен'),
+      valueGetter: (_value: string, row: OrderWithClient) => new Date(row.delivered_at),
+      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
     },
     {
       field: 'price',

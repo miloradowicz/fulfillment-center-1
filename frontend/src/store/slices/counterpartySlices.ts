@@ -22,7 +22,6 @@ interface CounterpartyState {
   loadingArchive: boolean
   error: boolean
   createError: ValidationError | null
-  updateError: ValidationError | null
 }
 
 const initialState: CounterpartyState = {
@@ -35,14 +34,12 @@ const initialState: CounterpartyState = {
   loadingArchive: false,
   error: false,
   createError: null,
-  updateError: null,
 }
 
 export const selectAllCounterparties = (state: RootState) => state.counterparties.counterparties
 export const selectOneCounterparty = (state: RootState) => state.counterparties.counterparty
 export const selectCounterpartyError = (state: RootState) => state.counterparties.error
 export const selectCounterpartyCreateError = (state: RootState) => state.counterparties.createError
-export const selectCounterpartyUpdateError = (state: RootState) => state.counterparties.updateError
 
 export const selectLoadingFetch = (state: RootState) => state.counterparties.loadingFetch
 export const selectLoadingAdd = (state: RootState) => state.counterparties.loadingAdd
@@ -53,13 +50,7 @@ export const selectLoadingArchive = (state: RootState) => state.counterparties.l
 const counterpartiesSlice = createSlice({
   name: 'counterparties',
   initialState,
-  reducers: {
-    clearErrors: state => {
-      state.createError = null
-      state.updateError = null
-      state.error = false
-    },
-  },
+  reducers: {},
   extraReducers: builder => {
     builder
       .addCase(fetchCounterparties.pending, state => {
@@ -120,7 +111,6 @@ const counterpartiesSlice = createSlice({
       })
       .addCase(createCounterparty.fulfilled, state => {
         state.loadingAdd = false
-        state.createError = null
       })
       .addCase(createCounterparty.rejected, (state, { payload: error }) => {
         state.loadingAdd = false
@@ -129,15 +119,14 @@ const counterpartiesSlice = createSlice({
 
       .addCase(updateCounterparty.pending, state => {
         state.loadingUpdate = true
-        state.updateError = null
+        state.error = false
       })
       .addCase(updateCounterparty.fulfilled, state => {
         state.loadingUpdate = false
-        state.updateError = null
       })
-      .addCase(updateCounterparty.rejected, (state, { payload: error }) => {
+      .addCase(updateCounterparty.rejected, state => {
         state.loadingUpdate = false
-        state.updateError = error || null
+        state.error = true
       })
 
       .addCase(archiveCounterparty.pending, state => {
@@ -167,5 +156,4 @@ const counterpartiesSlice = createSlice({
   },
 })
 
-export const { clearErrors } = counterpartiesSlice.actions
 export const counterpartyReducer = counterpartiesSlice.reducer

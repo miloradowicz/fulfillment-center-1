@@ -186,18 +186,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       return
     }
 
+    if (!form.shipping_agent ) {
+      delete form.shipping_agent
+    }
+
     try {
-      let updated_shipping_agent: string |  null = ''
-
-      if (form.shipping_agent ) {
-        updated_shipping_agent = form.shipping_agent
-      } else if (form.shipping_agent === '') {
-        updated_shipping_agent = null
-      }
-
       const updatedForm = {
         ...form,
-        shipping_agent: updated_shipping_agent,
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
@@ -210,7 +205,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
       } else {
-        await dispatch(addArrival({ ...updatedForm, shipping_agent: updated_shipping_agent })).unwrap()
+        await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
         await dispatch(fetchPopulatedArrivals())
       }

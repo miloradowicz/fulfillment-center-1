@@ -1,13 +1,11 @@
 import {
   ArrayNotEmpty,
-  IsArray,
-  IsDate,
+  IsArray, IsDate,
   IsEnum,
   IsInt,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
-  IsPositive,
+  IsOptional, IsPositive,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -22,7 +20,7 @@ class ProductDto {
 
   @IsNotEmpty({ message: 'Поле количество товара не должно быть пустым.' })
   @IsInt({ message: 'Поле количество товара должно являться числом' })
-  @IsPositive({ message: 'Поле количество товарa не может быть отрицательным' })
+  @IsPositive( { message: 'Поле количество товарa не может быть отрицательным' })
   amount: number
 }
 
@@ -48,7 +46,7 @@ class DefectDto {
 
   @IsNotEmpty({ message: 'Поле количество дефектных товаров не должно быть пустым.' })
   @IsInt({ message: 'Поле количество дефектных товаров должно являться числом' })
-  @IsPositive({ message: 'Поле количество дефектных товаров не может быть отрицательным' })
+  @IsPositive( { message: 'Поле количество дефектных товаров не может быть отрицательным' })
   amount: number
 }
 
@@ -68,12 +66,12 @@ export class CreateOrderDto {
   price: number
 
   @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' })
-  @IsDate({ message: 'Заполните дату отправки' })
-  @Type(() => Date)
+  @IsDate({ message: 'Заполните дату отправки' })@Type(() => Date)
   sent_at: Date
 
-  @IsOptional()
-  delivered_at?: string
+  @IsNotEmpty({ message: 'Поле дата отправки обязательно для заполнения' })
+  @IsDate({ message: 'Заполните дату доставки' })@Type(() => Date)
+  delivered_at: Date
 
   @IsOptional()
   comment?: string

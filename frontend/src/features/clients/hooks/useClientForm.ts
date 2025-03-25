@@ -1,11 +1,11 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError, clearCreationAndModificationError } from '../../../store/slices/clientSlice.ts'
+import { selectClient, selectClientError, selectLoadingAddClient, selectAllClients } from '../../../store/slices/clientSlice.ts'
 import { addClient, fetchClientById, fetchClients, updateClient } from '../../../store/thunks/clientThunk.ts'
 import { emailRegex, initialClientState, phoneNumberRegex } from '../../../constants.ts'
 import { ClientMutation } from '../../../types'
-import { isValidationError } from '../../../utils/helpers.ts'
+import { useNavigate } from 'react-router-dom'
 
 const requiredFields: (keyof ClientMutation)[] = ['name', 'email', 'phone_number', 'inn']
 
@@ -15,9 +15,10 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
 
   const dispatch = useAppDispatch()
   const loading = useAppSelector(selectLoadingAddClient)
-  const creationAndModificationError = useAppSelector(selectClientCreationAndModificationError)
+  const createError = useAppSelector(selectClientError)
   const client = useAppSelector(selectClient)
   const clients = useAppSelector(selectAllClients) || []
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (clientId) {
@@ -30,10 +31,6 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
       setForm(client)
     }
   }, [clientId, client])
-
-  useEffect(() => {
-    dispatch(clearCreationAndModificationError())
-  }, [dispatch])
 
   const validateField = (name: keyof ClientMutation, value: string): string => {
     if (!value.trim()) return 'Поле не может быть пустым'
@@ -93,36 +90,32 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
     const isNameTaken = checkClientNameExistence(form.name)
     if (isNameTaken) return
 
-    if (clientId) {
-      try {
-        await dispatch(updateClient({ clientId, data: form })).unwrap()
+    try {
+      if (clientId) {
+        await dispatch(updateClient({ clientId, data: form }))
         await dispatch(fetchClientById(clientId))
+        toast.success('Клиент успешно обновлен!')
+      } else {
+        await dispatch(addClient(form))
         await dispatch(fetchClients())
-        toast.success('Клиент успешно обновлен')
-      } catch {
-        return void toast.error('Не удалось обновить клиента')
+        toast.success('Клиент успешно создан!')
+        navigate('/clients')
       }
-    } else {
-      try {
-        await dispatch(addClient(form)).unwrap()
-        await dispatch(fetchClients())
-        toast.success('Клиент успешно создан')
-      } catch {
-        return void toast.error('Не удалось создать клиента')
-      }
-    }
 
-    if (onClose) onClose()
+      setForm(initialClientState)
+      if (onClose) {
+        onClose()
+      }
+    } catch {
+      toast.error('Не удалось создать клиента')
+    }
   }
 
   const getFieldError = (fieldName: keyof ClientMutation) => {
-    const messages = errors[fieldName] ? [errors[fieldName]] : []
+    const fieldErrors = errors[fieldName] ? [errors[fieldName]] : []
+    if (createError?.message) fieldErrors.push(createError.message)
 
-    if (isValidationError(creationAndModificationError) && creationAndModificationError.errors[fieldName]) {
-      messages.push(...creationAndModificationError.errors[fieldName].messages)
-    }
-
-    return messages.length ? messages.join(', ') : undefined
+    return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
   }
 
   return { form, errors, loading, inputChangeHandler, onSubmit, getFieldError }

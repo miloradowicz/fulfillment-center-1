@@ -223,6 +223,23 @@ export class SeederService {
       },
     ])
 
+    await this.serviceModel.create([
+      {
+        name: 'Работа с товаром',
+        dynamic_fields: [
+          { key: '1', label: 'Приемка, пересчёт товара', value: '500 сом' },
+          { key: '2', label: 'Маркировка двойная', value: '300 сом' },
+        ],
+      },
+      {
+        name: 'Забор товара',
+        dynamic_fields: [
+          { key: '3', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
+          { key: '4', label: 'Забор с другого адреса', value: '1000 сом' },
+        ],
+      },
+    ])
+
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
         name: 'ООО "Фулфилмент Партнер"',
@@ -345,6 +362,8 @@ export class SeederService {
         isArchived: false,
       }]
     )
+    console.log('_serviceCat1:', _serviceCat1)
+    console.log('_serviceCat2:', _serviceCat2)
 
     await this.serviceModel.create([
       {
