@@ -35,7 +35,4 @@ export class CreateProductDto {
   @IsOptional()
   @Type(() => DynamicFieldDto)
   dynamic_fields?: DynamicFieldDto[] | string
-
-  @IsOptional()
-  documents?: Array<{ document: string }> | string[] | string
 }

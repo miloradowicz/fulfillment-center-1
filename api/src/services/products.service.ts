@@ -4,13 +4,8 @@ import { Model } from 'mongoose'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { UpdateProductDto } from '../dto/update-product.dto'
 import { Product, ProductDocument } from '../schemas/product.schema'
-import { FilesService } from './files.service'
 import { Arrival, ArrivalDocument } from 'src/schemas/arrival.schema'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
-
-interface DocumentObject {
-  document: string;
-}
 
 interface DynamicFieldDto {
   key: string;
@@ -24,7 +19,6 @@ export class ProductsService {
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    private readonly filesService: FilesService,
   ) {}
 
   async getById(id: string, populate?: boolean) {
@@ -63,7 +57,7 @@ export class ProductsService {
     return (await unarchived).reverse()
   }
 
-  async create(productDto: CreateProductDto, files: Array<Express.Multer.File> = []) {
+  async create(productDto: CreateProductDto) {
 
     const barcode = await this.productModel.findOne({ barcode: productDto.barcode })
     if (barcode) {
@@ -94,29 +88,6 @@ export class ProductsService {
         } catch (_e) {
           throw new BadRequestException('Неверный формат dynamic_fields')
         }
-      }
-
-      if (files && files.length > 0) {
-        const documentPaths = files.map(file => ({
-          document: this.filesService.getFilePath(file.filename),
-        }))
-
-        productDto.documents = productDto.documents || []
-        if (typeof productDto.documents === 'string') {
-          try {
-            productDto.documents = JSON.parse(productDto.documents) as DocumentObject[]
-          } catch (_e) {
-            productDto.documents = []
-          }
-        }
-
-        const formattedDocs = Array.isArray(productDto.documents)
-          ? productDto.documents.map((doc: DocumentObject | string) =>
-            typeof doc === 'string' ? { document: doc } : doc,
-          )
-          : []
-
-        productDto.documents = [...formattedDocs, ...documentPaths]
       }
 
       return await this.productModel.create(productDto)
@@ -150,9 +121,8 @@ export class ProductsService {
       $or: [{ products: { $elemMatch: { product: product._id } } }],
     })
 
-    if (orders.length) return true
+    return !!orders.length
 
-    return false
   }
 
   async archive(id: string) {
@@ -189,7 +159,7 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, productDto: UpdateProductDto, files: Array<Express.Multer.File> = []) {
+  async update(id: string, productDto: UpdateProductDto) {
     const existingProduct = await this.getById(id)
     if (!existingProduct){
       throw new NotFoundException('Товар не найден')
@@ -224,15 +194,6 @@ export class ProductsService {
         } catch (_e) {
           throw new BadRequestException('Неверный формат dynamic_fields')
         }
-      }
-
-      if (files && files.length > 0) {
-        const documentPaths = files.map(file => ({
-          document: this.filesService.getFilePath(file.filename),
-        }))
-
-        const existingDocs = existingProduct.documents || []
-        productDto.documents = [...existingDocs, ...documentPaths]
       }
 
       return this.productModel.findByIdAndUpdate(
