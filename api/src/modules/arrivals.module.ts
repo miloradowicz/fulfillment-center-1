@@ -5,9 +5,10 @@ import { DbModule } from './db.module'
 import { ValidatorsModule } from './validators.module'
 import { AuthModule } from './auth.module'
 import { CounterService } from '../services/counter.service'
+import { FilesModule } from './file-upload.module'
 
 @Module({
-  imports: [DbModule, AuthModule, ValidatorsModule],
+  imports: [DbModule, AuthModule, ValidatorsModule, FilesModule],
   controllers: [ArrivalsController],
   providers: [ArrivalsService, CounterService],
 })

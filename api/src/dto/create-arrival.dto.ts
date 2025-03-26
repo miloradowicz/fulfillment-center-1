@@ -92,6 +92,9 @@ export class CreateArrivalDto {
   shipping_agent?: mongoose.Schema.Types.ObjectId | null
 
   @IsOptional()
+  documents?: Array<{ document: string }> | string[] | string
+
+  @IsOptional()
   @IsEnum(['ожидается доставка', 'получена', 'отсортирована'], {
     message: 'Статус должен быть одним из: "ожидается доставка", "получена", "отсортирована"',
   })
