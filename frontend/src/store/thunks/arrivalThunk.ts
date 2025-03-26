@@ -9,6 +9,7 @@ import {
   ValidationError,
 } from '../../types'
 import { isAxiosError } from 'axios'
+import { createArrivalFormData } from '../../utils/createArrivalFormData.ts'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
   const response = await axiosAPI.get('/arrivals')
@@ -47,23 +48,25 @@ export const fetchPopulatedArrivals = createAsyncThunk<ArrivalWithClient[]>(
   },
 )
 
-export const addArrival = createAsyncThunk<Arrival, ArrivalMutation | FormData, { rejectValue: ValidationError }>(
-  'arrivals/addArrival',
-  async (arrivalData, { rejectWithValue }) => {
-    try {
-      const response = await axiosAPI.post('/arrivals', arrivalData, {
-        headers: arrivalData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
-      })
-      return response.data
-    } catch (error) {
-      if (isAxiosError(error) && error.response && error.response.status === 400) {
-        return rejectWithValue(error.response.data as ValidationError)
-      }
-      throw error
-    }
-  },
-)
+export const addArrival = createAsyncThunk<
+  Arrival,
+  ArrivalMutation & { file?: File },
+  { rejectValue: ValidationError }
+>('arrivals/addArrival', async (arrivalData, { rejectWithValue }) => {
+  try {
+    const formData = createArrivalFormData(arrivalData, arrivalData.file)
 
+    const response = await axiosAPI.post('/arrivals', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 400) {
+      return rejectWithValue(error.response.data as ValidationError)
+    }
+    throw error
+  }
+})
 
 export const archiveArrival = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'arrivals/archiveArrival',
@@ -95,17 +98,21 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 )
 
 export const updateArrival = createAsyncThunk<
-  void,
-  { arrivalId: string; data: FormData },
-  {  rejectValue: ValidationError  }
->('arrivals/updateArrival',
-  async ({ arrivalId, data }, { rejectWithValue }) => {
-    try {
-      await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
-    } catch (e) {
-      if (isAxiosError(e) && e.response) {
-        return rejectWithValue(e.response.data as ValidationError)
-      }
-      throw e
+  Arrival,
+  { arrivalId: string; data: ArrivalMutation & { file?: File } },
+  { rejectValue: ValidationError }
+>('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
+  try {
+    const formData = createArrivalFormData(data, data.file)
+
+    const response = await axiosAPI.put(`/arrivals/${ arrivalId }`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
+  } catch (e) {
+    if (isAxiosError(e) && e.response?.status === 400) {
+      return rejectWithValue(e.response.data as ValidationError)
     }
-  })
+    throw e
+  }
+})
