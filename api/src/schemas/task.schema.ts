@@ -42,13 +42,13 @@ export class Task {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
   })
-  associated_order: string
+  associated_order: mongoose.Schema.Types.ObjectId
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Arrival',
   })
-  associated_arrival: string
+  associated_arrival: mongoose.Schema.Types.ObjectId
 
   @Prop({
     type: [

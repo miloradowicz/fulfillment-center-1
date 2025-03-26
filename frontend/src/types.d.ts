@@ -230,6 +230,9 @@ export interface Task {
   _id: string
   user: string
   title: string
+  type: string
+  associated_order?: string | null
+  associated_arrival?: string | null
   description: string
   status: string
   logs?: Log[]
