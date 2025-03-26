@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Service, ServiceDocument } from '../schemas/service.schema'
@@ -7,7 +7,7 @@ import { UpdateServiceDto } from '../dto/update-service.dto'
 
 @Injectable()
 export class ServicesService {
-  constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) {}
+  constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) { }
 
   async getAll() {
     return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
@@ -27,15 +27,36 @@ export class ServicesService {
     return service
   }
 
+  async getAllArchived() {
+    return this.serviceModel.find({ isArchived: true }).populate('serviceCategory').exec()
+  }
+
+  async getAllByNameArchived(name: string) {
+    return this.serviceModel.find({ isArchived: true }).find({ name: { $regex: name, $options: 'i' } }).populate('serviceCategory').exec()
+  }
+
+  async getByIdArchived(id: string) {
+    const service = await this.serviceModel.find({ isArchived: true }).findById(id).populate('serviceCategory').exec()
+
+    if (!service) throw new NotFoundException('Услуга не найдена в архиве')
+
+    return service
+  }
+
   async create(serviceDto: CreateServiceDto) {
     return await this.serviceModel.create(serviceDto)
   }
 
-  async update(id: string, serviceDto: UpdateServiceDto) {
-    const service = await this.serviceModel.findByIdAndUpdate(id, serviceDto, { new: true })
-    if (!service) {
-      throw new NotFoundException('Услуга не найдена')
-    }
+  async update(id: string, serviceDto: UpdateServiceDto, force: boolean = false) {
+    const service = await this.serviceModel.findById(id)
+
+    if (!service) throw new NotFoundException('Услуга не найдена')
+
+    if (!force && service.isArchived) throw new ForbiddenException('Услуга в архиве')
+
+    service.set(serviceDto)
+    await service.save()
+
     return service
   }
 
