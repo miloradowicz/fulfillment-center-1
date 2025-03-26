@@ -16,9 +16,19 @@ export class TasksController {
     }
   }
 
+  @Get('archived/all')
+  async getAllArchivedTasks(@Query('populate') populate?: string) {
+    return await this.tasksService.getAllArchived(populate === '1')
+  }
+
   @Get(':id')
   async getTaskById(@Param('id') id: string) {
     return this.tasksService.getById(id)
+  }
+
+  @Get('archived/:id')
+  async getArchivedTaskById(@Param('id') id: string) {
+    return await this.tasksService.getArchivedById(id)
   }
 
   @Post()

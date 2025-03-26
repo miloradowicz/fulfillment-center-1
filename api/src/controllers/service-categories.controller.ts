@@ -12,7 +12,7 @@ export class ServiceCategoriesController {
     return this.serviceCategoryService.getAll()
   }
 
-  @Get('all')
+  @Get('archived/all')
   async getAllArchivedServiceCategories() {
     return this.serviceCategoryService.getAllArchived()
   }
@@ -22,7 +22,7 @@ export class ServiceCategoriesController {
     return this.serviceCategoryService.getById(id)
   }
 
-  @Get('all/:id')
+  @Get('archived/:id')
   async getArchivedServiceCategoryById(@Param('id') id: string) {
     return this.serviceCategoryService.getArchivedById(id)
   }

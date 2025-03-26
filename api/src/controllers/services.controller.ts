@@ -15,9 +15,19 @@ export class ServicesController {
     return this.servicesService.getAll()
   }
 
+  @Get('archived/all')
+  async getAllArchivedServices() {
+    return this.servicesService.getAllArchived()
+  }
+
   @Get(':id')
   async getServiceById(@Param('id') id: string) {
     return this.servicesService.getById(id)
+  }
+
+  @Get('archived/:id')
+  async getArchivedServiceById(@Param('id') id: string) {
+    return this.servicesService.getArchivedById(id)
   }
 
   @Post()

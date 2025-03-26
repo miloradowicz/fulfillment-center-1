@@ -43,12 +43,27 @@ export class ProductsController {
     }
   }
 
+  @Get('archived/all')
+  async getAllArchivedProducts(
+    @Query('populate') populate?: string
+  ) {
+    return await this.productsService.getAllArchived(populate === '1')
+  }
+
   @Get(':id')
   async getProduct(
     @Param('id') id: string,
     @Query('populate') populate?: string
   ) {
     return await this.productsService.getById(id, populate === '1')
+  }
+
+  @Get('archived/:id')
+  async getArchivedProduct(
+    @Param('id') id: string,
+    @Query('populate') populate?: string
+  ) {
+    return await this.productsService.getArchivedById(id, populate === '1')
   }
 
   @Patch(':id/archive')

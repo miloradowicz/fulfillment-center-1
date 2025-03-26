@@ -21,12 +21,26 @@ export class ClientsService {
     return this.clientModel.find({ isArchived: false })
   }
 
+  async getAllArchived() {
+    return this.clientModel.find({ isArchived: true })
+  }
+
   async getById(id: string) {
     const client = await this.clientModel.findById(id)
 
     if (!client) throw new NotFoundException('Клиент не найден')
 
     if (client.isArchived) throw new ForbiddenException('Клиент в архиве')
+
+    return client
+  }
+
+  async getArchivedById(id: string) {
+    const client = await this.clientModel.findById(id)
+
+    if (!client) throw new NotFoundException('Клиент не найден')
+
+    if (!client.isArchived) throw new ForbiddenException('Этот клиент не в архиве')
 
     return client
   }
