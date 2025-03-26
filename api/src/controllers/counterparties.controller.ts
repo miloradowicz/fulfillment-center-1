@@ -12,9 +12,9 @@ export class CounterpartiesController {
     return this.counterpartiesService.getAll()
   }
 
-  @Get('all')
-  async getAllCounterpartiesWithArchived() {
-    return this.counterpartiesService.getAllWithArchived()
+  @Get('archived/all')
+  async getAllArchivedCounterparties() {
+    return this.counterpartiesService.getAllArchived()
   }
 
   @Get(':id')
@@ -22,10 +22,11 @@ export class CounterpartiesController {
     return this.counterpartiesService.getById(id)
   }
 
-  @Get('all/:id')
-  async getCounterpartyByIdWithArchived(@Param('id') id: string) {
-    return this.counterpartiesService.getByIdWithArchived(id)
+  @Get('archived/:id')
+  async getArchivedCounterparty(@Param('id') id: string) {
+    return this.counterpartiesService.getArchivedById(id)
   }
+
 
   @Post()
   async createCounterparty(@Body() counterpartyDto: CreateCounterpartyDto) {

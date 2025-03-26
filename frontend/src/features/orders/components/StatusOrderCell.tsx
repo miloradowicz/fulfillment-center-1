@@ -1,4 +1,4 @@
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient, StatusColor } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import React, { useState } from 'react'
 import { fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderThunk.ts'
@@ -12,7 +12,7 @@ export interface Props  {
 const StatusOrderCell:React.FC<Props> =({ row })  => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
+  const statusColors: Record<string,StatusColor> = {
     'в сборке': 'warning',
     'доставлен': 'success',
     'в пути': 'info',

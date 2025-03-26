@@ -13,6 +13,10 @@ export class StocksService {
     return (await this.stockModel.find({ isArchived: false })).reverse()
   }
 
+  async getAllArchived() {
+    return this.stockModel.find({ isArchived: true }).exec()
+  }
+
   async getOne(id: string) {
     const stock = await this.stockModel
       .findById(id)
@@ -25,6 +29,16 @@ export class StocksService {
     if (!stock) throw new NotFoundException('Склад не найден.')
 
     if (stock.isArchived) throw new ForbiddenException('Склад в архиве.')
+
+    return stock
+  }
+
+  async getArchivedById(id: string) {
+    const stock = await this.stockModel.findById(id).exec()
+
+    if (!stock) throw new NotFoundException('Склад не найден.')
+
+    if (!stock.isArchived) throw new ForbiddenException('Этот склад не в архиве.')
 
     return stock
   }

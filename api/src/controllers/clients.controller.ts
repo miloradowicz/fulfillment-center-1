@@ -12,9 +12,19 @@ export class ClientsController {
     return this.clientsService.getAll()
   }
 
+  @Get('archived/all')
+  async getAllArchivedClients() {
+    return this.clientsService.getAllArchived()
+  }
+
   @Get(':id')
   async getOneClient(@Param('id') id: string) {
     return this.clientsService.getById(id)
+  }
+
+  @Get('archived/:id')
+  async getArchivedClient(@Param('id') id: string) {
+    return this.clientsService.getArchivedById(id)
   }
 
   @Post()

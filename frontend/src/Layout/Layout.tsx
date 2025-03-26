@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+import React, { PropsWithChildren } from 'react'
 import AppToolbar from '../components/UI/AppToolbar/AppToolbar.tsx'
 import { Container, CssBaseline } from '@mui/material'
 
@@ -10,7 +10,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
         <AppToolbar />
       </header>
       <main>
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ pt: 10 }}>
           {children}
         </Container>
       </main>

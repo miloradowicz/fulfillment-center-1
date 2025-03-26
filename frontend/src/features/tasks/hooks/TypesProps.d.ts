@@ -13,8 +13,13 @@ export interface TaskCardProps {
   selectedUser: string | null
 }
 
-interface UserListProps {
+export interface UserListProps {
   users: UserStripped[]
   selectedUser: string | null
   setSelectedUser: (userId: string | null) => void
+}
+
+export interface PropsStatus {
+  task: TaskWithPopulate,
+  selectedUser: string | null
 }

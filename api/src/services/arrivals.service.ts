@@ -39,6 +39,16 @@ export class ArrivalsService {
     return (await unarchived).reverse()
   }
 
+  async getArchivedAll(populate: boolean) {
+    const archived = this.arrivalModel.find({ isArchived: true })
+
+    if (populate) {
+      return (await archived.populate('client stock shipping_agent').exec()).reverse()
+    }
+
+    return (await archived).reverse()
+  }
+
   async getOne(id: string, populate: boolean) {
     let arrival: ArrivalDocument | null
 
@@ -54,6 +64,24 @@ export class ArrivalsService {
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
 
     if (arrival.isArchived) throw new ForbiddenException('Поставка в архиве.')
+
+    return arrival
+  }
+
+  async getArchivedOne(id: string, populate: boolean) {
+    let arrival: ArrivalDocument | null
+
+    if (populate) {
+      arrival = await this.arrivalModel
+        .findById(id)
+        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate({ path: 'logs.user', select: '-password -token' })
+    } else {
+      arrival = await this.arrivalModel.findById(id)
+    }
+
+    if (!arrival) throw new NotFoundException('Поставка не найдена.')
+    if (!arrival.isArchived) throw new ForbiddenException('Эта поставка не в архиве.')
 
     return arrival
   }

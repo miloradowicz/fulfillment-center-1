@@ -17,6 +17,10 @@ export class OrdersService {
     return this.orderModel.find({ isArchived: false })
   }
 
+  async getAllArchived() {
+    return this.orderModel.find({ isArchived: true }).exec()
+  }
+
   async getAllWithClient() {
     return this.orderModel.find({ isArchived: false }).populate('client').exec()
   }
@@ -41,6 +45,15 @@ export class OrdersService {
     if (!order) throw new NotFoundException('Заказ не найден')
 
     if (order.isArchived) throw new ForbiddenException('Заказ в архиве')
+
+    return order
+  }
+
+  async getArchivedById(id: string) {
+    const order = await this.orderModel.findById(id).exec()
+
+    if (!order) throw new NotFoundException('Заказ не найден')
+    if (!order.isArchived) throw new ForbiddenException('Этот заказ не в архиве')
 
     return order
   }

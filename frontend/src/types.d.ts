@@ -288,3 +288,5 @@ export interface Counterparty {
 }
 
 export type CounterpartyMutation = Omit<Counterparty , '_id'>
+
+export type StatusColor = 'warning' | 'success' | 'info' | 'default'
