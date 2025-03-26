@@ -1,6 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { Arrival, ArrivalMutation, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
+import {
+  Arrival,
+  ArrivalMutation,
+  ArrivalWithClient,
+  ArrivalWithPopulate,
+  GlobalError,
+  ValidationError,
+} from '../../types'
 import { isAxiosError } from 'axios'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
@@ -40,11 +47,14 @@ export const fetchPopulatedArrivals = createAsyncThunk<ArrivalWithClient[]>(
   },
 )
 
-export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue: ValidationError }>(
+export const addArrival = createAsyncThunk<Arrival, ArrivalMutation | FormData, { rejectValue: ValidationError }>(
   'arrivals/addArrival',
-  async (data: ArrivalMutation, { rejectWithValue }) => {
+  async (arrivalData, { rejectWithValue }) => {
     try {
-      await axiosAPI.post('/arrivals', data)
+      const response = await axiosAPI.post('/arrivals', arrivalData, {
+        headers: arrivalData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
+      })
+      return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response && error.response.status === 400) {
         return rejectWithValue(error.response.data as ValidationError)
@@ -53,6 +63,7 @@ export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue:
     }
   },
 )
+
 
 export const archiveArrival = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'arrivals/archiveArrival',
@@ -85,15 +96,16 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 
 export const updateArrival = createAsyncThunk<
   void,
-  { arrivalId: string; data: ArrivalMutation },
+  { arrivalId: string; data: FormData },
   {  rejectValue: ValidationError  }
->('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
-  try {
-    await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
-  } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as ValidationError)
+>('arrivals/updateArrival',
+  async ({ arrivalId, data }, { rejectWithValue }) => {
+    try {
+      await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as ValidationError)
+      }
+      throw e
     }
-    throw e
-  }
-})
+  })
