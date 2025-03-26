@@ -17,7 +17,6 @@ const initialState: ProductMutation = {
   amount: 0,
   barcode: '',
   article: '',
-  documents: [],
   dynamic_fields: [],
 }
 
@@ -52,7 +51,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
   )
   const [newField, setNewField] = useState<DynamicField>(dynamicFieldState)
   const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const dispatch = useAppDispatch()
@@ -83,19 +81,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     }
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null
-    if (selectedFile) {
-      const maxFileSize = 10 * 1024 * 1024
-      if (selectedFile.size > maxFileSize) {
-        toast.warn('Размер файла слишком большой. Максимальный размер: 10MB')
-        setFile(null)
-        return
-      }
-      setFile(selectedFile)
-    }
-  }
-
   const addDynamicField = () => {
     if (!newField.key.trim() || !newField.label.trim()) return
 
@@ -121,34 +106,23 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     }
 
     try {
-      const formData = new FormData()
-      formData.append('client', form.client)
-      formData.append('title', form.title)
-      formData.append('amount', String(form.amount))
-      formData.append('barcode', form.barcode)
-      formData.append('article', form.article)
-
-      if (dynamicFields.length > 0) {
-        formData.append('dynamic_fields', JSON.stringify(dynamicFields))
-      }
-
-      if (file) {
-        formData.append('documents', file)
+      const updatedForm = {
+        ...form,
+        dynamic_fields: dynamicFields,
       }
 
       if (initialData) {
-        await dispatch(updateProduct({ productId: initialData._id, data: formData })).unwrap()
+        await dispatch(updateProduct({ productId: initialData._id, data: updatedForm })).unwrap()
         onSuccess?.()
         toast.success('Товар успешно обновлен.')
       } else {
-        await dispatch(addProduct(formData)).unwrap()
+        await dispatch(addProduct(updatedForm)).unwrap()
         onSuccess?.()
         toast.success('Товар успешно создан.')
         setForm(initialState)
         setDynamicFields([])
         setSelectedClient('')
       }
-      setFile(null)
       setErrors({})
     } catch (e) {
       console.error(e)
@@ -184,19 +158,16 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     dynamicFields,
     newField,
     showNewFieldInputs,
-    file,
     clients,
     loadingAdd,
     loadingUpdate,
     inputChangeHandler,
-    handleFileChange,
     addDynamicField,
     onChangeDynamicFieldValue,
     onSubmit,
     setForm,
     setDynamicFields,
     setSelectedClient,
-    setFile,
     setNewField,
     setShowNewFieldInputs,
     setErrors,

@@ -48,7 +48,6 @@ export interface Product {
   amount: number
   barcode: string
   article: string
-  documents?: { document: string }[]
   dynamic_fields?: DynamicField[]
   logs?: Log[]
 }
@@ -60,7 +59,6 @@ export interface ProductWithPopulate {
   amount: number
   barcode: string
   article: string
-  documents: { document: string }[]
   dynamic_fields: DynamicField[]
   logs?: Log[]
 }
@@ -117,6 +115,7 @@ export interface Arrival {
   received_amount?: ProductArrival[]
   logs?: Log[]
   arrivalNumber?: string
+  documents?: { document: string }[]
 }
 
 export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent'> & {
@@ -127,12 +126,14 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   logs?: LogWithPopulate[]
   stock: Stock
   shipping_agent?: Counterparty
+  documents?: { document: string }[]
 }
 
 export interface ArrivalWithClient extends Omit<Arrival, 'client' | 'stock' | 'shipping_agent'> {
   client: Client
   stock: Stock
   shipping_agent?: Counterparty | null
+  documents?: { document: string }[]
 }
 
 export type ArrivalMutation = Omit<Arrival, '_id'>

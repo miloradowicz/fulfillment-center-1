@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import {
   ArrivalError,
@@ -55,6 +55,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         defects: [],
         received_amount: [],
         arrival_status: initialData.arrival_status,
+        documents: [],
       }
       : { ...initialState },
   )
@@ -77,12 +78,12 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
 
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
   const [errors, setErrors] = useState<ArrivalError>({ ...initialErrorState })
+  const [availableItem, setAvailableItem] = useState<Product[]>([])
+  const [file, setFile] = useState<File | null>(null)
 
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
   const [defectsModalOpen, setDefectsModalOpen] = useState(false)
-
-  const [availableItem, setAvailableItem] = useState<Product[]>([])
 
   useEffect(() => {
     dispatch(fetchClients())
@@ -178,6 +179,19 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }))
   }
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files ? e.target.files[0] : null
+    if (selectedFile) {
+      const maxFileSize = 10 * 1024 * 1024
+      if (selectedFile.size > maxFileSize) {
+        toast.warn('Размер файла слишком большой. Максимальный размер: 10MB')
+        setFile(null)
+        return
+      }
+      setFile(selectedFile)
+    }
+  }
+
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -187,21 +201,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
 
     try {
-      let updated_shipping_agent: string |  null = ''
-
-      if (form.shipping_agent ) {
-        updated_shipping_agent = form.shipping_agent
-      } else if (form.shipping_agent === '') {
-        updated_shipping_agent = null
-      }
-
       const updatedForm = {
         ...form,
-        shipping_agent: updated_shipping_agent,
+        ...form,
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
-        arrival_price: Number(form.arrival_price),
+        file: file || undefined,
       }
 
       if (initialData) {
@@ -210,11 +216,10 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
       } else {
-        await dispatch(addArrival({ ...updatedForm, shipping_agent: updated_shipping_agent })).unwrap()
+        await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
         await dispatch(fetchPopulatedArrivals())
       }
-
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
@@ -255,5 +260,8 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     stocks,
     counterparties,
     availableItem,
+    file,
+    setFile,
+    handleFileChange,
   }
 }

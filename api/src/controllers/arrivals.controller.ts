@@ -1,7 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
+import { FilesInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import * as path from 'node:path'
 
 @Controller('arrivals')
 export class ArrivalsController {
@@ -22,10 +37,7 @@ export class ArrivalsController {
   }
 
   @Get(':id')
-  async getOneArrival(
-    @Param('id') id: string,
-    @Query('populate') populate: string
-  ) {
+  async getOneArrival(@Param('id') id: string, @Query('populate') populate: string) {
     return this.arrivalsService.getOne(id, populate === '1')
   }
 
@@ -38,13 +50,30 @@ export class ArrivalsController {
   }
 
   @Post()
-  async createArrival(@Body() arrivalDto: CreateArrivalDto) {
-    return this.arrivalsService.create(arrivalDto)
+  @UseInterceptors(
+    FilesInterceptor('documents', 10, {
+      storage: diskStorage({
+        destination: './uploads/documents',
+        filename: (_req, file, cb) => {
+          const originalExt = path.extname(file.originalname) || ''
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+          cb(null, `${ file.fieldname }-${ uniqueSuffix }${ originalExt }`)
+        },
+      }),
+    }),
+  )
+  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Express.Multer.File[]) {
+    return this.arrivalsService.create(arrivalDto, files)
   }
 
   @Put(':id')
-  async updateArrival(@Param('id') id: string, @Body() arrivalDto: UpdateArrivalDto) {
-    return await this.arrivalsService.update(id, arrivalDto)
+  @UseInterceptors(FilesInterceptor('documents', 10, { dest: './uploads/documents' }))
+  async updateArrival(
+    @Param('id') id: string,
+    @Body() arrivalDto: UpdateArrivalDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    return await this.arrivalsService.update(id, arrivalDto, files)
   }
 
   @Patch(':id/archive')

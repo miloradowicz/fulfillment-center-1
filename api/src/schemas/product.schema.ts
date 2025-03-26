@@ -26,8 +26,6 @@ export class Product {
   @Prop({ required: true })
   article: string
   @Prop()
-  documents: [{ document: string }]
-  @Prop()
   dynamic_fields: [
     {
       key: { type: string; unique: true }

@@ -5,12 +5,18 @@ import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 import { CounterService } from './counter.service'
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
+import { FilesService } from './files.service'
+
+interface DocumentObject {
+  document: string
+}
 
 @Injectable()
 export class ArrivalsService {
   constructor(
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
-    private counterService: CounterService
+    private counterService: CounterService,
+    private readonly filesService: FilesService,
   ) {}
 
   async getAllByClient(clientId: string, populate: boolean) {
@@ -80,12 +86,41 @@ export class ArrivalsService {
     return arrival
   }
 
-  async create(arrivalDto: CreateArrivalDto) {
+  async create(arrivalDto: CreateArrivalDto, files: Array<Express.Multer.File> = []) {
     try {
-      const newArrival = await this.arrivalModel.create(arrivalDto)
+      let documents: DocumentObject[] = []
+
+      if (files.length > 0) {
+        documents = files.map(file => ({
+          document: this.filesService.getFilePath(file.filename),
+        }))
+      }
+
+      if (arrivalDto.documents) {
+        if (typeof arrivalDto.documents === 'string') {
+          try {
+            arrivalDto.documents = JSON.parse(arrivalDto.documents) as DocumentObject[]
+          } catch (_e) {
+            arrivalDto.documents = []
+          }
+        }
+
+        const formattedDocs = Array.isArray(arrivalDto.documents)
+          ? arrivalDto.documents.map((doc: DocumentObject | string) =>
+            typeof doc === 'string' ? { document: doc } : doc,
+          )
+          : []
+
+        documents = [...formattedDocs, ...documents]
+      }
+
+      const newArrival = await this.arrivalModel.create({
+        ...arrivalDto,
+        documents,
+      })
 
       const sequenceNumber = await this.counterService.getNextSequence('arrival')
-      newArrival.arrivalNumber  = `ARL-${ sequenceNumber }`
+      newArrival.arrivalNumber = `ARL-${ sequenceNumber }`
 
       return newArrival.save()
     } catch (error) {
@@ -99,12 +134,31 @@ export class ArrivalsService {
     }
   }
 
-  async update(id: string, arrivalDto: UpdateArrivalDto) {
+  async update(id: string, arrivalDto: UpdateArrivalDto, files: Array<Express.Multer.File> = []) {
     const arrival = await this.arrivalModel.findByIdAndUpdate(id, arrivalDto, { new: true })
+
     if (!arrival) {
       throw new NotFoundException('Поставка не найдена.')
     }
-    return arrival
+
+    try {
+      if (files && files.length > 0) {
+        const documentPaths = files.map(file => ({
+          document: this.filesService.getFilePath(file.filename),
+        }))
+
+        const existingDocs = arrival?.documents || []
+        arrivalDto.documents = [...existingDocs, ...documentPaths]
+      }
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      throw new BadRequestException(`Ошибка при обновлении продукта: ${ errorMessage }`)
+    }
+
+    return this.arrivalModel.findByIdAndUpdate(id, arrivalDto, { new: true })
   }
 
   async archive(id: string) {

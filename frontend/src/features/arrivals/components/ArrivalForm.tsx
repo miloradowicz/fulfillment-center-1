@@ -1,5 +1,6 @@
 import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, Divider, InputLabel, TextField, Typography } from '@mui/material'
+import { Button, CircularProgress, Divider, IconButton, InputLabel, TextField, Typography } from '@mui/material'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
 import { ArrivalData, useArrivalForm } from '../hooks/useArrivalForm.ts'
@@ -48,6 +49,8 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     stocks,
     availableItem,
     counterparties,
+    file,
+    handleFileChange,
   } = useArrivalForm(initialData, onSuccess)
 
   return (
@@ -55,7 +58,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
+            <CircularProgress/>
           </Grid>
         ) : null}
 
@@ -128,7 +131,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             options={getItemNameById(counterparties, 'name', '_id')}
             getOptionKey={option => option.id}
             sx={{ width: '100%' }}
-            renderInput={params => <TextField {...params} label="Компания-перевозчик" />}
+            renderInput={params => <TextField {...params} label="Компания-перевозчик"/>}
           />
         </Grid>
 
@@ -168,7 +171,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Autocomplete
             id="arrival_status"
-            value={ form.arrival_status && status.includes(form.arrival_status) ? form.arrival_status : null}
+            value={form.arrival_status && status.includes(form.arrival_status) ? form.arrival_status : null}
             onChange={(_, newValue) => setForm(prevState => ({ ...prevState, arrival_status: newValue || '' }))}
             size="small"
             fullWidth
@@ -297,7 +300,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
+          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
           <Typography fontWeight="bold">Полученные товары</Typography>
           <ItemsList
             items={receivedForm}
@@ -378,7 +381,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
+          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
           <Typography fontWeight="bold">Дефекты</Typography>
           <ItemsList
             items={defectsForm}
@@ -461,10 +464,27 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </Grid>
         )}
 
+        <Divider sx={{ width: '100%', marginBottom: '10px' }}/>
+
+        <Grid className="flex gap-2 content-between items-center">
+          <Typography>Загрузить документ</Typography>
+          <Grid sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton component="label" className="">
+              <InsertDriveFileIcon fontSize={'large'} color={'primary'}/>
+              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange}/>
+            </IconButton>
+            {file && (
+              <Grid sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Typography variant="body2">{file.name}</Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
             {isLoading ? (
-              <CircularProgress size={24} color="inherit" />
+              <CircularProgress size={24} color="inherit"/>
             ) : initialData ? (
               'Обновить поставку'
             ) : (
