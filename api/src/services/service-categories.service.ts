@@ -14,7 +14,7 @@ export class ServiceCategoriesService {
   }
 
   async getAllArchived() {
-    return this.serviceCategoryModel.find().exec()
+    return this.serviceCategoryModel.find({ isArchived: true }).exec()
   }
 
   async getById(id: string) {
@@ -31,6 +31,8 @@ export class ServiceCategoriesService {
     const serviceCategory = await this.serviceCategoryModel.findById(id).exec()
 
     if (!serviceCategory) throw new NotFoundException('Категория услуги не найдена')
+
+    if (!serviceCategory.isArchived) throw new ForbiddenException('Эта категория услуги не в архиве')
 
     return serviceCategory
   }

@@ -16,12 +16,25 @@ export class ArrivalsController {
     }
   }
 
+  @Get('archived/all')
+  async getAllArchivedArrivals(@Query('populate') populate?: string) {
+    return await this.arrivalsService.getArchivedAll(populate === '1')
+  }
+
   @Get(':id')
   async getOneArrival(
     @Param('id') id: string,
     @Query('populate') populate: string
   ) {
     return this.arrivalsService.getOne(id, populate === '1')
+  }
+
+  @Get('archived/:id')
+  async getOneArchivedArrival(
+    @Param('id') id: string,
+    @Query('populate') populate: string
+  ) {
+    return this.arrivalsService.getArchivedOne(id, populate === '1')
   }
 
   @Post()

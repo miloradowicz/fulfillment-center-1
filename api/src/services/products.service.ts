@@ -63,6 +63,32 @@ export class ProductsService {
     return (await unarchived).reverse()
   }
 
+  async getAllArchived(populate: boolean) {
+    const archived = this.productModel.find({ isArchived: true })
+
+    if (populate) {
+      return (await archived.populate('client')).reverse()
+    }
+
+    return (await archived).reverse()
+  }
+
+  async getArchivedById(id: string, populate?: boolean) {
+    let product: ProductDocument | null
+
+    if (populate) {
+      product = await this.productModel.findById(id).populate('client').exec()
+    } else {
+      product = await this.productModel.findById(id).exec()
+    }
+
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    if (!product.isArchived) throw new ForbiddenException('Этот товар не в архиве')
+
+    return product
+  }
+
   async create(productDto: CreateProductDto, files: Array<Express.Multer.File> = []) {
 
     const barcode = await this.productModel.findOne({ barcode: productDto.barcode })

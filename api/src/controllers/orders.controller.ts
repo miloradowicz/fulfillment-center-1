@@ -15,12 +15,22 @@ export class OrdersController {
     return this.ordersService.getAll()
   }
 
+  @Get('archived/all')
+  async getAllArchivedOrders() {
+    return this.ordersService.getAllArchived()
+  }
+
   @Get(':id')
   async getOrderById(@Param('id') id: string, @Query('populate') populate: string) {
     if (populate === 'true') {
       return this.ordersService.getByIdWithPopulate(id)
     }
     return this.ordersService.getById(id)
+  }
+
+  @Get('archived/:id')
+  async getArchivedOrder(@Param('id') id: string) {
+    return this.ordersService.getArchivedById(id)
   }
 
   @Post()

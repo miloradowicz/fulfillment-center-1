@@ -29,12 +29,31 @@ export class TasksService {
     return (await unarchived.find()).reverse()
   }
 
+  async getAllArchived(populate: boolean) {
+    const archived = this.taskModel.find({ isArchived: true })
+
+    if (populate) {
+      return (await archived.populate('user', 'email displayName role')).reverse()
+    }
+
+    return (await archived).reverse()
+  }
+
   async getById(id: string) {
     const task = await this.taskModel.findById(id).populate('user', 'email displayName role').exec()
 
     if (!task) throw new NotFoundException('Задача не найдена')
 
     if (task.isArchived) throw new ForbiddenException('Задача в архиве')
+
+    return task
+  }
+
+  async getArchivedById(id: string) {
+    const task = await this.taskModel.findById(id).exec()
+
+    if (!task) throw new NotFoundException('Задача не найдена')
+    if (!task.isArchived) throw new ForbiddenException('Эта задача не в архиве')
 
     return task
   }

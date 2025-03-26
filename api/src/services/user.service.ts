@@ -54,12 +54,26 @@ export class UsersService {
     return this.userModel.find({ isArchived: false }).select('-token')
   }
 
+  async getArchivedUsers() {
+    return this.userModel.find({ isArchived: true }).select('-token')
+  }
+
   async getById(id: string) {
     const user = await this.userModel.findById(id)
 
     if (!user) throw new NotFoundException('Пользователь не найден')
 
     if (user.isArchived) throw new ForbiddenException('Пользователь в архиве.')
+
+    return user
+  }
+
+  async getArchivedById(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (!user.isArchived) throw new ForbiddenException('Этот пользователь не в архиве')
 
     return user
   }

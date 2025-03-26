@@ -13,8 +13,8 @@ export class CounterpartiesService {
     return this.counterpartyModel.find({ isArchived: false }).exec()
   }
 
-  async getAllWithArchived() {
-    return this.counterpartyModel.find().exec()
+  async getAllArchived() {
+    return this.counterpartyModel.find({ isArchived: true }).exec()
   }
 
   async getById(id: string) {
@@ -27,10 +27,11 @@ export class CounterpartiesService {
     return counterparty
   }
 
-  async getByIdWithArchived(id: string) {
+  async getArchivedById(id: string) {
     const counterparty = await this.counterpartyModel.findById(id).exec()
 
     if (!counterparty) throw new NotFoundException('Контрагент не найден')
+    if (!counterparty.isArchived) throw new ForbiddenException('Этот контрагент не в архиве')
 
     return counterparty
   }

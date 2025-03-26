@@ -12,9 +12,19 @@ export class StocksController {
     return await this.stocksService.getAll()
   }
 
+  @Get('archived/all')
+  async getAllArchivedStocks() {
+    return this.stocksService.getAllArchived()
+  }
+
   @Get(':id')
   async getOneStock(@Param('id') id: string) {
     return this.stocksService.getOne(id)
+  }
+
+  @Get('archived/:id')
+  async getArchivedStockById(@Param('id') id: string) {
+    return this.stocksService.getArchivedById(id)
   }
 
   @Post()
