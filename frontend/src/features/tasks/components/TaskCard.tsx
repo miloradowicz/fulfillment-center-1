@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Card, CardContent, IconButton, Menu, MenuItem, Typography } from '@mui/material'
+import { Card, CardContent, IconButton, Menu, MenuItem, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { CSS } from '@dnd-kit/utilities'
 import React, { useState } from 'react'
 import { TaskCardProps } from '../hooks/TypesProps'
@@ -10,8 +10,14 @@ import { useAppDispatch } from '../../../app/hooks.ts'
 import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
+import StatusCell from './StatusCell.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [isSwipe, setIsSwipe] = useState(false)
+  const open = Boolean(anchorEl)
+  const dispatch = useAppDispatch()
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
     data: {
@@ -21,9 +27,24 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     },
   })
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const dispatch = useAppDispatch()
+
+  const handlePointerDown = (event: React.PointerEvent) => {
+    event.stopPropagation()
+    setIsSwipe(false)
+  }
+
+  const handlePointerMove = (event: React.PointerEvent) => {
+    const deltaX = Math.abs(event.movementX)
+    const deltaY = Math.abs(event.movementY)
+
+    if (deltaX > deltaY) {
+      setIsSwipe(true)
+    }
+  }
+
+  const handlePointerUp = () => {
+    setIsSwipe(false)
+  }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -66,6 +87,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     opacity: isDragging ? 0.9 : 1,
   }
 
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
   return (
     <Card
       ref={setNodeRef}
@@ -76,16 +100,21 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         marginBottom: 2,
         transform: style.transform,
         position: 'relative',
-        cursor: 'grab',
+        cursor: isSwipe ? 'auto' : 'grab',
         willChange: 'transform',
         zIndex: style.zIndex,
         opacity: style.opacity,
+        touchAction: 'none',
+        userSelect: 'none',
       }}
       {...attributes}
       onClick={e => {
         e.stopPropagation()
         e.preventDefault()
       }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
     >
       <div
         {...listeners}
@@ -116,6 +145,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
             </Typography>
           )}
         </CardContent>
+        {isMobile && <StatusCell task={task} selectedUser={selectedUser} />}
       </div>
 
       <IconButton
