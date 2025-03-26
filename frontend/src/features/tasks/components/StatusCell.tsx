@@ -1,28 +1,26 @@
-import { ArrivalWithClient, StatusColor } from '../../../types'
+import { StatusColor } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import React, { useState } from 'react'
-import { Box, Chip, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate, updateTask } from '../../../store/thunks/tasksThunk.ts'
+import { PropsStatus } from '../hooks/TypesProps'
 
-export interface Props  {
-  row: ArrivalWithClient,
-}
 
-const StatusArrivalCell:React.FC<Props> =({ row })  => {
+const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const statusColors: Record<string, StatusColor> = {
-    'ожидается доставка': 'warning',
-    'получена': 'success',
-    'отсортирована': 'info',
+    'к выполнению': 'warning',
+    'в работе': 'success',
+    'готово': 'info',
   }
 
-  const status = row.arrival_status || 'ожидается доставка'
+  const status = task.status || 'к выполнению'
   const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
-  const statusOptions = ['ожидается доставка', 'получена', 'отсортирована']
+  const statusOptions = ['к выполнению', 'в работе', 'готово']
   const open = Boolean(anchorEl)
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -31,16 +29,20 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
 
   const handleClose = async (newStatus?: string) => {
     setAnchorEl(null)
-    if (newStatus && newStatus !== row.arrival_status) {
+    if (newStatus && newStatus !== task.status) {
+
       const updatedData = {
-        ...row,
-        client: row.client._id,
-        stock: row.stock._id,
-        arrival_status: newStatus,
-        shipping_agent: row.shipping_agent?._id,
+        ...task,
+        user:task.user._id,
+        status: newStatus,
       }
-      await dispatch(updateArrival({ arrivalId: row._id, data: updatedData })).unwrap()
-      await dispatch(fetchPopulatedArrivals())
+      await dispatch(updateTask({ taskId: task._id, data: updatedData })).unwrap()
+      if (!selectedUser) {
+        await dispatch(fetchTasksWithPopulate())
+      } else {
+        await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+      }
+
     }
   }
 
@@ -61,7 +63,7 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100%" width="100%">
-      {status === 'ожидается доставка' || status === 'отсортирована'? <Tooltip title={status} arrow placement="top">{chip}</Tooltip>:chip}
+      {chip}
       <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
         {statusOptions.map(option => (
           <MenuItem key={option} onClick={() => handleClose(option)}>
@@ -73,4 +75,4 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
   )
 }
 
-export default StatusArrivalCell
+export default StatusCell
