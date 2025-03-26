@@ -39,7 +39,7 @@ export class SeederService {
     private readonly counterpartyModel: Model<CounterpartyDocument>,
     @InjectModel(ServiceCategory.name)
     private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
-  ) {}
+  ) { }
 
   async seed() {
     await this.userModel.deleteMany()
@@ -348,28 +348,24 @@ export class SeederService {
 
     await this.serviceModel.create([
       {
-        name: 'Работа с товаром по прибытию на склад',
+        name: 'Приемка, пересчет товара',
+        price: 50000,
         serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
-          { key: '6', label: 'Маркировка двойная', value: '300 сом' },
-        ],
       },
       {
-        name: 'Замена/установка бирки',
+        name: 'Маркировка двойная',
+        price: 30000,
         serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
       },
       {
-        name: 'Создание поставки в ЛК селлера (до 10 артикулов)',
+        name: 'Погрузка-Разгрузка на складе фулфилмента',
+        price: 70000,
         serviceCategory: _serviceCat2._id,
-        dynamic_fields: [
-          { key: '9', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '10', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
+      },
+      {
+        name: 'Забор с другого адреса',
+        serviceCategory: _serviceCat2._id,
+        price: 100000,
       },
     ])
   }

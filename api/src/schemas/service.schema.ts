@@ -22,20 +22,13 @@ export class Service {
   serviceCategory: mongoose.Schema.Types.ObjectId
 
   @Prop({
-    type: [
-      {
-        key: { type: String, required: true, unique: true },
-        label: { type: String, required: true },
-        value: { type: String, required: true },
-      },
-    ],
+    type: Number,
     required: true,
   })
-  dynamic_fields: {
-    key: string
-    label: string
-    value: string
-  }[]
+  price: number
+
+  @Prop()
+  description: string
 
   @Prop({
     type: [
