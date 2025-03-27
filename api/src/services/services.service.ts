@@ -44,7 +44,7 @@ export class ServicesService {
   }
 
   async create(serviceDto: CreateServiceDto) {
-    return await this.serviceModel.create(serviceDto)
+    return (await this.serviceModel.create(serviceDto)).populate('serviceCategory')
   }
 
   async update(id: string, serviceDto: UpdateServiceDto, force: boolean = false) {
@@ -57,7 +57,7 @@ export class ServicesService {
     service.set(serviceDto)
     await service.save()
 
-    return service
+    return service.populate('serviceCategory')
   }
 
   async archive(id: string) {

@@ -201,7 +201,7 @@ export interface ArrivalError {
   stock: string
   amount: number
   defect_description: string
-  arrival_status?:string
+  arrival_status?: string
 }
 
 export interface ErrorForOrder {
@@ -211,7 +211,7 @@ export interface ErrorForOrder {
   amount: number
   defect_description: string
   sent_at: string
-  status?:string
+  status?: string
 }
 
 export interface ProductForOrderForm {
@@ -259,11 +259,21 @@ export type TaskMutation = Omit<Task, '_id'>
 export interface Service {
   _id: string
   name: string
-  dynamic_fields: DynamicField[]
+  serviceCategory: string
+  price: number
+  description: string
   logs?: Log[]
 }
 
-export type ServiceMutation = Omit<Service, '_id'>
+export interface ServiceCategory {
+  name: string
+}
+
+export type ServiceMutation = Omit<Service, '_id' | 'logs'>
+
+export type PopulatedService = Omit<Service, 'serviceCategory'> & {
+  serviceCategory: ServiceCategory
+}
 
 export interface Stock {
   _id: string
@@ -286,4 +296,4 @@ export interface Counterparty {
   isArchived: boolean
 }
 
-export type CounterpartyMutation = Omit<Counterparty , '_id'>
+export type CounterpartyMutation = Omit<Counterparty, '_id'>

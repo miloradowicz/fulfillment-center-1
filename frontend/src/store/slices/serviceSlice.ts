@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GlobalError, Service } from '../../types'
+import { GlobalError, PopulatedService } from '../../types'
 import {
   fetchServices,
   fetchServiceById,
@@ -11,8 +11,8 @@ import {
 import { RootState } from '../../app/store.ts'
 
 interface ServiceState {
-  service: Service | null;
-  services: Service[] | null;
+  service: PopulatedService | null;
+  services: PopulatedService[] | null;
   loadingFetch: boolean;
   loadingFetchOne: boolean;
   loadingAdd: boolean;

@@ -1,9 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
-import { GlobalError, Service, ServiceMutation } from '../../types'
+import { GlobalError, PopulatedService, ServiceMutation } from '../../types'
 import axiosAPI from '../../utils/axiosAPI.ts'
 
-export const fetchServices = createAsyncThunk<Service[], void, { rejectValue: GlobalError }>(
+export const fetchServices = createAsyncThunk<PopulatedService[], void, { rejectValue: GlobalError }>(
   'services/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
@@ -18,11 +18,11 @@ export const fetchServices = createAsyncThunk<Service[], void, { rejectValue: Gl
   },
 )
 
-export const fetchServiceById = createAsyncThunk<Service, string, { rejectValue: GlobalError }>(
+export const fetchServiceById = createAsyncThunk<PopulatedService, string, { rejectValue: GlobalError }>(
   'services/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.get(`/services/${ id }`)
+      const response = await axiosAPI.get(`/services/${id}`)
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -33,7 +33,7 @@ export const fetchServiceById = createAsyncThunk<Service, string, { rejectValue:
   },
 )
 
-export const createService = createAsyncThunk<Service, ServiceMutation, { rejectValue: GlobalError }>(
+export const createService = createAsyncThunk<PopulatedService, ServiceMutation, { rejectValue: GlobalError }>(
   'services/create',
   async (data, { rejectWithValue }) => {
     try {
@@ -48,11 +48,11 @@ export const createService = createAsyncThunk<Service, ServiceMutation, { reject
   },
 )
 
-export const updateService = createAsyncThunk<Service, { id: string; data: ServiceMutation }, { rejectValue: GlobalError }>(
+export const updateService = createAsyncThunk<PopulatedService, { id: string; data: ServiceMutation }, { rejectValue: GlobalError }>(
   'services/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.put(`/services/${ id }`, data)
+      const response = await axiosAPI.put(`/services/${id}`, data)
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -67,7 +67,7 @@ export const archiveService = createAsyncThunk<{ id: string }, string, { rejectV
   'services/archive',
   async (id, { rejectWithValue }) => {
     try {
-      await axiosAPI.patch(`/services/${ id }/archive`)
+      await axiosAPI.patch(`/services/${id}/archive`)
       return { id }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -82,7 +82,7 @@ export const deleteService = createAsyncThunk<{ message: string }, string, { rej
   'services/delete',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.delete(`/services/${ id }`)
+      const response = await axiosAPI.delete(`/services/${id}`)
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
