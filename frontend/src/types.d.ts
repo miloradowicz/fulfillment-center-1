@@ -146,7 +146,7 @@ export interface Order {
   sent_at: string
   delivered_at?: string
   comment?: string
-  status?: string
+  status: string
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
