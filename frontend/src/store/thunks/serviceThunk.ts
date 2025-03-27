@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { GlobalError, PopulatedService, ServiceMutation } from '../../types'
+import { isAxiosError } from 'axios'
+import { GlobalError, PopulatedService, ServiceMutation, ValidationError } from '../../types'
 import axiosAPI from '../../utils/axiosAPI.ts'
+import { isGlobalError } from '../../utils/helpers.ts'
 
 export const fetchServices = createAsyncThunk<PopulatedService[], void, { rejectValue: GlobalError }>(
   'services/fetchAll',
@@ -10,7 +11,7 @@ export const fetchServices = createAsyncThunk<PopulatedService[], void, { reject
       const response = await axiosAPI.get('/services')
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
@@ -22,10 +23,10 @@ export const fetchServiceById = createAsyncThunk<PopulatedService, string, { rej
   'services/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.get(`/services/${id}`)
+      const response = await axiosAPI.get(`/services/${ id }`)
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
@@ -33,14 +34,16 @@ export const fetchServiceById = createAsyncThunk<PopulatedService, string, { rej
   },
 )
 
-export const createService = createAsyncThunk<PopulatedService, ServiceMutation, { rejectValue: GlobalError }>(
+export const createService = createAsyncThunk<PopulatedService, ServiceMutation, { rejectValue: ValidationError | GlobalError }>(
   'services/create',
   async (data, { rejectWithValue }) => {
     try {
       const response = await axiosAPI.post('/services', data)
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response && error.status === 400) {
+        return rejectWithValue(error.response.data as ValidationError)
+      } else if (isAxiosError(error) && error.response && isGlobalError(error.response.data)) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
@@ -48,14 +51,16 @@ export const createService = createAsyncThunk<PopulatedService, ServiceMutation,
   },
 )
 
-export const updateService = createAsyncThunk<PopulatedService, { id: string; data: ServiceMutation }, { rejectValue: GlobalError }>(
+export const updateService = createAsyncThunk<PopulatedService, { id: string; data: ServiceMutation }, { rejectValue: ValidationError | GlobalError }>(
   'services/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.put(`/services/${id}`, data)
+      const response = await axiosAPI.put(`/services/${ id }`, data)
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response && error.status === 400) {
+        return rejectWithValue(error.response.data as ValidationError)
+      } else if (isAxiosError(error) && error.response && isGlobalError(error.response.data)) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
@@ -67,10 +72,10 @@ export const archiveService = createAsyncThunk<{ id: string }, string, { rejectV
   'services/archive',
   async (id, { rejectWithValue }) => {
     try {
-      await axiosAPI.patch(`/services/${id}/archive`)
+      await axiosAPI.patch(`/services/${ id }/archive`)
       return { id }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
@@ -82,10 +87,10 @@ export const deleteService = createAsyncThunk<{ message: string }, string, { rej
   'services/delete',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.delete(`/services/${id}`)
+      const response = await axiosAPI.delete(`/services/${ id }`)
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error

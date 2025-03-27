@@ -7,14 +7,16 @@ import { UpdateServiceCategoryDto } from '../dto/update-service-category.dto'
 
 @Injectable()
 export class ServiceCategoriesService {
-  constructor(@InjectModel(ServiceCategory.name) private readonly serviceCategoryModel: Model<ServiceCategoryDocument>) {}
+  constructor(
+    @InjectModel(ServiceCategory.name) private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
+  ) {}
 
   async getAll() {
     return this.serviceCategoryModel.find({ isArchived: false }).exec()
   }
 
   async getAllArchived() {
-    return this.serviceCategoryModel.find().exec()
+    return this.serviceCategoryModel.find({ isArchived: true }).exec()
   }
 
   async getById(id: string) {
@@ -28,9 +30,9 @@ export class ServiceCategoriesService {
   }
 
   async getArchivedById(id: string) {
-    const serviceCategory = await this.serviceCategoryModel.findById(id).exec()
+    const serviceCategory = await this.serviceCategoryModel.find({ isArchived: true }).findById(id).exec()
 
-    if (!serviceCategory) throw new NotFoundException('Категория услуги не найдена')
+    if (!serviceCategory) throw new NotFoundException('Категория услуги в архиве не найдена')
 
     return serviceCategory
   }
@@ -39,11 +41,16 @@ export class ServiceCategoriesService {
     return this.serviceCategoryModel.create(serviceCategoryDto)
   }
 
-  async update(id: string, serviceCategoryDto: UpdateServiceCategoryDto) {
-    const serviceCategory = await this.serviceCategoryModel.findByIdAndUpdate(id, serviceCategoryDto, { new: true }).exec()
-    if (!serviceCategory) {
-      throw new NotFoundException('Категория услуги не найдена')
-    }
+  async update(id: string, serviceCategoryDto: UpdateServiceCategoryDto, force: boolean = false) {
+    const serviceCategory = await this.serviceCategoryModel.findById(id).exec()
+
+    if (!serviceCategory) throw new NotFoundException('Категория услуги не найдена')
+
+    if (!force && serviceCategory.isArchived) throw new ForbiddenException('Категория услуги в архиве')
+
+    serviceCategory.set(serviceCategoryDto)
+    await serviceCategory.save()
+
     return serviceCategory
   }
 
@@ -51,6 +58,7 @@ export class ServiceCategoriesService {
     const serviceCategory = await this.serviceCategoryModel.findById(id).exec()
 
     if (!serviceCategory) throw new NotFoundException('Категория услуги не найдена')
+
     if (serviceCategory.isArchived) throw new ForbiddenException('Категория услуги уже в архиве')
 
     serviceCategory.isArchived = true

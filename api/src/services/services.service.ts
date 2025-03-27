@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Service, ServiceDocument } from '../schemas/service.schema'
@@ -7,14 +7,18 @@ import { UpdateServiceDto } from '../dto/update-service.dto'
 
 @Injectable()
 export class ServicesService {
-  constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) { }
+  constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) {}
 
   async getAll() {
     return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
   }
 
   async getAllByName(name: string) {
-    return this.serviceModel.find({ isArchived: false }).find({ name: { $regex: name, $options: 'i' } }).populate('serviceCategory').exec()
+    return this.serviceModel
+      .find({ isArchived: false })
+      .find({ name: { $regex: name, $options: 'i' } })
+      .populate('serviceCategory')
+      .exec()
   }
 
   async getById(id: string) {
@@ -31,14 +35,18 @@ export class ServicesService {
     return this.serviceModel.find({ isArchived: true }).populate('serviceCategory').exec()
   }
 
-  async getAllByNameArchived(name: string) {
-    return this.serviceModel.find({ isArchived: true }).find({ name: { $regex: name, $options: 'i' } }).populate('serviceCategory').exec()
+  async getAllArchivedByName(name: string) {
+    return this.serviceModel
+      .find({ isArchived: true })
+      .find({ name: { $regex: name, $options: 'i' } })
+      .populate('serviceCategory')
+      .exec()
   }
 
-  async getByIdArchived(id: string) {
+  async getArchivedById(id: string) {
     const service = await this.serviceModel.find({ isArchived: true }).findById(id).populate('serviceCategory').exec()
 
-    if (!service) throw new NotFoundException('Услуга не найдена в архиве')
+    if (!service) throw new NotFoundException('Услуга в архиве не найдена')
 
     return service
   }
@@ -61,11 +69,14 @@ export class ServicesService {
   }
 
   async archive(id: string) {
-    const service = await this.serviceModel.findByIdAndUpdate(id, { isArchived: true })
+    const service = await this.serviceModel.findById(id)
 
     if (!service) throw new NotFoundException('Услуга не найдена')
 
     if (service.isArchived) throw new ForbiddenException('Услуга уже в архиве')
+
+    service.isArchived = true
+    await service.save()
 
     return { message: 'Услуга перемещена в архив' }
   }

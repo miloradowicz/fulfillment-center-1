@@ -1,18 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GlobalError, PopulatedService, ValidationError } from '../../types'
-import {
-  fetchServices,
-  fetchServiceById,
-  createService,
-  updateService,
-  deleteService,
-  archiveService,
-} from '../thunks/serviceThunk.ts'
+import { GlobalError, ServiceCategory, ValidationError } from '../../types'
+import { archiveServiceCategory, createServiceCategory, deleteServiceCategory, fetchServiceCategories, fetchServiceCategoryById, updateServiceCategory } from '../thunks/serviceCategoryThunk.ts'
 import { RootState } from '../../app/store.ts'
 
 interface ServiceState {
-  service: PopulatedService | null;
-  services: PopulatedService[];
+  serviceCategory: ServiceCategory | null;
+  serviceCategories: ServiceCategory[];
   loadingFetch: boolean;
   loadingFetchOne: boolean;
   loadingAdd: boolean;
@@ -24,8 +17,8 @@ interface ServiceState {
 }
 
 const initialState: ServiceState = {
-  service: null,
-  services: [],
+  serviceCategory: null,
+  serviceCategories: [],
   loadingFetch: false,
   loadingFetchOne: false,
   loadingAdd: false,
@@ -45,7 +38,7 @@ export const selectLoadingDeleteService = (state: RootState) => state.services.l
 export const selectLoadingUpdateService = (state: RootState) => state.services.loadingUpdate
 export const selectServiceError = (state: RootState) => state.services.error
 
-const serviceSlice = createSlice({
+const serviceCategorySlice = createSlice({
   name: 'services',
   initialState,
   reducers: {
@@ -54,78 +47,78 @@ const serviceSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(fetchServices.pending, state => {
+    builder.addCase(fetchServiceCategories.pending, state => {
       state.loadingFetch = true
     })
-    builder.addCase(fetchServices.fulfilled, (state, action) => {
+    builder.addCase(fetchServiceCategories.fulfilled, (state, action) => {
       state.loadingFetch = false
-      state.services = action.payload
+      state.serviceCategories = action.payload
     })
-    builder.addCase(fetchServices.rejected, state => {
+    builder.addCase(fetchServiceCategories.rejected, state => {
       state.loadingFetch = false
     })
 
-    builder.addCase(fetchServiceById.pending, state => {
+    builder.addCase(fetchServiceCategoryById.pending, state => {
       state.loadingFetchOne = true
     })
-    builder.addCase(fetchServiceById.fulfilled, (state, action) => {
+    builder.addCase(fetchServiceCategoryById.fulfilled, (state, action) => {
       state.loadingFetchOne = false
-      state.service = action.payload
+      state.serviceCategory = action.payload
     })
-    builder.addCase(fetchServiceById.rejected, state => {
+    builder.addCase(fetchServiceCategoryById.rejected, state => {
       state.loadingFetchOne = false
     })
 
-    builder.addCase(createService.pending, state => {
+    builder.addCase(createServiceCategory.pending, state => {
       state.loadingAdd = true
     })
-    builder.addCase(createService.fulfilled, state => {
+    builder.addCase(createServiceCategory.fulfilled, state => {
       state.loadingAdd = false
     })
-    builder.addCase(createService.rejected, (state, { payload: returnedError, error: thrownError }) => {
-      state.loadingUpdate = false
+    builder.addCase(createServiceCategory.rejected, (state, { payload: returnedError, error: thrownError }) => {
+      state.loadingAdd = false
       state.creationAndModificationError =
         returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
 
-    builder.addCase(updateService.pending, state => {
+    builder.addCase(updateServiceCategory.pending, state => {
       state.loadingUpdate = true
     })
-    builder.addCase(updateService.fulfilled, state => {
+    builder.addCase(updateServiceCategory.fulfilled, state => {
       state.loadingUpdate = false
     })
-    builder.addCase(updateService.rejected, (state, { payload: returnedError, error: thrownError }) => {
+    builder.addCase(updateServiceCategory.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingUpdate = false
       state.creationAndModificationError =
         returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
 
-    builder.addCase(archiveService.pending, state => {
+    builder.addCase(archiveServiceCategory.pending, state => {
       state.loadingArchive = true
       state.error = null
     })
-    builder.addCase(archiveService.fulfilled, state => {
+    builder.addCase(archiveServiceCategory.fulfilled, state => {
       state.loadingArchive = false
       state.error = null
     })
-    builder.addCase(archiveService.rejected, (state, { payload: error }) => {
+    builder.addCase(archiveServiceCategory.rejected, (state, { payload: error }) => {
       state.loadingArchive = false
       state.error = error || null
     })
 
-    builder.addCase(deleteService.pending, state => {
+    builder.addCase(deleteServiceCategory.pending, state => {
       state.loadingDelete = true
       state.error = null
     })
-    builder.addCase(deleteService.fulfilled, state => {
+    builder.addCase(deleteServiceCategory.fulfilled, state => {
       state.loadingDelete = false
       state.error = null
     })
-    builder.addCase(deleteService.rejected, (state, { payload: error }) => {
+    builder.addCase(deleteServiceCategory.rejected, (state, { payload: error }) => {
       state.loadingDelete = false
       state.error = error || null
     })
   },
 })
 
-export const serviceReducer = serviceSlice.reducer
+export const serviceCategoryReducer = serviceCategorySlice.reducer
