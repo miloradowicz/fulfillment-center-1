@@ -4,6 +4,8 @@ import { selectLoadingFetchOrder, selectPopulateOrder } from '../../../store/sli
 import { deleteOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { OrderWithProductsAndClients } from '../../../types'
+import dayjs from 'dayjs'
 
 export const useOrderDetails = () => {
   const { id } = useParams()
@@ -37,6 +39,19 @@ export const useOrderDetails = () => {
     setOpen(true)
   }
 
+  const navigateBack = () => {
+    navigate(-1)
+  }
+
+  const getStepDescription = (index: number, order: OrderWithProductsAndClients) => {
+    const descriptions = [
+      'Товар собирается на складе',
+      'Заказ отправлен заказчику',
+      order.delivered_at ? `Дата доставки: ${ dayjs(order.delivered_at).format('D MMMM YYYY') }` : 'Ожидается доставка',
+    ]
+    return descriptions[index] || ''
+  }
+
   return {
     order,
     loading,
@@ -46,6 +61,7 @@ export const useOrderDetails = () => {
     handleDelete,
     handleOpenEdit,
     setOpen,
-    navigate,
+    navigateBack,
+    getStepDescription,
   }
 }

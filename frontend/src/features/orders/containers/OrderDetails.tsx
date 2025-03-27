@@ -8,11 +8,6 @@ import {
   StepLabel,
   Stepper,
   Tab,
-  Table,
-  TableBody,
-  TableCell, TableContainer,
-  TableHead,
-  TableRow,
   Tabs,
   Typography,
 } from '@mui/material'
@@ -20,12 +15,13 @@ import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
 import DefectsTable from '../components/DefectsTable.tsx'
 import OrderLogs from '../components/OrderLogs.tsx'
-import { AccountCircle, ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
-import { OrderWithProductsAndClients } from '../../../types'
-
-const OrderStatus = ['в сборке', 'в пути', 'доставлен']
+import { Link } from 'react-router-dom'
+import { getOrderStatusColor } from '../utils/getOrderStatusColor.ts'
+import ProductsTable from '../components/ProductsTable.tsx'
+import { OrderStatus } from '../../../constants.ts'
 
 const OrderDetails = () => {
   const {
@@ -37,37 +33,12 @@ const OrderDetails = () => {
     handleOpenEdit,
     handleDelete,
     setOpen,
-    navigate,
+    navigateBack,
+    getStepDescription,
   } = useOrderDetails()
 
   const statuses = Object.values(OrderStatus)
   const activeStep = order ? statuses.indexOf(order.status as string) : 0
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-    case 'в сборке':
-      return 'warning'
-    case 'в пути':
-      return 'info'
-    case 'доставлен':
-      return 'success'
-    default:
-      return 'default'
-    }
-  }
-
-  const getStepDescription = (index: number, order: OrderWithProductsAndClients) => {
-    const descriptions = [
-      'Товар собирается на складе',
-      'Заказ отправлен заказчику',
-      order.delivered_at ? `Дата доставки: ${ dayjs(order.delivered_at).format('D MMMM YYYY') }` : 'Ожидается доставка',
-    ]
-    return descriptions[index] || ''
-  }
-
-  const navigateBack = () => {
-    navigate(-1)
-  }
 
   if (loading) {
     return (
@@ -92,23 +63,19 @@ const OrderDetails = () => {
             Заказы
           </Typography>
         </Box>
-        <Box className="flex flex-wrap gap-5 items-center pb-2 mt-3">
+        <Box className="flex flex-wrap gap-5 items-center mt-3">
           <Box>
             <Typography variant="h5" className="!font-bold">
               Детали заказа #{order.orderNumber}
             </Typography>
           </Box>
-          <Chip label={order.status} color={getStatusColor(order.status)}  sx={{
+          <Chip label={order.status} color={getOrderStatusColor(order.status)}  sx={{
             borderRadius: '4px',
             height: '28px',
           }}
           variant="outlined" />
-          <Box className="ml-auto flex flex-col items-center">
-            <Box className="flex flex-col items-center">
-              <AccountCircle  sx={{ fontSize: 28 }} />
-              <Typography variant="caption" className="!font-light">Заказчик</Typography>
-            </Box>
-            <Typography className="!font-bold">{order.client.name}</Typography>
+          <Box className="ml-auto flex flex-col items-center !self-end">
+            <Typography component={Link} to={`/clients/${ order.client._id }`} target="_blank" className="!font-bold underline underline-offset-4">{order.client.name}</Typography>
             <Typography className="!font-light">{order.client.phone_number}</Typography>
           </Box>
         </Box>
@@ -139,30 +106,7 @@ const OrderDetails = () => {
         <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Товары</Divider>
 
         <Box className="mt-2 rounded-lg ">
-          <TableContainer>
-            <Table  size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ width: '40%' }}>Наименование</TableCell>
-                  <TableCell align="center" sx={{ width: '10%' }}>Количество</TableCell>
-                  <TableCell align="center" sx={{ width: '25%' }}>Штрихкод</TableCell>
-                  <TableCell align="center" sx={{ width: '25%' }}>Артикул</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {order.products.map((item, index) => (
-                  <TableRow key={`${ item.product._id }-${ index }`}>
-                    <TableCell component="th" scope="row" className="!border-0">
-                      {item.product.title}
-                    </TableCell>
-                    <TableCell align="center" className="!border-0">{item.amount}</TableCell>
-                    <TableCell align="center" className="!border-0">{item.product.barcode}</TableCell>
-                    <TableCell align="center" className="!border-0">{item.product.article}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <ProductsTable products={order.products}/>
         </Box>
 
         <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Дополнительно</Divider>
