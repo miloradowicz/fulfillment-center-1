@@ -11,6 +11,7 @@ import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } f
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
+import { NavLink } from 'react-router-dom'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -125,15 +126,35 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         }}
       >
         <CardContent>
-          <Typography marginTop={'10px'} variant="body1">
+          <Typography marginTop={'5px'} variant="body1">
             Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
-          <Typography variant="body1">{task.title}</Typography>
+          <Typography variant="body1">
+            Тип: {task.type}
+          </Typography>
+          <Typography variant="body1">{task.title} </Typography>
+          {task.associated_arrival && (
+            <NavLink to={`/arrivals/${ task.associated_arrival._id }`}  style={{
+              textDecoration: 'underline',
+              color: '#1A73E8',
+            }}>
+              {`Поставка № ${ task.associated_arrival.arrivalNumber }`}
+            </NavLink>
+          )}
+          {task.associated_order && (
+            <NavLink to={`/orders/${ task.associated_order._id }`} style={{
+              textDecoration: 'underline',
+              color: '#1A73E8',
+            }}>
+              {`Заказ № ${ task.associated_order.orderNumber }`}
+            </NavLink>
+          )}
           {task.description && (
             <Typography variant="body2" color="textSecondary">
               {task.description}
             </Typography>
           )}
+
           {task.createdAt && (
             <Typography variant="body2" color="textSecondary" marginTop={'5px'}>
               Создано: {dayjs(task.createdAt).format('DD.MM.YYYY HH:mm')}
