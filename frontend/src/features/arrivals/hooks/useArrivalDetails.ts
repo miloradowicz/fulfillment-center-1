@@ -36,8 +36,9 @@ const useArrivalDetails = () => {
     if (arrivalId) {
       try {
         await dispatch(deleteArrival(arrivalId)).unwrap()
-        toast.success('Поставка удалена')
+        toast.success('Поставка успешно удалена!')
         setIsDeleted(true)
+        navigate('/arrivals')
       } catch (e) {
         if (hasMessage(e)) {
           toast.error(e.message || 'Ошибка удаления')

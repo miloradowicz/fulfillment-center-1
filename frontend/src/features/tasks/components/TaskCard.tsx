@@ -11,10 +11,12 @@ import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } f
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isSwipe, setIsSwipe] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
 
@@ -61,24 +63,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     handleMenuClose()
   }
 
-  const handleDelete = async (id: string, event: React.MouseEvent) => {
-    event.stopPropagation()
+  const handleDelete = async () => {
     try {
-      if (confirm('Вы уверены, что хотите переместить в архив эту задачу?')) {
-        await dispatch(archiveTask(id))
-        if (!selectedUser) {
-          await dispatch(fetchTasksWithPopulate())
-        } else {
-          await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
-        }
-        toast.success('Задача перемещена в архив.')
+      await dispatch(archiveTask(task._id))
+      if (!selectedUser) {
+        await dispatch(fetchTasksWithPopulate())
       } else {
-        toast.info('Вы отменили перемещение задачи в архив.')
+        await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
       }
+      toast.success('Задача перемещена в архив.')
     } catch (e) {
       console.error(e)
     }
-    handleMenuClose()
+    setOpenDeleteModal(false)
+  }
+
+  const handleCancelDelete = () => {
+    setOpenDeleteModal(false)
   }
 
   const style = {
@@ -158,10 +159,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         <MenuItem onClick={handleEdit}>
           <EditIcon style={{ marginRight: 8 }} /> Редактировать
         </MenuItem>
-        <MenuItem onClick={e => handleDelete(task._id, e)}>
-          <DeleteIcon style={{ marginRight: 8 }} /> Удалить
+        <MenuItem
+          onClick={e => {
+            e.stopPropagation()
+            setOpenDeleteModal(true)
+            handleMenuClose()
+          }}
+        >
+          <DeleteIcon style={{ marginRight: 8 }} /> Переместить в архив
         </MenuItem>
       </Menu>
+      <ConfirmationModal
+        open={openDeleteModal}
+        entityName="эту задачу"
+        actionType="archive"
+        onConfirm={handleDelete}
+        onCancel={handleCancelDelete}
+      />
     </Card>
   )
 }

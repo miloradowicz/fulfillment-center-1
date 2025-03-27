@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import { useNavigate } from 'react-router-dom'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 enum OrderStatus {
   InAssembly = 'в сборке',
@@ -24,6 +25,7 @@ const OrderDetails = () => {
   const [tabValue, setTabValue] = useState(0)
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const navigate = useNavigate()
 
   const statuses = Object.values(OrderStatus)
@@ -36,18 +38,28 @@ const OrderDetails = () => {
     { field: 'article', headerName: 'Артикул', width: 150 },
   ]
 
-  const handleDelete = async (id: string) => {
+  const handleConfirmDelete = async () => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
-        await dispatch(deleteOrder(id))
+      if (order) {
+        await dispatch(deleteOrder(order._id))
         navigate('/orders')
-      } else {
-        toast.info('Вы отменили удаление заказа')
+        toast.success('Заказ успешно удалён!')
       }
     } catch (e) {
       console.error(e)
+      toast.error('Ошибка при удалении заказа')
     }
+    setOpenDeleteModal(false)
   }
+
+  const handleCancelDelete = () => {
+    setOpenDeleteModal(false)
+  }
+
+  const handleOpenDeleteModal = () => {
+    setOpenDeleteModal(true)
+  }
+
 
   const handleOpenEdit = () => {
     setOpen(true)
@@ -172,7 +184,7 @@ const OrderDetails = () => {
             borderRadius: 2,
             textTransform: 'none',
           }}
-          onClick={() => handleDelete(order._id)}
+          onClick={handleOpenDeleteModal}
         >
           Удалить
         </Button>
@@ -180,6 +192,14 @@ const OrderDetails = () => {
           <OrderForm onSuccess={() => setOpen(false)} />
         </Modal>
       </Box>
+
+      <ConfirmationModal
+        open={openDeleteModal}
+        entityName="этот заказ"
+        actionType="delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </Card>
   )
 }

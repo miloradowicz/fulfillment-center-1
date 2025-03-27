@@ -39,7 +39,7 @@ export const useStockDetails = () => {
       try {
         await dispatch(deleteStock(stockId)).unwrap()
         navigate('/stocks')
-        toast.success('Склад успешно удален')
+        toast.success('Склад успешно удалён!')
       } catch (e) {
         if (hasMessage(e)) {
           toast.error(e.message || 'Ошибка удаления')
