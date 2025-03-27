@@ -1,18 +1,13 @@
 import React from 'react'
-import { DefectMutation } from '../../../types'
-import { Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DefectForOrderForm } from '../../../types'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+
 
  interface Props {
-  defects: DefectMutation[];
+  defects: DefectForOrderForm[]
 }
 
 const DefectsTable: React.FC<Props> = ({ defects }) => {
-  const defectsColumns = [
-    { field: 'productName', headerName: 'Наименование', flex: 0.2 },
-    { field: 'defectDescription', headerName: 'Описание дефекта', flex: 0.6 },
-    { field: 'amount', headerName: 'Количество', flex: 0.2 },
-  ]
 
   if (defects.length === 0) {
     return (
@@ -23,17 +18,28 @@ const DefectsTable: React.FC<Props> = ({ defects }) => {
   }
 
   return (
-    <DataGrid
-      rows={defects.map((defect, index) => ({
-        id: index,
-        productName: defect.productName,
-        defectDescription: defect.defect_description,
-        amount: defect.amount,
-      }))}
-      columns={defectsColumns}
-      pageSizeOptions={[5, 10, 15]}
-      disableRowSelectionOnClick
-    />
+    <TableContainer>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: '40%' }}>Наименование</TableCell>
+            <TableCell align="center" sx={{ width: '10%' }}>Количество</TableCell>
+            <TableCell align="center" sx={{ width: '50%' }}>Дефект</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {defects.map((defect, index) => (
+            <TableRow key={`${ defect.product._id }-${ index }`}>
+              <TableCell component="th" scope="row" className="!border-0">
+                {defect.product.title}
+              </TableCell>
+              <TableCell align="center" className="!border-0">{defect.amount}</TableCell>
+              <TableCell align="center" className="!border-0">{defect.defect_description}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
 

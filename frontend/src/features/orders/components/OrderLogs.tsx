@@ -1,10 +1,10 @@
 import React from 'react'
 import { Log } from '../../../types'
-import { List, ListItem, Typography } from '@mui/material'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 
 interface Props {
-  logs: Log[] | [];
+  logs: Log[] | []
 }
 
 const OrderLogs: React.FC<Props> = ({ logs }) => {
@@ -17,14 +17,28 @@ const OrderLogs: React.FC<Props> = ({ logs }) => {
     )
   }
   return (
-    <List className="mt-2 space-y-2">
-      {logs.map((log, index) => (
-        <ListItem key={index} className="text-gray-700 border-b py-2">
-          <strong>{log.user}:</strong> {log.change}
-          <span className="text-gray-500 text-sm">({dayjs(log.date).format('DD.MM.YYYY HH:mm')})</span>
-        </ListItem>
-      ))}
-    </List>
+    <TableContainer>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: '30%' }}>Пользователь</TableCell>
+            <TableCell sx={{ width: '50%' }}>Изменение</TableCell>
+            <TableCell sx={{ width: '20%' }} align="right">Дата</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {logs.map((log, index) => (
+            <TableRow key={index}>
+              <TableCell>{log.user}</TableCell>
+              <TableCell>{log.change}</TableCell>
+              <TableCell align="right" className="text-gray-500 text-sm">
+                {dayjs(log.date).format('DD.MM.YYYY HH:mm')}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
 
