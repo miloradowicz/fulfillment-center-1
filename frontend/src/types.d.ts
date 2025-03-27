@@ -251,6 +251,15 @@ export interface TaskWithPopulate {
   description: string
   status: string
   logs?: Log[]
+  type: string
+  associated_order?: {
+    _id: string | null,
+    orderNumber: string
+  }
+  associated_arrival?: {
+    _id: string | null,
+    arrivalNumber: string
+  }
   createdAt: Date,
   updatedAt: Date,
 }
