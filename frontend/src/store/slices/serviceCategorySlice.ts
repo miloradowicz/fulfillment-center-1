@@ -29,14 +29,15 @@ const initialState: ServiceState = {
   creationAndModificationError: null,
 }
 
-export const selectService = (state: RootState) => state.services.service
-export const selectAllServices = (state: RootState) => state.services.services
-export const selectLoadingFetchService = (state: RootState) => state.services.loadingFetch
-export const selectLoadingAddService = (state: RootState) => state.services.loadingAdd
-export const selectLoadingArchiveService = (state: RootState) => state.services.loadingArchive
-export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete
-export const selectLoadingUpdateService = (state: RootState) => state.services.loadingUpdate
-export const selectServiceError = (state: RootState) => state.services.error
+export const selectServiceCategory = (state: RootState) => state.serviceCategories.serviceCategory
+export const selectAllServiceCateogories = (state: RootState) => state.serviceCategories.serviceCategories
+export const selectLoadingFetchServiceCategory = (state: RootState) => state.serviceCategories.loadingFetch
+export const selectLoadingAddServiceCategory = (state: RootState) => state.serviceCategories.loadingAdd
+export const selectLoadingArchiveServiceCategory = (state: RootState) => state.serviceCategories.loadingArchive
+export const selectLoadingDeleteServiceCategory = (state: RootState) => state.serviceCategories.loadingDelete
+export const selectLoadingUpdateServiceCategory = (state: RootState) => state.serviceCategories.loadingUpdate
+export const selectServiceCategoryError = (state: RootState) => state.serviceCategories.error
+export const selectServiceCategoryCreationAndModificationError = (state: RootState) => state.serviceCategories.creationAndModificationError
 
 const serviceCategorySlice = createSlice({
   name: 'services',
@@ -122,3 +123,4 @@ const serviceCategorySlice = createSlice({
 })
 
 export const serviceCategoryReducer = serviceCategorySlice.reducer
+export const { clearCreationAndModificationError } = serviceCategorySlice.actions

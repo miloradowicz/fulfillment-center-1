@@ -266,10 +266,13 @@ export interface Service {
 }
 
 export interface ServiceCategory {
+  _id: string
   name: string
 }
 
 export type ServiceMutation = Omit<Service, '_id' | 'logs'>
+
+export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
 export type PopulatedService = Omit<Service, 'serviceCategory'> & {
   serviceCategory: ServiceCategory

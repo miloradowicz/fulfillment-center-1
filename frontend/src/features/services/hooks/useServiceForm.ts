@@ -1,8 +1,13 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { ServiceMutation } from '../../../types'
+import { ServiceCategory, ServiceMutation } from '../../../types'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { fetchServices } from '../../../store/thunks/serviceThunk'
+import { createService, fetchServices } from '../../../store/thunks/serviceThunk'
 import { selectAllServices, selectLoadingAddService } from '../../../store/slices/serviceSlice'
+import { selectAllServiceCateogories } from '../../../store/slices/serviceCategorySlice'
+import { fetchServiceCategories } from '../../../store/thunks/serviceCategoryThunk'
+import { toast } from 'react-toastify'
+import { clearCreationAndModificationError } from '../../../store/slices/serviceCategorySlice'
+import { isAxiosError } from 'axios'
 
 type Form = Omit<ServiceMutation, 'price'> & {
   price: string,
@@ -16,24 +21,32 @@ const initialState: Form = {
 }
 
 interface Errors {
-  name?: string;
-  [key: `dynamicField_${number}`]: string;
+  [key: string]: string;
 }
 
 const useServiceForm = (onClose: () => void) => {
   const [form, setForm] = useState<Form>(initialState)
   const [errors, setErrors] = useState<Errors>({})
+  const [open, setOpen] = useState(false)
+  const [showCreateButton, setShowCreateButton] = useState(false)
 
-  const services = useAppSelector(selectAllServices) ?? []
+  const services = useAppSelector(selectAllServices)
+  const serviceCategories = useAppSelector(selectAllServiceCateogories)
 
   const loading = useAppSelector(selectLoadingAddService)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
+    dispatch(clearCreationAndModificationError())
     dispatch(fetchServices())
+    dispatch(fetchServiceCategories())
   }, [dispatch])
 
-  const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleOpen = () => setOpen(true)
+
+  const handleClose = () => setOpen(false)
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     setForm(prevState => ({
@@ -42,80 +55,65 @@ const useServiceForm = (onClose: () => void) => {
     }))
   }
 
+  const handleAutocompleteChange = (_: unknown, newValue: ServiceCategory | string | null) => {
+    if (typeof newValue === 'string') {
+      setShowCreateButton(true)
+    } else {
+      setErrors(prevErrors => ({ ...prevErrors, serviceCategory: '' }))
+      setForm(prevState => ({ ...prevState, serviceCategory: newValue?._id ?? '' }))
+    }
+  }
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    // if (!form.name.trim()) {
-    //   setErrors(prevErrors => ({ ...prevErrors, name: 'Название обязательно' }))
-    //   return
-    // }
+    if (!form.name.trim()) {
+      setErrors(prevErrors => ({ ...prevErrors, name: 'Название обязательно' }))
+      return
+    }
 
-    // if (dynamicFields.length === 0) {
-    //   setErrors(prevErrors => ({ ...prevErrors, dynamicField_: 'Добавьте хотя бы одно дополнительное свойство' }))
-    //   toast.warn('Добавьте хотя бы одно дополнительное свойство')
-    //   return
-    // }
+    try {
+      const serviceData: ServiceMutation = { ...form, price: Number.parseFloat(form.price) }
 
-    // const hasEmptyFields = dynamicFields.some(field => !field.key.trim() || !field.label.trim() || !field.value.trim())
-    // if (hasEmptyFields) {
-    //   setErrors(prevErrors => ({ ...prevErrors, dynamicField_: 'Все дополнительные поля должны быть заполнены' }))
-    //   toast.warn('Все дополнительные поля должны быть заполнены')
-    //   return
-    // }
+      await dispatch(createService(serviceData)).unwrap()
+      toast.success('Услуга успешно создана!')
 
-    // const keys = new Set<string>()
-    // const labels = new Set<string>()
-    // for (const field of dynamicFields) {
-    //   if (keys.has(field.key) || labels.has(field.label)) {
-    //     setErrors({ dynamicField_: 'Поле с таким ключом или названием уже существует' })
-    //     toast.warn('Поле с таким ключом или названием уже существует')
-    //     return
-    //   }
-    //   keys.add(field.key)
-    //   labels.add(field.label)
-    // }
+      onClose()
+      setForm(initialState)
+      setErrors({})
+    } catch (e) {
+      if (isAxiosError(e) && e.response?.data) {
 
-    // try {
-    //   const serviceData: ServiceMutation = {
-    //     name: form.name,
-    //     dynamic_fields: dynamicFields,
-    //   }
-
-    //   await dispatch(createService(serviceData)).unwrap()
-    //   toast.success('Услуга успешно создана!')
-
-    //   onClose()
-    //   setForm({ name: '', dynamic_fields: [] })
-    //   setDynamicFields([])
-    //   setErrors({})
-    // } catch (e) {
-    //   if (isAxiosError(e) && e.response?.data) {
-    //     console.error('Ошибка валидации:', e.response.data)
-
-    //     if (e.response.data.message) {
-    //       if (Array.isArray(e.response.data.message)) {
-    //         setErrors(prev => ({
-    //           ...prev,
-    //           dynamicField_: e.response?.data.message.join(', '),
-    //         }))
-    //         toast.error(e.response.data.message.join(', '))
-    //       } else {
-    //         toast.error(e.response.data.message)
-    //       }
-    //     } else {
-    //       toast.error('Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
-    //     }
-    //   } else {
-    //     console.error('Ошибка сервера:', e)
-    //   }
-    // }
+        if (e.response.data.message) {
+          if (Array.isArray(e.response.data.message)) {
+            setErrors(prev => ({
+              ...prev,
+              dynamicField_: e.response?.data.message.join(', '),
+            }))
+            toast.error(e.response.data.message.join(', '))
+          } else {
+            toast.error(e.response.data.message)
+          }
+        } else {
+          toast.error('Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
+        }
+      } else {
+        console.error('Ошибка сервера:', e)
+      }
+    }
   }
 
   return {
     form,
     loading,
     services,
-    inputChangeHandler,
+    serviceCategories,
+    open,
+    showCreateButton,
+    handleOpen,
+    handleClose,
+    handleInputChange,
+    handleAutocompleteChange,
     onSubmit,
     errors,
   }

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { isAxiosError } from 'axios'
-import { GlobalError, ServiceCategory, ServiceMutation, ValidationError } from '../../types'
+import { GlobalError, ServiceCategory, ServiceCategoryMutation, ValidationError } from '../../types'
 import axiosAPI from '../../utils/axiosAPI.ts'
 import { isGlobalError } from '../../utils/helpers.ts'
 
@@ -23,7 +23,7 @@ export const fetchServiceCategoryById = createAsyncThunk<ServiceCategory, string
   'serviceCategories/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.get(`/servicecategories/${ id }`)
+      const response = await axiosAPI.get(`/servicecategories/${id}`)
       return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -36,7 +36,7 @@ export const fetchServiceCategoryById = createAsyncThunk<ServiceCategory, string
 
 export const createServiceCategory = createAsyncThunk<
   ServiceCategory,
-  ServiceMutation,
+  ServiceCategoryMutation,
   { rejectValue: ValidationError | GlobalError }
 >('serviceCategories/create', async (data, { rejectWithValue }) => {
   try {
@@ -54,11 +54,11 @@ export const createServiceCategory = createAsyncThunk<
 
 export const updateServiceCategory = createAsyncThunk<
   ServiceCategory,
-  { id: string; data: ServiceMutation },
+  { id: string; data: ServiceCategoryMutation },
   { rejectValue: ValidationError | GlobalError }
 >('serviceCategories/update', async ({ id, data }, { rejectWithValue }) => {
   try {
-    const response = await axiosAPI.put(`/servicecategories/${ id }`, data)
+    const response = await axiosAPI.put(`/servicecategories/${id}`, data)
     return response.data
   } catch (error) {
     if (isAxiosError(error) && error.response && error.status === 400) {
@@ -74,7 +74,7 @@ export const archiveServiceCategory = createAsyncThunk<{ id: string }, string, {
   'serviceCategories/archive',
   async (id, { rejectWithValue }) => {
     try {
-      await axiosAPI.patch(`/servicecategories/${ id }/archive`)
+      await axiosAPI.patch(`/servicecategories/${id}/archive`)
       return { id }
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -89,7 +89,7 @@ export const deleteServiceCategory = createAsyncThunk<{ message: string }, strin
   'serviceCategories/delete',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.delete(`/servicecategories/${ id }`)
+      const response = await axiosAPI.delete(`/servicecategories/${id}`)
       return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response) {

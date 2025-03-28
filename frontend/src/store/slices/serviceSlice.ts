@@ -129,3 +129,4 @@ const serviceSlice = createSlice({
 })
 
 export const serviceReducer = serviceSlice.reducer
+export const { clearCreationAndModificationError } = serviceSlice.actions
