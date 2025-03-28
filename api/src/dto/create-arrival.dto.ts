@@ -49,7 +49,7 @@ class DefectDto {
 
 class ReceivedProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: string
+  product: mongoose.Schema.Types.ObjectId
 
   @IsOptional({ message: 'Заполните описание товара.' })
   @IsOptional()
