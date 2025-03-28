@@ -46,14 +46,6 @@ const ProductsDataList = () => {
       filterable: true,
     },
     {
-      field: 'amount',
-      headerName: 'Количество',
-      width: 100,
-      sortable: true,
-      editable: false,
-      filterable: true,
-    },
-    {
       field: 'Actions',
       headerName: '',
       type: 'number',

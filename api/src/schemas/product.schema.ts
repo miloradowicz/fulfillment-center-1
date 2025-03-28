@@ -17,14 +17,16 @@ export class Product {
     ref: 'Client',
   })
   client: string
+
   @Prop({ required: true })
   title: string
-  @Prop({ required: true })
-  amount: number
+
   @Prop({ required: true })
   barcode: string
+
   @Prop({ required: true })
   article: string
+
   @Prop()
   dynamic_fields: [
     {
@@ -33,6 +35,7 @@ export class Product {
       value: string
     },
   ]
+
   @Prop({
     type: [
       {

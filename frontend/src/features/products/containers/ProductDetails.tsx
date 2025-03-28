@@ -1,22 +1,32 @@
 import { Box, Button, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
-import {
-  ArrowBack, DeleteOutline, EditOutlined,
-} from '@mui/icons-material'
+import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ProductDetails = () => {
-  const { navigate, id, product, error, loading, deleteOneProduct, open, handleClose, handleOpen, fetchProduct, confirmationOpen, handleConfirmationOpen, handleConfirmationClose, productToDeleteId } = useProductActions(false)
+  const {
+    navigate,
+    id,
+    product,
+    error,
+    loading,
+    deleteOneProduct,
+    open,
+    handleClose,
+    handleOpen,
+    fetchProduct,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    productToDeleteId,
+  } = useProductActions(false)
 
   return (
     <>
       <Modal handleClose={handleClose} open={open}>
-        <ProductForm
-          initialData={product || undefined}
-          onSuccess={() => id && fetchProduct(id)}
-        />
+        <ProductForm initialData={product || undefined} onSuccess={() => id && fetchProduct(id)} />
       </Modal>
 
       <ConfirmationModal
@@ -81,9 +91,6 @@ const ProductDetails = () => {
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 <strong>Штрихкод:</strong> {product.barcode}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                <strong>Количество:</strong> {product.amount}
               </Typography>
 
               {product.dynamic_fields.length > 0 && (

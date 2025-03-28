@@ -45,7 +45,6 @@ export interface Product {
   _id: string
   client: string
   title: string
-  amount: number
   barcode: string
   article: string
   dynamic_fields?: DynamicField[]
@@ -56,7 +55,6 @@ export interface ProductWithPopulate {
   _id: string
   client: Client
   title: string
-  amount: number
   barcode: string
   article: string
   dynamic_fields: DynamicField[]
