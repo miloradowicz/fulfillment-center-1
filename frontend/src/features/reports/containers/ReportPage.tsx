@@ -10,35 +10,8 @@ import { CircularProgress } from '@mui/material'
 import TasksList from '../components/TaskList.tsx'
 import { useEffect } from 'react'
 import { fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${ index }`}
-      aria-labelledby={`simple-tab-${ index }`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  )
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${ index }`,
-    'aria-controls': `simple-tabpanel-${ index }`,
-  }
-}
+import { CustomTabPanel } from '../utils/CustomTabPanel.tsx'
+import { TabProps } from '../utils/TabProps.ts'
 
 export default function ReportTabs() {
   const [value, setValue] = React.useState(0)
@@ -60,11 +33,11 @@ export default function ReportTabs() {
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
-          <Tab label="Задачи" {...a11yProps(0)} />
-          <Tab label="Клиенты" {...a11yProps(1)} />
-          <Tab label="Заказы" {...a11yProps(2)} />
-          <Tab label="Поставки" {...a11yProps(2)} />
-          <Tab label="Склады" {...a11yProps(2)} />
+          <Tab label="Задачи" {...TabProps(0)} />
+          <Tab label="Клиенты" {...TabProps(1)} />
+          <Tab label="Заказы" {...TabProps(2)} />
+          <Tab label="Поставки" {...TabProps(2)} />
+          <Tab label="Склады" {...TabProps(2)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
