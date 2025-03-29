@@ -32,7 +32,7 @@ export const onDragEnd = async ({
   const taskData = e.active?.data?.current
   if (!taskData) return
 
-  const { _id, title, description, createdAt, user, parent } = taskData
+  const { _id, title, description,date_inProgress, date_Done,date_ToDO,  type,associated_order,  associated_arrival,  createdAt, user, parent } = taskData
   const userID = user?._id ?? ''
   const userEmail = user?.email ?? ''
   const userName = user?.displayName ?? ''
@@ -57,6 +57,12 @@ export const onDragEnd = async ({
     _id,
     title,
     description,
+    type,
+    associated_order,
+    associated_arrival,
+    date_inProgress,
+    date_Done,
+    date_ToDO,
     user: {
       _id: userID,
       email: userEmail,
@@ -76,14 +82,36 @@ export const onDragEnd = async ({
 
   if (parent !== container) {
     try {
+      const currentDate = new Date().toISOString() // Получаем текущую дату в формате ISO
+
+      const updatedData = {
+        user: userID,
+        title,
+        description,
+        type,
+        status: container as string,
+        date_inProgress,
+        date_Done,
+        date_ToDO,
+      }
+
+      if (container === 'в работе') {
+        updatedData.date_inProgress = currentDate
+        updatedData.date_Done = null
+        updatedData.date_ToDO = null
+      } else if (container === 'готово') {
+        updatedData.date_Done = currentDate
+        updatedData.date_ToDO = null
+        updatedData.date_inProgress =  null
+      } else if (container === 'к выполнению') {
+        updatedData.date_ToDO = currentDate
+        updatedData.date_Done = null
+        updatedData.date_inProgress =  null
+      }
+
       await dispatch(updateTask({
         taskId: _id,
-        data: {
-          user: userID,
-          title,
-          description,
-          status: container as string,
-        },
+        data: updatedData,
       }))
     } catch (error) {
       console.error('Ошибка при обновлении задачи:', error)

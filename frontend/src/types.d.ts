@@ -235,7 +235,10 @@ export interface Task {
   associated_order?: string | null
   associated_arrival?: string | null
   description: string
-  status: string
+  date_ToDO?:string | null
+  date_inProgress?:string | null
+  date_Done?: string | null
+  status?: string | null
   logs?: Log[]
 }
 
@@ -262,6 +265,9 @@ export interface TaskWithPopulate {
   }
   createdAt: Date,
   updatedAt: Date,
+  date_inProgress:string | null,
+  date_Done:string | null,
+  date_ToDO:string | null,
 }
 
 export type TaskMutation = Omit<Task, '_id'>
@@ -299,3 +305,22 @@ export interface Counterparty {
 export type CounterpartyMutation = Omit<Counterparty , '_id'>
 
 export type StatusColor = 'warning' | 'success' | 'info' | 'default'
+
+export interface UserTaskReport {
+  user: {
+    _id: string;
+    displayName: string;
+  };
+  taskCount: number;
+}
+
+
+export interface DailyTaskCount {
+  date: string;
+  taskCount: number;
+}
+
+export interface ReportTaskResponse {
+  userTaskReports: UserTaskReport[];
+  dailyTaskCounts: DailyTaskCount[];
+}

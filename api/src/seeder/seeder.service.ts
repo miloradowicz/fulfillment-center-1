@@ -310,6 +310,7 @@ export class SeederService {
         title: 'Упаковка товара для заказа',
         status: 'готово',
         type: 'другое',
+        date_Done: '2025-03-29T08:27:17.078Z',
       },
       {
         user: _User2._id,
@@ -323,12 +324,22 @@ export class SeederService {
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
+      },
+      {
+        user: _User1._id,
+        title: 'Решить вопрос по начислению оплаты по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
       },
       {
         user: _User5._id,
         title: 'Связаться с клиентом ',
         status: 'готово',
         type: 'другое',
+        date_Done: '2025-03-26T08:27:17.078Z',
       },
       {
         user: _User6._id,
@@ -336,6 +347,7 @@ export class SeederService {
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival2._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
       },
     ])
 

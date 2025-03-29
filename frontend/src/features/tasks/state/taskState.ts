@@ -6,6 +6,7 @@ export const initialState = {
   associated_order: null,
   associated_arrival: null,
   status: 'к выполнению',
+  date_ToDO: new Date(),
 }
 
 export const initialErrorState = {
