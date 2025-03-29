@@ -82,7 +82,10 @@ const ProductsDataList = () => {
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
           initialData={selectedProduct || undefined}
-          onSuccess={() => fetchAllProducts()}
+          onSuccess={() => {
+            fetchAllProducts()
+            handleClose()
+          }}
         />
       </Modal>
 

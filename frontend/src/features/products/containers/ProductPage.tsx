@@ -13,7 +13,10 @@ const ProductPage = () => {
     <>
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
-          onSuccess={fetchAllProducts}
+          onSuccess={() => {
+            fetchAllProducts()
+            handleClose()
+          }}
         />
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">

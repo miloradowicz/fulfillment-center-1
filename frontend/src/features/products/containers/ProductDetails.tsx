@@ -15,7 +15,10 @@ const ProductDetails = () => {
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
           initialData={product || undefined}
-          onSuccess={() => id && fetchProduct(id)}
+          onSuccess={() => {
+            if (id) fetchProduct(id)
+            handleClose()
+          }}
         />
       </Modal>
 
