@@ -14,6 +14,7 @@ export const useOrderDetails = () => {
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [tabValue, setTabValue] = useState(0)
   const [open, setOpen] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -22,17 +23,18 @@ export const useOrderDetails = () => {
     }
   }, [dispatch, id])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
-        await dispatch(deleteOrder(id))
+      if (order) {
+        await dispatch(deleteOrder(order._id))
         navigate('/orders')
-      } else {
-        toast.info('Вы отменили удаление заказа')
+        toast.success('Заказ успешно удалён!')
       }
     } catch (e) {
       console.error(e)
+      toast.error('Ошибка при удалении заказа')
     }
+    setOpenDeleteModal(false)
   }
 
   const handleOpenEdit = () => {
@@ -57,11 +59,13 @@ export const useOrderDetails = () => {
     loading,
     tabValue,
     open,
+    openDeleteModal,
     setTabValue,
     handleDelete,
     handleOpenEdit,
     setOpen,
     navigateBack,
     getStepDescription,
+    setOpenDeleteModal,
   }
 }

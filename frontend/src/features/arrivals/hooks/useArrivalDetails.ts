@@ -38,8 +38,9 @@ const useArrivalDetails = () => {
     if (arrivalId) {
       try {
         await dispatch(deleteArrival(arrivalId)).unwrap()
-        toast.success('Поставка удалена')
+        toast.success('Поставка успешно удалена!')
         setIsDeleted(true)
+        navigate('/arrivals')
       } catch (e) {
         if (hasMessage(e)) {
           toast.error(e.message || 'Ошибка удаления')
@@ -50,14 +51,6 @@ const useArrivalDetails = () => {
       }
     }
 
-    hideConfirmDeleteModal()
-  }
-
-  const showConfirmDeleteModal = () => {
-    setConfirmDeleteModalOpen(true)
-  }
-
-  const hideConfirmDeleteModal = () => {
     setConfirmDeleteModalOpen(false)
   }
 
@@ -79,13 +72,12 @@ const useArrivalDetails = () => {
     infoTab,
     confirmDeleteModalOpen,
     isDeleted,
-    showConfirmDeleteModal,
-    hideConfirmDeleteModal,
     handleDelete,
     navigateBack,
     editModalOpen,
     setEditModalOpen,
     setProductsTabs,
+    setConfirmDeleteModalOpen,
     setInfoTab,
     getStepDescription,
   }

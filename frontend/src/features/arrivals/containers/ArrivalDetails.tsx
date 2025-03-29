@@ -4,9 +4,8 @@ import {
   Card, Chip, CircularProgress,
   Container,
   Divider,
-  Grid2 as Grid,
   IconButton,
-  Stack, Step, StepLabel, Stepper, Tab, Tabs,
+  Step, StepLabel, Stepper, Tab, Tabs,
   Typography,
 } from '@mui/material'
 import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
@@ -21,6 +20,7 @@ import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
 import { getArrivalStatusColor } from '../../orders/utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import LogsTable from '../../../components/Tables/LogsTable.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
 
 
@@ -32,10 +32,10 @@ const ArrivalDetails = () => {
     productsTab,
     confirmDeleteModalOpen,
     navigateBack,
-    hideConfirmDeleteModal,
     handleDelete,
     editModalOpen,
     setEditModalOpen,
+    setConfirmDeleteModalOpen,
     setInfoTab,
     setProductsTabs,
     getStepDescription,
@@ -67,25 +67,14 @@ const ArrivalDetails = () => {
         />
       </Modal>
 
-      <Modal open={confirmDeleteModalOpen} handleClose={hideConfirmDeleteModal}>
-        <Grid container direction="column">
-          <Grid mb={4}>
-            <Typography variant="h6" gutterBottom>
-              Вы действительно хотите удалить поставку?
-            </Typography>
-          </Grid>
-          <Grid>
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Удалить
-              </Button>
-              <Button variant="outlined" onClick={hideConfirmDeleteModal}>
-                Отмена
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Modal>
+      <ConfirmationModal
+        open={confirmDeleteModalOpen}
+        entityName="эту поставку"
+        actionType="delete"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDeleteModalOpen(false)}
+      />
+
       <Container maxWidth="md">
         <Card className="mx-auto bg-white shadow-lg rounded-lg p-6">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
@@ -215,7 +204,7 @@ const ArrivalDetails = () => {
                 borderRadius: 2,
                 textTransform: 'none',
               }}
-              onClick={() => handleDelete()}
+              onClick={() => setConfirmDeleteModalOpen(true)}
             >
               Удалить
             </Button>

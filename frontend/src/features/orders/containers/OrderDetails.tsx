@@ -22,6 +22,7 @@ import { getOrderStatusColor } from '../utils/getOrderStatusColor.ts'
 import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
 import { OrderStatus } from '../../../constants.ts'
 import LogsTable from '../../../components/Tables/LogsTable.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const OrderDetails = () => {
   const {
@@ -29,12 +30,14 @@ const OrderDetails = () => {
     loading,
     tabValue,
     open,
+    openDeleteModal,
     setTabValue,
     handleOpenEdit,
     handleDelete,
     setOpen,
     navigateBack,
     getStepDescription,
+    setOpenDeleteModal,
   } = useOrderDetails()
 
   const statuses = Object.values(OrderStatus)
@@ -151,13 +154,20 @@ const OrderDetails = () => {
               borderRadius: 2,
               textTransform: 'none',
             }}
-            onClick={() => handleDelete(order._id)}
+            onClick={() => setOpenDeleteModal(true)}
           >
             Удалить
           </Button>
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />
           </Modal>
+          <ConfirmationModal
+            open={openDeleteModal}
+            entityName="этот заказ"
+            actionType="delete"
+            onConfirm={() => handleDelete()}
+            onCancel={() => setOpenDeleteModal(false)}
+          />
         </Box>
       </Card>
     </Container>
