@@ -15,6 +15,7 @@ const ArrivalPage = () => {
     isLoading,
     arrivalToEdit,
     handleOpenEdit,
+    fetchAllArrivals,
   } = useArrivalPage()
 
   return (
@@ -26,7 +27,13 @@ const ArrivalPage = () => {
       ) : null}
 
       <Modal handleClose={handleClose} open={open} aria-modal="true">
-        <ArrivalForm initialData={arrivalToEdit} onSuccess={handleClose} />
+        <ArrivalForm
+          initialData={arrivalToEdit}
+          onSuccess={() => {
+            handleClose()
+            fetchAllArrivals()
+          }}
+        />
       </Modal>
 
       <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">

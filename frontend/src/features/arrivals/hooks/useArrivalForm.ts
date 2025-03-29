@@ -224,6 +224,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
+      if (onSuccess) onSuccess()
     } catch (e) {
       console.error(e)
     }

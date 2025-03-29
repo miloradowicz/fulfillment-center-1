@@ -51,5 +51,6 @@ export const useArrivalsList = () => {
     isOpen,
     deleteModalOpen,
     handleClose,
+    fetchAllArrivals,
   }
 }
