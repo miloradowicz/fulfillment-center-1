@@ -111,7 +111,7 @@ export interface Arrival {
   shipping_agent?: string | null
   pickup_location?: string
   defects?: Defect[]
-  arrival_status?: string
+  arrival_status: string
   received_amount?: ProductArrival[]
   logs?: Log[]
   arrivalNumber?: string
@@ -122,7 +122,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
-  received_amount?: ProductArrivalWithPopulate[]
+  received_amount: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
   stock: Stock
   shipping_agent?: Counterparty

@@ -1,9 +1,9 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
-import { ProductForOrderForm } from '../../../types'
+import { ProductArrivalWithPopulate, ProductForOrderForm } from '../../types'
 import React from 'react'
 
 interface Props {
-  products: ProductForOrderForm[]
+  products: ProductForOrderForm[] | ProductArrivalWithPopulate[] | []
 }
 
 const ProductsTable: React.FC<Props> = ({ products }) => {

@@ -10,3 +10,16 @@ export  const getOrderStatusColor = (status: string) => {
     return 'warning'
   }
 }
+
+export const getArrivalStatusColor = (status: string) => {
+  switch (status) {
+  case 'ожидается доставка':
+    return 'warning'
+  case 'отсортирована':
+    return 'info'
+  case 'получена':
+    return 'success'
+  default:
+    return 'warning'
+  }
+}

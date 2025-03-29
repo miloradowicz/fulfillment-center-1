@@ -1,13 +1,13 @@
 import React from 'react'
-import { Log } from '../../../types'
+import { Log, LogWithPopulate } from '../../types'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 
 interface Props {
-  logs: Log[] | []
+  logs: LogWithPopulate[] | Log[]
 }
 
-const OrderLogs: React.FC<Props> = ({ logs }) => {
+const LogsTable: React.FC<Props> = ({ logs }) => {
 
   if (logs.length === 0) {
     return (
@@ -29,7 +29,7 @@ const OrderLogs: React.FC<Props> = ({ logs }) => {
         <TableBody>
           {logs.map((log, index) => (
             <TableRow key={index}>
-              <TableCell>{log.user}</TableCell>
+              <TableCell>{typeof log.user === 'object' ? log.user.displayName : log.user}</TableCell>
               <TableCell>{log.change}</TableCell>
               <TableCell align="right" className="text-gray-500 text-sm">
                 {dayjs(log.date).format('DD.MM.YYYY HH:mm')}
@@ -42,4 +42,4 @@ const OrderLogs: React.FC<Props> = ({ logs }) => {
   )
 }
 
-export default OrderLogs
+export default LogsTable

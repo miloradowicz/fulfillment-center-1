@@ -13,15 +13,15 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
-import DefectsTable from '../components/DefectsTable.tsx'
-import OrderLogs from '../components/OrderLogs.tsx'
+import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
 import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import { Link } from 'react-router-dom'
 import { getOrderStatusColor } from '../utils/getOrderStatusColor.ts'
-import ProductsTable from '../components/ProductsTable.tsx'
+import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
 import { OrderStatus } from '../../../constants.ts'
+import LogsTable from '../../../components/Tables/LogsTable.tsx'
 
 const OrderDetails = () => {
   const {
@@ -63,31 +63,33 @@ const OrderDetails = () => {
             Заказы
           </Typography>
         </Box>
-        <Box className="flex flex-wrap gap-5 items-center mt-3">
+        <Box className="flex flex-wrap gap-5 items-start mt-3 mb-5">
           <Box>
             <Typography variant="h5" className="!font-bold">
               Детали заказа #{order.orderNumber}
             </Typography>
+            <Box className="flex flex-col">
+              <Typography variant="caption" className="text-gray-600 text-sm">Создан: {dayjs(order.sent_at).format('D MMMM YYYY')}
+              </Typography>
+              {order.delivered_at &&
+                <Typography variant="caption" className="text-gray-600 text-sm">
+                  Доставлен: {dayjs(order.delivered_at).format('D MMMM YYYY')}
+                </Typography>
+              }
+            </Box>
           </Box>
           <Chip label={order.status} color={getOrderStatusColor(order.status)}  sx={{
             borderRadius: '4px',
             height: '28px',
           }}
           variant="outlined" />
-          <Box className="ml-auto flex flex-col items-center !self-end">
+          <Box className="ml-auto flex flex-col items-center !self-end !me-10">
+            <Typography className="!text-xs">Заказчик</Typography>
             <Typography component={Link} to={`/clients/${ order.client._id }`} target="_blank" className="!font-bold underline underline-offset-4">{order.client.name}</Typography>
             <Typography className="!font-light">{order.client.phone_number}</Typography>
           </Box>
         </Box>
-        <Box className="flex flex-col ml-5 mb-6">
-          <Typography variant="caption" className="text-gray-600 text-sm">Отправлен: {dayjs(order.sent_at).format('D MMMM YYYY')}
-          </Typography>
-          {order.delivered_at &&
-            <Typography variant="caption" className="text-gray-600 text-sm">
-              Доставлен: {dayjs(order.delivered_at).format('D MMMM YYYY')}
-            </Typography>
-          }
-        </Box>
+
 
         <Box>
           <Stepper  activeStep={activeStep} alternativeLabel>
@@ -116,7 +118,7 @@ const OrderDetails = () => {
           <Tab label="История" />
         </Tabs>
         <Box className="mt-4">
-          {tabValue === 0 ? <DefectsTable defects={order.defects} /> : <OrderLogs logs={order.logs || []} />}
+          {tabValue === 0 ? <DefectsTable defects={order.defects} /> : <LogsTable logs={order.logs || []} />}
         </Box>
         <Box
           sx={{
