@@ -29,9 +29,7 @@ export default function ReportTabs() {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()
-
     const tabName = tabNames[newValue]
-
     navigate(`?tab=${ tabName }`, { replace: true })
     setValue(newValue)
   }
@@ -54,11 +52,11 @@ export default function ReportTabs() {
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
-          <Tab label="Задачи" sx={{ fontSize:'1.2rem' }}{...TabProps(0)} />
-          <Tab label="Клиенты" sx={{ fontSize:'1.2rem' }} {...TabProps(1)} />
-          <Tab label="Заказы" sx={{ fontSize:'1.2rem' }} {...TabProps(2)} />
-          <Tab label="Поставки" sx={{ fontSize:'1.2rem' }}  {...TabProps(3)} />
-          <Tab label="Склады" sx={{ fontSize:'1.2rem' }} {...TabProps(4)} />
+          <Tab label="Задачи" sx={{ fontSize:'1rem' }} {...TabProps(0)} />
+          <Tab label="Клиенты" sx={{ fontSize:'1rem' }} {...TabProps(1)} />
+          <Tab label="Заказы" sx={{ fontSize:'1rem' }} {...TabProps(2)} />
+          <Tab label="Поставки" sx={{ fontSize:'1rem' }}  {...TabProps(3)} />
+          <Tab label="Склады" sx={{ fontSize:'1rem' }} {...TabProps(4)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>

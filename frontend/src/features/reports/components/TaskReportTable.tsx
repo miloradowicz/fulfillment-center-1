@@ -1,19 +1,19 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material'
-import { UserTaskReport } from '../../../types'
 import Box from '@mui/material/Box'
+import { useSearchParams } from 'react-router-dom'
+import { formatDate } from '../utils/FormattedDateForTitle.ts'
+import { PropsTaskTable } from '../utils/TypesProps.ts'
 
-interface Props {
-  userTaskReports:  UserTaskReport[]
-}
-
-const TaskReportTable: React.FC<Props> = ({ userTaskReports }) => {
+const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
+  const [searchParams] = useSearchParams()
+  const startDate = formatDate(searchParams.get('startDate'))
+  const endDate = formatDate(searchParams.get('endDate'))
   return (
     <>{userTaskReports.length === 0 ? null:
       <Box style={{ textAlign: 'center', marginBottom: '20px', width: '100%' }}>
-        <Typography variant={'h6'} style={{ marginBottom: '10px' }}>Количество задач выполненных каждым <br/> сотрудником
-            за указанный
-            период</Typography>
+        <Typography variant={'h6'} style={{ marginBottom: '10px' }}>Количество задач, выполненных каждым <br/> сотрудником
+          за период с {startDate} по {endDate}</Typography>
         <TableContainer component={Paper} sx={{ maxWidth: 650, marginInline:'auto' }}>
           <Table aria-label="simple table">
             <TableHead>

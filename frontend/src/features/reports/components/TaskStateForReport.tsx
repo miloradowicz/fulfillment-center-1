@@ -2,16 +2,7 @@ import React from 'react'
 import { PieChart } from '@mui/x-charts'
 import Box from '@mui/material/Box'
 import { Card, Typography } from '@mui/material'
-
-interface TaskWithPopulate {
-  _id: string;
-  title: string;
-  status: string;
-}
-
-interface TaskSummaryProps {
-  tasks: TaskWithPopulate[] | null;
-}
+import { TaskSummaryProps } from '../utils/TypesProps.ts'
 
 const TaskStateForReport: React.FC<TaskSummaryProps> = ({ tasks }) => {
   const taskStats = tasks?.reduce(

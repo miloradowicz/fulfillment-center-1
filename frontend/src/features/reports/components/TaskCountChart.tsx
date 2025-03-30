@@ -2,26 +2,23 @@ import React from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import Box from '@mui/material/Box'
 import { Typography } from '@mui/material'
+import { useSearchParams } from 'react-router-dom'
+import { formatDate } from '../utils/FormattedDateForTitle.ts'
+import { PropsCountChart } from '../utils/TypesProps.ts'
 
-interface DailyTaskCount {
-  date: string;
-  taskCount: number;
-}
-
-interface Props {
-  data: DailyTaskCount[];
-}
-
-const TaskCountAreaChart: React.FC<Props> = ({ data }) => {
+const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
   const chartData = data.map(item => ({
     date: item.date,
     taskCount: item.taskCount,
   }))
 
+  const [searchParams] = useSearchParams()
+  const startDate = formatDate(searchParams.get('startDate'))
+  const endDate = formatDate(searchParams.get('endDate'))
+
   return (
     <>{data.length === 0 ? null: <Box style={{ textAlign: 'center', marginBottom: '20px', width: '100%' }}>
-      <Typography variant={'h6'} style={{ marginBottom: '10px' }}>Ежедневная динамика общего количества <br/> выполненных задач за указанный
-        период</Typography>
+      <Typography variant={'h6'} style={{ marginBottom: '10px' }}>Ежедневная динамика общего количества <br/> выполненных задач за период c {startDate} по {endDate}</Typography>
       <ResponsiveContainer width={'100%'}  height={400}
         style={{ margin: '20px 0', paddingBottom: '30px' }}>
         <AreaChart data={chartData} margin={{ bottom: 50 }}>
