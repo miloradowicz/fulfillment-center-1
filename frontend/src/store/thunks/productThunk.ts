@@ -43,13 +43,11 @@ export const fetchProductsWithPopulate = createAsyncThunk<ProductWithPopulate[]>
   },
 )
 
-export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, { rejectValue: ValidationError }>(
+export const addProduct = createAsyncThunk<Product, ProductMutation, { rejectValue: ValidationError }>(
   'products/addProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.post('/products', productData, {
-        headers: productData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
-      })
+      const response = await axiosAPI.post('/products', productData)
       return response.data
     } catch (e) {
       if (isAxiosError(e) && e.response) {
@@ -87,7 +85,7 @@ export const deleteProduct = createAsyncThunk<void, string, { rejectValue: Globa
   }
 })
 
-export const updateProduct = createAsyncThunk<void, { productId: string; data: FormData  }, { rejectValue: ValidationError }>(
+export const updateProduct = createAsyncThunk<void, { productId: string; data: ProductMutation }, { rejectValue: ValidationError }>(
   'products/updateProduct',
   async ({ productId, data }, { rejectWithValue }) => {
     try {

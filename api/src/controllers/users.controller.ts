@@ -37,6 +37,16 @@ export class UsersController {
     return this.usersService.getById(id)
   }
 
+  @Get('archived/all')
+  async getArchivedUsers() {
+    return this.usersService.getArchivedUsers()
+  }
+
+  @Get('archived/:id')
+  async getArchivedUserById(@Param('id') id: string) {
+    return this.usersService.getArchivedById(id)
+  }
+
   @Put(':id')
   async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto)

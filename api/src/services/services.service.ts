@@ -13,6 +13,10 @@ export class ServicesService {
     return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
   }
 
+  async getAllArchived() {
+    return this.serviceModel.find({ isArchived: true }).populate('serviceCategory').exec()
+  }
+
   async getAllByName(name: string) {
     return this.serviceModel
       .find({ isArchived: false })
@@ -31,10 +35,6 @@ export class ServicesService {
     return service
   }
 
-  async getAllArchived() {
-    return this.serviceModel.find({ isArchived: true }).populate('serviceCategory').exec()
-  }
-
   async getAllArchivedByName(name: string) {
     return this.serviceModel
       .find({ isArchived: true })
@@ -44,9 +44,11 @@ export class ServicesService {
   }
 
   async getArchivedById(id: string) {
-    const service = await this.serviceModel.find({ isArchived: true }).findById(id).populate('serviceCategory').exec()
+    const service = await this.serviceModel.findById(id).populate('serviceCategory').exec()
 
-    if (!service) throw new NotFoundException('Услуга в архиве не найдена')
+    if (!service) throw new NotFoundException('Услуга не найдена')
+
+    if (!service.isArchived) throw new ForbiddenException('Эта услуга не в архиве')
 
     return service
   }

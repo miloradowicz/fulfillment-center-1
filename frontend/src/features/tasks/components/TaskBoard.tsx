@@ -1,4 +1,4 @@
-import { Box, CircularProgress, TextField, Stack, IconButton, InputAdornment, Button } from '@mui/material'
+import { Box, CircularProgress, TextField, Stack, IconButton, InputAdornment } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { DndContext, rectIntersection } from '@dnd-kit/core'
 import { useAppDispatch } from '../../../app/hooks.ts'
@@ -9,11 +9,13 @@ import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import UserList from './UserList'
 import { useEffect, useState } from 'react'
+import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import TaskForm from './TaskForm.tsx'
 
 const TaskBoard = () => {
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
-
 
   const {
     todoItems,
@@ -33,6 +35,9 @@ const TaskBoard = () => {
     selectedUser,
     setSelectedUser,
     sensors,
+    handleOpen,
+    open,
+    handleClose,
   } = useTaskBoard()
 
   useEffect(() => {
@@ -40,7 +45,10 @@ const TaskBoard = () => {
       setLoading(false)
     }
   }, [selectFetchUser])
-  return (
+  return (<>
+    <Modal handleClose={handleClose} open={open}>
+      <TaskForm onSuccess={handleClose} />
+    </Modal>
     <DndContext
       sensors={sensors}
       collisionDetection={rectIntersection}
@@ -61,9 +69,9 @@ const TaskBoard = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box display="flex" flexDirection="column" p={2} paddingBottom={'150px'} justifyContent={'space-between'} overflow={'hidden'} minWidth={'950px'}>
+        <Box display="flex" flexDirection="column" p={2} paddingBottom={'150px'} justifyContent={'space-between'} overflow={'hidden'} minWidth={'950px'} >
           <Stack direction="row" spacing={1} sx={{ display:'flex', width:'100%', marginLeft: '20px', marginBottom: '0', marginTop: '10px', alignItems: 'center' }}>
-            <Box sx={{ position: 'relative', display: 'inline-block', maxWidth: 300 }}>
+            <Box sx={{ position: 'relative', display: 'inline-block', maxWidth: 300, minWidth: 230 }}>
               <TextField
                 label="Поиск по содержанию"
                 variant="outlined"
@@ -95,20 +103,9 @@ const TaskBoard = () => {
               selectedUser={selectedUser}
               setSelectedUser={setSelectedUser}
             />:null }
-            <Stack sx={{ flexGrow:'1', marginBottom: '0', marginTop: '10px', alignItems: 'center' }}>
-              <Button   sx={{
-                color: '#32363F',
-                border: '1px solid #32363F',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  color: '#ffffff',
-                  backgroundColor: '#32363F',
-                  border: '1px solid #ffffff',
-                },
-              }}
-              variant='outlined' onClick={clearAllFilters}>
-                Сбросить фильтры
-              </Button>
+            <Stack sx={{ display:'flex', flexDirection:'row', paddingRight:'20px', justifyContent:'flex-start',flexGrow:'1', maxWidth:'700px', marginBottom: '0', marginTop: '10px', alignItems: 'center' }}>
+              <Box className={'mx-3'}><CustomButton text={'Сбросить фильтры'} onClick={clearAllFilters}/></Box>
+              <Box marginLeft={'auto'} ><CustomButton text={'Добавить задачу'} onClick={handleOpen}/></Box>
             </Stack>
           </Stack>
 
@@ -126,6 +123,7 @@ const TaskBoard = () => {
         </Box>
       )}
     </DndContext>
+  </>
   )
 }
 

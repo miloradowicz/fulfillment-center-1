@@ -59,6 +59,9 @@ export class Arrival {
   @Prop({ default: null })
   pickup_location: string
 
+  @Prop({ default: null })
+  documents: [{ document: string }]
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Counterparty',

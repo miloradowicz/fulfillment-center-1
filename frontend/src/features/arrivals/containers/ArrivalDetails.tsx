@@ -9,7 +9,6 @@ import {
   Divider,
   Grid2 as Grid,
   IconButton,
-  Stack,
   Typography,
 } from '@mui/material'
 import { ArrowBack, DeleteOutline, EditOutlined, ExpandMore } from '@mui/icons-material'
@@ -20,6 +19,8 @@ import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
 import Modal from '../../../components/UI/Modal/Modal'
 import ArrivalForm from '../components/ArrivalForm.tsx'
+import { Link } from 'react-router-dom'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ArrivalDetails = () => {
   const {
@@ -46,25 +47,14 @@ const ArrivalDetails = () => {
         />
       </Modal>
 
-      <Modal open={confirmDeleteModalOpen} handleClose={hideConfirmDeleteModal}>
-        <Grid container direction="column">
-          <Grid mb={4}>
-            <Typography variant="h6" gutterBottom>
-              Вы действительно хотите удалить поставку?
-            </Typography>
-          </Grid>
-          <Grid>
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Удалить
-              </Button>
-              <Button variant="outlined" onClick={hideConfirmDeleteModal}>
-                Отмена
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Modal>
+      <ConfirmationModal
+        open={confirmDeleteModalOpen}
+        entityName="эту поставку"
+        actionType="delete"
+        onConfirm={handleDelete}
+        onCancel={hideConfirmDeleteModal}
+      />
+
       <Container maxWidth="lg">
         <Box sx={{ mx: 'auto', p: { xs: 1, md: 3 } }}>
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -104,21 +94,46 @@ const ArrivalDetails = () => {
                 </Grid>
               </Box>
 
-              {arrival?.shipping_agent ?
+              {arrival?.shipping_agent ? (
                 <Box sx={{ mb: 3 }}>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
                     <Grid>
-                      <ClientInfoItem loading={loading} label="Компания-перевозчик" value={arrival?.shipping_agent.name} />
+                      <ClientInfoItem
+                        loading={loading}
+                        label="Компания-перевозчик"
+                        value={arrival?.shipping_agent.name}
+                      />
                     </Grid>
                   </Grid>
-                </Box> : null}
+                </Box>
+              ) : null}
 
-              {arrival?.pickup_location ?
+              {arrival?.pickup_location ? (
                 <Box sx={{ mb: 3 }}>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
                     <Grid>
                       <ClientInfoItem loading={loading} label="Адрес доставки" value={arrival?.pickup_location} />
                     </Grid>
+                  </Grid>
+                </Box>
+              ) : null}
+
+              {arrival?.documents ?
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" color="text.secondary">
+                  Документы
+                  </Typography>
+                  <Grid sx={{ mt: 1 }} className="flex flex-col items-start">
+                    {arrival?.documents.map((doc, id) => (
+                      <Link
+                        target="_blank"
+                        to={`http://localhost:8000${ doc.document }`}
+                        key={id}
+                        className="font-bold text-blue-500 hover:text-blue-700"
+                      >
+                        {`Документ ${ id + 1 }`}
+                      </Link>
+                    ))}
                   </Grid>
                 </Box> : null}
 
@@ -134,7 +149,6 @@ const ArrivalDetails = () => {
                 />
               )}
               <ArrivalDetailsTextItem label="Отправлено" value={arrival?.sent_amount} loading={loading} />
-
               <Divider sx={{ my: 3 }} />
 
               <Accordion>

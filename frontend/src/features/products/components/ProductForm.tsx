@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
+import { Button, CircularProgress, TextField, Typography, Autocomplete } from '@mui/material'
 import useProductForm from '../hooks/useProductForm.ts'
 import { ProductWithPopulate } from '../../../types'
 import React from 'react'
@@ -17,12 +17,10 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     dynamicFields,
     newField,
     showNewFieldInputs,
-    file,
     clients,
     loadingAdd,
     loadingUpdate,
     inputChangeHandler,
-    handleFileChange,
     addDynamicField,
     onChangeDynamicFieldValue,
     onSubmit,
@@ -163,17 +161,6 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Button type="button" onClick={() => setShowNewFieldInputs(true)}>
           + Добавить параметр
         </Button>
-
-        <Typography variant="h6">Загрузить файл</Typography>
-        <Grid>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button variant="outlined" component="label" sx={{ mr: 2 }}>
-              Выбрать файл
-              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange} />
-            </Button>
-            {file && <Typography variant="body2">{file.name}</Typography>}
-          </Box>
-        </Grid>
 
         <Grid>
           <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate}>

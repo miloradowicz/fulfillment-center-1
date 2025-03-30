@@ -1,3 +1,4 @@
+import React from 'react'
 import { useArrivalsList } from '../hooks/useArrivalsList.ts'
 import { ArrivalWithClient } from '../../../types'
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
@@ -7,18 +8,17 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
-import React from 'react'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ArrivalForm from './ArrivalForm.tsx'
 import StatusArrivalCell from './StatusArrivalCell.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 interface Props {
-  onEdit: (data: ArrivalWithClient) => void
+  onEdit: (data: ArrivalWithClient) => void;
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const { arrivals, deleteOneArrival, handleClose, isOpen } = useArrivalsList()
-
+  const { arrivals, handleDeleteClick, handleConfirmDelete, handleClose, isOpen, deleteModalOpen } = useArrivalsList()
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -30,37 +30,11 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       minWidth: isMediumScreen ? 180 : 120,
       align: 'left',
       headerAlign: 'left',
-      editable: false,
-      filterable: true,
       renderCell: ({ row }) => (
-        <NavLink
-          to={`/arrivals/${ row._id }`}
-          className="
-        py-2 px-3
-        bg-blue-50
-        text-blue-700
-        rounded-md
-        text-sm
-        font-medium
-        hover:bg-blue-100
-        transition-colors
-        duration-150
-        border
-        border-blue-200
-        hover:border-blue-300
-        whitespace-nowrap
-      "
-          style={{
-            lineHeight: '1.25rem',
-            maxWidth: '120px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+        <NavLink to={`/arrivals/${ row._id }`} className="py-2 px-3 bg-blue-50 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-100 transition-colors duration-150 border border-blue-200 hover:border-blue-300 whitespace-nowrap">
           {row.arrivalNumber}
         </NavLink>
       ),
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.arrivalNumber,
     },
     {
       field: 'client',
@@ -69,9 +43,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       minWidth: isMediumScreen ? 180 : 120,
       align: 'left',
       headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.client?.name ?? 'Неизвестный клиент',
+      valueGetter: (_value, row) => row.client?.name ?? 'Неизвестный клиент',
     },
     {
       field: 'stock',
@@ -80,9 +52,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       minWidth: isMediumScreen ? 180 : 120,
       align: 'left',
       headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.stock.name ?? 'Неизвестный склад',
+      valueGetter: (_value, row) => row.stock.name ?? 'Неизвестный склад',
     },
     {
       field: 'arrival_date',
@@ -91,9 +61,8 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       minWidth: isMediumScreen ? 140 : 100,
       align: 'left',
       headerAlign: 'left',
-      editable: false,
       type: 'date',
-      valueGetter: (_value: string, row: ArrivalWithClient) => new Date(row.arrival_date),
+      valueGetter: (_value, row) => new Date(row.arrival_date),
       valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
     },
     {
@@ -123,18 +92,16 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       headerAlign: 'left',
       sortable: false,
       filterable: false,
-      renderCell: ({ row }) => {
-        return (
-          <>
-            <IconButton onClick={() => onEdit(row)}>
-              <EditIcon />
-            </IconButton>
-            <IconButton onClick={() => deleteOneArrival(row._id)}>
-              <ClearIcon />
-            </IconButton>
-          </>
-        )
-      },
+      renderCell: ({ row }) => (
+        <>
+          <IconButton onClick={() => onEdit(row)}>
+            <EditIcon />
+          </IconButton>
+          <IconButton onClick={() => handleDeleteClick(row._id)}>
+            <ClearIcon />
+          </IconButton>
+        </>
+      ),
     },
   ]
 
@@ -160,6 +127,14 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       ) : (
         <Typography className="text-center mt-5">Поставки не найдены.</Typography>
       )}
+
+      <ConfirmationModal
+        open={deleteModalOpen}
+        entityName="эту поставку"
+        actionType="delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleClose}
+      />
 
       <Box className="my-8">
         <Modal handleClose={handleClose} open={isOpen}>

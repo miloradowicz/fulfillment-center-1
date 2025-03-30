@@ -38,6 +38,8 @@ export class ServiceCategoriesService {
 
     if (!serviceCategory) throw new NotFoundException('Категория услуг в архиве не найдена')
 
+    if (!serviceCategory.isArchived) throw new ForbiddenException('Эта категория услуги не в архиве')
+
     return serviceCategory
   }
 
