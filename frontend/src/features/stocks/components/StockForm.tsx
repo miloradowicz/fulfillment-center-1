@@ -12,7 +12,7 @@ interface Props {
 }
 
 const StockForm: React.FC<Props> = ({ initialData, onSuccess }) => {
-  const { isLoading, form, setForm, errors, handleBlur, error, submitFormHandler } = useStockForm(
+  const {  isLoading, form, setForm, errors, handleBlur, error, submitFormHandler } = useStockForm(
     initialData,
     onSuccess,
   )
