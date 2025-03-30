@@ -79,7 +79,7 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     }
 
     if (isValidationError(createServiceCategoryError)) {
-      setErrors(() => (reassemble(createServiceCategoryError)))
+      setErrors(() => ( { serviceCategory: createServiceCategoryError.errors.name.messages.join(', ') }))
     }
   }, [createServiceError, createServiceCategoryError])
 
@@ -96,13 +96,17 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     setErrors(prevErrors => ({ ...prevErrors, serviceCategory: '' }))
     if (typeof newValue === 'string') {
       try {
-        const { payload: category } = await dispatch(createServiceCategory({ name: newValue }))
+        const category = await dispatch(createServiceCategory({ name: newValue })).unwrap()
         await dispatch(fetchServiceCategories())
         setForm(prevState => ({
           ...prevState,
           serviceCategory: category as ServiceCategory,
         }))
       } catch (e) {
+        setForm(prevState => ({
+          ...prevState,
+          serviceCategory: null,
+        }))
         console.error(e)
       }
     } else {

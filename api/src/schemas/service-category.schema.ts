@@ -6,7 +6,18 @@ export type ServiceCategoryDocument = ServiceCategory & Document
 
 @Schema()
 export class ServiceCategory {
-  @Prop({ type: String, required: true, unique: true }) name: string
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: async function (this: HydratedDocument<ServiceCategory>, value: string) {
+        return !this.isModified('name') || !(await this.model().findOne({ name: value }))
+      },
+      message: 'Название категории услуг должно быть уникальным',
+    },
+  })
+  name: string
 
   @Prop({ type: Boolean, default: false }) isArchived: boolean
 }
