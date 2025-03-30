@@ -44,6 +44,7 @@ export const selectLoadingArchiveService = (state: RootState) => state.services.
 export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete
 export const selectLoadingUpdateService = (state: RootState) => state.services.loadingUpdate
 export const selectServiceError = (state: RootState) => state.services.error
+export const selectServiceCreationAndModificationError = (state: RootState) => state.services.creationAndModificationError
 
 const serviceSlice = createSlice({
   name: 'services',
@@ -83,7 +84,7 @@ const serviceSlice = createSlice({
       state.loadingAdd = false
     })
     builder.addCase(createService.rejected, (state, { payload: returnedError, error: thrownError }) => {
-      state.loadingUpdate = false
+      state.loadingAdd = false
       state.creationAndModificationError =
         returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })

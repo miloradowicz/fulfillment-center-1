@@ -68,6 +68,14 @@ export class ServicesService {
     return service.populate('serviceCategory')
   }
 
+  async isLocked(id: string) {
+    const service = await this.serviceModel.findById(id)
+
+    if (!service) throw new NotFoundException('Товар не найден')
+
+    return true
+  }
+
   async archive(id: string) {
     const service = await this.serviceModel.findById(id)
 

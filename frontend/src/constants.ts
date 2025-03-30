@@ -2,6 +2,7 @@ import { Options } from 'check-password-strength'
 
 export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/
 export const phoneNumberRegex = /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/
+export const positiveDecimalNumber = /^(0|[1-9]\d*)(\.\d+)?$/
 
 export const roles = [
   { name: 'super-admin', title: 'Супер-пользователь' },

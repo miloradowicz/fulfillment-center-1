@@ -23,7 +23,7 @@ export const fetchServiceCategoryById = createAsyncThunk<ServiceCategory, string
   'serviceCategories/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.get(`/servicecategories/${id}`)
+      const response = await axiosAPI.get(`/servicecategories/${ id }`)
       return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -58,7 +58,7 @@ export const updateServiceCategory = createAsyncThunk<
   { rejectValue: ValidationError | GlobalError }
 >('serviceCategories/update', async ({ id, data }, { rejectWithValue }) => {
   try {
-    const response = await axiosAPI.put(`/servicecategories/${id}`, data)
+    const response = await axiosAPI.put(`/servicecategories/${ id }`, data)
     return response.data
   } catch (error) {
     if (isAxiosError(error) && error.response && error.status === 400) {
@@ -74,7 +74,7 @@ export const archiveServiceCategory = createAsyncThunk<{ id: string }, string, {
   'serviceCategories/archive',
   async (id, { rejectWithValue }) => {
     try {
-      await axiosAPI.patch(`/servicecategories/${id}/archive`)
+      await axiosAPI.patch(`/servicecategories/${ id }/archive`)
       return { id }
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -89,7 +89,7 @@ export const deleteServiceCategory = createAsyncThunk<{ message: string }, strin
   'serviceCategories/delete',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.delete(`/servicecategories/${id}`)
+      const response = await axiosAPI.delete(`/servicecategories/${ id }`)
       return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response) {

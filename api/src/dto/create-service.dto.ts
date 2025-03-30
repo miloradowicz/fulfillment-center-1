@@ -1,6 +1,5 @@
 import {
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
@@ -18,17 +17,6 @@ class LogDto {
 
   @IsNotEmpty({ message: 'Заполните дату изменения.' })
   date: Date
-}
-
-class DynamicFieldDto {
-  @IsNotEmpty({ message: 'Поле ключ обязательно для заполнения' })
-  key: string
-
-  @IsNotEmpty({ message: 'Поле лейбл обязательно для заполнения' })
-  label: string
-
-  @IsNotEmpty({ message: 'Поле значение обязательно для заполнения' })
-  value: string
 }
 
 export class CreateServiceDto {

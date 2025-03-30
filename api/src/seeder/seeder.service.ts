@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Model } from 'mongoose'
-import { InjectModel } from '@nestjs/mongoose'
+import { Connection, Model } from 'mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { User, UserDocument } from 'src/schemas/user.schema'
@@ -17,6 +17,8 @@ import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-cat
 @Injectable()
 export class SeederService {
   constructor(
+    @InjectConnection()
+    private readonly connection: Connection,
     @InjectModel(Client.name)
     private readonly clientModel: Model<ClientDocument>,
     @InjectModel(Product.name)
@@ -42,17 +44,7 @@ export class SeederService {
   ) { }
 
   async seed() {
-    await this.userModel.deleteMany()
-    await this.clientModel.deleteMany({})
-    await this.productModel.deleteMany({})
-    await this.taskModel.deleteMany({})
-    await this.orderModel.deleteMany({})
-    await this.arrivalModel.deleteMany({})
-    await this.serviceModel.deleteMany({})
-    await this.stockModel.deleteMany({})
-    await this.counterModel.deleteMany({})
-    await this.counterpartyModel.deleteMany({})
-    await this.serviceCategoryModel.deleteMany({})
+    await this.connection.dropDatabase()
 
     const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
