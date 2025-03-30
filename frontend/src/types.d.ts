@@ -111,7 +111,7 @@ export interface Arrival {
   shipping_agent?: string | null
   pickup_location?: string
   defects?: Defect[]
-  arrival_status: string
+  arrival_status?: string
   received_amount?: ProductArrival[]
   logs?: Log[]
   arrivalNumber?: string
@@ -122,7 +122,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
-  received_amount: ProductArrivalWithPopulate[]
+  received_amount?: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
   stock: Stock
   shipping_agent?: Counterparty
@@ -146,7 +146,7 @@ export interface Order {
   sent_at: string
   delivered_at?: string
   comment?: string
-  status: string
+  status?: string
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
@@ -251,6 +251,15 @@ export interface TaskWithPopulate {
   description: string
   status: string
   logs?: Log[]
+  type: string
+  associated_order?: {
+    _id: string | null,
+    orderNumber: string
+  }
+  associated_arrival?: {
+    _id: string | null,
+    arrivalNumber: string
+  }
   createdAt: Date,
   updatedAt: Date,
 }
