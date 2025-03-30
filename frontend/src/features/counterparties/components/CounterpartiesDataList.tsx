@@ -6,20 +6,12 @@ import { Counterparty } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import { useCounterpartiesList } from '../hooks/useCounterpartiesList.ts'
+import { useState } from 'react'
 import CounterpartyForm from './CounterpartyForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
-import { useState } from 'react'
 
 const CounterpartiesDataList = () => {
-  const {
-    counterparties,
-    isLoading,
-    confirmationModalOpen,
-    handleOpenConfirmationModal,
-    handleCloseConfirmationModal,
-    confirmDelete,
-  } = useCounterpartiesList()
+  const { counterparties, deleteOneCounterparty, isLoading } = useCounterpartiesList()
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [selectedCounterparty, setSelectedCounterparty] = useState<Counterparty | null>(null)
@@ -83,7 +75,7 @@ const CounterpartiesDataList = () => {
           <IconButton onClick={() => handleOpenEditModal(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleOpenConfirmationModal(row)}>
+          <IconButton onClick={() => deleteOneCounterparty(row._id)}>
             <ClearIcon />
           </IconButton>
           <NavLink
@@ -127,14 +119,6 @@ const CounterpartiesDataList = () => {
       <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
         {selectedCounterparty && <CounterpartyForm counterparty={selectedCounterparty} onClose={handleCloseEditModal} />}
       </Modal>
-
-      <ConfirmationModal
-        open={confirmationModalOpen}
-        entityName="этого контрагента"
-        actionType="delete"
-        onConfirm={confirmDelete}
-        onCancel={handleCloseConfirmationModal}
-      />
     </Box>
   )
 }

@@ -1,5 +1,5 @@
 import { OrderWithClient } from '../../../types'
-import React, { useState } from 'react'
+import React from 'react'
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
@@ -8,7 +8,6 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 import StatusOrderCell from './StatusOrderCell.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 interface Props {
   orders: OrderWithClient[] | []
@@ -19,8 +18,6 @@ interface Props {
 const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
-  const [openModal, setOpenModal] = useState(false)
-  const [orderToDelete, setOrderToDelete] = useState<OrderWithClient | null>(null)
 
   const columns: GridColDef<OrderWithClient>[] = [
     {
@@ -36,20 +33,20 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
         <NavLink
           to={`/orders/${ row._id }`}
           className="
-            py-2 px-3
-            bg-blue-50
-            text-blue-700
-            rounded-md
-            text-sm
-            font-medium
-            hover:bg-blue-100
-            transition-colors
-            duration-150
-            border
-            border-blue-200
-            hover:border-blue-300
-            whitespace-nowrap
-          "
+        py-2 px-3
+        bg-blue-50
+        text-blue-700
+        rounded-md
+        text-sm
+        font-medium
+        hover:bg-blue-100
+        transition-colors
+        duration-150
+        border
+        border-blue-200
+        hover:border-blue-300
+        whitespace-nowrap
+      "
           style={{
             lineHeight: '1.25rem',
             maxWidth: '120px',
@@ -127,31 +124,20 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       headerAlign: 'left',
       renderCell: ({ row }) => (
         <>
-          <IconButton onClick={() => onEdit(row)}>
+          <IconButton
+            onClick={() => {
+              onEdit(row)
+            }}
+          >
             <EditIcon fontSize="inherit" />
           </IconButton>
-          <IconButton onClick={() => {
-            setOrderToDelete(row)
-            setOpenModal(true)
-          }}>
+          <IconButton onClick={() => handleDelete(row._id)}>
             <ClearIcon fontSize="inherit" />
           </IconButton>
         </>
       ),
     },
   ]
-
-  const handleModalConfirm = () => {
-    if (orderToDelete) {
-      handleDelete(orderToDelete._id)
-    }
-    setOpenModal(false)
-  }
-
-  const handleModalCancel = () => {
-    setOpenModal(false)
-    setOrderToDelete(null)
-  }
 
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
@@ -175,14 +161,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       ) : (
         <Typography className="text-center mt-5">Заказы не найдены.</Typography>
       )}
-
-      <ConfirmationModal
-        open={openModal}
-        entityName="этот заказ"
-        actionType="delete"
-        onConfirm={handleModalConfirm}
-        onCancel={handleModalCancel}
-      />
     </Box>
   )
 }
