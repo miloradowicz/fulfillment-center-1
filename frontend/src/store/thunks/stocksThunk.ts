@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { GlobalError, Stock, StockMutation, ValidationError } from '../../types'
+import { GlobalError, Stock, StockMutation, StockPopulate, ValidationError } from '../../types'
 import axiosAPI from '../../utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
@@ -8,8 +8,8 @@ export const fetchStocks = createAsyncThunk<Stock[], void>('stocks/fetchStocks',
   return response.data
 })
 
-export const fetchStockById = createAsyncThunk<Stock, string>('stocks/fetchStockById', async stockId => {
-  const response = await axiosAPI.get<Stock>(`/stocks/${ stockId }`)
+export const fetchStockById = createAsyncThunk<StockPopulate, string>('stocks/fetchStockById', async stockId => {
+  const response = await axiosAPI.get<StockPopulate>(`/stocks/${ stockId }`)
   return response.data
 })
 
