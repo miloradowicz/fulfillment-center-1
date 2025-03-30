@@ -33,6 +33,8 @@ const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
 
       const updatedData = {
         ...task,
+        associated_arrival: task.associated_arrival ? task.associated_arrival._id : null,
+        associated_order: task.associated_order ? task.associated_order._id : null,
         user:task.user._id,
         status: newStatus,
       }

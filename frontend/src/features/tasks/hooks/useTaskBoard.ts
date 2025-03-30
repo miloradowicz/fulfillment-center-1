@@ -20,6 +20,7 @@ export const useTaskBoard = () => {
   const users = useAppSelector(selectAllUsers)
   const selectFetchUser = useAppSelector(selectLoadingFetchUser)
   const loading = useAppSelector(selectLoadingFetchTask)
+  const [open, setOpen] = useState(false)
 
   const fetchAllTasks = useCallback(async () => {
     setTodoItems([])
@@ -32,6 +33,12 @@ export const useTaskBoard = () => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
 
+  const handleOpen = () => setOpen(true)
+
+  const handleClose = () => {
+    setOpen(false)
+    void fetchAllTasks()
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -130,5 +137,7 @@ export const useTaskBoard = () => {
     setSelectedUser,
     sensors,
     selectFetchUser,
+    handleOpen,
+    handleClose,
   }
 }

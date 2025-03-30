@@ -1,10 +1,9 @@
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient, StatusColor } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import React, { useState } from 'react'
 import { fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderThunk.ts'
 import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { getOrderStatusColor } from '../utils/getOrderStatusColor.ts'
 
 export interface Props  {
   row: OrderWithClient,
@@ -13,6 +12,11 @@ export interface Props  {
 const StatusOrderCell:React.FC<Props> =({ row })  => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const statusColors: Record<string,StatusColor> = {
+    'в сборке': 'warning',
+    'доставлен': 'success',
+    'в пути': 'info',
+  }
 
   const statusOptions = ['в сборке', 'в пути', 'доставлен']
   const open = Boolean(anchorEl)
@@ -33,12 +37,13 @@ const StatusOrderCell:React.FC<Props> =({ row })  => {
       dispatch(fetchOrdersWithClient())
     }
   }
+  const status = row.status ?? 'в сборке'
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100%" width="100%">
       <Chip
-        label={row.status}
-        color={getOrderStatusColor(row.status)}
+        label={status}
+        color={statusColors[status] ?? 'default'}
         onClick={handleClick}
         icon={<ArrowDropDownIcon style={{ marginRight: '5px' }} />}
         sx={{

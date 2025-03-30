@@ -9,9 +9,10 @@ import { useClientsList } from '../hooks/useClientsList.ts'
 import { useState } from 'react'
 import ClientForm from './ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ClientsDataList = () => {
-  const { clients, deleteOneClient, isLoading } = useClientsList()
+  const { clients, isLoading, deleteModalOpen, handleDeleteClick, handleConfirmDelete, setDeleteModalOpen } = useClientsList()
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
@@ -97,7 +98,7 @@ const ClientsDataList = () => {
           <IconButton onClick={() => handleOpenEditModal(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => deleteOneClient(row._id)}>
+          <IconButton onClick={() => handleDeleteClick(row._id)}>
             <ClearIcon />
           </IconButton>
           <NavLink
@@ -138,6 +139,15 @@ const ClientsDataList = () => {
       ) : (
         <Typography className="text-center mt-5">Клиентов нет</Typography>
       )}
+
+      <ConfirmationModal
+        open={deleteModalOpen}
+        entityName="этого клиента"
+        actionType="delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteModalOpen(false)}
+      />
+
       <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
         {selectedClient && <ClientForm client={selectedClient} onClose={handleCloseEditModal} />}
       </Modal>
