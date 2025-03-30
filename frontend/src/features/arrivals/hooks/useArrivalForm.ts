@@ -203,11 +203,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     try {
       const updatedForm = {
         ...form,
-        ...form,
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
         file: file || undefined,
+        shipping_agent: form.shipping_agent || null,
       }
 
       if (initialData) {
@@ -220,12 +220,21 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         toast.success('Поставка успешно создана!')
         await dispatch(fetchPopulatedArrivals())
       }
+
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
+
+      if (error instanceof Error) {
+        return error.message
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        toast.error((error as { message: string }).message)
+      } else if (typeof error === 'string') {
+        toast.error(error)
+      }
     }
   }
 
