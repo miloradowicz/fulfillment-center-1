@@ -24,15 +24,15 @@ export const useArrivalsList = () => {
     setDeleteModalOpen(false)
   }
 
-  const handleDeleteClick = (arrivalId: string) => {
-    setSelectedArrivalId(arrivalId)
+  const handleDeleteClick = (id: string) => {
+    setSelectedArrivalId(id)
     setDeleteModalOpen(true)
   }
 
   const handleConfirmDelete = async () => {
     try {
       if (selectedArrivalId) {
-        await dispatch(deleteArrival(selectedArrivalId))
+        await dispatch(deleteArrival(selectedArrivalId)).unwrap()
         await fetchAllArrivals()
         toast.success('Поставка успешно удалена.')
       }
@@ -46,10 +46,12 @@ export const useArrivalsList = () => {
 
   return {
     arrivals,
-    handleDeleteClick,
-    handleConfirmDelete,
+    deleteOneArrival: handleConfirmDelete,
     isOpen,
     deleteModalOpen,
     handleClose,
+    handleDeleteClick,
+    handleConfirmDelete,
+    fetchAllArrivals,
   }
 }

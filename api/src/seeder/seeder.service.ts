@@ -289,7 +289,7 @@ export class SeederService {
     await this.taskModel.create([
       {
         user: _User1._id,
-        title: 'Принять товар из поставки',
+        title: 'Принять товар из поставки №2248239487',
         description: 'Проверить товар на дефекты и внести информацию в базу',
         status: 'к выполнению',
         type: 'поставка',
@@ -297,14 +297,14 @@ export class SeederService {
       },
       {
         user: _User2._id,
-        title: 'Собрать заказ',
+        title: 'Собрать заказ №12423424',
         status: 'в работе',
         type: 'заказ',
         associated_order: _order2._id,
       },
       {
         user: _User1._id,
-        title: 'Упаковка товара для заказа',
+        title: 'Упаковка товара для заказа №12423424',
         status: 'готово',
         type: 'другое',
       },
@@ -316,23 +316,19 @@ export class SeederService {
       },
       {
         user: _User1._id,
-        title: 'Связаться с клиентом по заказу',
+        title: 'Связаться с клиентом по заказу №556677',
         status: 'готово',
-        type: 'заказ',
-        associated_order: _order2._id,
+        type: 'другое',
       },
       {
         user: _User5._id,
         title: 'Связаться с клиентом ',
         status: 'готово',
-        type: 'другое',
       },
       {
         user: _User6._id,
-        title: 'Узнать информацию у клиента по прибытию поставки ',
+        title: 'Связаться с клиентом ',
         status: 'к выполнению',
-        type: 'поставка',
-        associated_arrival: _arrival2._id,
       },
     ])
 

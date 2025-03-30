@@ -4,8 +4,9 @@ import Grid from '@mui/material/Grid2'
 import { Box, CircularProgress } from '@mui/material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '../../../components/CustomButton/CustomButton.tsx'
+import CustomTitle from '../../../components/CustomTitle/CustomTitle.tsx'
+
 
 const StockPage = () => {
   const { open, handleOpen, isLoading, handleClose, stocks } = useStockPage()
@@ -23,8 +24,8 @@ const StockPage = () => {
       </Modal>
 
       <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Склады'}/>
-        <CustomButton text={'Добавить склад'} onClick={handleOpen}/>
+        <CustomTitle text={'Склады'} />
+        <CustomButton text={'Добавить склад'} onClick={handleOpen} />
       </Box>
 
       <div className="max-w-[1040px] mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-10">

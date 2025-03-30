@@ -3,7 +3,6 @@ import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ProductDetails = () => {
   const {
@@ -17,26 +16,19 @@ const ProductDetails = () => {
     handleClose,
     handleOpen,
     fetchProduct,
-    confirmationOpen,
-    handleConfirmationOpen,
-    handleConfirmationClose,
-    productToDeleteId,
   } = useProductActions(false)
 
   return (
     <>
       <Modal handleClose={handleClose} open={open}>
-        <ProductForm initialData={product || undefined} onSuccess={() => id && fetchProduct(id)} />
+        <ProductForm
+          initialData={product || undefined}
+          onSuccess={() => {
+            if (id) fetchProduct(id)
+            handleClose()
+          }}
+        />
       </Modal>
-
-      <ConfirmationModal
-        open={confirmationOpen}
-        entityName="этот товар"
-        actionType="delete"
-        onConfirm={() => productToDeleteId && deleteOneProduct(productToDeleteId)}
-        onCancel={handleConfirmationClose}
-      />
-
       <Box className="max-w-2xl mx-auto p-4 sm:p-8">
         <Box
           sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
@@ -129,7 +121,7 @@ const ProductDetails = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                 }}
-                onClick={() => handleConfirmationOpen(product._id)}
+                onClick={() => deleteOneProduct(product._id)}
               >
                 Удалить
               </Button>
@@ -139,6 +131,7 @@ const ProductDetails = () => {
       </Box>
     </>
   )
+
 }
 
 export default ProductDetails

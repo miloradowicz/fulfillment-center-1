@@ -1,10 +1,9 @@
-import { Box, Button, CircularProgress, IconButton, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, IconButton, Stack, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
 import Grid from '@mui/material/Grid2'
 import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
 
@@ -39,13 +38,26 @@ const StockDetails = () => {
         />
       </Modal>
 
-      <ConfirmationModal
-        open={deleteModalOpen}
-        entityName="этот склад"
-        actionType="delete"
-        onConfirm={handleDelete}
-        onCancel={hideDeleteModal}
-      />
+      <Modal open={deleteModalOpen} handleClose={hideDeleteModal}>
+        <Grid container direction="column">
+          <Grid mb={4}>
+            <Typography variant="h6" gutterBottom>
+              Вы действительно хотите удалить склад?
+            </Typography>
+          </Grid>
+
+          <Grid>
+            <Stack direction="row" justifyContent="flex-end" spacing={2}>
+              <Button variant="contained" color="error" onClick={handleDelete}>
+                Удалить
+              </Button>
+              <Button variant="outlined" onClick={hideDeleteModal}>
+                Отмена
+              </Button>
+            </Stack>
+          </Grid>
+        </Grid>
+      </Modal>
 
       <div className="flex items-center gap-3">
         <IconButton onClick={() => navigateBack()}>

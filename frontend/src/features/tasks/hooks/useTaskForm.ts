@@ -17,7 +17,7 @@ const userSelectionError = 'Выберите пользователя'
 const titleMissingError =  'Введите название задачи'
 const taskTypeMissingError =  'Укажите тип задачи'
 
-const UseTaskForm = (onSuccess?: () => void) => {
+const UseTaskForm = () => {
   const dispatch = useAppDispatch()
   const [form, setForm] = useState<TaskMutation>(initialState)
   const [errors, setErrors] = useState<Record<string, string>>(initialErrorState)
@@ -45,7 +45,6 @@ const UseTaskForm = (onSuccess?: () => void) => {
 
     try {
       await dispatch(addTask(form))
-      onSuccess?.()
       setForm(initialState)
       setErrors(initialErrorState)
       toast.success('Задача успешно создна')

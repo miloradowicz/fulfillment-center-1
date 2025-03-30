@@ -102,16 +102,15 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
 
       if (initialData) {
         await dispatch(updateProduct({ productId: initialData._id, data: updatedForm })).unwrap()
-        onSuccess?.()
         toast.success('Товар успешно обновлен.')
       } else {
         await dispatch(addProduct(updatedForm)).unwrap()
-        onSuccess?.()
         toast.success('Товар успешно создан.')
         setForm(initialState)
         setDynamicFields([])
         setSelectedClient('')
       }
+      if (onSuccess) onSuccess()
       setErrors({})
     } catch (e) {
       console.error(e)
