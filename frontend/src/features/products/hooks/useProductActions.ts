@@ -14,6 +14,7 @@ import {
 } from '../../../store/slices/productSlice.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductWithPopulate } from '../../../types'
+import { isGlobalError } from '../../../utils/helpers.ts'
 
 
 const UseProductActions = ( fetchOnDelete: boolean ) => {
@@ -63,7 +64,7 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
 
   const deleteOneProduct = async (id: string) => {
     try {
-      await dispatch(deleteProduct(id))
+      await dispatch(deleteProduct(id)).unwrap()
       if (fetchOnDelete) {
         fetchAllProducts()
       } else {
@@ -71,6 +72,11 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
       }
       toast.success('Товар успешно удалён!')
     } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось удалить товар')
+      }
       console.error(e)
     }
   }
