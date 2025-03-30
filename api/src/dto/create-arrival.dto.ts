@@ -35,9 +35,9 @@ class LogDto {
   date: Date
 }
 
-class DefectDto {
+export class DefectDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: string
+  product: mongoose.Schema.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните описание дефекта.' })
   defect_description: string
@@ -47,7 +47,7 @@ class DefectDto {
   amount: number
 }
 
-class ReceivedProductDto {
+export class ReceivedProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
   product: mongoose.Schema.Types.ObjectId
 
