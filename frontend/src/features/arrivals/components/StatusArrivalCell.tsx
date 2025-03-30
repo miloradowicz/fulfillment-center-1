@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { Box, Chip, Menu, MenuItem, Tooltip } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
+import { toast } from 'react-toastify'
+
 
 export interface Props  {
   row: ArrivalWithClient,
@@ -19,10 +21,11 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
     'отсортирована': 'info',
   }
 
+  const statusOptions = ['ожидается доставка', 'получена', 'отсортирована']
+
   const status = row.arrival_status || 'ожидается доставка'
   const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
-  const statusOptions = ['ожидается доставка', 'получена', 'отсортирована']
   const open = Boolean(anchorEl)
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -30,17 +33,29 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
   }
 
   const handleClose = async (newStatus?: string) => {
-    setAnchorEl(null)
-    if (newStatus && newStatus !== row.arrival_status) {
-      const updatedData = {
-        ...row,
-        client: row.client._id,
-        stock: row.stock._id,
-        arrival_status: newStatus,
-        shipping_agent: row.shipping_agent?._id,
+    try {
+      setAnchorEl(null)
+      if (newStatus && newStatus !== row.arrival_status) {
+        const updatedData = {
+          ...row,
+          client: row.client._id,
+          stock: row.stock._id,
+          arrival_status: newStatus,
+          shipping_agent: row.shipping_agent?._id,
+        }
+        await dispatch(updateArrival({ arrivalId: row._id, data: updatedData })).unwrap()
+        await dispatch(fetchPopulatedArrivals())
       }
-      await dispatch(updateArrival({ arrivalId: row._id, data: updatedData })).unwrap()
-      await dispatch(fetchPopulatedArrivals())
+    } catch (error) {
+      console.error(error)
+
+      if (error instanceof Error) {
+        return error.message
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        toast.error((error as { message: string }).message)
+      } else if (typeof error === 'string') {
+        toast.error(error)
+      }
     }
   }
 

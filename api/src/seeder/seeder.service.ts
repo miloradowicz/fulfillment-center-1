@@ -127,7 +127,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Сарафан',
-        amount: 7,
         barcode: '012345678901',
         article: '01234567',
         dynamic_fields: [
@@ -138,7 +137,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Джинсы',
-        amount: 10,
         barcode: '987654321012',
         article: '987654',
         dynamic_fields: [
@@ -149,7 +147,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Футболка',
-        amount: 15,
         barcode: '567890123456',
         article: '567890',
         dynamic_fields: [
@@ -214,12 +211,12 @@ export class SeederService {
       {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, description: '', amount: 20 }],
+        products: [{ product: _product1._id, amount: 20 }],
       },
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
-        products: [{ product: _product2._id, description: '', amount: 20 }],
+        products: [{ product: _product2._id, amount: 20 }],
       },
     ])
 

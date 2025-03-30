@@ -21,7 +21,6 @@ export class Stock {
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        description: { type: String },
         amount: { type: Number, required: true },
       },
     ],
@@ -29,7 +28,6 @@ export class Stock {
   })
   products: {
     product: mongoose.Schema.Types.ObjectId
-    description: string
     amount: number
   }[]
 
