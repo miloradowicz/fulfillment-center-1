@@ -1,13 +1,13 @@
 import React from 'react'
 import { Typography } from '@mui/material'
-import { StockPopulate } from '../../../types'
+import { Stock } from '../../../types'
 import { NavLink } from 'react-router-dom'
 import { useStockCard } from '../hooks/useStockCard.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import StockForm from './StockForm.tsx'
 
 interface Props {
-  stock: StockPopulate
+  stock: Stock
 }
 
 const StockCard: React.FC<Props> = ({ stock }) => {
