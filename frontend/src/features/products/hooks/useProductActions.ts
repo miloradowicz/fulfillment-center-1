@@ -28,14 +28,13 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
   const error = useAppSelector(selectProductError)
 
   const handleOpen = (product?: ProductWithPopulate) => {
-    if (product) {
-      setSelectedProduct(product)
-    }
     setOpen(true)
+    if (product) setSelectedProduct(product)
   }
 
   const handleClose = () => {
     setOpen(false)
+    setSelectedProduct(null)
     dispatch(clearErrorProduct())
   }
 
