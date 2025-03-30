@@ -55,6 +55,7 @@ export const useStockForm = (initialData?: Stock, onSuccess?: () => void) => {
     try {
       if (initialData) {
         await dispatch(updateStock({ stockId: initialData._id, stock: form })).unwrap()
+        onSuccess?.()
         toast.success('Склад успешно обновлен!')
         await dispatch(fetchStockById(initialData._id))
       } else {
@@ -63,7 +64,6 @@ export const useStockForm = (initialData?: Stock, onSuccess?: () => void) => {
         toast.success('Склад успешно создан!')
       }
       setForm({ ...initialState })
-      if (onSuccess) onSuccess()
     } catch (e) {
       console.error(e)
     }

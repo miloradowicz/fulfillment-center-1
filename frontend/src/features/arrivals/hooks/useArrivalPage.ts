@@ -1,18 +1,14 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppSelector } from '../../../app/hooks.ts'
+import { useState } from 'react'
 import { clearErrorArrival, selectLoadingFetchArrival } from '../../../store/slices/arrivalSlice.ts'
-import { useState, useCallback } from 'react'
 import { ArrivalWithClient } from '../../../types'
-import { fetchPopulatedArrivals } from '../../../store/thunks/arrivalThunk.ts'
+import { useDispatch } from 'react-redux'
 
 export const useArrivalPage = () => {
-  const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const isLoading = useAppSelector(selectLoadingFetchArrival)
   const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined>(undefined)
-
-  const fetchAllArrivals = useCallback(async () => {
-    await dispatch(fetchPopulatedArrivals())
-  }, [dispatch])
+  const dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true)
 
@@ -34,6 +30,5 @@ export const useArrivalPage = () => {
     handleClose,
     arrivalToEdit,
     handleOpenEdit,
-    fetchAllArrivals,
   }
 }
