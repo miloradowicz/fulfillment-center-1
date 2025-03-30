@@ -25,7 +25,7 @@ export default function ReportTabs() {
     dispatch(fetchTasksWithPopulate())
   }, [dispatch])
 
-  const tabNames = ['tasks', 'clients', 'orders', 'deliveries', 'warehouses']
+  const tabNames = React.useMemo(() => ['tasks', 'clients', 'orders', 'deliveries', 'warehouses'], [])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()
@@ -49,16 +49,16 @@ export default function ReportTabs() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box style={{ textAlign: 'center', margin: '30px' }}>
+      <Box style={{ textAlign: 'center', margin: '10px 0 15px' }}>
         <CustomTitle text={'Отчеты'} />
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
-          <Tab label="Задачи" {...TabProps(0)} />
-          <Tab label="Клиенты" {...TabProps(1)} />
-          <Tab label="Заказы" {...TabProps(2)} />
-          <Tab label="Поставки" {...TabProps(3)} />
-          <Tab label="Склады" {...TabProps(4)} />
+          <Tab label="Задачи" sx={{ fontSize:'1.2rem' }}{...TabProps(0)} />
+          <Tab label="Клиенты" sx={{ fontSize:'1.2rem' }} {...TabProps(1)} />
+          <Tab label="Заказы" sx={{ fontSize:'1.2rem' }} {...TabProps(2)} />
+          <Tab label="Поставки" sx={{ fontSize:'1.2rem' }}  {...TabProps(3)} />
+          <Tab label="Склады" sx={{ fontSize:'1.2rem' }} {...TabProps(4)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
