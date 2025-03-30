@@ -211,12 +211,12 @@ export class SeederService {
       {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, description: '', amount: 20 }],
+        products: [{ product: _product1._id, amount: 20 }],
       },
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
-        products: [{ product: _product2._id, description: '', amount: 20 }],
+        products: [{ product: _product2._id, amount: 20 }],
       },
     ])
 
