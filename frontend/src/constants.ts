@@ -34,3 +34,7 @@ export const passwordStrengthOptions: Options<string> = [
     minLength: 8,
   },
 ]
+
+export const OrderStatus = ['в сборке', 'в пути', 'доставлен']
+
+export const ArrivalStatus = ['ожидается доставка', 'получена', 'отсортирована']

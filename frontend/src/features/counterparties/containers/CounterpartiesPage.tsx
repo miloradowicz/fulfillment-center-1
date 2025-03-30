@@ -1,13 +1,14 @@
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import { Box, CircularProgress } from '@mui/material'
+import { Box, Button, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useCounterpartyPage } from '../hooks/useCounterpartyPage.ts'
 import CounterpartiesDataList from '../components/CounterpartiesDataList.tsx'
 import CounterpartyForm from '../components/CounterpartyForm.tsx'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
 
 const CounterpartiesPage = () => {
   const { open, handleOpen, handleClose, isLoading } = useCounterpartyPage()
+
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <>
@@ -21,8 +22,28 @@ const CounterpartiesPage = () => {
         <CounterpartyForm onClose={handleClose} />
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Контрагенты'}/>
-        <CustomButton text={'Добавить контрагента'} onClick={handleOpen}/>
+        <Typography variant={isSmallScreen ? 'h6' : 'h5'} className="flex-grow">
+          Контрагенты
+        </Typography>
+        <Button
+          sx={{
+            color: '#32363F',
+            marginLeft: 'auto',
+            border: '1px solid #32363F',
+            transition: 'all 0.3s ease-in-out',
+            padding: isSmallScreen ? '1px 3px' : '3px 6px',
+            fontSize: isSmallScreen ? '10px' : '12px',
+            '&:hover': {
+              color: '#ffffff',
+              backgroundColor: '#32363F',
+              border: '1px solid #ffffff',
+            },
+          }}
+          variant="outlined"
+          onClick={handleOpen}
+        >
+          Добавить контрагента
+        </Button>
       </Box>
       <Box className="my-8">
         <CounterpartiesDataList />

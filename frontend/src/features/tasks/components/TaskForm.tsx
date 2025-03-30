@@ -9,14 +9,9 @@ import { getFieldError } from '../../../utils/getFieldError.ts'
 import Grid from '@mui/material/Grid2'
 import { taskStatus, taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
-import React from 'react'
 
-interface Props {
-  onSuccess?: () => void
-}
-
-const TaskForm:React.FC<Props> = ({ onSuccess }) => {
-  const { users, form, orders, arrivals, error, errors, addLoading, handleInputChange, handleSubmit, handleBlur, setForm } = useTaskForm(onSuccess)
+const TaskForm = () => {
+  const { users, form, orders, arrivals, error, errors, addLoading, handleInputChange, handleSubmit, handleBlur, setForm } = useTaskForm()
 
   return (
     <form onSubmit={handleSubmit}>

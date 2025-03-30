@@ -2,13 +2,13 @@ import { Box, Button, Card, CircularProgress, Divider, IconButton, Typography } 
 import {
   ArrowBack, DeleteOutline, EditOutlined,
 } from '@mui/icons-material'
+import DescriptionIcon from '@mui/icons-material/Description'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ProductDetails = () => {
-  const { navigate, id, product, error, loading, deleteOneProduct, open, handleClose, handleOpen, fetchProduct, confirmationOpen, handleConfirmationOpen, handleConfirmationClose, productToDeleteId } = useProductActions(false)
+  const { navigate, id, product, error, loading, deleteOneProduct, open, handleClose, handleOpen, fetchProduct } = useProductActions(false)
 
   return (
     <>
@@ -18,15 +18,6 @@ const ProductDetails = () => {
           onSuccess={() => id && fetchProduct(id)}
         />
       </Modal>
-
-      <ConfirmationModal
-        open={confirmationOpen}
-        entityName="этот товар"
-        actionType="delete"
-        onConfirm={() => productToDeleteId && deleteOneProduct(productToDeleteId)}
-        onCancel={handleConfirmationClose}
-      />
-
       <Box className="max-w-2xl mx-auto p-4 sm:p-8">
         <Box
           sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
@@ -98,6 +89,28 @@ const ProductDetails = () => {
                   ))}
                 </Box>
               )}
+
+              {product.documents.length > 0 && (
+                <Box mt={2}>
+                  <Typography variant="h6" fontWeight={600}>
+                    Документы:
+                  </Typography>
+                  <Box display="flex" flexWrap="wrap" gap={2} mt={1}>
+                    {product.documents.map((doc, index) => (
+                      <IconButton
+                        key={index}
+                        component="a"
+                        href={doc.document}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ fontSize: '2rem' }}
+                      >
+                        <DescriptionIcon fontSize="inherit" color="primary" />
+                      </IconButton>
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Card>
 
             <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
@@ -122,7 +135,7 @@ const ProductDetails = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                 }}
-                onClick={() => handleConfirmationOpen(product._id)}
+                onClick={() => deleteOneProduct(product._id)}
               >
                 Удалить
               </Button>
@@ -132,6 +145,7 @@ const ProductDetails = () => {
       </Box>
     </>
   )
+
 }
 
 export default ProductDetails

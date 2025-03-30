@@ -13,10 +13,7 @@ export class TasksService {
     const unarchived = this.taskModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.find({ user: userId })
-        .populate('user', 'email displayName role')
-        .populate('associated_order', 'orderNumber')
-        .populate('associated_arrival', 'arrivalNumber')).reverse()
+      return (await unarchived.find({ user: userId }).populate('user', 'email displayName role')).reverse()
     }
 
     return (await unarchived.find({ user: userId })).reverse()
@@ -26,10 +23,7 @@ export class TasksService {
     const unarchived = this.taskModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.find()
-        .populate('user', 'email displayName role')
-        .populate('associated_order', 'orderNumber')
-        .populate('associated_arrival', 'arrivalNumber')).reverse()
+      return (await unarchived.find().populate('user', 'email displayName role')).reverse()
     }
 
     return (await unarchived.find()).reverse()

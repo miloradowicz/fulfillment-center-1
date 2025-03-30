@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { deleteClient, fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
@@ -11,9 +11,6 @@ export const useClientsList = () => {
   const isLoading = useAppSelector(selectLoadingFetchClient)
   const navigate = useNavigate()
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
-
   const fetchAllClients = useCallback(async () => {
     await dispatch(fetchClients())
   }, [dispatch])
@@ -22,41 +19,32 @@ export const useClientsList = () => {
     void fetchAllClients()
   }, [dispatch, fetchAllClients])
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedClientId(id)
-    setDeleteModalOpen(true)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (selectedClientId) {
-      try {
-        await dispatch(deleteClient(selectedClientId)).unwrap()
+  const deleteOneClient = async (id: string) => {
+    try {
+      if (confirm('Вы уверены, что хотите удалить этого клиента?')) {
+        await dispatch(deleteClient(id)).unwrap()
         navigate('/clients')
         void fetchAllClients()
         toast.success('Клиент успешно удалён!')
-      } catch (e) {
-        console.error(e)
-        let errorMessage = 'Не удалось удалить клиента'
-
-        if (e instanceof Error) {
-          errorMessage = e.message
-        } else if (typeof e === 'object' && e !== null && 'message' in e && typeof e.message === 'string') {
-          errorMessage = e.message
-        }
-        toast.error(errorMessage)
-      } finally {
-        setDeleteModalOpen(false)
-        setSelectedClientId(null)
+      } else {
+        toast.info('Вы отменили удаление клиента')
       }
+    } catch (e) {
+      console.error(e)
+      let errorMessage = 'Не удалось удалить клиента'
+
+      if (e instanceof Error) {
+        errorMessage = e.message
+      } else if (typeof e === 'object' && e !== null && 'message' in e && typeof e.message === 'string') {
+        errorMessage = e.message
+      }
+      toast.error(errorMessage)
     }
   }
 
   return {
     clients,
+    deleteOneClient,
     isLoading,
-    deleteModalOpen,
-    handleDeleteClick,
-    handleConfirmDelete,
-    setDeleteModalOpen,
   }
 }

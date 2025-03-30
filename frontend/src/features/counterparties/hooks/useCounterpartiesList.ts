@@ -1,19 +1,15 @@
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { deleteCounterparty, fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
 import { selectAllCounterparties, selectLoadingFetch } from '../../../store/slices/counterpartySlices.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-import { Counterparty } from '../../../types'
 
 export const useCounterpartiesList = () => {
   const dispatch = useAppDispatch()
   const counterparties = useAppSelector(selectAllCounterparties)
   const isLoading = useAppSelector(selectLoadingFetch)
   const navigate = useNavigate()
-
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [counterpartyToDelete, setCounterpartyToDelete] = useState<Counterparty | null>(null)
 
   const fetchAllCounterparties = useCallback(async () => {
     await dispatch(fetchCounterparties())
@@ -25,10 +21,14 @@ export const useCounterpartiesList = () => {
 
   const deleteOneCounterparty = async (id: string) => {
     try {
-      await dispatch(deleteCounterparty(id)).unwrap()
-      navigate('/counterparties')
-      void fetchAllCounterparties()
-      toast.success('Контрагент успешно удалён!')
+      if (confirm('Вы уверены, что хотите удалить этого контрагента?')) {
+        await dispatch(deleteCounterparty(id)).unwrap()
+        navigate('/counterparties')
+        void fetchAllCounterparties()
+        toast.success('Контрагент успешно удалён!')
+      } else {
+        toast.info('Вы отменили удаление контрагента')
+      }
     } catch (e) {
       console.error(e)
       let errorMessage = 'Не удалось удалить контрагента'
@@ -42,31 +42,9 @@ export const useCounterpartiesList = () => {
     }
   }
 
-  const handleOpenConfirmationModal = (counterparty: Counterparty) => {
-    setCounterpartyToDelete(counterparty)
-    setConfirmationModalOpen(true)
-  }
-
-  const handleCloseConfirmationModal = () => {
-    setConfirmationModalOpen(false)
-    setCounterpartyToDelete(null)
-  }
-
-  const confirmDelete = () => {
-    if (counterpartyToDelete) {
-      deleteOneCounterparty(counterpartyToDelete._id)
-      handleCloseConfirmationModal()
-    }
-  }
-
   return {
     counterparties,
     deleteOneCounterparty,
     isLoading,
-    confirmationModalOpen,
-    counterpartyToDelete,
-    handleOpenConfirmationModal,
-    handleCloseConfirmationModal,
-    confirmDelete,
   }
 }

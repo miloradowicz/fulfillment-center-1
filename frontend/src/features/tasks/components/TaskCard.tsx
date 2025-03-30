@@ -11,13 +11,10 @@ import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } f
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
-import { NavLink } from 'react-router-dom'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isSwipe, setIsSwipe] = useState(false)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
 
@@ -64,23 +61,24 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     handleMenuClose()
   }
 
-  const handleDelete = async () => {
+  const handleDelete = async (id: string, event: React.MouseEvent) => {
+    event.stopPropagation()
     try {
-      await dispatch(archiveTask(task._id))
-      if (!selectedUser) {
-        await dispatch(fetchTasksWithPopulate())
+      if (confirm('Вы уверены, что хотите переместить в архив эту задачу?')) {
+        await dispatch(archiveTask(id))
+        if (!selectedUser) {
+          await dispatch(fetchTasksWithPopulate())
+        } else {
+          await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+        }
+        toast.success('Задача перемещена в архив.')
       } else {
-        await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+        toast.info('Вы отменили перемещение задачи в архив.')
       }
-      toast.success('Задача перемещена в архив.')
     } catch (e) {
       console.error(e)
     }
-    setOpenDeleteModal(false)
-  }
-
-  const handleCancelDelete = () => {
-    setOpenDeleteModal(false)
+    handleMenuClose()
   }
 
   const style = {
@@ -127,35 +125,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         }}
       >
         <CardContent>
-          <Typography marginTop={'5px'} variant="body1">
+          <Typography marginTop={'10px'} variant="body1">
             Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
-          <Typography variant="body1">
-            Тип: {task.type}
-          </Typography>
-          <Typography variant="body1">{task.title} </Typography>
-          {task.associated_arrival && (
-            <NavLink to={`/arrivals/${ task.associated_arrival._id }`}  style={{
-              textDecoration: 'underline',
-              color: '#1A73E8',
-            }}>
-              {`Поставка № ${ task.associated_arrival.arrivalNumber }`}
-            </NavLink>
-          )}
-          {task.associated_order && (
-            <NavLink to={`/orders/${ task.associated_order._id }`} style={{
-              textDecoration: 'underline',
-              color: '#1A73E8',
-            }}>
-              {`Заказ № ${ task.associated_order.orderNumber }`}
-            </NavLink>
-          )}
+          <Typography variant="body1">{task.title}</Typography>
           {task.description && (
             <Typography variant="body2" color="textSecondary">
               {task.description}
             </Typography>
           )}
-
           {task.createdAt && (
             <Typography variant="body2" color="textSecondary" marginTop={'5px'}>
               Создано: {dayjs(task.createdAt).format('DD.MM.YYYY HH:mm')}
@@ -180,23 +158,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         <MenuItem onClick={handleEdit}>
           <EditIcon style={{ marginRight: 8 }} /> Редактировать
         </MenuItem>
-        <MenuItem
-          onClick={e => {
-            e.stopPropagation()
-            setOpenDeleteModal(true)
-            handleMenuClose()
-          }}
-        >
-          <DeleteIcon style={{ marginRight: 8 }} /> Переместить в архив
+        <MenuItem onClick={e => handleDelete(task._id, e)}>
+          <DeleteIcon style={{ marginRight: 8 }} /> Удалить
         </MenuItem>
       </Menu>
-      <ConfirmationModal
-        open={openDeleteModal}
-        entityName="эту задачу"
-        actionType="archive"
-        onConfirm={handleDelete}
-        onCancel={handleCancelDelete}
-      />
     </Card>
   )
 }

@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box, Button,
@@ -21,30 +21,23 @@ import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
 import ClientForm from '../components/ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { useClientsList } from '../hooks/useClientsList.ts'
+import { toast } from 'react-toastify'
 
 const ClientDetail = () => {
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   const handleOpenEditModal = () => setEditModalOpen(true)
   const handleCloseEditModal = () => setEditModalOpen(false)
 
-  const handleOpenDeleteModal = () => setDeleteModalOpen(true)
-  const handleCloseDeleteModal = () => setDeleteModalOpen(false)
-
   const { clientId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { deleteOneClient } = useClientsList()
 
   const client = useAppSelector(selectClient)
   const loading = useAppSelector(selectLoadingFetchClient)
   const error = useAppSelector(selectClientError)
-
-  const {
-    handleConfirmDelete,
-  } = useClientsList()
 
   useEffect(() => {
     if (clientId) {
@@ -55,19 +48,21 @@ const ClientDetail = () => {
   return (
     <>
       {error ? (
-        <Box textAlign="center" mt={4}>
-          <Typography color="error" variant="body1">
-            Ошибка загрузки данных клиента
-          </Typography>
-        </Box>
-      ) : (
+        <>
+          <Box textAlign="center" mt={4}>
+            <Typography color="error" variant="body1" textAlign="center">
+                  Ошибка загрузки данных клиента
+            </Typography>
+          </Box>
+        </>
+      ) : <>
         <Box sx={{ maxWidth: 700, mx: 'auto', p: { xs: 1, md: 3 } }}>
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
             <IconButton onClick={() => navigate('/clients')}>
               <ArrowBack />
             </IconButton>
             <Typography variant="h5" fontWeight={700}>
-              Профиль клиента
+                Профиль клиента
             </Typography>
           </Box>
 
@@ -85,20 +80,22 @@ const ClientDetail = () => {
                 </Typography>
               )}
 
-              <Grid container spacing={2}>
-                <Grid>
-                  <ClientInfoItem
-                    loading={loading}
-                    label="ИНН"
-                    value={client?.inn || '—'}
-                  />
-                </Grid>
-                <Grid>
-                  <ClientInfoItem
-                    loading={loading}
-                    label="ОГРН"
-                    value={client?.ogrn || '—'}
-                  />
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid>
+                    <ClientInfoItem
+                      loading={loading}
+                      label="ИНН"
+                      value={client?.inn || '—'}
+                    />
+                  </Grid>
+                  <Grid>
+                    <ClientInfoItem
+                      loading={loading}
+                      label="ОГРН"
+                      value={client?.ogrn || '—'}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Box>
@@ -136,7 +133,6 @@ const ClientDetail = () => {
                 />
               </Grid>
             </Grid>
-
             <Box sx={{
               mt: 4,
               display: 'flex',
@@ -164,26 +160,25 @@ const ClientDetail = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                 }}
-                onClick={handleOpenDeleteModal}
+                onClick={async () => {
+                  if (clientId) {
+                    try {
+                      await deleteOneClient(clientId)
+                    } catch {
+                      toast.error('Ошибка при удалении клиента. Пожалуйста, попробуйте позже.')
+                    }
+                  }
+                }}
               >
                 Удалить
               </Button>
             </Box>
           </Card>
-
           <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
             <ClientForm client={client} onClose={handleCloseEditModal} />
           </Modal>
-
-          <ConfirmationModal
-            open={deleteModalOpen}
-            entityName="этого клиента"
-            actionType={'delete'}
-            onConfirm={handleConfirmDelete}
-            onCancel={handleCloseDeleteModal}
-          />
         </Box>
-      )}
+      </>}
     </>
   )
 }
