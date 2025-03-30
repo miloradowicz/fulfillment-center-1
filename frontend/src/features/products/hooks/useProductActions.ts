@@ -19,6 +19,8 @@ import { ProductWithPopulate } from '../../../types'
 const UseProductActions = ( fetchOnDelete: boolean ) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [productToDeleteId, setProductToDeleteId] = useState<string | null>(null)
   const products = useAppSelector(selectProductsWithPopulate)
   const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
   const { id } = useParams()
@@ -28,13 +30,14 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
   const error = useAppSelector(selectProductError)
 
   const handleOpen = (product?: ProductWithPopulate) => {
+    if (product) {
+      setSelectedProduct(product)
+    }
     setOpen(true)
-    if (product) setSelectedProduct(product)
   }
 
   const handleClose = () => {
     setOpen(false)
-    setSelectedProduct(null)
     dispatch(clearErrorProduct())
   }
 
@@ -60,20 +63,26 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
 
   const deleteOneProduct = async (id: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот товар?')) {
-        await dispatch(deleteProduct(id))
-        if (fetchOnDelete) {
-          fetchAllProducts()
-        } else {
-          navigate('/products')
-        }
-        toast.success('Товар успешно удален.')
+      await dispatch(deleteProduct(id))
+      if (fetchOnDelete) {
+        fetchAllProducts()
       } else {
-        toast.info('Вы отменили удаление товара.')
+        navigate('/products')
       }
+      toast.success('Товар успешно удалён!')
     } catch (e) {
       console.error(e)
     }
+  }
+
+  const handleConfirmationOpen = (id: string) => {
+    setProductToDeleteId(id)
+    setConfirmationOpen(true)
+  }
+
+  const handleConfirmationClose = () => {
+    setConfirmationOpen(false)
+    setProductToDeleteId(null)
   }
 
   return  {
@@ -89,7 +98,12 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
     id,
     navigate,
     loading,
-    error }
+    error,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    productToDeleteId,
+  }
 }
 
 export default UseProductActions

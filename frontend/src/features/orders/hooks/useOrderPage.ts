@@ -15,6 +15,7 @@ const UseOrderPage = () => {
   const orders = useAppSelector(selectAllOrdersWithClient)
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [open, setOpen] = useState(false)
+  const [counterpartyToDelete, setCounterpartyToDelete] = useState<OrderWithClient | null>(null)
 
   useEffect(() => {
     dispatch(fetchOrdersWithClient())
@@ -22,13 +23,11 @@ const UseOrderPage = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
-        await dispatch(deleteOrder(id))
-        dispatch(fetchOrdersWithClient())
-      } else {
-        toast.info('Вы отменили удаление заказа')
-      }
+      await dispatch(deleteOrder(id))
+      dispatch(fetchOrdersWithClient())
+      toast.success('Заказ успешно удалён!')
     } catch (e) {
+      toast.error('Ошибка при удалении заказа.')
       console.error(e)
     }
   }
@@ -38,7 +37,7 @@ const UseOrderPage = () => {
   const handleClose = () => {
     setOpen(false)
     dispatch(clearPopulateOrder())
-    dispatch( clearErrorOrder ())
+    dispatch(clearErrorOrder())
   }
 
   const handleOpenEdit = async (order: OrderWithClient) => {
@@ -46,6 +45,13 @@ const UseOrderPage = () => {
     setOpen(true)
   }
 
+  const handleConfirmDelete = async () => {
+    if (counterpartyToDelete) {
+      await dispatch(deleteOrder(counterpartyToDelete._id))
+      dispatch(fetchOrdersWithClient())
+      handleClose()
+    }
+  }
 
   return {
     orders,
@@ -55,6 +61,8 @@ const UseOrderPage = () => {
     handleClose,
     handleDelete,
     handleOpenEdit,
+    setCounterpartyToDelete,
+    handleConfirmDelete,
   }
 }
 

@@ -69,8 +69,8 @@ const ProductsDataList = () => {
       ),
     },
   ]
-  return (
 
+  return (
     <Box className="max-w-[1000px] mx-auto w-full">
       <Modal handleClose={handleClose} open={open}>
         <ProductForm

@@ -18,24 +18,9 @@ interface Props {
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const {
-    arrivals,
-    deleteModalOpen,
-    isOpen,
-    handleClose,
-    handleDeleteClick,
-    handleConfirmDelete,
-    fetchAllArrivals,
-  } = useArrivalsList()
-
+  const { arrivals, handleDeleteClick, handleConfirmDelete, handleClose, isOpen, deleteModalOpen } = useArrivalsList()
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
-
-  const handleEdit = (arrival: ArrivalWithClient) => {
-    onEdit(arrival)
-    fetchAllArrivals().catch(console.error)
-  }
-
 
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
@@ -109,7 +94,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       filterable: false,
       renderCell: ({ row }) => (
         <>
-          <IconButton onClick={() => handleEdit(row)}>
+          <IconButton onClick={() => onEdit(row)}>
             <EditIcon />
           </IconButton>
           <IconButton onClick={() => handleDeleteClick(row._id)}>
