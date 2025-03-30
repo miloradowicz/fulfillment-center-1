@@ -18,14 +18,24 @@ interface Props {
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const { arrivals, handleDeleteClick, handleConfirmDelete, handleClose, isOpen, deleteModalOpen, fetchAllArrivals } = useArrivalsList()
+  const {
+    arrivals,
+    deleteModalOpen,
+    isOpen,
+    handleClose,
+    handleDeleteClick,
+    handleConfirmDelete,
+    fetchAllArrivals,
+  } = useArrivalsList()
+
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   const handleEdit = (arrival: ArrivalWithClient) => {
     onEdit(arrival)
-    fetchAllArrivals()
+    fetchAllArrivals().catch(console.error)
   }
+
 
   const columns: GridColDef<ArrivalWithClient>[] = [
     {
