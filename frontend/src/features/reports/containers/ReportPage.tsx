@@ -25,7 +25,7 @@ export default function ReportTabs() {
     dispatch(fetchTasksWithPopulate())
   }, [dispatch])
 
-  const tabNames = React.useMemo(() => ['tasks', 'clients', 'orders', 'deliveries', 'warehouses'], [])
+  const tabNames = React.useMemo(() => ['tasks', 'clients', 'orders', 'arrivals', 'stocks'], [])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()

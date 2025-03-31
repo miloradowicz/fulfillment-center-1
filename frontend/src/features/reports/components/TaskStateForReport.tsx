@@ -28,15 +28,15 @@ const TaskStateForReport: React.FC<TaskSummaryProps> = ({ tasks }) => {
       <Typography variant={'h6'} className="text-xl text-center font-bold mb-2">Всего задач: {totalTasks}</Typography>
       <Box className="flex flex-row items-center p-4  ">
         <Box className="flex flex-col mb-4 w-[35%]">
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm">
+          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
             <h4 className="text-lg font-bold">К выполнению</h4>
             <p className="text-lg">{taskStats.toDo} задач(a)</p>
           </Box>
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm">
-            <h4 className="text-lg font-bold">В работе</h4>
+          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
+            <h4 className="text-lg font-bold ">В работе</h4>
             <p className=" text-lg">{taskStats.inProgress} задач(a)</p>
           </Box>
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm">
+          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
             <h4 className="text-lg font-bold">Готово</h4>
             <p className=" text-lg">{taskStats.completed} задач(a)</p>
           </Box>
