@@ -7,7 +7,7 @@ import {
 import { getItemNameById } from '../../../utils/getItemNameById.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import Grid from '@mui/material/Grid2'
-import { taskStatus, taskType } from '../state/taskState.ts'
+import { taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
 import React from 'react'
 
@@ -140,26 +140,26 @@ const TaskForm:React.FC<Props> = ({ onSuccess }) => {
           )}
         </Grid>
 
-        <Grid>
-          <Autocomplete
-            id="status"
-            value={ form.status && taskStatus.includes(form.status) ? form.status : null}
-            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, status: newValue || '' }))}
-            size="small"
-            fullWidth
-            disablePortal
-            options={taskStatus}
-            sx={{ width: '100%' }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Статус задачи"
-                error={Boolean(errors.status || getFieldError('status', error))}
-                helperText={errors.status || getFieldError('status', error)}
-              />
-            )}
-          />
-        </Grid>
+        {/*<Grid>*/}
+        {/*  <Autocomplete*/}
+        {/*    id="status"*/}
+        {/*    value={ form.status && taskStatus.includes(form.status) ? form.status : null}*/}
+        {/*    onChange={(_, newValue) => setForm(prevState => ({ ...prevState, status: newValue || '' }))}*/}
+        {/*    size="small"*/}
+        {/*    fullWidth*/}
+        {/*    disablePortal*/}
+        {/*    options={taskStatus}*/}
+        {/*    sx={{ width: '100%' }}*/}
+        {/*    renderInput={params => (*/}
+        {/*      <TextField*/}
+        {/*        {...params}*/}
+        {/*        label="Статус задачи"*/}
+        {/*        error={Boolean(errors.status || getFieldError('status', error))}*/}
+        {/*        helperText={errors.status || getFieldError('status', error)}*/}
+        {/*      />*/}
+        {/*    )}*/}
+        {/*  />*/}
+        {/*</Grid>*/}
         <Button type="submit" variant="contained" color="primary" disabled={addLoading}>
           {addLoading ? <CircularProgress size={24} /> : ' Создать задачу'}
         </Button>

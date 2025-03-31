@@ -24,6 +24,15 @@ export class Task {
   @Prop()
   description: string
 
+  @Prop({ type: String, required: false, default: null })
+  date_ToDO?: string
+
+  @Prop({ type: String, required: false, default: null })
+  date_inProgress?: string
+
+  @Prop({ type: String, required: false, default: null })
+  date_Done?: string
+
   @Prop({
     type: String,
     enum: ['к выполнению', 'в работе', 'готово'],
@@ -43,6 +52,7 @@ export class Task {
     ref: 'Order',
   })
   associated_order: mongoose.Schema.Types.ObjectId
+
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

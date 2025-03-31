@@ -30,13 +30,28 @@ const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
   const handleClose = async (newStatus?: string) => {
     setAnchorEl(null)
     if (newStatus && newStatus !== task.status) {
+      const currentDate = new Date().toISOString()
 
       const updatedData = {
         ...task,
         associated_arrival: task.associated_arrival ? task.associated_arrival._id : null,
         associated_order: task.associated_order ? task.associated_order._id : null,
-        user:task.user._id,
+        user: task.user._id,
         status: newStatus,
+      }
+
+      if (newStatus === 'в работе') {
+        updatedData.date_inProgress = currentDate
+        updatedData.date_Done = null
+        updatedData.date_ToDO = null
+      } else if (newStatus === 'готово') {
+        updatedData.date_Done = currentDate
+        updatedData.date_ToDO = null
+        updatedData.date_inProgress = null
+      } else if (newStatus === 'к выполнению') {
+        updatedData.date_ToDO = currentDate
+        updatedData.date_Done = null
+        updatedData.date_inProgress = null
       }
       await dispatch(updateTask({ taskId: task._id, data: updatedData })).unwrap()
       if (!selectedUser) {
