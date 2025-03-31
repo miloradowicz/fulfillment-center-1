@@ -34,6 +34,7 @@ const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
             angle={-45}
             textAnchor="end"
             tickSize={10}
+            height={50}
             interval={Math.ceil(data.length / 10)}
           />
           <YAxis/>
