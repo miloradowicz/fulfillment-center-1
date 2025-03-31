@@ -21,6 +21,8 @@ const useArrivalDetails = () => {
   const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const [productsTab, setProductsTabs] = useState(0)
+  const [infoTab, setInfoTab] = useState(0)
 
   useEffect(() => {
     if (arrivalId) {
@@ -49,15 +51,16 @@ const useArrivalDetails = () => {
       }
     }
 
-    hideConfirmDeleteModal()
-  }
-
-  const showConfirmDeleteModal = () => {
-    setConfirmDeleteModalOpen(true)
-  }
-
-  const hideConfirmDeleteModal = () => {
     setConfirmDeleteModalOpen(false)
+  }
+
+  const getStepDescription = (index: number) => {
+    const descriptions = [
+      'Товар отправлен заказчиком',
+      'Товар прибыл на склад',
+      'Товар отсортирован на складе',
+    ]
+    return descriptions[index] || ''
   }
 
   return {
@@ -65,14 +68,18 @@ const useArrivalDetails = () => {
     arrival,
     loading,
     error,
+    productsTab,
+    infoTab,
     confirmDeleteModalOpen,
     isDeleted,
-    showConfirmDeleteModal,
-    hideConfirmDeleteModal,
     handleDelete,
     navigateBack,
     editModalOpen,
     setEditModalOpen,
+    setProductsTabs,
+    setConfirmDeleteModalOpen,
+    setInfoTab,
+    getStepDescription,
   }
 }
 

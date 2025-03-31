@@ -5,6 +5,7 @@ import { Box, Chip, Menu, MenuItem, Tooltip } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
+import { ArrivalStatus } from '../../../constants.ts'
 
 
 export interface Props  {
@@ -20,8 +21,6 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
     'получена': 'success',
     'отсортирована': 'info',
   }
-
-  const statusOptions = ['ожидается доставка', 'получена', 'отсортирована']
 
   const status = row.arrival_status || 'ожидается доставка'
   const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -78,7 +77,7 @@ const StatusArrivalCell:React.FC<Props> =({ row })  => {
     <Box display="flex" justifyContent="center" alignItems="center" height="100%" width="100%">
       {status === 'ожидается доставка' || status === 'отсортирована'? <Tooltip title={status} arrow placement="top">{chip}</Tooltip>:chip}
       <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
-        {statusOptions.map(option => (
+        {ArrivalStatus.map(option => (
           <MenuItem key={option} onClick={() => handleClose(option)}>
             {option}
           </MenuItem>

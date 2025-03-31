@@ -1,69 +1,47 @@
-import { useState } from 'react'
-import { Box, Button, Card, CircularProgress, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import {
+  Box,
+  Button,
+  Card, Chip,
+  CircularProgress,
+  Container, Divider, IconButton,
+  Step,
+  StepLabel,
+  Stepper,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
-import DefectsTable from '../components/DefectsTable.tsx'
-import OrderLogs from '../components/OrderLogs.tsx'
-import { DeleteOutline, EditOutlined } from '@mui/icons-material'
-import { useAppDispatch } from '../../../app/hooks.ts'
-import { deleteOrder } from '../../../store/thunks/orderThunk.ts'
-import { toast } from 'react-toastify'
+import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
+import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
+import { OrderStatus } from '../../../constants.ts'
+import LogsTable from '../../../components/Tables/LogsTable.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
-
-enum OrderStatus {
-  InAssembly = 'в сборке',
-  InTransit = 'в пути',
-  Delivered = 'доставлен',
-}
+import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
 
 const OrderDetails = () => {
-  const { order, client, defects, loading } = useOrderDetails()
-  const [tabValue, setTabValue] = useState(0)
-  const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const navigate = useNavigate()
+  const {
+    order,
+    loading,
+    tabValue,
+    open,
+    openDeleteModal,
+    setTabValue,
+    handleOpenEdit,
+    handleDelete,
+    setOpen,
+    navigateBack,
+    getStepDescription,
+    setOpenDeleteModal,
+  } = useOrderDetails()
 
   const statuses = Object.values(OrderStatus)
-  const activeStep = order ? statuses.indexOf(order.status as OrderStatus) : 0
-
-  const orderColumns = [
-    { field: 'title', headerName: 'Наименование', flex: 1 },
-    { field: 'amount', headerName: 'Количество', width: 130 },
-    { field: 'barcode', headerName: 'Штрихкод', width: 180 },
-    { field: 'article', headerName: 'Артикул', width: 150 },
-  ]
-
-  const handleConfirmDelete = async () => {
-    try {
-      if (order) {
-        await dispatch(deleteOrder(order._id))
-        navigate('/orders')
-        toast.success('Заказ успешно удалён!')
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error('Ошибка при удалении заказа')
-    }
-    setOpenDeleteModal(false)
-  }
-
-  const handleCancelDelete = () => {
-    setOpenDeleteModal(false)
-  }
-
-  const handleOpenDeleteModal = () => {
-    setOpenDeleteModal(true)
-  }
-
-
-  const handleOpenEdit = () => {
-    setOpen(true)
-  }
+  const activeStep = order ? statuses.indexOf(order.status as string) : 0
 
   if (loading) {
     return (
@@ -78,129 +56,124 @@ const OrderDetails = () => {
   }
 
   return (
-    <Card className="max-w-4xl mx-auto mt-6 bg-white shadow-lg rounded-lg p-6">
-      <Box className="flex justify-between items-center pb-2 mb-2">
-        <Typography variant="h5" className="font-semibold">
-          Заказ #{order._id}
-        </Typography>
-        <Box className="text-right">
-          <Typography variant="body2" className="text-gray-600 text-sm">
-            Отправлен: <span className="font-bold">{dayjs(order.sent_at).format('DD.MM.YYYY HH:mm')}</span>
-          </Typography>
-
-          <Typography variant="body2" className="text-gray-600 text-sm">
-            {order.delivered_at ? (
-              <>
-                Доставлен: <span className="font-bold">{dayjs(order.delivered_at).format('DD.MM.YYYY HH:mm')}</span>
-              </>
-            ) : (
-              'Не доставлен'
-            )}
-          </Typography>
-
-          <Typography variant="h6" className="text-sky-700" sx={{ fontWeight: 600, fontSize: '18px' }}>
-            Стоимость: {order.price}
+    <Container maxWidth="md">
+      <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
+          <IconButton >
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="caption" className="!text-sm">
+            Заказы
           </Typography>
         </Box>
-      </Box>
-
-      <Box className="flex justify-center gap-4 mt-4">
-        {client && (
-          <Card className="bg-gray-100 p-4 shadow-sm flex flex-col gap-1 w-100">
-            <Typography variant="h6" marginBottom={2} className="text-center">
-              Клиент
+        <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
+          <Box>
+            <Chip label={order.status}
+              color={getOrderStatusColor(order.status)}
+              className="mb-5"
+              sx={{
+                borderRadius: '4px',
+                height: '28px',
+              }}
+              variant="outlined" />
+            <Typography variant="h5" className="!font-bold">
+              Детали заказа #{order.orderNumber}
             </Typography>
-            <Typography variant="body1">{client.name}</Typography>
-            <Typography variant="body1">{client.email}</Typography>
-            <Typography variant="body1">{client.phone_number}</Typography>
-          </Card>
-        )}
-        <Card className="bg-gray-100 p-4 shadow-sm w-100">
-          <Typography variant="h6" marginBottom={4} className="text-center">
-            Статус заказа
-          </Typography>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {statuses.map((label, index) => (
+            <Box className="flex flex-col">
+              <Typography variant="caption" className="text-gray-600 text-sm">Создан: {dayjs(order.sent_at).format('D MMMM YYYY')}
+              </Typography>
+              {order.delivered_at &&
+                <Typography variant="caption" className="text-gray-600 text-sm">
+                  Доставлен: {dayjs(order.delivered_at).format('D MMMM YYYY')}
+                </Typography>
+              }
+            </Box>
+          </Box>
+          <Box className="ml-auto flex flex-col gap-2 items-center !self-end !me-10">
+            <Typography className="!text-xs">Заказчик</Typography>
+            <Typography component={Link} to={`/clients/${ order.client._id }`} target="_blank" className="!font-bold underline underline-offset-4">{order.client.name}</Typography>
+            <Typography className="!font-light">{order.client.phone_number}</Typography>
+          </Box>
+        </Box>
+
+
+        <Box>
+          <Stepper  activeStep={activeStep} alternativeLabel>
+            {OrderStatus.map((label, index) => (
               <Step key={index}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel
+                  optional={<span style={{ fontSize: '12px', color: '#888' }}>{getStepDescription(index, order)}</span>}
+                >
+                  {label}
+                </StepLabel>
               </Step>
             ))}
-          </Stepper>
-        </Card>
-      </Box>
+          </Stepper >
+        </Box>
 
-      <Box className="mt-2 bg-gray-50 p-4 rounded-lg">
-        <Typography variant="h6" className="mb-3 font-semibold text-center">
-          Товары:
-        </Typography>
-        <DataGrid
-          rows={order.products.map(item => ({
-            id: item._id,
-            title: item.product.title,
-            amount: item.amount,
-            barcode: item.product.barcode,
-            article: item.product.article,
-          }))}
-          columns={orderColumns}
-          pageSizeOptions={[5, 10, 20, 100]}
-          disableRowSelectionOnClick
-        />
-      </Box>
-      <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} className="mt-6">
-        <Tab label="История" />
-        <Tab label="Дефекты" />
-      </Tabs>
-      <Box className="mt-4 bg-gray-50 p-4 rounded-lg">
-        {tabValue === 0 ? <OrderLogs logs={order.logs || []} /> : <DefectsTable defects={defects} />}
-      </Box>
-      <Box
-        sx={{
-          mt: 4,
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end',
-        }}
-      >
-        <Button
-          type={'button'}
-          variant="contained"
-          startIcon={<EditOutlined />}
-          sx={{
-            px: 3,
-            borderRadius: 2,
-            textTransform: 'none',
-          }}
-          onClick={() => handleOpenEdit()}
-        >
-          Редактировать
-        </Button>
-        <Button
-          type={'button'}
-          variant="contained"
-          color="error"
-          startIcon={<DeleteOutline />}
-          sx={{
-            px: 3,
-            borderRadius: 2,
-            textTransform: 'none',
-          }}
-          onClick={handleOpenDeleteModal}
-        >
-          Удалить
-        </Button>
-        <Modal handleClose={() => setOpen(false)} open={open}>
-          <OrderForm onSuccess={() => setOpen(false)} />
-        </Modal>
-      </Box>
+        <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Товары</Divider>
 
-      <ConfirmationModal
-        open={openDeleteModal}
-        entityName="этот заказ"
-        actionType="delete"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      />
-    </Card>
+        <Box className="mt-2 rounded-lg ">
+          <ProductsTable products={order.products}/>
+        </Box>
+
+        <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Дополнительно</Divider>
+
+        <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} className="mt-6">
+          <Tab label="Дефекты" />
+          <Tab label="История" />
+        </Tabs>
+        <Box className="mt-4">
+          {tabValue === 0 ? <DefectsTable defects={order.defects} /> : <LogsTable logs={order.logs || []} />}
+        </Box>
+        <Box
+          sx={{
+            mt: 4,
+            display: 'flex',
+            gap: 2,
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button
+            type={'button'}
+            variant="contained"
+            startIcon={<EditOutlined />}
+            sx={{
+              px: 3,
+              borderRadius: 2,
+              textTransform: 'none',
+            }}
+            onClick={() => handleOpenEdit()}
+          >
+            Редактировать
+          </Button>
+          <Button
+            type={'button'}
+            variant="contained"
+            color="error"
+            startIcon={<DeleteOutline />}
+            sx={{
+              px: 3,
+              borderRadius: 2,
+              textTransform: 'none',
+            }}
+            onClick={() => setOpenDeleteModal(true)}
+          >
+            Удалить
+          </Button>
+          <Modal handleClose={() => setOpen(false)} open={open}>
+            <OrderForm onSuccess={() => setOpen(false)} />
+          </Modal>
+          <ConfirmationModal
+            open={openDeleteModal}
+            entityName="этот заказ"
+            actionType="delete"
+            onConfirm={() => handleDelete()}
+            onCancel={() => setOpenDeleteModal(false)}
+          />
+        </Box>
+      </Card>
+    </Container>
   )
 }
 
