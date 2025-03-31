@@ -45,7 +45,6 @@ export interface Product {
   _id: string
   client: string
   title: string
-  amount: number
   barcode: string
   article: string
   dynamic_fields?: DynamicField[]
@@ -56,7 +55,6 @@ export interface ProductWithPopulate {
   _id: string
   client: Client
   title: string
-  amount: number
   barcode: string
   article: string
   dynamic_fields: DynamicField[]
@@ -111,7 +109,7 @@ export interface Arrival {
   shipping_agent?: string | null
   pickup_location?: string
   defects?: Defect[]
-  arrival_status?: string
+  arrival_status: string
   received_amount?: ProductArrival[]
   logs?: Log[]
   arrivalNumber?: string
@@ -122,7 +120,7 @@ export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'receiv
   client: Client
   products: ProductArrivalWithPopulate[]
   defects: DefectWithPopulate[]
-  received_amount?: ProductArrivalWithPopulate[]
+  received_amount: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
   stock: Stock
   shipping_agent?: Counterparty
@@ -146,7 +144,7 @@ export interface Order {
   sent_at: string
   delivered_at?: string
   comment?: string
-  status?: string
+  status: string
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
@@ -235,7 +233,10 @@ export interface Task {
   associated_order?: string | null
   associated_arrival?: string | null
   description: string
-  status: string
+  date_ToDO?:string | null
+  date_inProgress?:string | null
+  date_Done?: string | null
+  status?: string | null
   logs?: Log[]
 }
 
@@ -262,6 +263,9 @@ export interface TaskWithPopulate {
   }
   createdAt: Date,
   updatedAt: Date,
+  date_inProgress:string | null,
+  date_Done:string | null,
+  date_ToDO:string | null,
 }
 
 export type TaskMutation = Omit<Task, '_id'>
@@ -288,10 +292,24 @@ export type PopulatedService = Omit<Service, 'serviceCategory'> & {
   serviceCategory: ServiceCategory
 }
 
+export interface ProductStockPopulate {
+  _id: string
+  product: ProductWithPopulate
+  amount: number
+}
+
 export interface Stock {
   _id: string
   name: string
   address: string
+  products?: ProductStockPopulate[]
+}
+
+export interface StockPopulate {
+  _id: string
+  name: string
+  address: string
+  products?: ProductStockPopulate[]
 }
 
 export interface StockError {
@@ -312,3 +330,22 @@ export interface Counterparty {
 export type CounterpartyMutation = Omit<Counterparty, '_id'>
 
 export type StatusColor = 'warning' | 'success' | 'info' | 'default'
+
+export interface UserTaskReport {
+  user: {
+    _id: string;
+    displayName: string;
+  };
+  taskCount: number;
+}
+
+
+export interface DailyTaskCount {
+  date: string;
+  taskCount: number;
+}
+
+export interface ReportTaskResponse {
+  userTaskReports: UserTaskReport[];
+  dailyTaskCounts: DailyTaskCount[];
+}

@@ -1,45 +1,71 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchOrder, selectOrder } from '../../../store/slices/orderSlice.ts'
-import { fetchOrderById, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
-import { useParams } from 'react-router-dom'
-import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
-import { selectClient } from '../../../store/slices/clientSlice.ts'
-import { DefectMutation, OrderWithProducts } from '../../../types'
+import { selectLoadingFetchOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
+import { deleteOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { OrderWithProductsAndClients } from '../../../types'
+import dayjs from 'dayjs'
 
 export const useOrderDetails = () => {
   const { id } = useParams()
   const dispatch = useAppDispatch()
-  const order = useAppSelector(selectOrder)
-  const client = useAppSelector(selectClient)
+  const order = useAppSelector(selectPopulateOrder)
   const loading = useAppSelector(selectLoadingFetchOrder)
-  const [defects, setDefects] = useState<DefectMutation[]>([])
+  const [tabValue, setTabValue] = useState(0)
+  const [open, setOpen] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchOrderById(id))
       dispatch(fetchOrderByIdWithPopulate(id))
     }
   }, [dispatch, id])
 
-  useEffect(() => {
-    if (order && order.client) {
-      dispatch(fetchClientById(order.client))
-      setDefects(mapDefectsWithProductNames(order))
-    }
-  }, [dispatch, order])
-
-  const mapDefectsWithProductNames = (order: OrderWithProducts): DefectMutation[] => {
-    if (!order || !order.defects) return []
-
-    return order.defects.map(defect => {
-      const product = order.products.find(p => p.product._id === defect.product)
-      return {
-        ...defect,
-        productName: product ? product.product.title : 'Неизвестный продукт',
+  const handleDelete = async () => {
+    try {
+      if (order) {
+        await dispatch(deleteOrder(order._id))
+        navigate('/orders')
+        toast.success('Заказ успешно удалён!')
       }
-    })
+    } catch (e) {
+      console.error(e)
+      toast.error('Ошибка при удалении заказа')
+    }
+    setOpenDeleteModal(false)
   }
 
-  return { order, client, defects, loading }
+  const handleOpenEdit = () => {
+    setOpen(true)
+  }
+
+  const navigateBack = () => {
+    navigate(-1)
+  }
+
+  const getStepDescription = (index: number, order: OrderWithProductsAndClients) => {
+    const descriptions = [
+      'Товар собирается на складе',
+      'Заказ отправлен заказчику',
+      order.delivered_at ? `Дата доставки: ${ dayjs(order.delivered_at).format('D MMMM YYYY') }` : 'Ожидается доставка',
+    ]
+    return descriptions[index] || ''
+  }
+
+  return {
+    order,
+    loading,
+    tabValue,
+    open,
+    openDeleteModal,
+    setTabValue,
+    handleDelete,
+    handleOpenEdit,
+    setOpen,
+    navigateBack,
+    getStepDescription,
+    setOpenDeleteModal,
+  }
 }

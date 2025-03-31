@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
@@ -14,7 +14,6 @@ import {
 const initialState: ProductMutation = {
   client: '',
   title: '',
-  amount: 0,
   barcode: '',
   article: '',
   dynamic_fields: [],
@@ -26,19 +25,18 @@ const dynamicFieldState: DynamicField = {
   value: '',
 }
 
-const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void) => {
+const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => void) => {
   const [form, setForm] = useState<ProductMutation>(
-    initialData? {
-      client: initialData.client._id,
-      title: initialData.title,
-      amount: initialData.amount,
-      barcode: initialData.barcode,
-      article: initialData.article,
-    } : { ...initialState },
+    initialData
+      ? {
+        client: initialData.client._id,
+        title: initialData.title,
+        barcode: initialData.barcode,
+        article: initialData.article,
+      }
+      : { ...initialState },
   )
-  const [selectedClient, setSelectedClient] = useState(
-    initialData?  initialData.client._id : '',
-  )
+  const [selectedClient, setSelectedClient] = useState(initialData ? initialData.client._id : '')
 
   const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(
     initialData?.dynamic_fields
@@ -65,20 +63,14 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
 
   const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
-    if (name === 'amount') {
-      const amountValue = value === '' ? 0 : Number(value)
-      if (amountValue < 0 || isNaN(amountValue)) return
-      setForm(prevState => ({
-        ...prevState,
-        [name]: amountValue,
-      }))
-    } else {
-      setForm(prevState => ({
-        ...prevState,
-        [name]: value,
-      }))
-    }
+
+    setForm(prevState => ({
+      ...prevState,
+      [name]: value,
+    }))
+
   }
 
   const addDynamicField = () => {
@@ -89,10 +81,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     setShowNewFieldInputs(false)
   }
 
-  const onChangeDynamicFieldValue = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const onChangeDynamicFieldValue = (index: number, e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value
     setDynamicFields(prev => prev.map((field, i) => (i === index ? { ...field, value } : field)))
     setErrors(prevErrors => ({ ...prevErrors, [`dynamicField_${ index }`]: '' }))
@@ -137,9 +126,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     }
     if (!form.title.trim()) {
       newErrors.title = 'Поле "Название" обязательно для заполнения!'
-    }
-    if (form.amount === 0) {
-      newErrors.amount = 'Поле "Количество" обязательно для заполнения!'
     }
     if (!form.barcode.trim()) {
       newErrors.barcode = 'Поле "Баркод" обязательно для заполнения!'

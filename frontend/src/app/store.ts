@@ -8,6 +8,7 @@ import { taskReducer } from '../store/slices/taskSlice.ts'
 import { serviceReducer } from '../store/slices/serviceSlice.ts'
 import { stockReducer } from '../store/slices/stocksSlice.ts'
 import { counterpartyReducer } from '../store/slices/counterpartySlices.ts'
+import { reportReducer } from '../store/slices/reportSlice.ts'
 import { serviceCategoryReducer } from '../store/slices/serviceCategorySlice.ts'
 
 export const store = configureStore({
@@ -21,6 +22,7 @@ export const store = configureStore({
     services: serviceReducer,
     stocks: stockReducer,
     counterparties: counterpartyReducer,
+    reports: reportReducer,
     serviceCategories: serviceCategoryReducer,
   },
 })

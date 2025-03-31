@@ -32,6 +32,15 @@ export class CreateTaskDto {
   description?: string
 
   @IsOptional()
+  date_ToDO?: string
+
+  @IsOptional()
+  date_inProgress?: string
+
+  @IsOptional()
+  date_Done?: string
+
+  @IsOptional()
   @IsEnum(['к выполнению', 'в работе', 'готово'], {
     message: 'Статус должен быть одним из: "к выполнению", "в работе", "готово"',
   })

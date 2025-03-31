@@ -20,7 +20,12 @@ import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 
 const App = () => {
-  const theme = createTheme()
+  const theme = createTheme({
+    typography: {
+      fontFamily: '\'Inter\', sans-serif',
+    },
+  })
+
   return (
     <>
       <ThemeProvider theme={theme}>

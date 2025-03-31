@@ -17,6 +17,7 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import * as path from 'node:path'
+import { getRandomStr } from '../utils/getRandomString'
 
 @Controller('arrivals')
 export class ArrivalsController {
@@ -56,8 +57,9 @@ export class ArrivalsController {
         destination: './uploads/documents',
         filename: (_req, file, cb) => {
           const originalExt = path.extname(file.originalname) || ''
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-          cb(null, `${ file.fieldname }-${ uniqueSuffix }${ originalExt }`)
+          const { name } = path.parse(file.originalname)
+          const uniqueSuffix = getRandomStr()
+          cb(null, `${ name.replaceAll(' ', '_') }-${ uniqueSuffix }${ originalExt }`)
         },
       }),
     }),

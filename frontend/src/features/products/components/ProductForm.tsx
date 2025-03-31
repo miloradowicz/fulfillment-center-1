@@ -77,19 +77,6 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Grid>
         <Grid>
           <TextField
-            name="amount"
-            label="Количество"
-            type="number"
-            value={form.amount || ''}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.amount || getFieldError('amount',createError))}
-            helperText={errors.amount || getFieldError('amount',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
             name="barcode"
             label="Баркод"
             value={form.barcode}

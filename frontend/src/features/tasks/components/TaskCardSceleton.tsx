@@ -13,8 +13,10 @@ const TaskCardSkeleton = () => {
     >
       <CardContent>
         <Skeleton variant="text" animation="wave" width="50%" height={24} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="text" animation="wave" width="80%" height={20} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="rectangular" animation="wave" width="100%" height={60} sx={{ borderRadius: 2 }} />
+        <Skeleton variant="text" animation="wave" width="40%" height={20} sx={{ marginBottom: 1 }} />
+        <Skeleton variant="text" animation="wave" width="70%" height={25} sx={{ marginBottom: 1 }} />
+        <Skeleton variant="text" animation="wave" width="40%" height={20} sx={{ marginBottom: 1 }} />
+        <Skeleton variant="rectangular" animation="wave" width="80%" height={40} sx={{ borderRadius: 2 }} />
       </CardContent>
     </Card>
   )

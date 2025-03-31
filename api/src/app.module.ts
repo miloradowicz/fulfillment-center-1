@@ -14,6 +14,7 @@ import { StocksModule } from './modules/stocks.module'
 import { AuthModule } from './modules/auth.module'
 import { CounterpartiesModule } from './modules/counterparties.module'
 import { ServiceCategoriesModule } from './modules/service-category.module'
+import { ReportsModule } from './modules/reports.module'
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ServiceCategoriesModule } from './modules/service-category.module'
     StocksModule,
     CounterpartiesModule,
     ServiceCategoriesModule,
+    ReportsModule,
   ],
   controllers: [],
   providers: [],

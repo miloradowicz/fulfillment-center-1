@@ -119,7 +119,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Сарафан',
-        amount: 7,
         barcode: '012345678901',
         article: '01234567',
         dynamic_fields: [
@@ -130,7 +129,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Джинсы',
-        amount: 10,
         barcode: '987654321012',
         article: '987654',
         dynamic_fields: [
@@ -141,7 +139,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Футболка',
-        amount: 15,
         barcode: '567890123456',
         article: '567890',
         dynamic_fields: [
@@ -206,12 +203,12 @@ export class SeederService {
       {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, description: '', amount: 20 }],
+        products: [{ product: _product1._id, amount: 20 }],
       },
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
-        products: [{ product: _product2._id, description: '', amount: 20 }],
+        products: [{ product: _product2._id, amount: 20 }],
       },
     ])
 
@@ -302,6 +299,7 @@ export class SeederService {
         title: 'Упаковка товара для заказа',
         status: 'готово',
         type: 'другое',
+        date_Done: '2025-03-29T08:27:17.078Z',
       },
       {
         user: _User2._id,
@@ -315,12 +313,46 @@ export class SeederService {
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
+      },
+      {
+        user: _User4._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-20T08:27:17.078Z',
+      },
+      {
+        user: _User3._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-21T08:27:17.078Z',
+      },
+      {
+        user: _User3._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-22T08:27:17.078Z',
+      },
+      {
+        user: _User1._id,
+        title: 'Решить вопрос по начислению оплаты по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
       },
       {
         user: _User5._id,
         title: 'Связаться с клиентом ',
         status: 'готово',
         type: 'другое',
+        date_Done: '2025-03-26T08:27:17.078Z',
       },
       {
         user: _User6._id,
@@ -328,6 +360,7 @@ export class SeederService {
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival2._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
       },
     ])
 
