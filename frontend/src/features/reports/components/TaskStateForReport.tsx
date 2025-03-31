@@ -24,8 +24,8 @@ const TaskStateForReport: React.FC<TaskSummaryProps> = ({ tasks }) => {
   ]
 
   return (
-    <Card style={{ height:'360px' }}>
-      <Typography variant={'h6'} className="text-xl text-center font-bold mb-2">Всего задач: {totalTasks}</Typography>
+    <Card style={{ height:'360px' }} >
+      <Typography variant={'h6'} className="text-xl text-center font-bold pt-2.5">Всего задач: {totalTasks}</Typography>
       <Box className="flex flex-row items-center p-4  ">
         <Box className="flex flex-col mb-4 w-[35%]">
           <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
