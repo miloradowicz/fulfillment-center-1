@@ -57,7 +57,7 @@ const OrderDetails = () => {
 
   return (
     <Container maxWidth="md">
-      <Card className="mx-auto bg-white shadow-lg rounded-lg p-6">
+      <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
           <IconButton >
             <ArrowBack />
@@ -66,8 +66,16 @@ const OrderDetails = () => {
             Заказы
           </Typography>
         </Box>
-        <Box className="flex flex-wrap gap-5 items-start mt-3 mb-5">
+        <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
           <Box>
+            <Chip label={order.status}
+              color={getOrderStatusColor(order.status)}
+              className="mb-5"
+              sx={{
+                borderRadius: '4px',
+                height: '28px',
+              }}
+              variant="outlined" />
             <Typography variant="h5" className="!font-bold">
               Детали заказа #{order.orderNumber}
             </Typography>
@@ -81,12 +89,7 @@ const OrderDetails = () => {
               }
             </Box>
           </Box>
-          <Chip label={order.status} color={getOrderStatusColor(order.status)}  sx={{
-            borderRadius: '4px',
-            height: '28px',
-          }}
-          variant="outlined" />
-          <Box className="ml-auto flex flex-col items-center !self-end !me-10">
+          <Box className="ml-auto flex flex-col gap-2 items-center !self-end !me-10">
             <Typography className="!text-xs">Заказчик</Typography>
             <Typography component={Link} to={`/clients/${ order.client._id }`} target="_blank" className="!font-bold underline underline-offset-4">{order.client.name}</Typography>
             <Typography className="!font-light">{order.client.phone_number}</Typography>
