@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Model } from 'mongoose'
-import { InjectModel } from '@nestjs/mongoose'
+import { Connection, Model } from 'mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { User, UserDocument } from 'src/schemas/user.schema'
@@ -17,6 +17,8 @@ import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-cat
 @Injectable()
 export class SeederService {
   constructor(
+    @InjectConnection()
+    private readonly connection: Connection,
     @InjectModel(Client.name)
     private readonly clientModel: Model<ClientDocument>,
     @InjectModel(Product.name)
@@ -39,20 +41,10 @@ export class SeederService {
     private readonly counterpartyModel: Model<CounterpartyDocument>,
     @InjectModel(ServiceCategory.name)
     private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
-  ) {}
+  ) { }
 
   async seed() {
-    await this.userModel.deleteMany()
-    await this.clientModel.deleteMany({})
-    await this.productModel.deleteMany({})
-    await this.taskModel.deleteMany({})
-    await this.orderModel.deleteMany({})
-    await this.arrivalModel.deleteMany({})
-    await this.serviceModel.deleteMany({})
-    await this.stockModel.deleteMany({})
-    await this.counterModel.deleteMany({})
-    await this.counterpartyModel.deleteMany({})
-    await this.serviceCategoryModel.deleteMany({})
+    await this.connection.dropDatabase()
 
     const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
@@ -385,28 +377,24 @@ export class SeederService {
 
     await this.serviceModel.create([
       {
-        name: 'Работа с товаром по прибытию на склад',
+        name: 'Приемка, пересчет товара',
+        price: 50000,
         serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
-          { key: '6', label: 'Маркировка двойная', value: '300 сом' },
-        ],
       },
       {
-        name: 'Замена/установка бирки',
+        name: 'Маркировка двойная',
+        price: 30000,
         serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
       },
       {
-        name: 'Создание поставки в ЛК селлера (до 10 артикулов)',
+        name: 'Погрузка-Разгрузка на складе фулфилмента',
+        price: 70000,
         serviceCategory: _serviceCat2._id,
-        dynamic_fields: [
-          { key: '9', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '10', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
+      },
+      {
+        name: 'Забор с другого адреса',
+        serviceCategory: _serviceCat2._id,
+        price: 100000,
       },
     ])
   }

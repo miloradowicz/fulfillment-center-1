@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GlobalError, Service } from '../../types'
+import { GlobalError, PopulatedService, ValidationError } from '../../types'
 import {
   fetchServices,
   fetchServiceById,
@@ -11,8 +11,8 @@ import {
 import { RootState } from '../../app/store.ts'
 
 interface ServiceState {
-  service: Service | null;
-  services: Service[] | null;
+  service: PopulatedService | null;
+  services: PopulatedService[];
   loadingFetch: boolean;
   loadingFetchOne: boolean;
   loadingAdd: boolean;
@@ -20,11 +20,12 @@ interface ServiceState {
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
+  creationAndModificationError: ValidationError | GlobalError | null;
 }
 
 const initialState: ServiceState = {
   service: null,
-  services: null,
+  services: [],
   loadingFetch: false,
   loadingFetchOne: false,
   loadingAdd: false,
@@ -32,6 +33,7 @@ const initialState: ServiceState = {
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
+  creationAndModificationError: null,
 }
 
 export const selectService = (state: RootState) => state.services.service
@@ -42,11 +44,16 @@ export const selectLoadingArchiveService = (state: RootState) => state.services.
 export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete
 export const selectLoadingUpdateService = (state: RootState) => state.services.loadingUpdate
 export const selectServiceError = (state: RootState) => state.services.error
+export const selectServiceCreationAndModificationError = (state: RootState) => state.services.creationAndModificationError
 
 const serviceSlice = createSlice({
   name: 'services',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCreationAndModificationError: state => {
+      state.creationAndModificationError = null
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchServices.pending, state => {
       state.loadingFetch = true
@@ -76,9 +83,10 @@ const serviceSlice = createSlice({
     builder.addCase(createService.fulfilled, state => {
       state.loadingAdd = false
     })
-    builder.addCase(createService.rejected, (state, action) => {
+    builder.addCase(createService.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingAdd = false
-      state.error = action.payload ?? { message: 'Ошибка создания услуги' }
+      state.creationAndModificationError =
+        returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
 
     builder.addCase(updateService.pending, state => {
@@ -87,9 +95,10 @@ const serviceSlice = createSlice({
     builder.addCase(updateService.fulfilled, state => {
       state.loadingUpdate = false
     })
-    builder.addCase(updateService.rejected, (state, { payload: error }) => {
+    builder.addCase(updateService.rejected, (state, { payload: returnedError, error: thrownError }) => {
       state.loadingUpdate = false
-      state.error = error || null
+      state.creationAndModificationError =
+        returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
     })
 
     builder.addCase(archiveService.pending, state => {
@@ -121,3 +130,4 @@ const serviceSlice = createSlice({
 })
 
 export const serviceReducer = serviceSlice.reducer
+export const { clearCreationAndModificationError } = serviceSlice.actions

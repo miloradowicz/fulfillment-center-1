@@ -9,6 +9,7 @@ import { serviceReducer } from '../store/slices/serviceSlice.ts'
 import { stockReducer } from '../store/slices/stocksSlice.ts'
 import { counterpartyReducer } from '../store/slices/counterpartySlices.ts'
 import { reportReducer } from '../store/slices/reportSlice.ts'
+import { serviceCategoryReducer } from '../store/slices/serviceCategorySlice.ts'
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     stocks: stockReducer,
     counterparties: counterpartyReducer,
     reports: reportReducer,
+    serviceCategories: serviceCategoryReducer,
   },
 })
 

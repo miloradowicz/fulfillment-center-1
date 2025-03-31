@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, HydratedDocument } from 'mongoose'
 
 export type ServiceDocument = Service & Document
 
@@ -11,7 +11,15 @@ export class Service {
   })
   isArchived: boolean
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    validate: {
+      validator: async function (this: HydratedDocument<Service>, value: string) {
+        return !this.isModified('name') || !(await this.model().findOne({ name: value }))
+      },
+      message: 'Название услуги должно быть уникальным',
+    },
+  })
   name: string
 
   @Prop({
@@ -22,20 +30,13 @@ export class Service {
   serviceCategory: mongoose.Schema.Types.ObjectId
 
   @Prop({
-    type: [
-      {
-        key: { type: String, required: true, unique: true },
-        label: { type: String, required: true },
-        value: { type: String, required: true },
-      },
-    ],
+    type: Number,
     required: true,
   })
-  dynamic_fields: {
-    key: string
-    label: string
-    value: string
-  }[]
+  price: number
+
+  @Prop()
+  description: string
 
   @Prop({
     type: [
