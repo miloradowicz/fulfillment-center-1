@@ -50,11 +50,11 @@ export const fetchPopulatedArrivals = createAsyncThunk<ArrivalWithClient[]>(
 
 export const addArrival = createAsyncThunk<
   Arrival,
-  ArrivalMutation & { file?: File },
+  ArrivalMutation & { files?: File[] },
   { rejectValue: ValidationError }
->('arrivals/addArrival', async (arrivalData, { rejectWithValue }) => {
+>('arrivals/addArrival', async (data, { rejectWithValue }) => {
   try {
-    const formData = createArrivalFormData(arrivalData, arrivalData.file)
+    const formData = createArrivalFormData(data, data.files)
 
     const response = await axiosAPI.post('/arrivals', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -99,12 +99,11 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 
 export const updateArrival = createAsyncThunk<
   Arrival,
-  { arrivalId: string; data: ArrivalMutation & { file?: File } },
+  { arrivalId: string; data: ArrivalMutation & { files?: File[] } },
   { rejectValue: ValidationError }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
-    const formData = createArrivalFormData(data, data.file)
-
+    const formData = createArrivalFormData(data, data.files)
     const response = await axiosAPI.put(`/arrivals/${ arrivalId }`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })

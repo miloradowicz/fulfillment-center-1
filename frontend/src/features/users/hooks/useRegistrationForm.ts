@@ -48,7 +48,7 @@ export const useRegistrationForm = () => {
 
         if (!checkStrenght((form as UserRegistrationMutation).password)) {
           return void toast.error(
-            'Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латниские буквы, одну цифру',
+            'Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латинские буквы, одну цифру',
           )
         }
 
@@ -60,7 +60,7 @@ export const useRegistrationForm = () => {
         setFrontendError({})
         toast.success('Пользователь успешно создан!')
       } catch {
-        toast.error('Пользователь не создан')
+        toast.error('При создании пользователя произошла ошибка.')
       }
     }
   }
