@@ -102,7 +102,7 @@ export interface Arrival {
   _id: string
   client: string
   products: ProductArrival[]
-  arrival_price: number
+  arrival_price?: number
   arrival_date: string
   sent_amount: string
   stock: string
@@ -192,23 +192,16 @@ export type UserRegistrationMutation = {
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
 }
 
-export interface ArrivalError {
+export interface ErrorsFields {
   client: string
   product: string
-  arrival_price: number
+  price: string
   arrival_date: string
+  arrival_price: string
   stock: string
-  amount: number
+  amount: string
   defect_description: string
   arrival_status?: string
-}
-
-export interface ErrorForOrder {
-  client: string
-  product: string
-  price: number
-  amount: number
-  defect_description: string
   sent_at: string
   status?: string
 }
@@ -233,9 +226,9 @@ export interface Task {
   associated_order?: string | null
   associated_arrival?: string | null
   description: string
-  date_ToDO?:string | null
-  date_inProgress?:string | null
-  date_Done?: string | null
+  date_ToDO?:string | Date
+  date_inProgress?:string | Date
+  date_Done?: string | Date
   status?: string | null
   logs?: Log[]
 }

@@ -14,10 +14,7 @@ import {
 import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { ArrivalsService } from '../services/arrivals.service'
 import { UpdateArrivalDto } from '../dto/update-arrival.dto'
-import { FilesInterceptor } from '@nestjs/platform-express'
-import { diskStorage } from 'multer'
-import * as path from 'node:path'
-import { getRandomStr } from '../utils/getRandomString'
+import { FileUploadInterceptor } from '../utils/uploadFiles'
 
 @Controller('arrivals')
 export class ArrivalsController {
@@ -43,33 +40,19 @@ export class ArrivalsController {
   }
 
   @Get('archived/:id')
-  async getOneArchivedArrival(
-    @Param('id') id: string,
-    @Query('populate') populate: string
-  ) {
+  async getOneArchivedArrival(@Param('id') id: string, @Query('populate') populate: string) {
     return this.arrivalsService.getArchivedOne(id, populate === '1')
   }
 
   @Post()
-  @UseInterceptors(
-    FilesInterceptor('documents', 10, {
-      storage: diskStorage({
-        destination: './uploads/documents',
-        filename: (_req, file, cb) => {
-          const originalExt = path.extname(file.originalname) || ''
-          const { name } = path.parse(file.originalname)
-          const uniqueSuffix = getRandomStr()
-          cb(null, `${ name.replaceAll(' ', '_') }-${ uniqueSuffix }${ originalExt }`)
-        },
-      }),
-    }),
-  )
-  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Express.Multer.File[]) {
+  @UseInterceptors(FileUploadInterceptor())
+  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Array<Express.Multer.File>) {
     return this.arrivalsService.create(arrivalDto, files)
   }
 
   @Put(':id')
-  @UseInterceptors(FilesInterceptor('documents', 10, { dest: './uploads/documents' }))
+  @UseInterceptors(FileUploadInterceptor())
+
   async updateArrival(
     @Param('id') id: string,
     @Body() arrivalDto: UpdateArrivalDto,

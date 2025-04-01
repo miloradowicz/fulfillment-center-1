@@ -11,6 +11,7 @@ import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import React from 'react'
 import { getProductNameById } from '../../../utils/getProductName.ts'
 import { getItemNameById } from '../../../utils/getItemNameById.ts'
+import { ItemType } from '../../../constants.ts'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -49,7 +50,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     stocks,
     availableItem,
     counterparties,
-    file,
+    files,
     handleFileChange,
   } = useArrivalForm(initialData, onSuccess)
 
@@ -58,7 +59,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         {isLoading ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress/>
+            <CircularProgress />
           </Grid>
         ) : null}
 
@@ -131,7 +132,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             options={getItemNameById(counterparties, 'name', '_id')}
             getOptionKey={option => option.id}
             sx={{ width: '100%' }}
-            renderInput={params => <TextField {...params} label="Компания-перевозчик"/>}
+            renderInput={params => <TextField {...params} label="Компания-перевозчик" />}
           />
         </Grid>
 
@@ -226,7 +227,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onDelete={i => deleteItem(i, setProductsForm)}
             getProductNameById={i => getProductNameById(products, i)}
           />
-          <Button type="button" onClick={() => openModal('products', initialItemState)}>
+          <Button type="button" onClick={() => openModal(ItemType.PRODUCTS, initialItemState)}>
             + Добавить товары
           </Button>
         </Grid>
@@ -288,7 +289,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem('products')}>
+              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.PRODUCTS)}>
                 Добавить
               </Button>
 
@@ -300,14 +301,14 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Полученные товары</Typography>
           <ItemsList
             items={receivedForm}
             onDelete={i => deleteItem(i, setReceivedForm)}
             getProductNameById={i => getProductNameById(products, i)}
           />
-          <Button type="button" onClick={() => openModal('received_amount', initialItemState)}>
+          <Button type="button" onClick={() => openModal(ItemType.PRODUCTS, initialItemState)}>
             + Добавить полученные товары
           </Button>
         </Grid>
@@ -369,7 +370,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem('received_amount')}>
+              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.RECEIVED_AMOUNT)}>
                 Добавить
               </Button>
 
@@ -381,14 +382,14 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         )}
 
         <Grid>
-          <Divider sx={{ width: '100%', marginBottom: '15px' }}/>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Дефекты</Typography>
           <ItemsList
             items={defectsForm}
             onDelete={i => deleteItem(i, setDefectForm)}
             getProductNameById={i => getProductNameById(products, i)}
           />
-          <Button type="button" onClick={() => openModal('defects', initialItemState)}>
+          <Button type="button" onClick={() => openModal(ItemType.DEFECTS, initialItemState)}>
             + Добавить дефекты
           </Button>
         </Grid>
@@ -453,7 +454,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem('defects')}>
+              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.DEFECTS)}>
                 Добавить
               </Button>
 
@@ -464,27 +465,30 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </Grid>
         )}
 
-        <Divider sx={{ width: '100%', marginBottom: '10px' }}/>
+        <Divider sx={{ width: '100%', marginBottom: '10px' }} />
 
         <Grid className="flex gap-2 content-between items-center">
           <Typography>Загрузить документ</Typography>
           <Grid sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton component="label" className="">
-              <InsertDriveFileIcon fontSize={'large'} color={'primary'}/>
-              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange}/>
+            <IconButton component="label">
+              <InsertDriveFileIcon fontSize="large" color="primary" />
+              <input type="file" accept=".pdf, .doc, .docx, .xlsx" multiple hidden onChange={handleFileChange} />
             </IconButton>
-            {file && (
-              <Grid sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Typography variant="body2">{file.name}</Typography>
+            {files.length > 0 && (
+              <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                {files.map((file, index) => (
+                  <Typography key={index} variant="body2">{file.name}</Typography>
+                ))}
               </Grid>
             )}
           </Grid>
         </Grid>
 
+
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
             {isLoading ? (
-              <CircularProgress size={24} color="inherit"/>
+              <CircularProgress size={24} color="inherit" />
             ) : initialData ? (
               'Обновить поставку'
             ) : (

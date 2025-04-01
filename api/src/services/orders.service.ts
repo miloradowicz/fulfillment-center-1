@@ -14,15 +14,18 @@ export class OrdersService {
   ) {}
 
   async getAll() {
-    return this.orderModel.find({ isArchived: false })
+    const orders = await this.orderModel.find({ isArchived: false }).exec()
+    return orders.reverse()
   }
 
   async getAllArchived() {
-    return this.orderModel.find({ isArchived: true }).exec()
+    const orders = await this.orderModel.find({ isArchived: true }).exec()
+    return orders.reverse()
   }
 
   async getAllWithClient() {
-    return this.orderModel.find({ isArchived: false }).populate('client').exec()
+    const orders = await this.orderModel.find({ isArchived: false }).populate('client').exec()
+    return orders.reverse()
   }
 
   async getById(id: string) {

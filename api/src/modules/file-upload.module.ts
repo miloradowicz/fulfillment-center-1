@@ -23,9 +23,8 @@ import * as fs from 'fs'
         },
       }),
       fileFilter: (_req, file, cb) => {
-        const allowedTypes = ['.pdf', '.doc', '.docx']
+        const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx']
         const ext = path.extname(file.originalname).toLowerCase()
-
         if (allowedTypes.includes(ext)) {
           cb(null, true)
         } else {
@@ -34,10 +33,12 @@ import * as fs from 'fs'
       },
       limits: {
         fileSize: 10 * 1024 * 1024,
+        files: 10,
       },
     }),
   ],
   providers: [FilesService],
   exports: [FilesService],
 })
+
 export class FilesModule {}

@@ -1,11 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import {
-  ArrivalError,
   ArrivalMutation,
   ArrivalWithClient,
   ArrivalWithPopulate,
   Defect,
+  ErrorsFields,
   Product,
   ProductArrival,
 } from '../../../types'
@@ -28,8 +28,22 @@ import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
 import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
+import { ErrorMessagesList } from '../../../messages.ts'
+import { ItemType } from '../../../constants.ts'
 
 export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
+
+type ErrorMessages = Pick<
+  ErrorsFields,
+  'client'
+  | 'product'
+  | 'arrival_date'
+  | 'amount'
+  | 'stock'
+  | 'defect_description'
+  | 'arrival_status'
+  | 'arrival_price'
+>
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -77,9 +91,9 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   )
 
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
-  const [errors, setErrors] = useState<ArrivalError>({ ...initialErrorState })
+  const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
   const [availableItem, setAvailableItem] = useState<Product[]>([])
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
 
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
@@ -110,7 +124,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = (type: 'products' | 'received_amount' | 'defects', initialState: ProductArrival | Defect) => {
+  const openModal = (type: ItemType, initialState: ProductArrival | Defect) => {
     setNewItem(initialState)
 
     const modalSetters = {
@@ -123,12 +137,12 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     modalSetters[type](true)
   }
 
-  const addItem = (type: 'products' | 'received_amount' | 'defects') => {
+  const addItem = (type: ItemType) => {
     const baseItem = {
       product: newItem.product,
       amount: Number(newItem.amount),
-      ...(type !== 'defects' && { description: (newItem as ProductArrival).description }),
-      ...(type === 'defects' && { defect_description: (newItem as Defect).defect_description }),
+      ...(type !== ItemType.DEFECTS && { description: (newItem as ProductArrival).description }),
+      ...(type === ItemType.DEFECTS && { defect_description: (newItem as Defect).defect_description }),
     }
 
     if (!baseItem.product || baseItem.amount <= 0 || (type === 'defects' && !(baseItem as Defect).defect_description)) {
@@ -137,15 +151,15 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
 
     switch (type) {
-    case 'products':
+    case ItemType.PRODUCTS:
       setProductsForm(prev => [...prev, baseItem as ProductArrival])
       setProductsModalOpen(false)
       break
-    case 'received_amount':
+    case ItemType.RECEIVED_AMOUNT:
       setReceivedForm(prev => [...prev, baseItem as ProductArrival])
       setReceivedModalOpen(false)
       break
-    case 'defects':
+    case ItemType.DEFECTS:
       setDefectForm(prev => [...prev, baseItem as Defect])
       setDefectsModalOpen(false)
       break
@@ -158,19 +172,15 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     setter(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleBlur = (field: keyof ArrivalError, value: string | number) => {
-    type ErrorMessages = {
-      [key in keyof ArrivalError]: string
-    }
-
+  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
     const errorMessages: ErrorMessages = {
-      product: !value ? 'Выберите товар' : '',
-      amount: Number(value) <= 0 ? 'Количество должно быть больше 0' : '',
-      arrival_price: Number(value) <= 0 ? 'Цена должна быть больше 0' : '',
-      defect_description: !value ? 'Заполните описание дефекта' : '',
-      client: !value ? 'Выберите клиента' : '',
-      arrival_date: !value ? 'Укажите дату прибытия' : '',
-      stock: !value ? 'Выберите склад' : '',
+      product: !value ? ErrorMessagesList.ProductErr : ErrorMessagesList.Default,
+      amount: Number(value) <= 0 ? ErrorMessagesList.Amount : ErrorMessagesList.Default,
+      defect_description: !value ? ErrorMessagesList.DefectDescription : ErrorMessagesList.Default,
+      client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
+      arrival_date: !value ? ErrorMessagesList.ArrivalDate : ErrorMessagesList.Default,
+      stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
+      arrival_price: Number(value) <= 0 ? ErrorMessagesList.ArrivalPrice : ErrorMessagesList.Default,
     }
 
     setErrors(prev => ({
@@ -179,24 +189,34 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }))
   }
 
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null
-    if (selectedFile) {
-      const maxFileSize = 10 * 1024 * 1024
-      if (selectedFile.size > maxFileSize) {
-        toast.warn('Размер файла слишком большой. Максимальный размер: 10MB')
-        setFile(null)
-        return
+    if (!e.target.files) return
+
+    const selectedFiles = Array.from(e.target.files)
+    const maxFileSize = 10 * 1024 * 1024
+
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > maxFileSize) {
+        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
+        return false
       }
-      setFile(selectedFile)
-    }
+      return true
+    })
+
+    setFiles(prevFiles => [...prevFiles, ...validFiles])
   }
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (Object.values(errors).filter(Boolean).length) {
+      toast.error('Заполните все обязательные поля.')
+      return
+    }
+
     if (productsForm.length === 0) {
-      toast.error('Добавьте товары.')
+      toast.error('Добавьте отправленные товары.')
       return
     }
 
@@ -206,12 +226,12 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
-        file: file || undefined,
+        files: files || [],
         shipping_agent: form.shipping_agent || null,
       }
 
       if (initialData) {
-        await dispatch(updateArrival({ arrivalId: initialData._id, data: updatedForm })).unwrap()
+        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm, files } })).unwrap()
         onSuccess?.()
         await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
@@ -227,6 +247,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setDefectForm([])
 
       if (onSuccess) onSuccess()
+
     } catch (error) {
       console.error(error)
 
@@ -271,8 +292,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     stocks,
     counterparties,
     availableItem,
-    file,
-    setFile,
+    files,
     handleFileChange,
   }
 }

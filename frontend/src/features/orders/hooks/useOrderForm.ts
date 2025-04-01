@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Defect,
+  Defect, ErrorsFields,
   DefectForOrderForm,
-  ErrorForOrder,
   OrderMutation,
   Product,
   ProductForOrderForm,
@@ -34,6 +33,9 @@ import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
+import { ItemType } from '../../../constants.ts'
+
+type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status'>
 
 export const useOrderForm = (onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
@@ -69,7 +71,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [isButtonVisible, setButtonVisible] = useState(true)
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
-  const status = ['в сборке', 'в пути', 'доставлен']
 
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
@@ -200,10 +201,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const deleteProduct = (index: number) => {
-    deleteItem(index, setProductsForm, setForm, 'products')
+    deleteItem(index, setProductsForm, setForm, ItemType.PRODUCTS)
   }
   const deleteDefect = (index: number) => {
-    deleteItem(index, setDefectForm, setForm, 'defects')
+    deleteItem(index, setDefectForm, setForm, ItemType.DEFECTS)
   }
 
   type FormData = OrderMutation | ProductOrder | Defect
@@ -214,7 +215,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
     formData: FormData,
     errorMessage: string,
   ) => {
-    if ('client' in formData || 'products' in formData || 'product' in formData) {
+    if ('client' in formData || ItemType.PRODUCTS in formData || 'product' in formData) {
       const keys = Object.keys(formData) as (keyof FormData)[]
       if (keys.includes(field as keyof FormData)) {
         if (!formData[field as keyof FormData]) {
@@ -269,7 +270,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   return {
     form,
     setForm,
-    status,
     productsForm,
     setProductsForm,
     defectForm,

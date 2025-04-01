@@ -1,6 +1,6 @@
 import { ArrivalMutation } from '../types'
 
-export const createArrivalFormData = (data: ArrivalMutation, file?: File) => {
+export const createArrivalFormData = (data: ArrivalMutation, files?: File[]) => {
   const formData = new FormData()
 
   Object.entries(data).forEach(([key, value]) => {
@@ -13,18 +13,16 @@ export const createArrivalFormData = (data: ArrivalMutation, file?: File) => {
           formData.append(formattedKey, fieldValue.toString())
         })
       })
-    }
-    else if (typeof value === 'object' && 'toISOString' in value) {
+    } else if (typeof value === 'object' && 'toISOString' in value) {
       formData.append(key, (value as Date).toISOString())
-    }
-    else {
+    } else {
       formData.append(key, value.toString())
     }
   })
 
-  if (file) {
+  files?.forEach(file => {
     formData.append('documents', file)
-  }
+  })
 
   return formData
 }

@@ -22,10 +22,9 @@ export const initialItemState = {
 export const initialErrorState = {
   client: '',
   product: '',
-  arrival_price: 0,
+  arrival_price: '',
   arrival_date: '',
-  amount: 0,
-  sent_amount: '',
+  amount: '',
   stock: '',
   defect_description: '',
   arrival_status: '',

@@ -18,11 +18,13 @@ export class ClientsService {
   ) {}
 
   async getAll() {
-    return this.clientModel.find({ isArchived: false })
+    const clients = await this.clientModel.find({ isArchived: false }).exec()
+    return clients.reverse()
   }
 
   async getAllArchived() {
-    return this.clientModel.find({ isArchived: true })
+    const clients = await this.clientModel.find({ isArchived: true }).exec()
+    return clients.reverse()
   }
 
   async getById(id: string) {
