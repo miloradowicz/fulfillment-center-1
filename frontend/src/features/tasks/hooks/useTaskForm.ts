@@ -48,7 +48,7 @@ const UseTaskForm = (onSuccess?: () => void) => {
       onSuccess?.()
       setForm(initialState)
       setErrors(initialErrorState)
-      toast.success('Задача успешно создна')
+      toast.success('Задача успешно создана')
     } catch (e) {
       console.error(e)
     }

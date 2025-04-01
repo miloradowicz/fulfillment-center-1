@@ -39,3 +39,9 @@ export const passwordStrengthOptions: Options<string> = [
 export const OrderStatus = ['в сборке', 'в пути', 'доставлен']
 
 export const ArrivalStatus = ['ожидается доставка', 'получена', 'отсортирована']
+
+export enum ItemType {
+  PRODUCTS = 'products',
+  RECEIVED_AMOUNT = 'received_amount',
+  DEFECTS = 'defects',
+}

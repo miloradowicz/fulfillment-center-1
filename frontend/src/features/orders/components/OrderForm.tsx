@@ -5,6 +5,8 @@ import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
+import { ErrorMessagesList } from '../../../messages.ts'
+import { OrderStatus } from '../../../constants.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -15,7 +17,6 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
   const {
     form,
     setForm,
-    status,
     productsForm,
     defectForm,
     newField,
@@ -83,7 +84,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                         label="Клиент"
                         error={Boolean(errors.client || getFieldError('client', createError))}
                         helperText={errors.client || getFieldError('client', createError)}
-                        onBlur={() => handleBlurAutoComplete('client', setErrors, form, 'Выберите клиента')}
+                        onBlur={() => handleBlurAutoComplete('client', setErrors, form, ErrorMessagesList.ClientErr)}
                       />
                     )}
                   />
@@ -161,7 +162,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       required={true}
                       error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={() => handleBlurAutoComplete('product', setErrors, newField, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newField, ErrorMessagesList.ProductErr)}
                     />
                   )}
                 />
@@ -246,20 +247,20 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               />
             </Grid>
             <Grid container direction="column" spacing={2}>
-              {status && status?.length > 0 && (
+              {OrderStatus && OrderStatus?.length > 0 && (
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
                     <Autocomplete
                       size={'small'}
                       fullWidth
                       disablePortal
-                      options={status}
+                      options={OrderStatus}
                       onChange={(_, newValue) => {
                         if (newValue) {
                           setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
-                      value={status.find(option => option === form.status) || status[0] || null}
+                      value={OrderStatus.find(option => option === form.status) || OrderStatus[0] || null}
                       getOptionLabel={option => option || ''}
                       isOptionEqualToValue={(option, value) => option === value}
                       renderInput={params => (
@@ -361,7 +362,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       label="Товар"
                       error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={() => handleBlurAutoComplete('product', setErrors, newFieldDefects, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newFieldDefects, ErrorMessagesList.ProductErr)}
                     />
                   )}
                 />

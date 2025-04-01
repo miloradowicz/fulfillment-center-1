@@ -10,6 +10,7 @@ import {
   selectLoadingAddProduct,
   selectLoadingUpdateProduct,
 } from '../../../store/slices/productSlice.ts'
+import { ErrorMessagesList } from '../../../messages.ts'
 
 const initialState: ProductMutation = {
   client: '',
@@ -122,16 +123,16 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
     const newErrors: Record<string, string> = {}
 
     if (!form.client) {
-      newErrors.client = 'Поле "Клиент" обязательно для заполнения!'
+      newErrors.client = ErrorMessagesList.ClientErr
     }
     if (!form.title.trim()) {
-      newErrors.title = 'Поле "Название" обязательно для заполнения!'
+      newErrors.title = 'Заполните название товара'
     }
     if (!form.barcode.trim()) {
-      newErrors.barcode = 'Поле "Баркод" обязательно для заполнения!'
+      newErrors.barcode = 'Поле "Баркод" обязательно для заполнения'
     }
     if (!form.article.trim()) {
-      newErrors.article = 'Поле "Артикул" обязательно для заполнения!'
+      newErrors.article = 'Поле "Артикул" обязательно для заполнения'
     }
 
     setErrors(newErrors)
