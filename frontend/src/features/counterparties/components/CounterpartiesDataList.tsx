@@ -4,7 +4,6 @@ import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Counterparty } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
-import { NavLink } from 'react-router-dom'
 import { useCounterpartiesList } from '../hooks/useCounterpartiesList.ts'
 import CounterpartyForm from './CounterpartyForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
@@ -72,7 +71,7 @@ const CounterpartiesDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      minWidth: isMediumScreen ? 220 : 180,
+      minWidth: 150,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
@@ -86,13 +85,6 @@ const CounterpartiesDataList = () => {
           <IconButton onClick={() => handleOpenConfirmationModal(row)}>
             <ClearIcon />
           </IconButton>
-          <NavLink
-            to={`/counterparties/${ row._id }`}
-            style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Подробнее
-          </NavLink>
         </Box>
       ),
     },
