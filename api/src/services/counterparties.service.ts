@@ -10,11 +10,13 @@ export class CounterpartiesService {
   constructor(@InjectModel(Counterparty.name) private readonly counterpartyModel: Model<CounterpartyDocument>) {}
 
   async getAll() {
-    return this.counterpartyModel.find({ isArchived: false }).exec()
+    const counterparties = await this.counterpartyModel.find({ isArchived: false }).exec()
+    return counterparties.reverse()
   }
 
   async getAllArchived() {
-    return this.counterpartyModel.find({ isArchived: true }).exec()
+    const counterparties = await this.counterpartyModel.find({ isArchived: true }).exec()
+    return counterparties.reverse()
   }
 
   async getById(id: string) {
@@ -39,7 +41,10 @@ export class CounterpartiesService {
   async create(counterpartyDto: CreateCounterpartyDto) {
     const existingCounterparty = await this.counterpartyModel.findOne({ name: counterpartyDto.name }).exec()
     if (existingCounterparty) {
-      throw new BadRequestException({ message: 'Контрагент с таким именем уже существует', errors: { name: 'Имя должно быть уникальным' } })
+      throw new BadRequestException({
+        message: 'Контрагент с таким именем уже существует',
+        errors: { name: 'Имя должно быть уникальным' },
+      })
     }
 
     return this.counterpartyModel.create(counterpartyDto)
@@ -49,7 +54,10 @@ export class CounterpartiesService {
     const existingCounterparty = await this.counterpartyModel.findOne({ name: counterpartyDto.name }).exec()
 
     if (existingCounterparty && existingCounterparty.id !== id) {
-      throw new BadRequestException({ message: 'Контрагент с таким именем уже существует', errors: { name: 'Имя должно быть уникальным' } })
+      throw new BadRequestException({
+        message: 'Контрагент с таким именем уже существует',
+        errors: { name: 'Имя должно быть уникальным' },
+      })
     }
 
     const counterparty = await this.counterpartyModel.findByIdAndUpdate(id, counterpartyDto, { new: true }).exec()
