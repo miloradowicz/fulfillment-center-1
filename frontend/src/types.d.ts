@@ -220,6 +220,7 @@ export interface DefectForOrderForm {
 
 export interface Task {
   _id: string
+  taskNumber: string
   user: string
   title: string
   type: string
@@ -235,6 +236,7 @@ export interface Task {
 
 export interface TaskWithPopulate {
   _id: string
+  taskNumber: string
   user: {
     _id: string
     email: string

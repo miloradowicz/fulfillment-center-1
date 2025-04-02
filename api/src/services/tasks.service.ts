@@ -1,13 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Task, TaskDocument } from '../schemas/task.schema'
 import { CreateTaskDto } from '../dto/create-task.dto'
 import { UpdateTaskDto } from '../dto/update-task.dto'
+import { CounterService } from './counter.service'
 
 @Injectable()
 export class TasksService {
-  constructor(@InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>) {}
+  constructor(
+    @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
+    private counterService: CounterService,
+  ) {}
 
   async getAllByUser(userId: string, populate: boolean) {
     const unarchived = this.taskModel.find({ isArchived: false })
@@ -65,7 +69,22 @@ export class TasksService {
   }
 
   async create(taskDto: CreateTaskDto) {
-    return await this.taskModel.create(taskDto)
+    try {
+      const newTask = await this.taskModel.create(taskDto)
+
+      const sequenceNumber = await this.counterService.getNextSequence('task')
+      newTask.taskNumber  = `TSK-${ sequenceNumber }`
+
+      return newTask.save()
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error
+      }
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message)
+      }
+      throw new BadRequestException('Произошла ошибка при создании задачи')
+    }
   }
   async update(id: string, taskDto: UpdateTaskDto) {
     const task = await this.taskModel.findById(id)

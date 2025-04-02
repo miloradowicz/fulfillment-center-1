@@ -280,6 +280,7 @@ export class SeederService {
 
     await this.taskModel.create([
       {
+        taskNumber: 'TSK-1',
         user: _User1._id,
         title: 'Принять товар из поставки',
         description: 'Проверить товар на дефекты и внести информацию в базу',
@@ -288,6 +289,7 @@ export class SeederService {
         associated_arrival: _arrival1._id,
       },
       {
+        taskNumber: 'TSK-2',
         user: _User2._id,
         title: 'Собрать заказ',
         status: 'в работе',
@@ -295,6 +297,7 @@ export class SeederService {
         associated_order: _order2._id,
       },
       {
+        taskNumber: 'TSK-3',
         user: _User1._id,
         title: 'Упаковка товара для заказа',
         status: 'готово',
@@ -302,12 +305,14 @@ export class SeederService {
         date_Done: '2025-03-29T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-4',
         user: _User2._id,
         title: 'Проверить складские остатки',
         status: 'в работе',
         type: 'другое',
       },
       {
+        taskNumber: 'TSK-5',
         user: _User1._id,
         title: 'Связаться с клиентом по заказу',
         status: 'готово',
@@ -316,6 +321,7 @@ export class SeederService {
         date_Done: '2025-03-23T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-6',
         user: _User4._id,
         title: 'Связаться с клиентом по заказу',
         status: 'готово',
@@ -324,6 +330,7 @@ export class SeederService {
         date_Done: '2025-03-20T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-7',
         user: _User3._id,
         title: 'Связаться с клиентом по заказу',
         status: 'готово',
@@ -332,6 +339,7 @@ export class SeederService {
         date_Done: '2025-03-21T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-8',
         user: _User3._id,
         title: 'Связаться с клиентом по заказу',
         status: 'готово',
@@ -340,6 +348,7 @@ export class SeederService {
         date_Done: '2025-03-22T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-9',
         user: _User1._id,
         title: 'Решить вопрос по начислению оплаты по заказу',
         status: 'готово',
@@ -348,6 +357,7 @@ export class SeederService {
         date_Done: '2025-03-23T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-10',
         user: _User5._id,
         title: 'Связаться с клиентом ',
         status: 'готово',
@@ -355,6 +365,7 @@ export class SeederService {
         date_Done: '2025-03-26T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-11',
         user: _User6._id,
         title: 'Узнать информацию у клиента по прибытию поставки ',
         status: 'к выполнению',
@@ -363,6 +374,12 @@ export class SeederService {
         date_Done: '2025-03-28T08:27:17.078Z',
       },
     ])
+
+    await this.counterModel.findOneAndUpdate(
+      { name: 'task' },
+      { $set: { seq: 11 } },
+      { upsert: true }
+    )
 
     const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
       {
