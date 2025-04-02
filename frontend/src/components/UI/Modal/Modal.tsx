@@ -25,7 +25,25 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
       >
         <CloseIcon />
       </IconButton>
-      <DialogContent>{children}</DialogContent>
+      <DialogContent
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '10px',
+          '& form': {
+            width: '100%',
+            maxWidth: '70%',
+            '@media (max-width:500px)': {
+              maxWidth: '100%',
+            },
+          },
+          '& .MuiTextField-root': {
+            width: '100%',
+          },
+        }}
+      >
+        {children}
+      </DialogContent>
     </Dialog>
   )
 }

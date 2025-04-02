@@ -55,7 +55,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
       {loadingFetchClient ? (
         <CircularProgress />
       ) : (
-        <form onSubmit={onSubmit} style={{ width: '60%', margin: '20px auto' }}>
+        <form onSubmit={onSubmit}>
           <Typography variant="h5" sx={{ mb: 2 }}>
             {initialData ? 'Редактировать данные заказа' : 'Добавить новый заказ'}
           </Typography>

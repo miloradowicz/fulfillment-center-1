@@ -34,7 +34,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   } = useProductForm(initialData, onSuccess)
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
+    <form onSubmit={onSubmit} >
       <Typography variant="h5" sx={{ mb: 1 }}>
         { initialData? 'Редактировать данные товара' : 'Добавить новый товар'}
       </Typography>

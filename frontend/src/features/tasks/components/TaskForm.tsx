@@ -20,7 +20,7 @@ const TaskForm:React.FC<Props> = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
+      <Grid container direction="column" spacing={2}>
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
           Добавить новую задачу
         </Typography>

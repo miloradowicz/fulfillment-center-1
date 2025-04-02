@@ -8,8 +8,8 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
 
   return (
     <>
-      <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>
+      <form onSubmit={onSubmit}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
           {client ? 'Редактировать клиента' : 'Добавить нового клиента'}
         </Typography>
         <Grid container direction="column" spacing={2}>
