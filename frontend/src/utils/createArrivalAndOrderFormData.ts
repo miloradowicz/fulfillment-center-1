@@ -1,6 +1,6 @@
-import { ArrivalMutation } from '../types'
+import { ArrivalMutation, OrderMutation } from '../types'
 
-export const createArrivalFormData = (data: ArrivalMutation, files?: File[]) => {
+export const createArrivalAndOrderFormData = (data: ArrivalMutation | OrderMutation, files?: File[]) => {
   const formData = new FormData()
 
   Object.entries(data).forEach(([key, value]) => {

@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common'
 import { OrdersService } from '../services/orders.service'
 import { CreateOrderDto } from '../dto/create-order.dto'
 import { UpdateOrderDto } from '../dto/update-order.dto'
+import { FileUploadInterceptor } from '../utils/uploadFiles'
 
 @Controller('orders')
 export class OrdersController {
@@ -34,13 +47,16 @@ export class OrdersController {
   }
 
   @Post()
-  async createOrder(@Body() orderDto: CreateOrderDto) {
-    return this.ordersService.create(orderDto)
+  @UseInterceptors(FileUploadInterceptor())
+  async createOrder(@Body() orderDto: CreateOrderDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+    return this.ordersService.create(orderDto, files)
   }
 
+
   @Put(':id')
-  async updateOrder(@Param('id') id: string, @Body() orderDto: UpdateOrderDto) {
-    return this.ordersService.update(id, orderDto)
+  @UseInterceptors(FileUploadInterceptor())
+  async updateOrder(@Param('id') id: string, @Body() orderDto: UpdateOrderDto, @UploadedFiles() files: Array<Express.Multer.File>,) {
+    return this.ordersService.update(id, orderDto, files)
   }
 
   @Patch(':id/archive')

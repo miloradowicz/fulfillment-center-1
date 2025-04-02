@@ -10,6 +10,7 @@ import {
   ValidationError,
 } from '../../types'
 import { isAxiosError } from 'axios'
+import { createArrivalAndOrderFormData } from '../../utils/createArrivalAndOrderFormData.ts'
 
 export const fetchOrders = createAsyncThunk<Order[]>(
   'orders/fetchOrders',
@@ -42,10 +43,15 @@ export const fetchOrderByIdWithPopulate = createAsyncThunk<OrderWithProductsAndC
     return response.data
   },
 )
-export const addOrder = createAsyncThunk<void, OrderMutation, { rejectValue: ValidationError}
->('orders/addOrder', async (data: OrderMutation, { rejectWithValue }) => {
+
+export const addOrder = createAsyncThunk<Order, OrderMutation & { files?: File[] }, { rejectValue: ValidationError}
+>('orders/addOrder', async (data, { rejectWithValue }) => {
   try {
-    await axiosAPI.post('/orders', data)
+    const formData = createArrivalAndOrderFormData(data, data.files)
+    const response = await axiosAPI.post('/orders', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
   } catch (error) {
     if (isAxiosError(error) && error.response && error.response.status === 400) {
       return rejectWithValue(error.response.data as ValidationError)
@@ -53,6 +59,7 @@ export const addOrder = createAsyncThunk<void, OrderMutation, { rejectValue: Val
     throw error
   }
 })
+
 
 export const archiveOrder = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'orders/archiveOrder',
@@ -81,11 +88,15 @@ export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalE
   }
 })
 
-export const updateOrder = createAsyncThunk<void, { orderId: string; data: OrderMutation }, { rejectValue: ValidationError }>(
+export const updateOrder = createAsyncThunk<Order, { orderId: string; data: OrderMutation & { files?: File[] } }, { rejectValue: ValidationError }>(
   'orders/updateOrder',
   async ({ orderId, data }, { rejectWithValue }) => {
     try {
-      await axiosAPI.put(`/orders/${ orderId }`, data)
+      const formData = createArrivalAndOrderFormData(data, data.files)
+      const response = await axiosAPI.put(`/orders/${ orderId }`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return response.data
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as ValidationError)
@@ -94,3 +105,5 @@ export const updateOrder = createAsyncThunk<void, { orderId: string; data: Order
     }
   },
 )
+
+

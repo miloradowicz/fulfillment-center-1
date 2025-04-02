@@ -9,7 +9,7 @@ import {
   ValidationError,
 } from '../../types'
 import { isAxiosError } from 'axios'
-import { createArrivalFormData } from '../../utils/createArrivalFormData.ts'
+import { createArrivalAndOrderFormData } from '../../utils/createArrivalAndOrderFormData.ts'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
   const response = await axiosAPI.get('/arrivals')
@@ -54,7 +54,7 @@ export const addArrival = createAsyncThunk<
   { rejectValue: ValidationError }
 >('arrivals/addArrival', async (data, { rejectWithValue }) => {
   try {
-    const formData = createArrivalFormData(data, data.files)
+    const formData = createArrivalAndOrderFormData(data, data.files)
 
     const response = await axiosAPI.post('/arrivals', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -103,7 +103,7 @@ export const updateArrival = createAsyncThunk<
   { rejectValue: ValidationError }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
-    const formData = createArrivalFormData(data, data.files)
+    const formData = createArrivalAndOrderFormData(data, data.files)
     const response = await axiosAPI.put(`/arrivals/${ arrivalId }`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })

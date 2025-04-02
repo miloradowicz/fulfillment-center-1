@@ -8,11 +8,14 @@ export function FileUploadInterceptor(fieldName = 'documents', maxCount = 10) {
     storage: diskStorage({
       destination: './uploads/documents',
       filename: (_req, file, cb) => {
-        const originalExt = path.extname(file.originalname) || ''
-        const { name } = path.parse(file.originalname)
+        const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8')
+        const originalExt = path.extname(originalName) || ''
+        const { name } = path.parse(originalName)
         const uniqueSuffix = getRandomStr()
-        cb(null, `${ name.replaceAll(' ', '_') }-${ uniqueSuffix }${ originalExt }`)
+        cb(null, `${ name.normalize('NFKC').replace(/[^\p{L}\p{N}._-]/gu, '_') }-${ uniqueSuffix }${ originalExt }`)
       },
     }),
   })
 }
+
+

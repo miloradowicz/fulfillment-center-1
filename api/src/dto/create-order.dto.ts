@@ -79,6 +79,9 @@ export class CreateOrderDto {
   comment?: string
 
   @IsOptional()
+  documents?: Array<{ document: string }> | string[] | string
+
+  @IsOptional()
   @IsEnum(['в сборке', 'в пути', 'доставлен'], {
     message: 'Статус должен быть одним из: "в сборке", "в пути", "доставлен"',
   })

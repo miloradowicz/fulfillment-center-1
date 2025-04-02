@@ -23,21 +23,23 @@ import { OrderStatus } from '../../../constants.ts'
 import LogsTable from '../../../components/Tables/LogsTable.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import { basename } from 'path-browserify'
 
 const OrderDetails = () => {
   const {
     order,
     loading,
-    tabValue,
     open,
     openDeleteModal,
-    setTabValue,
     handleOpenEdit,
     handleDelete,
     setOpen,
     navigateBack,
     getStepDescription,
     setOpenDeleteModal,
+    infoTab,
+    setInfoTab,
   } = useOrderDetails()
 
   const statuses = Object.values(OrderStatus)
@@ -118,13 +120,37 @@ const OrderDetails = () => {
         </Box>
 
         <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Дополнительно</Divider>
-
-        <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} className="mt-6">
-          <Tab label="Дефекты" />
-          <Tab label="История" />
-        </Tabs>
         <Box className="mt-4">
-          {tabValue === 0 ? <DefectsTable defects={order.defects} /> : <LogsTable logs={order.logs || []} />}
+          <Tabs value={infoTab} onChange={(_, newValue) => setInfoTab(newValue)} className="mt-6">
+            <Tab label="Дефекты" />
+            <Tab label="История" />
+            <Tab label="Документы" />
+          </Tabs>
+        </Box>
+        <Box className="mt-4">
+          {infoTab === 0 ? (
+            <DefectsTable defects={order.defects} />
+          ) : infoTab === 1 ? (
+            <LogsTable logs={order.logs || []} />
+          ) : (
+            <Box  className="flex gap-3 items-center">
+              {order?.documents?.length ? (
+                order.documents.map((doc, index) => (
+                  <Link
+                    key={index}
+                    to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center text-center gap-1 hover:text-blue-500"
+                  >
+                    <InsertDriveFileIcon fontSize="large" color="primary" />
+                    <Typography variant="caption" className="!text-sm !truncate !w-40">{basename(doc.document)}</Typography>
+                  </Link>
+                ))
+              ) : null}
+            </Box>
+          )}
         </Box>
         <Box
           sx={{

@@ -12,9 +12,9 @@ export const useOrderDetails = () => {
   const dispatch = useAppDispatch()
   const order = useAppSelector(selectPopulateOrder)
   const loading = useAppSelector(selectLoadingFetchOrder)
-  const [tabValue, setTabValue] = useState(0)
   const [open, setOpen] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [infoTab, setInfoTab] = useState(0)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -57,15 +57,15 @@ export const useOrderDetails = () => {
   return {
     order,
     loading,
-    tabValue,
     open,
     openDeleteModal,
-    setTabValue,
     handleDelete,
     handleOpenEdit,
     setOpen,
     navigateBack,
     getStepDescription,
     setOpenDeleteModal,
+    infoTab,
+    setInfoTab,
   }
 }

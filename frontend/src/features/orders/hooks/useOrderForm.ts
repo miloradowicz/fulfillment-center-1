@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import {
   Defect, ErrorsFields,
   DefectForOrderForm,
@@ -39,6 +39,7 @@ type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_a
 
 export const useOrderForm = (onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
+  const [files, setFiles] = useState<File[]>([])
   const [form, setForm] = useState<OrderMutation>(
     initialData
       ? {
@@ -50,6 +51,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         defects: [],
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
+        documents: initialData.documents? initialData.documents : [],
       }
       : { ...initialStateOrder },
   )
@@ -118,6 +120,23 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setButtonVisible(true)
   }
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    const maxFileSize = 10 * 1024 * 1024
+    const selectedFiles = Array.from(e.target.files)
+
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > maxFileSize) {
+        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
+        return false
+      }
+      return true
+    })
+
+    setFiles(prevFiles => [...prevFiles, ...validFiles])
+  }
+
   useEffect(() => {
     dispatch(fetchClients())
   }, [dispatch])
@@ -152,6 +171,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         const updatedForm = {
           ...form,
           delivered_at: updated_delivered_at,
+          files: files || [],
           products: transformToOrder(productsForm, item => ({
             product: item.product._id,
             description: item.description,
@@ -169,7 +189,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           return
         }
 
-        await dispatch(updateOrder({ orderId: initialData._id, data: updatedForm })).unwrap()
+        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm, files } })).unwrap()
 
         if (params.id) {
           onSuccess?.()
@@ -186,8 +206,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           toast.error('Добавьте товары')
           return
         }
-
-        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at })).unwrap()
+        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at, files })).unwrap()
         onSuccess?.()
         toast.success('Заказ успешно создан!')
         setForm({ ...initialStateOrder })
@@ -308,5 +327,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
     onSubmit,
     initialData,
     availableDefects,
+    files,
+    handleFileChange,
   }
 }

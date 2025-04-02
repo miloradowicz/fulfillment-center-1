@@ -4,10 +4,13 @@ import { OrdersService } from 'src/services/orders.service'
 import { DbModule } from './db.module'
 import { AuthModule } from './auth.module'
 import { CounterService } from '../services/counter.service'
+import { ValidatorsModule } from './validators.module'
+import { FilesModule } from './file-upload.module'
 
 @Module({
-  imports: [DbModule, AuthModule],
+  imports: [DbModule, AuthModule,ValidatorsModule, FilesModule],
   controllers: [OrdersController],
   providers: [OrdersService, CounterService],
 })
 export class OrdersModule {}
+
