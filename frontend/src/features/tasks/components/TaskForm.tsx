@@ -30,7 +30,7 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
+      <Grid container direction="column" spacing={2}>
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
           { initialData? 'Редактировать данные задачи' : 'Добавить новую задачу'}
         </Typography>
@@ -150,7 +150,7 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
           )}
         </Grid>
 
-        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
+        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit} sx={{ mb: 2 }}>
           {initialData?
             updateLoading ? <CircularProgress size={24} /> : ' Обновить задачу'
             : addLoading ? <CircularProgress size={24} /> : ' Создать задачу'

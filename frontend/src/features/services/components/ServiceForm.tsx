@@ -22,8 +22,8 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId: string, onClose: () =>
   const defaultFilterOptions = createFilterOptions<ServiceCategory | string>()
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
+    <form onSubmit={onSubmit}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         Добавить новую услугу
       </Typography>
       <Grid container direction="column" spacing={2}>
