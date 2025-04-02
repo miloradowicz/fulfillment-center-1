@@ -150,7 +150,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Button>
 
         <Grid>
-          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate}>
+          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate} sx={{ mb: 2 }}>
             {loadingAdd || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
           </Button>
         </Grid>

@@ -106,7 +106,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
           </Grid>
 
           <Grid>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} sx={{ mb: 2 }}>
               {loading ? <CircularProgress size={24}/> : client ? 'Сохранить клиента' : 'Создать клиента'}
             </Button>
           </Grid>

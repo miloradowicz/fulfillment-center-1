@@ -70,7 +70,7 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
         </Grid>
 
         <Grid>
-          <Button type="submit" disabled={loading} variant="contained" sx={{ mt: 2 }}>
+          <Button type="submit" disabled={loading} variant="contained" sx={{ mt: 2, mb: 2 }}>
             {loading ? <CircularProgress size={24} /> : counterparty ? 'Сохранить' : 'Создать'}
           </Button>
         </Grid>

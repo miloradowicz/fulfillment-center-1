@@ -160,7 +160,7 @@ const TaskForm:React.FC<Props> = ({ onSuccess }) => {
         {/*    )}*/}
         {/*  />*/}
         {/*</Grid>*/}
-        <Button type="submit" variant="contained" color="primary" disabled={addLoading}>
+        <Button type="submit" variant="contained" color="primary" disabled={addLoading} sx={{ mb: 2 }}>
           {addLoading ? <CircularProgress size={24} /> : ' Создать задачу'}
         </Button>
       </Grid>

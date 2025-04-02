@@ -61,7 +61,7 @@ const StockForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Grid>
 
         <Grid>
-          <Button fullWidth type="submit" variant="contained" sx={{ mt: 3 }} disabled={isLoading}>
+          <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
             {isLoading ? (
               <CircularProgress size={24} color="inherit" />
             ) : initialData ? (
