@@ -1,28 +1,38 @@
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Typography, CircularProgress,
-} from '@mui/material'
+import { Autocomplete, Button, CircularProgress, TextField, Typography } from '@mui/material'
 import { getItemNameById } from '../../../utils/getItemNameById.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import Grid from '@mui/material/Grid2'
 import { taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
 import React from 'react'
+import { TaskWithPopulate } from '../../../types'
 
 interface Props {
   onSuccess?: () => void
+  initialData?: TaskWithPopulate
 }
 
-const TaskForm:React.FC<Props> = ({ onSuccess }) => {
-  const { users, form, orders, arrivals, error, errors, addLoading, handleInputChange, handleSubmit, handleBlur, setForm } = useTaskForm(onSuccess)
+const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
+  const {
+    users,
+    form,
+    orders,
+    arrivals,
+    error,
+    errors,
+    addLoading,
+    updateLoading,
+    handleInputChange,
+    handleSubmit,
+    handleBlur,
+    setForm,
+  } = useTaskForm(onSuccess, initialData)
 
   return (
     <form onSubmit={handleSubmit}>
       <Grid container direction="column" spacing={2} sx={{ maxWidth: '500px', margin: 'auto' }}>
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
-          Добавить новую задачу
+          { initialData? 'Редактировать данные задачи' : 'Добавить новую задачу'}
         </Typography>
 
         <Grid>
@@ -140,28 +150,11 @@ const TaskForm:React.FC<Props> = ({ onSuccess }) => {
           )}
         </Grid>
 
-        {/*<Grid>*/}
-        {/*  <Autocomplete*/}
-        {/*    id="status"*/}
-        {/*    value={ form.status && taskStatus.includes(form.status) ? form.status : null}*/}
-        {/*    onChange={(_, newValue) => setForm(prevState => ({ ...prevState, status: newValue || '' }))}*/}
-        {/*    size="small"*/}
-        {/*    fullWidth*/}
-        {/*    disablePortal*/}
-        {/*    options={taskStatus}*/}
-        {/*    sx={{ width: '100%' }}*/}
-        {/*    renderInput={params => (*/}
-        {/*      <TextField*/}
-        {/*        {...params}*/}
-        {/*        label="Статус задачи"*/}
-        {/*        error={Boolean(errors.status || getFieldError('status', error))}*/}
-        {/*        helperText={errors.status || getFieldError('status', error)}*/}
-        {/*      />*/}
-        {/*    )}*/}
-        {/*  />*/}
-        {/*</Grid>*/}
-        <Button type="submit" variant="contained" color="primary" disabled={addLoading}>
-          {addLoading ? <CircularProgress size={24} /> : ' Создать задачу'}
+        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
+          {initialData?
+            updateLoading ? <CircularProgress size={24} /> : ' Обновить задачу'
+            : addLoading ? <CircularProgress size={24} /> : ' Создать задачу'
+          }
         </Button>
       </Grid>
     </form>

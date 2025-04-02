@@ -67,13 +67,26 @@ export class TasksService {
   async create(taskDto: CreateTaskDto) {
     return await this.taskModel.create(taskDto)
   }
-
   async update(id: string, taskDto: UpdateTaskDto) {
-    const task = await this.taskModel.findByIdAndUpdate(id, taskDto, { new: true })
-    if (!task) {
-      throw new NotFoundException('Задача не найдена')
+    const task = await this.taskModel.findById(id)
+    if (!task) throw new NotFoundException('Задача не найдена')
+
+    task.set(taskDto)
+
+    if (taskDto.type === 'заказ') {
+      task.set('associated_arrival', null)
+      task.set('associated_order', taskDto.associated_order)
     }
-    return task
+    else if (taskDto.type === 'поставка') {
+      task.set('associated_order', null)
+      task.set('associated_arrival', taskDto.associated_arrival)
+    }
+    else {
+      task.set('associated_order', null)
+      task.set('associated_arrival', null)
+    }
+
+    return await task.save()
   }
 
   async archive(id: string) {

@@ -261,7 +261,14 @@ export interface TaskWithPopulate {
   date_ToDO:string | null,
 }
 
-export type TaskMutation = Omit<Task, '_id'>
+export interface TaskMutation {
+  user: string
+  title: string
+  type: string
+  associated_order?: string | null
+  associated_arrival?: string | null
+  description: string
+}
 
 export interface Service {
   _id: string
