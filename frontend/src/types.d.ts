@@ -148,6 +148,7 @@ export interface Order {
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
+  documents?: { document: string }[]
 }
 
 export type OrderWithProducts = Omit<Order, 'products'> & {

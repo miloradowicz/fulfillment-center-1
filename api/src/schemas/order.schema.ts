@@ -52,6 +52,9 @@ export class Order {
   @Prop()
   comment: string
 
+  @Prop({ default: null })
+  documents: [{ document: string }]
+
   @Prop({
     type: [
       {
@@ -83,6 +86,7 @@ export class Order {
     defect_description: string
     amount: number
   }[]
+
   @Prop({
     type: String,
     enum: ['в сборке', 'в пути', 'доставлен'],
@@ -90,5 +94,6 @@ export class Order {
   })
   status: 'в сборке' | 'в пути' | 'доставлен'
 }
+
 
 export const OrderSchema = SchemaFactory.createForClass(Order)

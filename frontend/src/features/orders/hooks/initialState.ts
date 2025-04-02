@@ -9,6 +9,7 @@ export const initialStateOrder: OrderMutation = {
   comment: '',
   defects: [],
   status: '',
+  documents: [],
 }
 
 export const initialStateProductForOrder = {

@@ -1,5 +1,14 @@
 import Grid from '@mui/material/Grid2'
-import { Autocomplete, Button, CircularProgress, FormControl, InputLabel, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  Divider,
+  FormControl, IconButton,
+  InputLabel,
+  TextField,
+  Typography,
+} from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
@@ -7,6 +16,7 @@ import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
 import { ErrorMessagesList } from '../../../messages.ts'
 import { OrderStatus } from '../../../constants.ts'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 
 interface Props {
   onSuccess?: () => void
@@ -48,6 +58,8 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     onSubmit,
     initialData,
     availableDefects,
+    files,
+    handleFileChange,
   } = useOrderForm(onSuccess)
 
   return (
@@ -260,7 +272,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                           setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
-                      value={OrderStatus.find(option => option === form.status) || OrderStatus[0] || null}
+                      value={OrderStatus.find(option => option === form.status)|| null}
                       getOptionLabel={option => option || ''}
                       isOptionEqualToValue={(option, value) => option === value}
                       renderInput={params => (
@@ -401,6 +413,30 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             )}
 
+            {initialData && ( <> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
+              <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
+            {initialData && initialData.documents && initialData.documents.length>0 && (initialData.documents.map((document, index) => (
+              <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
+                <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
+            )))}
+
+            <Grid className="flex gap-2 content-between items-center">
+              <Typography>Загрузить документ</Typography>
+              <Grid sx={{ display: 'flex', alignItems: 'center' }}>
+                <IconButton component="label">
+                  <InsertDriveFileIcon fontSize="large" color="primary" />
+                  <input type="file" accept=".pdf, .doc, .docx, .xlsx" multiple hidden onChange={handleFileChange} />
+                </IconButton>
+                {files.length > 0 && (
+                  <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+
+                    {files.map((file, index) => (
+                      <Typography key={index} variant="body2">{file.name}</Typography>
+                    ))}
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
             <Grid>
               <Button type="submit" disabled={loading}>
                 {loading ? (

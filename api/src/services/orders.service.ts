@@ -5,12 +5,15 @@ import { Order, OrderDocument } from '../schemas/order.schema'
 import { CreateOrderDto } from '../dto/create-order.dto'
 import { UpdateOrderDto } from '../dto/update-order.dto'
 import { CounterService } from './counter.service'
+import { DocumentObject } from './arrivals.service'
+import { FilesService } from './files.service'
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    private counterService: CounterService
+    private counterService: CounterService,
+    private readonly filesService: FilesService,
   ) {}
 
   async getAll() {
@@ -61,9 +64,35 @@ export class OrdersService {
     return order
   }
 
-  async create(orderDto: CreateOrderDto) {
+  async create(orderDto: CreateOrderDto,files: Array<Express.Multer.File> = []) {
     try {
-      const newOrder = await this.orderModel.create(orderDto)
+      let documents: DocumentObject[] = []
+      if (files.length > 0) {
+        documents = files.map(file => ({
+          document: this.filesService.getFilePath(file.filename),
+        }))
+      }
+      if (orderDto.documents) {
+        if (typeof orderDto.documents === 'string') {
+          try {
+            orderDto.documents = JSON.parse(orderDto.documents) as DocumentObject[]
+          } catch (_e) {
+            orderDto.documents = []
+          }
+        }
+
+        const formattedDocs = Array.isArray(orderDto.documents)
+          ? orderDto.documents.map((doc: DocumentObject | string) =>
+            typeof doc === 'string' ? { document: doc } : doc,
+          )
+          : []
+
+        documents = [...formattedDocs, ...documents]
+      }
+      const newOrder = await this.orderModel.create({
+        ...orderDto,
+        documents,
+      })
 
       const sequenceNumber = await this.counterService.getNextSequence('order')
       newOrder.orderNumber  = `ORD-${ sequenceNumber }`
@@ -80,12 +109,18 @@ export class OrdersService {
     }
   }
 
-  async update(id: string, orderDto: UpdateOrderDto) {
-    const order = await this.orderModel.findByIdAndUpdate(id, orderDto, { new: true })
-    if (!order) {
+  async update(id: string, orderDto: UpdateOrderDto, files: Array<Express.Multer.File> = []) {
+    const existingOrder = await this.orderModel.findById(id)
+    if (!existingOrder) {
       throw new NotFoundException('Заказ не найден')
     }
-    return order
+    if (files.length > 0) {
+      const documentPaths = files.map(file => ({
+        document: this.filesService.getFilePath(file.filename),
+      }))
+      orderDto.documents = [...(existingOrder.documents || []), ...documentPaths]
+    }
+    return this.orderModel.findByIdAndUpdate(id, orderDto, { new: true })
   }
 
   async archive(id: string) {
