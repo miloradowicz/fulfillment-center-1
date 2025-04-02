@@ -12,6 +12,12 @@ export class Task {
   isArchived: boolean
 
   @Prop({
+    type: String,
+    unique: true,
+  })
+  taskNumber: string
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

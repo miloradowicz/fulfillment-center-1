@@ -133,7 +133,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         }}
       >
         <CardContent>
-          <Typography marginTop={'5px'} variant="body1">
+          <Typography variant="body1">
+            #<strong>{task.taskNumber}</strong>
+          </Typography>
+          <Typography variant="body1" marginTop={1}>
             Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
           <Typography variant="body1">
@@ -145,7 +148,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
               textDecoration: 'underline',
               color: '#1A73E8',
             }}>
-              {`Поставка № ${ task.associated_arrival.arrivalNumber }`}
+              {`Поставка ${ task.associated_arrival.arrivalNumber }`}
             </NavLink>
           )}
           {task.associated_order && (
@@ -153,7 +156,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
               textDecoration: 'underline',
               color: '#1A73E8',
             }}>
-              {`Заказ № ${ task.associated_order.orderNumber }`}
+              {`Заказ ${ task.associated_order.orderNumber }`}
             </NavLink>
           )}
           {task.description && (
