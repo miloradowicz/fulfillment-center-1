@@ -7,17 +7,24 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useAppDispatch } from '../../../app/hooks.ts'
-import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
+import {
+  archiveTask,
+  fetchTasksByUserIdWithPopulate,
+  fetchTasksWithPopulate,
+} from '../../../store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import TaskForm from './TaskForm.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isSwipe, setIsSwipe] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openEditModal, setOpenEditModal] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
 
@@ -29,7 +36,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       parent,
     },
   })
-
 
   const handlePointerDown = (event: React.PointerEvent) => {
     event.stopPropagation()
@@ -60,7 +66,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
 
   const handleEdit = (event: React.MouseEvent) => {
     event.stopPropagation()
-    console.log('Редактирование')
+    setOpenEditModal(true)
     handleMenuClose()
   }
 
@@ -197,6 +203,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         onConfirm={handleDelete}
         onCancel={handleCancelDelete}
       />
+      <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
+        <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
+      </Modal>
     </Card>
   )
 }
