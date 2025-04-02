@@ -4,12 +4,12 @@ import { getFieldError } from '../../../utils/getFieldError.ts'
 import { useLoginForm } from '../hooks/useLoginForm.ts'
 
 const LoginForm = () => {
-  const { form, handleChange, onSubmit, isFormValid, sending, backendError } = useLoginForm()
+  const { form, handleChange, onSubmit, isFormValid, sending, loginError, errors } = useLoginForm()
 
   return (
     <Box noValidate component="form" onSubmit={onSubmit} style={{ maxWidth: '20%', margin: '0 auto' }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
-          Вход в систему
+        Вход в систему
       </Typography>
       <Grid container spacing={2}>
         <Grid size={12}>
@@ -22,8 +22,8 @@ const LoginForm = () => {
             label="Email"
             value={form.email}
             onChange={handleChange}
-            error={!!getFieldError('email', backendError)}
-            helperText={getFieldError('email', backendError)}
+            error={Boolean(errors.email || getFieldError('email', loginError))}
+            helperText={errors.email || getFieldError('email', loginError)}
           />
         </Grid>
 
@@ -38,8 +38,8 @@ const LoginForm = () => {
             label="Пароль"
             value={form.password}
             onChange={handleChange}
-            error={!!getFieldError('password', backendError)}
-            helperText={getFieldError('password', backendError)}
+            error={Boolean(errors.password || getFieldError('password', loginError))}
+            helperText={errors.password || getFieldError('password', loginError)}
           />
         </Grid>
 
@@ -50,7 +50,7 @@ const LoginForm = () => {
             variant="outlined"
             disabled={!isFormValid}
           >
-              Войти
+            Войти
           </Button>
         </Grid>
       </Grid>

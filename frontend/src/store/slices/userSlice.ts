@@ -59,14 +59,14 @@ const userSlice = createSlice({
       }
     },
     clearLoginError: (state, { payload }: PayloadAction<string | undefined>) => {
-      if (state.loginError && payload) {
+      if (state.loginError && state.loginError.errors && payload) {
         delete state.loginError.errors[payload]
 
         if (!Object.keys(state.loginError.errors).length) {
           state.loginError = null
         }
       } else {
-        state.error = null
+        state.loginError = null
       }
     },
   },
@@ -109,9 +109,9 @@ const userSlice = createSlice({
       state.loadingLogin = false
       state.user = action.payload
     })
-    builder.addCase(loginUser.rejected, state => {
+    builder.addCase(loginUser.rejected, (state, { payload: error }) => {
       state.loadingLogin = false
-      state.createError = null
+      state.loginError = error || null
     })
     builder.addCase(updateUser.pending, state => {
       state.loadingUpdate = true
