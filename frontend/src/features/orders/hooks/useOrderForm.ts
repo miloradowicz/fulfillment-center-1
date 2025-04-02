@@ -189,6 +189,11 @@ export const useOrderForm = (onSuccess?: () => void) => {
           return
         }
 
+        if (Object.values(errors).filter(Boolean).length) {
+          toast.error('Заполните все обязательные поля.')
+          return
+        }
+
         await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm, files } })).unwrap()
 
         if (params.id) {
