@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { toast } from 'react-toastify'
 import { clearLoginError, selectLoginError, selectLoadingLoginUser } from '../../../store/slices/userSlice.ts'
@@ -32,6 +32,10 @@ export const useLoginForm = () => {
   const loginError = useAppSelector(selectLoginError)
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+
+  useEffect(() => {
+    dispatch(clearLoginError())
+  }, [dispatch])
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()

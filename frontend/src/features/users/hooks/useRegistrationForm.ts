@@ -48,6 +48,10 @@ export const useRegistrationForm = () => {
       try {
         setForm(data => ({ ...data, displayName: data.displayName.trim() }))
 
+        if ((form as UserRegistrationMutation).password !== confirmPassword) {
+          return void toast.error('Пароли не совпадают')
+        }
+
         if (!checkStrength((form as UserRegistrationMutation).password)) {
           return void toast.error(
             'Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латинские буквы, одну цифру',
@@ -94,6 +98,8 @@ export const useRegistrationForm = () => {
     setFrontendError(_error)
 
     fieldNames.forEach(x => {
+      if (x !== 'confirmPassword' && !form[x as keyof typeof form]?.trim()) return
+
       switch (x) {
       case 'email':
         if (!emailRegex.test(form.email)) {
@@ -102,7 +108,7 @@ export const useRegistrationForm = () => {
         break
 
       case 'confirmPassword':
-        if (form.password !== confirmPassword) {
+        if (form.password && confirmPassword && form.password !== confirmPassword) {
           setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают' }))
         }
         break
@@ -124,6 +130,16 @@ export const useRegistrationForm = () => {
     }
   }
 
+  const isFormValid = () => {
+    return (
+      form.email.trim() !== '' &&
+      form.displayName.trim() !== '' &&
+      form.password.trim() !== '' &&
+      confirmPassword.trim() !== '' &&
+      form.role.trim() !== ''
+    )
+  }
+
   return {
     sending,
     backendError,
@@ -139,5 +155,6 @@ export const useRegistrationForm = () => {
     handleChange,
     validateFields,
     getFieldError,
+    isFormValid,
   }
 }

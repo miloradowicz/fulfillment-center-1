@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid2'
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, TextField, Typography, CircularProgress } from '@mui/material'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { useLoginForm } from '../hooks/useLoginForm.ts'
 
@@ -7,8 +7,21 @@ const LoginForm = () => {
   const { form, handleChange, onSubmit, isFormValid, sending, loginError, errors } = useLoginForm()
 
   return (
-    <Box noValidate component="form" onSubmit={onSubmit} style={{ maxWidth: '20%', margin: '0 auto' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
+    <Box
+      noValidate
+      component="form"
+      onSubmit={onSubmit}
+      sx={{
+        width: '100%',
+        maxWidth: 400,
+        mx: 'auto',
+        p: 3,
+        boxShadow: 3,
+        borderRadius: 2,
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Typography variant="h5" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
         Вход в систему
       </Typography>
       <Grid container spacing={2}>
@@ -16,7 +29,7 @@ const LoginForm = () => {
           <TextField
             required
             fullWidth
-            size="small"
+            size="medium"
             id="email"
             name="email"
             label="Email"
@@ -31,7 +44,7 @@ const LoginForm = () => {
           <TextField
             required
             fullWidth
-            size="small"
+            size="medium"
             type="password"
             id="password"
             name="password"
@@ -46,11 +59,13 @@ const LoginForm = () => {
         <Grid size={12}>
           <Button
             type="submit"
-            loading={sending}
-            variant="outlined"
-            disabled={!isFormValid}
+            variant="contained"
+            fullWidth
+            color="primary"
+            disabled={!isFormValid || sending}
+            sx={{ py: 1.5, fontSize: '16px' }}
           >
-            Войти
+            {sending ? <CircularProgress size={24} color="inherit" /> : 'Войти'}
           </Button>
         </Grid>
       </Grid>
