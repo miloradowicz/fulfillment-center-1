@@ -29,10 +29,10 @@ interface ProductState {
 const initialState: ProductState = {
   product: null,
   productWithPopulate: null,
-  productsWithPopulate:null,
+  productsWithPopulate: null,
   products: null,
   loadingFetch: false,
-  loadingFetchOneClient:false,
+  loadingFetchOneClient: false,
   loadingAdd: false,
   loadingArchive: false,
   loadingDelete: false,
@@ -59,6 +59,7 @@ const productSlice = createSlice({
   reducers: {
     clearErrorProduct: state => {
       state.createAndUpdateError = null
+      state.error = null
     },
   },
   extraReducers: builder => {

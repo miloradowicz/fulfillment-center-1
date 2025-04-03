@@ -17,7 +17,7 @@ import { ProductWithPopulate } from '../../../types'
 import { isGlobalError } from '../../../utils/helpers.ts'
 
 
-const UseProductActions = ( fetchOnDelete: boolean ) => {
+const UseProductActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -42,6 +42,10 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
     dispatch(clearErrorProduct())
   }
 
+  const clearErrors = useCallback(() => {
+    dispatch(clearErrorProduct())
+  }, [dispatch])
+
   const fetchAllProducts = useCallback(() => {
     dispatch(fetchProductsWithPopulate())
   }, [dispatch])
@@ -50,16 +54,19 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
     dispatch(fetchProductByIdWithPopulate(id))
   }, [dispatch])
 
+  useEffect(() => {
+    void clearErrors()
+  }, [clearErrors])
 
   useEffect(() => {
     void fetchAllProducts()
-  }, [dispatch, fetchAllProducts])
+  }, [fetchAllProducts])
 
   useEffect(() => {
     if (id) {
       void fetchProduct(id)
     }
-  }, [dispatch, id, fetchProduct])
+  }, [id, fetchProduct])
 
 
   const deleteOneProduct = async (id: string) => {
@@ -91,7 +98,7 @@ const UseProductActions = ( fetchOnDelete: boolean ) => {
     setProductToDeleteId(null)
   }
 
-  return  {
+  return {
     products,
     product,
     selectedProduct,
