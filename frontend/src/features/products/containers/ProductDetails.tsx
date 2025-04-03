@@ -1,8 +1,10 @@
-import { Box, Button, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
-import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { Box, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
+import { ArrowBack } from '@mui/icons-material'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 const ProductDetails = () => {
   const {
@@ -100,31 +102,8 @@ const ProductDetails = () => {
             </Card>
 
             <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                startIcon={<EditOutlined />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={() => handleOpen()}
-              >
-                Редактировать
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteOutline />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={() => deleteOneProduct(product._id)}
-              >
-                Удалить
-              </Button>
+              <EditButton onClick={() => handleOpen()} />
+              <DeleteButton onClick={() => deleteOneProduct(product._id)} />
             </Box>
           </Card>
         )}
