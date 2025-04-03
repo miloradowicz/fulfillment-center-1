@@ -118,7 +118,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       {...attributes}
       onClick={e => {
         e.stopPropagation()
-        e.preventDefault()
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
