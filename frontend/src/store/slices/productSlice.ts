@@ -24,6 +24,7 @@ interface ProductState {
   loadingUpdate: boolean
   error: GlobalError | null
   createAndUpdateError: ValidationError | null
+  deleteError: GlobalError | null
 }
 
 const initialState: ProductState = {
@@ -39,6 +40,7 @@ const initialState: ProductState = {
   loadingUpdate: false,
   error: null,
   createAndUpdateError: null,
+  deleteError: null,
 }
 
 export const selectProduct = (state: RootState) => state.products.product
@@ -52,6 +54,7 @@ export const selectLoadingDeleteProduct = (state: RootState) => state.products.l
 export const selectLoadingUpdateProduct = (state: RootState) => state.products.loadingUpdate
 export const selectProductError = (state: RootState) => state.products.error
 export const selectCreateProductError = (state: RootState) => state.products.createAndUpdateError
+export const selectDeleteProductError = (state: RootState) => state.products.deleteError
 
 const productSlice = createSlice({
   name: 'products',
@@ -59,6 +62,7 @@ const productSlice = createSlice({
   reducers: {
     clearErrorProduct: state => {
       state.createAndUpdateError = null
+      state.deleteError = null
       state.error = null
     },
   },
@@ -138,15 +142,15 @@ const productSlice = createSlice({
     })
     builder.addCase(deleteProduct.pending, state => {
       state.loadingDelete = true
-      state.error = null
+      state.deleteError = null
     })
     builder.addCase(deleteProduct.fulfilled, state => {
       state.loadingDelete = false
-      state.error = null
+      state.deleteError = null
     })
     builder.addCase(deleteProduct.rejected, (state, { payload: error }) => {
       state.loadingDelete = false
-      state.error = error || null
+      state.deleteError = error || null
     })
     builder.addCase(updateProduct.pending, state => {
       state.loadingUpdate = true

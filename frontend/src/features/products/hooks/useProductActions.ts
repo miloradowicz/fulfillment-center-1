@@ -98,6 +98,11 @@ const UseProductActions = (fetchOnDelete: boolean) => {
     setProductToDeleteId(null)
   }
 
+  const handleConfirmationDelete = () => {
+    if (productToDeleteId) deleteOneProduct(productToDeleteId)
+    handleConfirmationClose()
+  }
+
   return {
     products,
     product,
@@ -115,6 +120,7 @@ const UseProductActions = (fetchOnDelete: boolean) => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
+    handleConfirmationDelete,
     productToDeleteId,
   }
 }
