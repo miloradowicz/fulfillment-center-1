@@ -30,7 +30,7 @@ export const registerUser = createAsyncThunk<
   },
 )
 
-export const loginUser = createAsyncThunk<User, LoginMutation, { rejectValue: string[] }>(
+export const loginUser = createAsyncThunk<User, LoginMutation, { rejectValue: ValidationError }>(
   'users/loginUser',
   async (data, { rejectWithValue }) => {
     try {
@@ -38,8 +38,7 @@ export const loginUser = createAsyncThunk<User, LoginMutation, { rejectValue: st
       return response.data
     } catch (error) {
       if (isAxiosError(error) && error.response) {
-        const errorMessage = error.response.data.message
-        return rejectWithValue(Array.isArray(errorMessage) ? errorMessage : [errorMessage])
+        return rejectWithValue(error.response.data as ValidationError)
       }
       throw error
     }

@@ -4,10 +4,11 @@ import { useState, ChangeEvent } from 'react'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { passwordStrengthOptions, emailRegex, roles } from '../../../constants'
-import { selectCreateError } from '../../../store/slices/arrivalSlice'
+import { selectCreateError } from '../../../store/slices/userSlice'
 import { selectLoadingRegisterUser, clearCreateError } from '../../../store/slices/userSlice'
 import { registerUser } from '../../../store/thunks/userThunk'
 import { UserRegistrationMutation } from '../../../types'
+import { useNavigate } from 'react-router-dom'
 
 type FormType = UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: '' })
 
@@ -23,6 +24,7 @@ const initialState: UserRegistrationMutation | (Omit<UserRegistrationMutation, '
 
 export const useRegistrationForm = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const sending = useAppSelector(selectLoadingRegisterUser)
   const backendError = useAppSelector(selectCreateError)
@@ -30,7 +32,7 @@ export const useRegistrationForm = () => {
   const [form, setForm] = useState(initialState)
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const checkStrenght = (password: string) => {
+  const checkStrength = (password: string) => {
     const strength = passwordStrength(password, passwordStrengthOptions)
     return (
       strength.id > 0 && ['number', 'uppercase', 'lowercase'].every(x => strength.contains.includes(x as DiversityType))
@@ -46,7 +48,11 @@ export const useRegistrationForm = () => {
       try {
         setForm(data => ({ ...data, displayName: data.displayName.trim() }))
 
-        if (!checkStrenght((form as UserRegistrationMutation).password)) {
+        if ((form as UserRegistrationMutation).password !== confirmPassword) {
+          return void toast.error('Пароли не совпадают')
+        }
+
+        if (!checkStrength((form as UserRegistrationMutation).password)) {
           return void toast.error(
             'Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латинские буквы, одну цифру',
           )
@@ -58,6 +64,7 @@ export const useRegistrationForm = () => {
         setConfirmPassword('')
         dispatch(clearCreateError())
         setFrontendError({})
+        navigate('/clients')
         toast.success('Пользователь успешно создан!')
       } catch {
         toast.error('При создании пользователя произошла ошибка.')
@@ -91,6 +98,8 @@ export const useRegistrationForm = () => {
     setFrontendError(_error)
 
     fieldNames.forEach(x => {
+      if (x !== 'confirmPassword' && !form[x as keyof typeof form]?.trim()) return
+
       switch (x) {
       case 'email':
         if (!emailRegex.test(form.email)) {
@@ -99,7 +108,7 @@ export const useRegistrationForm = () => {
         break
 
       case 'confirmPassword':
-        if (form.password !== confirmPassword) {
+        if (form.password && confirmPassword && form.password !== confirmPassword) {
           setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают' }))
         }
         break
@@ -121,6 +130,16 @@ export const useRegistrationForm = () => {
     }
   }
 
+  const isFormValid = () => {
+    return (
+      form.email.trim() !== '' &&
+      form.displayName.trim() !== '' &&
+      form.password.trim() !== '' &&
+      confirmPassword.trim() !== '' &&
+      form.role.trim() !== ''
+    )
+  }
+
   return {
     sending,
     backendError,
@@ -130,11 +149,12 @@ export const useRegistrationForm = () => {
     setForm,
     confirmPassword,
     setConfirmPassword,
-    checkStrenght,
+    checkStrength,
     onSubmit,
     handleConfirmPasswordChange,
     handleChange,
     validateFields,
     getFieldError,
+    isFormValid,
   }
 }
