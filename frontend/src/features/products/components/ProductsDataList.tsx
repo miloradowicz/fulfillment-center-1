@@ -8,9 +8,21 @@ import { NavLink } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from './ProductForm.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ProductsDataList = () => {
-  const { products, selectedProduct, deleteOneProduct, open, handleClose, handleOpen, fetchAllProducts } = useProductActions(true)
+  const {
+    products,
+    selectedProduct,
+    open,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationDelete,
+    handleClose,
+    handleOpen,
+    fetchAllProducts,
+  } = useProductActions(true)
 
   const columns: GridColDef<ProductWithPopulate>[] = [
     {
@@ -42,7 +54,7 @@ const ProductsDataList = () => {
       flex: 1,
       sortable: false,
       editable: false,
-      filterable: true ,
+      filterable: true,
     },
     {
       field: 'Actions',
@@ -57,13 +69,13 @@ const ProductsDataList = () => {
           <IconButton onClick={() => handleOpen(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => deleteOneProduct(row._id)}>
+          <IconButton onClick={() => handleConfirmationOpen(row._id)}>
             <ClearIcon />
           </IconButton>
           <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
             to={`/products/${ row._id }`}
           >
-              Подробнее
+            Подробнее
           </NavLink>
         </>
       ),
@@ -81,6 +93,13 @@ const ProductsDataList = () => {
           }}
         />
       </Modal>
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этот товар"
+        actionType={'delete'}
+        onConfirm={handleConfirmationDelete}
+        onCancel={handleConfirmationClose}
+      />
       {products ? (
         <DataGrid
           getRowId={row => row._id}
