@@ -17,6 +17,7 @@ import React from 'react'
 import { ErrorMessagesList } from '../../../messages.ts'
 import { OrderStatus } from '../../../constants.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import { getItemNameById } from '../../../utils/getItemNameById.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -60,6 +61,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     availableDefects,
     files,
     handleFileChange,
+    stocks,
   } = useOrderForm(onSuccess)
 
   return (
@@ -103,6 +105,30 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 </FormControl>
               </Grid>
             )}
+
+            <Grid>
+              <Autocomplete
+                id="stock"
+                value={getItemNameById(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+                onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
+                size="small"
+                fullWidth
+                disablePortal
+                options={getItemNameById(stocks, 'name', '_id')}
+                getOptionKey={option => option.id}
+                sx={{ width: '100%' }}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label="Склад, с которого будет отправлен товар"
+                    error={Boolean(errors.stock || getFieldError(ErrorMessagesList.StockErr, createError))}
+                    helperText={errors.stock || getFieldError(ErrorMessagesList.StockErr, createError)}
+                    onBlur={() => handleBlurAutoComplete('stock', setErrors, form, ErrorMessagesList.StockErr)}
+                  />
+                )}
+              />
+            </Grid>
+
             <>
               <label className={'fs-4 my-1'}>Товары</label>
               {productsForm.length === 0 ? (

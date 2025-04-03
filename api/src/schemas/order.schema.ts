@@ -25,6 +25,13 @@ export class Order {
   client: string
 
   @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+  })
+  stock: mongoose.Schema.Types.ObjectId
+
+  @Prop({
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },

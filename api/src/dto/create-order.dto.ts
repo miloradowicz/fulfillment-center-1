@@ -11,6 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import mongoose from 'mongoose'
 
 class ProductDto {
   @IsNotEmpty({ message: 'Поле товар не должно быть пустым.' })
@@ -71,6 +72,9 @@ export class CreateOrderDto {
   @IsDate({ message: 'Заполните дату отправки' })
   @Type(() => Date)
   sent_at: Date
+
+  @IsNotEmpty({ message: 'Поле склад обязательно для заполнения.' })
+  stock: mongoose.Schema.Types.ObjectId
 
   @IsOptional()
   delivered_at?: string

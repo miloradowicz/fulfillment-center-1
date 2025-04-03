@@ -4,6 +4,7 @@ export const initialStateOrder: OrderMutation = {
   client: '',
   products: [],
   price: 0,
+  stock: '',
   sent_at: '',
   delivered_at: '',
   comment: '',
@@ -27,6 +28,7 @@ export const initialStateDefectForOrder = {
 export const initialStateErrorForOrder = {
   client: '',
   product: '',
+  stock: '',
   price: '',
   sent_at: '',
   amount: '',

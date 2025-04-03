@@ -308,7 +308,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onDelete={i => deleteItem(i, setReceivedForm)}
             getProductNameById={i => getProductNameById(products, i)}
           />
-          <Button type="button" onClick={() => openModal(ItemType.PRODUCTS, initialItemState)}>
+          <Button type="button" onClick={() => openModal(ItemType.RECEIVED_AMOUNT, initialItemState)}>
             + Добавить полученные товары
           </Button>
         </Grid>

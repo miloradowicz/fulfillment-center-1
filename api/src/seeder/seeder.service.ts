@@ -154,10 +154,24 @@ export class SeederService {
       },
     ])
 
+    const [_stock1, _stock2] = await this.stockModel.create([
+      {
+        name: 'Склад Бишкек',
+        address: 'Ул. Малдыбаева 7/1',
+        products: [{ product: _product1._id, amount: 20 }],
+      },
+      {
+        name: 'Склад Москва',
+        address: 'Ул. Гагарина 102',
+        products: [{ product: _product2._id, amount: 20 }],
+      },
+    ])
+
     const [_order1, _order2, _order3] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
         client: _clients._id,
+        stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
           { product: _product2._id, description: 'Заказ 1 - Джинсы', amount: 1 },
@@ -170,6 +184,7 @@ export class SeederService {
       {
         orderNumber: 'ORD-2',
         client: _clients._id,
+        stock: _stock2._id,
         products: [
           { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
           { product: _product3._id, description: 'Заказ 2 - Футболка', amount: 3 },
@@ -182,6 +197,7 @@ export class SeederService {
       {
         orderNumber: 'ORD-3',
         client: _clients._id,
+        stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
           { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
@@ -199,18 +215,6 @@ export class SeederService {
       { upsert: true }
     )
 
-    const [_stock1, _stock2] = await this.stockModel.create([
-      {
-        name: 'Склад Бишкек',
-        address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, amount: 20 }],
-      },
-      {
-        name: 'Склад Москва',
-        address: 'Ул. Гагарина 102',
-        products: [{ product: _product2._id, amount: 20 }],
-      },
-    ])
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {

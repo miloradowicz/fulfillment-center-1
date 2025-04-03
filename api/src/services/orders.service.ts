@@ -7,32 +7,34 @@ import { UpdateOrderDto } from '../dto/update-order.dto'
 import { CounterService } from './counter.service'
 import { DocumentObject } from './arrivals.service'
 import { FilesService } from './files.service'
+import { Stock, StockDocument } from '../schemas/stock.schema'
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>,
     private counterService: CounterService,
     private readonly filesService: FilesService,
   ) {}
 
   async getAll() {
-    const orders = await this.orderModel.find({ isArchived: false }).exec()
+    const orders = await this.orderModel.find({ isArchived: false }).populate('stock').exec()
     return orders.reverse()
   }
 
   async getAllArchived() {
-    const orders = await this.orderModel.find({ isArchived: true }).exec()
+    const orders = await this.orderModel.find({ isArchived: true }).populate('stock').exec()
     return orders.reverse()
   }
 
   async getAllWithClient() {
-    const orders = await this.orderModel.find({ isArchived: false }).populate('client').exec()
+    const orders = await this.orderModel.find({ isArchived: false }).populate('client stock').exec()
     return orders.reverse()
   }
 
   async getById(id: string) {
-    const order = await this.orderModel.findById(id).populate('products.product').exec()
+    const order = await this.orderModel.findById(id).populate('products.product stock').exec()
 
     if (!order) throw new NotFoundException('Заказ не найден')
 
@@ -44,9 +46,7 @@ export class OrdersService {
   async getByIdWithPopulate(id: string) {
     const order = await this.orderModel
       .findById(id)
-      .populate('client')
-      .populate('products.product')
-      .populate('defects.product')
+      .populate('client products.product defects.product stock')
       .exec()
     if (!order) throw new NotFoundException('Заказ не найден')
 
@@ -56,7 +56,7 @@ export class OrdersService {
   }
 
   async getArchivedById(id: string) {
-    const order = await this.orderModel.findById(id).exec()
+    const order = await this.orderModel.findById(id).populate('stock').exec()
 
     if (!order) throw new NotFoundException('Заказ не найден')
     if (!order.isArchived) throw new ForbiddenException('Этот заказ не в архиве')
@@ -97,6 +97,9 @@ export class OrdersService {
       const sequenceNumber = await this.counterService.getNextSequence('order')
       newOrder.orderNumber  = `ORD-${ sequenceNumber }`
 
+      const stock = await this.stockModel.findById(orderDto.stock)
+      if (!stock) throw new NotFoundException('Указанный склад не найден')
+
       return newOrder.save()
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -114,6 +117,10 @@ export class OrdersService {
     if (!existingOrder) {
       throw new NotFoundException('Заказ не найден')
     }
+
+    const stock = await this.stockModel.findById(orderDto.stock)
+    if (!stock) throw new NotFoundException('Указанный склад не найден')
+
     if (files.length > 0) {
       const documentPaths = files.map(file => ({
         document: this.filesService.getFilePath(file.filename),

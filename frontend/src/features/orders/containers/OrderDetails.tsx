@@ -81,6 +81,7 @@ const OrderDetails = () => {
             <Typography variant="h5" className="!font-bold">
               Детали заказа #{order.orderNumber}
             </Typography>
+            <Typography variant="h6" >{order.stock.name}</Typography>
             <Box className="flex flex-col">
               <Typography variant="caption" className="text-gray-600 text-sm">Создан: {dayjs(order.sent_at).format('D MMMM YYYY')}
               </Typography>

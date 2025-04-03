@@ -34,8 +34,10 @@ import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { ItemType } from '../../../constants.ts'
+import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
+import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 
-type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status'>
+type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
 export const useOrderForm = (onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
@@ -47,6 +49,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
         delivered_at: initialData.delivered_at ? dayjs(initialData.delivered_at).format('YYYY-MM-DD') : '',
         price: initialData.price,
+        stock: initialData.stock._id,
         products: [],
         defects: [],
         status: initialData.status,
@@ -73,6 +76,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [isButtonVisible, setButtonVisible] = useState(true)
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
+  const stocks = useAppSelector(selectAllStocks)
 
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
@@ -139,6 +143,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
   useEffect(() => {
     dispatch(fetchClients())
+    dispatch(fetchStocks())
   }, [dispatch])
 
   useEffect(() => {
@@ -334,5 +339,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
     availableDefects,
     files,
     handleFileChange,
+    stocks,
   }
 }
