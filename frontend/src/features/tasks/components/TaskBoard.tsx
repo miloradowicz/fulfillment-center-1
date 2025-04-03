@@ -2,7 +2,6 @@ import { Box, CircularProgress, TextField, Stack, IconButton, InputAdornment } f
 import Grid from '@mui/material/Grid2'
 import { DndContext, rectIntersection } from '@dnd-kit/core'
 import { useAppDispatch } from '../../../app/hooks.ts'
-import { onDragEnd } from '../hooks/onDragEnd.ts'
 import { useTaskBoard } from '../hooks/useTaskBoard.ts'
 import TaskLine from './TaskLine.tsx'
 import ClearIcon from '@mui/icons-material/Clear'
@@ -12,6 +11,7 @@ import { useEffect, useState } from 'react'
 import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
+import { onDragEnd } from '../hooks/onDragEnd.ts'
 
 const TaskBoard = () => {
   const dispatch = useAppDispatch()
@@ -69,7 +69,7 @@ const TaskBoard = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box display="flex" flexDirection="column" p={2} paddingBottom={'150px'} justifyContent={'space-between'} overflow={'hidden'} minWidth={'950px'} >
+        <Box display="flex" flexDirection="column" p={2} paddingBottom={'150px'} justifyContent={'space-between'} overflow={'hidden'}  minWidth={'950px'} >
           <Stack direction="row" spacing={1} sx={{ display:'flex', width:'100%', marginLeft: '20px', marginBottom: '0', marginTop: '10px', alignItems: 'center' }}>
             <Box sx={{ position: 'relative', display: 'inline-block', maxWidth: 300, minWidth: 230 }}>
               <TextField
