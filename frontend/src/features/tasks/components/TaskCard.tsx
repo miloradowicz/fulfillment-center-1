@@ -22,7 +22,6 @@ import TaskForm from './TaskForm.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [isSwipe, setIsSwipe] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const open = Boolean(anchorEl)
@@ -36,24 +35,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       parent,
     },
   })
-
-  const handlePointerDown = (event: React.PointerEvent) => {
-    event.stopPropagation()
-    setIsSwipe(false)
-  }
-
-  const handlePointerMove = (event: React.PointerEvent) => {
-    const deltaX = Math.abs(event.movementX)
-    const deltaY = Math.abs(event.movementY)
-
-    if (deltaX > deltaY) {
-      setIsSwipe(true)
-    }
-  }
-
-  const handlePointerUp = () => {
-    setIsSwipe(false)
-  }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -100,6 +81,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
 
   return (
     <Card
+      id={task._id}
       ref={setNodeRef}
       sx={{
         borderRadius: '12px',
@@ -108,7 +90,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         marginBottom: 2,
         transform: style.transform,
         position: 'relative',
-        cursor: isSwipe ? 'auto' : 'grab',
+        cursor:  'grab',
         willChange: 'transform',
         zIndex: style.zIndex,
         opacity: style.opacity,
@@ -120,9 +102,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         e.stopPropagation()
         e.preventDefault()
       }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
     >
       <div
         {...listeners}
