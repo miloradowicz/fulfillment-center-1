@@ -1,9 +1,11 @@
 import {
   Box,
-  Button,
-  Card, Chip,
+  Card,
+  Chip,
   CircularProgress,
-  Container, Divider, IconButton,
+  Container,
+  Divider,
+  IconButton,
   Step,
   StepLabel,
   Stepper,
@@ -14,7 +16,7 @@ import {
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
 import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
-import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { ArrowBack } from '@mui/icons-material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import { Link } from 'react-router-dom'
@@ -25,6 +27,8 @@ import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.ts
 import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 const OrderDetails = () => {
   const {
@@ -161,33 +165,9 @@ const OrderDetails = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            type={'button'}
-            variant="contained"
-            startIcon={<EditOutlined />}
-            sx={{
-              px: 3,
-              borderRadius: 2,
-              textTransform: 'none',
-            }}
-            onClick={() => handleOpenEdit()}
-          >
-            Редактировать
-          </Button>
-          <Button
-            type={'button'}
-            variant="contained"
-            color="error"
-            startIcon={<DeleteOutline />}
-            sx={{
-              px: 3,
-              borderRadius: 2,
-              textTransform: 'none',
-            }}
-            onClick={() => setOpenDeleteModal(true)}
-          >
-            Удалить
-          </Button>
+          <EditButton onClick={() => handleOpenEdit()} />
+          <DeleteButton  onClick={() => setOpenDeleteModal(true)} />
+
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />
           </Modal>
