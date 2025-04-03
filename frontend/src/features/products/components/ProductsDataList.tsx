@@ -14,15 +14,14 @@ const ProductsDataList = () => {
   const {
     products,
     selectedProduct,
-    deleteOneProduct,
     open,
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
+    handleConfirmationDelete,
     handleClose,
     handleOpen,
     fetchAllProducts,
-    productToDeleteId,
   } = useProductActions(true)
 
   const columns: GridColDef<ProductWithPopulate>[] = [
@@ -74,7 +73,7 @@ const ProductsDataList = () => {
             <ClearIcon />
           </IconButton>
           <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
-            to={`/products/${row._id}`}
+            to={`/products/${ row._id }`}
           >
             Подробнее
           </NavLink>
@@ -98,7 +97,7 @@ const ProductsDataList = () => {
         open={confirmationOpen}
         entityName="этот товар"
         actionType={'delete'}
-        onConfirm={() => void (productToDeleteId && deleteOneProduct(productToDeleteId))}
+        onConfirm={handleConfirmationDelete}
         onCancel={handleConfirmationClose}
       />
       {products ? (

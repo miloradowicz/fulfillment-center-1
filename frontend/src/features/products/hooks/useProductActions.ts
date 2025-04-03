@@ -14,10 +14,10 @@ import {
 } from '../../../store/slices/productSlice.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductWithPopulate } from '../../../types'
-import { isGlobalError } from '../../../utils/helpers.ts'
+import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
 
 
-const UseProductActions = (fetchOnDelete: boolean) => {
+const useProductActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -30,28 +30,16 @@ const UseProductActions = (fetchOnDelete: boolean) => {
   const loading = useAppSelector(selectLoadingFetchProduct)
   const error = useAppSelector(selectProductError)
 
-  const handleOpen = (product?: ProductWithPopulate) => {
-    if (product) {
-      setSelectedProduct(product)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-    dispatch(clearErrorProduct())
-  }
-
   const clearErrors = useCallback(() => {
     dispatch(clearErrorProduct())
   }, [dispatch])
 
-  const fetchAllProducts = useCallback(() => {
-    dispatch(fetchProductsWithPopulate())
+  const fetchAllProducts = useCallback(async () => {
+    await dispatch(fetchProductsWithPopulate())
   }, [dispatch])
 
-  const fetchProduct = useCallback((id: string) => {
-    dispatch(fetchProductByIdWithPopulate(id))
+  const fetchProduct = useCallback(async (id: string) => {
+    await dispatch(fetchProductByIdWithPopulate(id))
   }, [dispatch])
 
   useEffect(() => {
@@ -68,24 +56,35 @@ const UseProductActions = (fetchOnDelete: boolean) => {
     }
   }, [id, fetchProduct])
 
-
   const deleteOneProduct = async (id: string) => {
     try {
       await dispatch(deleteProduct(id)).unwrap()
       if (fetchOnDelete) {
-        fetchAllProducts()
+        await fetchAllProducts()
       } else {
         navigate('/products')
       }
       toast.success('Товар успешно удалён!')
     } catch (e) {
-      if (isGlobalError(e)) {
+      if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
       } else {
         toast.error('Не удалось удалить товар')
       }
       console.error(e)
     }
+  }
+
+  const handleOpen = (product?: ProductWithPopulate) => {
+    if (product) {
+      setSelectedProduct(product)
+    }
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    clearErrors()
   }
 
   const handleConfirmationOpen = (id: string) => {
@@ -98,8 +97,8 @@ const UseProductActions = (fetchOnDelete: boolean) => {
     setProductToDeleteId(null)
   }
 
-  const handleConfirmationDelete = () => {
-    if (productToDeleteId) deleteOneProduct(productToDeleteId)
+  const handleConfirmationDelete = async () => {
+    if (productToDeleteId) await deleteOneProduct(productToDeleteId)
     handleConfirmationClose()
   }
 
@@ -125,4 +124,4 @@ const UseProductActions = (fetchOnDelete: boolean) => {
   }
 }
 
-export default UseProductActions
+export default useProductActions

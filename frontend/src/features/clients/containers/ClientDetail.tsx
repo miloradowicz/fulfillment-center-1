@@ -1,5 +1,3 @@
-import  { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box, Button,
   Card, CircularProgress,
@@ -15,42 +13,26 @@ import {
   LocationOnOutlined,
   AccountBalanceOutlined, EditOutlined, DeleteOutline,
 } from '@mui/icons-material'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClient, selectClientError, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
-import { fetchClientById } from '../../../store/thunks/clientThunk.ts'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
 import ClientForm from '../components/ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
-import { useClientsList } from '../hooks/useClientsList.ts'
+import { useClientActions } from '../hooks/useClientActions.ts'
 
 const ClientDetail = () => {
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-
-  const handleOpenEditModal = () => setEditModalOpen(true)
-  const handleCloseEditModal = () => setEditModalOpen(false)
-
-  const handleOpenDeleteModal = () => setDeleteModalOpen(true)
-  const handleCloseDeleteModal = () => setDeleteModalOpen(false)
-
-  const { clientId } = useParams()
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
-
-  const client = useAppSelector(selectClient)
-  const loading = useAppSelector(selectLoadingFetchClient)
-  const error = useAppSelector(selectClientError)
-
   const {
-    handleConfirmDelete,
-  } = useClientsList()
-
-  useEffect(() => {
-    if (clientId) {
-      dispatch(fetchClientById(clientId))
-    }
-  }, [dispatch, clientId])
+    error,
+    navigate,
+    loading,
+    client,
+    open,
+    handleOpen,
+    handleClose,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationDelete,
+  } = useClientActions(false)
 
   return (
     <>
@@ -58,6 +40,12 @@ const ClientDetail = () => {
         <Box textAlign="center" mt={4}>
           <Typography color="error" variant="body1">
             Ошибка загрузки данных клиента
+          </Typography>
+        </Box>
+      ) : !client ? (
+        <Box textAlign="center" mt={4}>
+          <Typography variant="body1" textAlign="center">
+            Клиент не найден
           </Typography>
         </Box>
       ) : (
@@ -146,7 +134,7 @@ const ClientDetail = () => {
               <Button
                 variant="contained"
                 startIcon={<EditOutlined />}
-                onClick={handleOpenEditModal}
+                onClick={() => handleOpen()}
                 sx={{
                   px: 3,
                   borderRadius: 2,
@@ -164,23 +152,23 @@ const ClientDetail = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                 }}
-                onClick={handleOpenDeleteModal}
+                onClick={() => handleConfirmationOpen(client._id)}
               >
                 Удалить
               </Button>
             </Box>
           </Card>
 
-          <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
-            <ClientForm client={client} onClose={handleCloseEditModal} />
+          <Modal open={open} handleClose={handleClose}>
+            <ClientForm client={client} onClose={handleClose} />
           </Modal>
 
           <ConfirmationModal
-            open={deleteModalOpen}
+            open={confirmationOpen}
             entityName="этого клиента"
             actionType={'delete'}
-            onConfirm={handleConfirmDelete}
-            onCancel={handleCloseDeleteModal}
+            onConfirm={handleConfirmationDelete}
+            onCancel={handleConfirmationClose}
           />
         </Box>
       )}

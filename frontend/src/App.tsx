@@ -33,7 +33,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<ClientPage />} />
             <Route path="/clients" element={<ClientPage />} />
-            <Route path="/clients/:clientId" element={<ClientDetail />} />
+            <Route path="/clients/:id" element={<ClientDetail />} />
             <Route path="/arrivals" element={<ArrivalPage />} />
             <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
             <Route path="/products" element={<ProductPage />} />
@@ -47,8 +47,8 @@ const App = () => {
             <Route path="/counterparties" element={<CounterpartiesPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegistrationPage />} />
-            <Route path="/stocks" element={<StockPage/>}/>
-            <Route path="/stocks/:stockId" element={<StockDetails/>}/>
+            <Route path="/stocks" element={<StockPage />} />
+            <Route path="/stocks/:stockId" element={<StockDetails />} />
             <Route
               path="/*"
               element={
