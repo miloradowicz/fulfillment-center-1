@@ -4,10 +4,11 @@ import { useState, ChangeEvent } from 'react'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { passwordStrengthOptions, emailRegex, roles } from '../../../constants'
-import { selectCreateError } from '../../../store/slices/arrivalSlice'
+import { selectCreateError } from '../../../store/slices/userSlice'
 import { selectLoadingRegisterUser, clearCreateError } from '../../../store/slices/userSlice'
 import { registerUser } from '../../../store/thunks/userThunk'
 import { UserRegistrationMutation } from '../../../types'
+import { useNavigate } from 'react-router-dom'
 
 type FormType = UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: '' })
 
@@ -23,6 +24,7 @@ const initialState: UserRegistrationMutation | (Omit<UserRegistrationMutation, '
 
 export const useRegistrationForm = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const sending = useAppSelector(selectLoadingRegisterUser)
   const backendError = useAppSelector(selectCreateError)
@@ -30,7 +32,7 @@ export const useRegistrationForm = () => {
   const [form, setForm] = useState(initialState)
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const checkStrenght = (password: string) => {
+  const checkStrength = (password: string) => {
     const strength = passwordStrength(password, passwordStrengthOptions)
     return (
       strength.id > 0 && ['number', 'uppercase', 'lowercase'].every(x => strength.contains.includes(x as DiversityType))
@@ -46,7 +48,7 @@ export const useRegistrationForm = () => {
       try {
         setForm(data => ({ ...data, displayName: data.displayName.trim() }))
 
-        if (!checkStrenght((form as UserRegistrationMutation).password)) {
+        if (!checkStrength((form as UserRegistrationMutation).password)) {
           return void toast.error(
             'Слишком слабый пароль. Пароль должен быть не короче 8 символов и содержать одну заглавную и одну строчную латинские буквы, одну цифру',
           )
@@ -58,6 +60,7 @@ export const useRegistrationForm = () => {
         setConfirmPassword('')
         dispatch(clearCreateError())
         setFrontendError({})
+        navigate('/clients')
         toast.success('Пользователь успешно создан!')
       } catch {
         toast.error('При создании пользователя произошла ошибка.')
@@ -130,7 +133,7 @@ export const useRegistrationForm = () => {
     setForm,
     confirmPassword,
     setConfirmPassword,
-    checkStrenght,
+    checkStrength,
     onSubmit,
     handleConfirmPasswordChange,
     handleChange,
