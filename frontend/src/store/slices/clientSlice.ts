@@ -6,13 +6,14 @@ import { addClient, archiveClient, deleteClient, fetchClientById, fetchClients, 
 interface ClientState {
   client: Client | null;
   clients: Client[] | null;
-  loadingFetch : boolean;
+  loadingFetch: boolean;
   loadingAdd: boolean;
   loadingArchive: boolean;
   loadingDelete: boolean;
   loadingUpdate: boolean;
   error: GlobalError | null;
   creationAndModificationError: ValidationError | GlobalError | null;
+  deletionError: GlobalError | null;
 }
 
 const initialState: ClientState = {
@@ -25,6 +26,7 @@ const initialState: ClientState = {
   loadingUpdate: false,
   error: null,
   creationAndModificationError: null,
+  deletionError: null,
 }
 
 export const selectClient = (state: RootState) => state.clients.client
@@ -43,6 +45,11 @@ export const clientSlice = createSlice({
   reducers: {
     clearCreationAndModificationError: state => {
       state.creationAndModificationError = null
+    },
+    clearClientError: state => {
+      state.creationAndModificationError = null
+      state.deletionError = null
+      state.error = null
     },
   },
   extraReducers: builder => {
@@ -93,15 +100,15 @@ export const clientSlice = createSlice({
     })
     builder.addCase(deleteClient.pending, state => {
       state.loadingDelete = true
-      state.error = null
+      state.deletionError = null
     })
     builder.addCase(deleteClient.fulfilled, state => {
       state.loadingDelete = false
-      state.error = null
+      state.deletionError = null
     })
     builder.addCase(deleteClient.rejected, (state, { payload: error }) => {
       state.loadingDelete = false
-      state.error = error || null
+      state.deletionError = error || null
     })
     builder.addCase(updateClient.pending, state => {
       state.loadingUpdate = true
@@ -119,6 +126,6 @@ export const clientSlice = createSlice({
   },
 })
 
-export const { clearCreationAndModificationError } = clientSlice.actions
+export const { clearCreationAndModificationError, clearClientError } = clientSlice.actions
 
 export const clientReducer = clientSlice.reducer
