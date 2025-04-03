@@ -1,7 +1,7 @@
 import  { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  Box, Button,
+  Box,
   Card, CircularProgress,
   Divider,
   IconButton,
@@ -13,7 +13,7 @@ import {
   EmailOutlined,
   PhoneAndroidOutlined,
   LocationOnOutlined,
-  AccountBalanceOutlined, EditOutlined, DeleteOutline,
+  AccountBalanceOutlined,
 } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectClient, selectClientError, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
@@ -23,34 +23,42 @@ import ClientForm from '../components/ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { useClientsList } from '../hooks/useClientsList.ts'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
 
 const ClientDetail = () => {
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-
-  const handleOpenEditModal = () => setEditModalOpen(true)
-  const handleCloseEditModal = () => setEditModalOpen(false)
-
-  const handleOpenDeleteModal = () => setDeleteModalOpen(true)
-  const handleCloseDeleteModal = () => setDeleteModalOpen(false)
-
+  const [isEditModalOpen, setEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
   const { clientId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-
   const client = useAppSelector(selectClient)
   const loading = useAppSelector(selectLoadingFetchClient)
   const error = useAppSelector(selectClientError)
-
-  const {
-    handleConfirmDelete,
-  } = useClientsList()
+  const { handleConfirmDelete } = useClientsList()
 
   useEffect(() => {
     if (clientId) {
       dispatch(fetchClientById(clientId))
     }
   }, [dispatch, clientId])
+
+  const handleOpenEditModal = () => setEditModalOpen(true)
+  const handleCloseEditModal = () => setEditModalOpen(false)
+  const handleOpenDeleteModal = () => setDeleteModalOpen(true)
+  const handleCloseDeleteModal = () => setDeleteModalOpen(false)
+
+  const handleDelete = async () => {
+    if (clientId) {
+      try {
+        await handleConfirmDelete(clientId)
+        handleCloseDeleteModal()
+        navigate('/clients')
+      } catch (error) {
+        console.error('Delete error:', error)
+      }
+    }
+  }
 
   return (
     <>
@@ -143,43 +151,20 @@ const ClientDetail = () => {
               gap: 2,
               justifyContent: 'flex-end',
             }}>
-              <Button
-                variant="contained"
-                startIcon={<EditOutlined />}
-                onClick={handleOpenEditModal}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-              >
-                Редактировать
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteOutline />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={handleOpenDeleteModal}
-              >
-                Удалить
-              </Button>
+              <EditButton onClick={handleOpenEditModal} />
+              <DeleteButton onClick={handleOpenDeleteModal} />
             </Box>
           </Card>
 
-          <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
+          <Modal open={isEditModalOpen} handleClose={handleCloseEditModal}>
             <ClientForm client={client} onClose={handleCloseEditModal} />
           </Modal>
 
           <ConfirmationModal
-            open={deleteModalOpen}
+            open={isDeleteModalOpen}
             entityName="этого клиента"
             actionType={'delete'}
-            onConfirm={handleConfirmDelete}
+            onConfirm={handleDelete}
             onCancel={handleCloseDeleteModal}
           />
         </Box>

@@ -12,10 +12,16 @@ import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ClientsDataList = () => {
-  const { clients, isLoading, deleteModalOpen, handleDeleteClick, handleConfirmDelete, setDeleteModalOpen } = useClientsList()
-
-  const [editModalOpen, setEditModalOpen] = useState(false)
+  const { clients, isLoading, handleConfirmDelete } = useClientsList()
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [isEditModalOpen, setEditModalOpen] = useState(false)
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedClientId(id)
+    setDeleteModalOpen(true)
+  }
 
   const handleOpenEditModal = (client: Client) => {
     setSelectedClient(client)
@@ -25,6 +31,17 @@ const ClientsDataList = () => {
   const handleCloseEditModal = () => {
     setEditModalOpen(false)
     setSelectedClient(null)
+  }
+
+  const handleDelete = async () => {
+    if (selectedClientId) {
+      try {
+        await handleConfirmDelete(selectedClientId)
+        setDeleteModalOpen(false)
+      } catch (error) {
+        console.error('Delete error:', error)
+      }
+    }
   }
 
   const theme = useTheme()
@@ -141,14 +158,14 @@ const ClientsDataList = () => {
       )}
 
       <ConfirmationModal
-        open={deleteModalOpen}
+        open={isDeleteModalOpen}
         entityName="этого клиента"
         actionType="delete"
-        onConfirm={handleConfirmDelete}
+        onConfirm={handleDelete}
         onCancel={() => setDeleteModalOpen(false)}
       />
 
-      <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
+      <Modal open={isEditModalOpen} handleClose={handleCloseEditModal}>
         {selectedClient && <ClientForm client={selectedClient} onClose={handleCloseEditModal} />}
       </Modal>
     </Box>
