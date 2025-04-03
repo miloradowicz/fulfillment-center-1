@@ -74,6 +74,15 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       valueGetter: (_value: string, row: OrderWithClient) => row.client.name,
     },
     {
+      field: 'stock',
+      headerName: 'Склад',
+      flex: 1,
+      minWidth: isMediumScreen ? 180 : 120,
+      align: 'left',
+      headerAlign: 'left',
+      valueGetter: (_value: string, row: OrderWithClient) => row.stock?.name ?? 'Неизвестный склад',
+    },
+    {
       field: 'sent_at',
       headerName: 'Отправлен',
       flex: 0.1,

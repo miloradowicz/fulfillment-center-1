@@ -39,7 +39,7 @@ export const fetchOrderById = createAsyncThunk<OrderWithProducts, string>(
 export const fetchOrderByIdWithPopulate = createAsyncThunk<OrderWithProductsAndClients , string>(
   'orders/fetchOrderByIdWithPopulate',
   async (orderId: string) => {
-    const response = await axiosAPI.get(`/orders/${ orderId }?populate=true`) // добавили параметр populate
+    const response = await axiosAPI.get(`/orders/${ orderId }?populate=true`)
     return response.data
   },
 )

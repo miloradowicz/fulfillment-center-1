@@ -141,6 +141,7 @@ export interface Order {
   client: string
   products: ProductOrder[]
   price: number
+  stock: string
   sent_at: string
   delivered_at?: string
   comment?: string
@@ -159,10 +160,12 @@ export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
   products: ProductForOrderForm[]
   defects: DefectForOrderForm[]
   client: Client
+  stock: Stock
 }
 
-export type OrderWithClient = Omit<Order, 'client'> & {
+export type OrderWithClient = Omit<Order, 'client' | 'stock'> & {
   client: Client
+  stock: Stock
 }
 
 export type OrderMutation = Omit<Order, '_id'>
