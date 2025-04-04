@@ -7,16 +7,16 @@ import { UpdateOrderDto } from '../dto/update-order.dto'
 import { CounterService } from './counter.service'
 import { DocumentObject } from './arrivals.service'
 import { FilesService } from './files.service'
-import { Stock, StockDocument } from '../schemas/stock.schema'
+import { StockManipulationService } from './stock-manipulation.service'
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>,
-    private counterService: CounterService,
+    private readonly counterService: CounterService,
     private readonly filesService: FilesService,
-  ) {}
+    private readonly stockManipulationService: StockManipulationService,
+  ) { }
 
   async getAll() {
     const orders = await this.orderModel.find({ isArchived: false }).populate('stock').exec()
@@ -64,7 +64,7 @@ export class OrdersService {
     return order
   }
 
-  async create(orderDto: CreateOrderDto,files: Array<Express.Multer.File> = []) {
+  async create(orderDto: CreateOrderDto, files: Array<Express.Multer.File> = []) {
     try {
       let documents: DocumentObject[] = []
       if (files.length > 0) {
@@ -89,18 +89,21 @@ export class OrdersService {
 
         documents = [...formattedDocs, ...documents]
       }
+
+      const sequenceNumber = await this.counterService.getNextSequence('order')
       const newOrder = await this.orderModel.create({
         ...orderDto,
         documents,
+        orderNumber: `ORD-${ sequenceNumber }`,
       })
 
-      const sequenceNumber = await this.counterService.getNextSequence('order')
-      newOrder.orderNumber  = `ORD-${ sequenceNumber }`
+      if (newOrder.status === 'в пути' || newOrder.status === 'доставлен') {
+        await this.stockManipulationService.decreaseProductStock(newOrder.stock, newOrder.products)
+      }
 
-      const stock = await this.stockModel.findById(orderDto.stock)
-      if (!stock) throw new NotFoundException('Указанный склад не найден')
-
-      return newOrder.save()
+      if (newOrder.status === 'доставлен') {
+        await this.stockManipulationService.increaseProductStock(newOrder.stock, newOrder.products)
+      }
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
@@ -118,16 +121,31 @@ export class OrdersService {
       throw new NotFoundException('Заказ не найден')
     }
 
-    const stock = await this.stockModel.findById(orderDto.stock)
-    if (!stock) throw new NotFoundException('Указанный склад не найден')
-
     if (files.length > 0) {
       const documentPaths = files.map(file => ({
         document: this.filesService.getFilePath(file.filename),
       }))
       orderDto.documents = [...(existingOrder.documents || []), ...documentPaths]
     }
-    return this.orderModel.findByIdAndUpdate(id, orderDto, { new: true })
+
+    if (existingOrder.status === 'в пути' || existingOrder.status === 'доставлен') {
+      await this.stockManipulationService.increaseProductStock(existingOrder.stock, existingOrder.products)
+    }
+
+    if (existingOrder.status === 'доставлен') {
+      await this.stockManipulationService.decreaseProductStock(existingOrder.stock, existingOrder.defects)
+    }
+
+    const updatedOrder = existingOrder.set(id, orderDto, { new: true })
+    await updatedOrder.save()
+
+    if (updatedOrder.status === 'в пути' || updatedOrder.status === 'доставлен') {
+      await this.stockManipulationService.decreaseProductStock(updatedOrder.stock, updatedOrder.products)
+    }
+
+    if (updatedOrder.status === 'доставлен') {
+      await this.stockManipulationService.increaseProductStock(updatedOrder.stock, updatedOrder.defects)
+    }
   }
 
   async archive(id: string) {
