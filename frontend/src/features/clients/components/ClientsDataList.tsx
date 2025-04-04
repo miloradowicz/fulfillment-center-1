@@ -21,7 +21,7 @@ const ClientsDataList = () => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
+    handleConfirmationArchive,
   } = useClientActions(true)
 
   const theme = useTheme()
@@ -140,8 +140,8 @@ const ClientsDataList = () => {
       <ConfirmationModal
         open={confirmationOpen}
         entityName="этого клиента"
-        actionType="delete"
-        onConfirm={handleConfirmationDelete}
+        actionType="archive"
+        onConfirm={handleConfirmationArchive}
         onCancel={handleConfirmationClose}
       />
 
