@@ -18,6 +18,7 @@ import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
+import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 
 const App = () => {
   const theme = createTheme({
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/stocks" element={<StockPage />} />
             <Route path="/stocks/:stockId" element={<StockDetails />} />
+            <Route path="/archives" element={<ArchivePage />} />
             <Route
               path="/*"
               element={

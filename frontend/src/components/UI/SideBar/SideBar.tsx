@@ -7,19 +7,21 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import DescriptionIcon from '@mui/icons-material/Description'
 import GroupIcon from '@mui/icons-material/Group'
 import {
+  Box,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  IconButton,
-  useMediaQuery,
   Theme,
-  Box } from '@mui/material'
+  useMediaQuery,
+} from '@mui/material'
 import { NavLink } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
+import ArchiveIcon from '@mui/icons-material/Archive'
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)
@@ -123,6 +125,15 @@ export default function Sidebar() {
                 <GroupIcon />
               </ListItemIcon>
               <ListItemText primary="Контрагенты" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/archives">
+              <ListItemIcon>
+                <ArchiveIcon />
+              </ListItemIcon>
+              <ListItemText primary="Архив" />
             </ListItemButton>
           </ListItem>
 
