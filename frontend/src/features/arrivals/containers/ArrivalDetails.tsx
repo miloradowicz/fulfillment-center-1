@@ -5,7 +5,6 @@ import {
   CircularProgress,
   Container,
   Divider,
-  IconButton,
   Step,
   StepLabel,
   Stepper,
@@ -13,7 +12,6 @@ import {
   Tabs,
   Typography,
 } from '@mui/material'
-import { ArrowBack } from '@mui/icons-material'
 import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
 import Modal from '../../../components/UI/Modal/Modal'
@@ -29,6 +27,7 @@ import { basename } from 'path-browserify'
 import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
 import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -38,7 +37,6 @@ const ArrivalDetails = () => {
     infoTab,
     productsTab,
     confirmDeleteModalOpen,
-    navigateBack,
     handleDelete,
     editModalOpen,
     setEditModalOpen,
@@ -84,14 +82,7 @@ const ArrivalDetails = () => {
 
       <Container maxWidth="md">
         <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
-            <IconButton >
-              <ArrowBack />
-            </IconButton>
-            <Typography variant="caption" className="!text-sm">
-              Поставки
-            </Typography>
-          </Box>
+          <BackButton/>
           <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
             <Box>
               <Chip label={arrival.arrival_status}
