@@ -37,6 +37,11 @@ export class ClientsController {
     return this.clientsService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveClient(@Param('id') id: string) {
+    return this.clientsService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteClient(@Param('id') id: string) {
     return this.clientsService.delete(id)

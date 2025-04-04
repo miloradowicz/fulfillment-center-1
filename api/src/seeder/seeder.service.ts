@@ -105,19 +105,43 @@ export class SeederService {
       },
     ])
 
-    const _clients = await this.clientModel.create({
-      name: 'CHAPSAN',
-      phone_number: '1 123-456-7890',
-      email: 'test@gmail.com',
-      inn: '123123',
-      address: 'Малдыбаева 7/1',
-      banking_data: '123123',
-      ogrn: '123123',
-    })
+    const [_client_1] = await this.clientModel.create(
+      {
+        name: 'CHAPSAN',
+        phone_number: '1 123-456-7890',
+        email: 'test@gmail.com',
+        inn: '123123',
+        address: 'Малдыбаева 7/1',
+        banking_data: '123123',
+        ogrn: '123123',
+        isArchived: false,
+      },
+      {
+        name: 'ОсOO CHAPSAN-GROUP',
+        phone_number: '1 123-456-7890',
+        email: 'test@gmail.com',
+        inn: '111',
+        address: 'Малдыбаева 7/2',
+        banking_data: '111',
+        ogrn: '111',
+        isArchived: true,
+      },
+      {
+        name: 'ИП Асанов',
+        phone_number: '1 123-456-7890',
+        email: 'test@gmail.com',
+        inn: '888',
+        address: 'Малдыбаева 7/3',
+        banking_data: '888',
+        ogrn: '888',
+        isArchived: true,
+      },
+
+    )
 
     const [_product1, _product2, _product3] = await this.productModel.create([
       {
-        client: _clients._id,
+        client: _client_1._id,
         title: 'Сарафан',
         barcode: '012345678901',
         article: '01234567',
@@ -127,7 +151,7 @@ export class SeederService {
         ],
       },
       {
-        client: _clients._id,
+        client: _client_1._id,
         title: 'Джинсы',
         barcode: '987654321012',
         article: '987654',
@@ -137,7 +161,7 @@ export class SeederService {
         ],
       },
       {
-        client: _clients._id,
+        client: _client_1._id,
         title: 'Футболка',
         barcode: '567890123456',
         article: '567890',
@@ -170,7 +194,7 @@ export class SeederService {
     const [_order1, _order2, _order3] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
-        client: _clients._id,
+        client: _client_1._id,
         stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
@@ -183,7 +207,7 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-2',
-        client: _clients._id,
+        client: _client_1._id,
         stock: _stock2._id,
         products: [
           { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
@@ -196,7 +220,7 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-3',
-        client: _clients._id,
+        client: _client_1._id,
         stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
@@ -237,7 +261,7 @@ export class SeederService {
     const [_arrival1, _arrival2, _arrival3] = await this.arrivalModel.create([
       {
         arrivalNumber: 'ARL-1',
-        client: _clients._id,
+        client: _client_1._id,
         products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
         arrival_date: new Date().toISOString(),
@@ -248,7 +272,7 @@ export class SeederService {
       },
       {
         arrivalNumber: 'ARL-2',
-        client: _clients._id,
+        client: _client_1._id,
         products: [{ product: _product2._id, description: '', amount: 100 }],
         arrival_price: 2500,
         arrival_status: 'получена',
@@ -264,7 +288,7 @@ export class SeederService {
       },
       {
         arrivalNumber: 'ARL-3',
-        client: _clients._id,
+        client: _client_1._id,
         products: [{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
         arrival_status: 'отсортирована',

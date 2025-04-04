@@ -94,6 +94,19 @@ export class ClientsService {
     return { message: 'Клиент перемещен в архив' }
   }
 
+  async unarchive(id: string) {
+    const client = await this.clientModel.findById(id)
+
+    if (!client) throw new NotFoundException('Клиент не найден')
+
+    if (!client.isArchived) throw new ForbiddenException('Клиент не находится в архиве')
+
+    client.isArchived = false
+    await client.save()
+
+    return { message: 'Клиент восстановлен из архива' }
+  }
+
   async delete(id: string) {
     const client = await this.clientModel.findById(id)
 
