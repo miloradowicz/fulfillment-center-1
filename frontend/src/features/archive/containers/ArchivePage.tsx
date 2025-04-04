@@ -7,12 +7,17 @@ import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { TabProps } from '../../reports/utils/TabProps.ts'
 import { CustomTabPanel } from '../../reports/utils/CustomTabPanel.tsx'
+import Grid from '@mui/material/Grid2'
+import { CircularProgress } from '@mui/material'
+import { selectLoadingArchiveClient } from '../../../store/slices/clientSlice.ts'
+import { useAppSelector } from '../../../app/hooks.ts'
+import ArchivedClients from '../components/ArchivedClients.tsx'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
   const location = useLocation()
   const navigate = useNavigate()
-
+  const loadingClients = useAppSelector(selectLoadingArchiveClient)
 
   const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
 
@@ -49,8 +54,15 @@ const ArchivePage = () =>  {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        Клиенты
-      </CustomTabPanel>
+        {loadingClients ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedClients/>
+          </>
+        )}      </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         Заказы
       </CustomTabPanel>
