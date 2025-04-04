@@ -1,6 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store.ts'
-import { registerUser, loginUser, fetchUsers, fetchUserById, updateUser, deleteUser, archiveUser } from '../thunks/userThunk.ts'
+import {
+  registerUser,
+  loginUser,
+  fetchUsers,
+  fetchUserById,
+  updateUser,
+  deleteUser,
+  archiveUser,
+  logoutUser,
+} from '../thunks/userThunk.ts'
 import { User, ValidationError, GlobalError, UserStripped } from '../../types'
 
 interface UserState {
@@ -68,6 +77,9 @@ const userSlice = createSlice({
       } else {
         state.loginError = null
       }
+    },
+    unsetUser: state => {
+      state.user = null
     },
   },
   extraReducers: builder => {
@@ -143,9 +155,20 @@ const userSlice = createSlice({
       state.loadingDelete = false
       state.error = error || null
     })
+    builder.addCase(logoutUser.pending, state => {
+      state.loadingLogin = true
+    })
+    builder.addCase(logoutUser.fulfilled, state => {
+      state.loadingLogin = false
+      state.user = null
+    })
+    builder.addCase(logoutUser.rejected, (state, { payload: error }) => {
+      state.loadingLogin = false
+      state.error = error || null
+    })
   },
 })
 
-export const { clearCreateError, clearLoginError } = userSlice.actions
+export const { clearCreateError, clearLoginError, unsetUser } = userSlice.actions
 
 export const userReducer = userSlice.reducer
