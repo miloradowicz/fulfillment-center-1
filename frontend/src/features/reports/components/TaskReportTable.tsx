@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import { useSearchParams } from 'react-router-dom'
 import { formatDate } from '../utils/FormattedDateForTitle.ts'
 import { PropsTaskTable } from '../utils/TypesProps.ts'
+import TaskDropdown from './TaskDropdown.tsx'
 
 const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
   const [searchParams] = useSearchParams()
@@ -19,16 +20,22 @@ const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontSize:'17px', fontWeight:'550' }}>Имя пользователя</TableCell>
-                <TableCell sx={{ fontSize:'17px', fontWeight:'550' }} align="right">Количество выполеннных задач</TableCell>
+                <TableCell sx={{ fontSize: '17px', fontWeight: '550' }} align="center">Выполненные <br/> задачи</TableCell>
+                <TableCell sx={{ fontSize:'17px', fontWeight:'550' }} align="center">Количество <br/> выполеннных задач</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {userTaskReports.map(report => (
                 <TableRow key={report.user._id}>
-                  <TableCell  sx={{ fontSize:'17px' }} component="th" scope="row">
+                  <TableCell sx={{ fontSize: '17px' }} component="th" scope="row">
                     {report.user.displayName}
                   </TableCell>
-                  <TableCell sx={{ fontSize:'17px' }} align="right">{report.taskCount}</TableCell>
+                  <TableCell sx={{ fontSize: '17px' }} align="center">
+                    <TaskDropdown tasks={report.tasks} />
+                  </TableCell>
+                  <TableCell sx={{ fontSize: '17px' }} align="center">
+                    {report.taskCount}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

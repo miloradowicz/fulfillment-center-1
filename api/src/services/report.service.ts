@@ -38,12 +38,13 @@ export class ReportService {
       .populate('user', 'displayName')
 
     const userTaskCount = tasks.reduce((acc, task) => {
-      const userId = task.user.toString()  // Преобразуем ObjectId в строку
+      const userId = task.user.toString()
 
       if (!acc[userId]) {
-        acc[userId] = { user: task.user, taskCount: 0 }
+        acc[userId] = { user: task.user, taskCount: 0, tasks: [] }
       }
       acc[userId].taskCount += 1
+      acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber })
 
       return acc
     }, {} as Record<string, UserTaskReport>)
@@ -53,8 +54,7 @@ export class ReportService {
     const dailyTaskCounts: DailyTaskCount[] = []
 
     tasks.forEach(task => {
-      const taskDate = task.date_Done ? new Date(task.date_Done).toISOString().split('T')[0] : '' // Форматируем дату
-
+      const taskDate = task.date_Done ? new Date(task.date_Done).toISOString().split('T')[0] : ''
       const existingDay = dailyTaskCounts.find(day => day.date === taskDate)
 
       if (existingDay) {

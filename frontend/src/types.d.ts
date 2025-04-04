@@ -342,6 +342,10 @@ export interface UserTaskReport {
     _id: string;
     displayName: string;
   };
+  tasks: {
+    _id: string
+    taskNumber: string
+  }[],
   taskCount: number;
 }
 
