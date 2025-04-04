@@ -1,9 +1,10 @@
-import { Box, Button, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
-import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { Box, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
+import { ArrowBack } from '@mui/icons-material'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 const ProductDetails = () => {
   const {
@@ -12,10 +13,7 @@ const ProductDetails = () => {
     product,
     error,
     loading,
-    handleConfirmationOpen,
-    handleConfirmationClose,
-    handleConfirmationDelete,
-    confirmationOpen,
+    deleteOneProduct,
     open,
     handleClose,
     handleOpen,
@@ -27,19 +25,13 @@ const ProductDetails = () => {
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
           initialData={product || undefined}
-          onSuccess={() => {
-            if (id) fetchProduct(id)
+          onSuccess={async () => {
+            if (id) await fetchProduct(id)
             handleClose()
           }}
+
         />
       </Modal>
-      <ConfirmationModal
-        open={confirmationOpen}
-        entityName="этот товар"
-        actionType={'delete'}
-        onConfirm={handleConfirmationDelete}
-        onCancel={handleConfirmationClose}
-      />
       <Box className="max-w-2xl mx-auto p-4 sm:p-8">
         <Box
           sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
@@ -111,31 +103,8 @@ const ProductDetails = () => {
             </Card>
 
             <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                startIcon={<EditOutlined />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={() => handleOpen()}
-              >
-                Редактировать
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteOutline />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={() => handleConfirmationOpen(product._id)}
-              >
-                Удалить
-              </Button>
+              <EditButton onClick={() => handleOpen()} />
+              <DeleteButton onClick={() => deleteOneProduct(product._id)} />
             </Box>
           </Card>
         )}

@@ -1,23 +1,19 @@
-import {
-  Box, Button,
-  Card, CircularProgress,
-  Divider,
-  IconButton,
-  Typography,
-} from '@mui/material'
+import { Box, Card, CircularProgress, Divider, IconButton, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
+  AccountBalanceOutlined,
   ArrowBack,
   EmailOutlined,
-  PhoneAndroidOutlined,
   LocationOnOutlined,
-  AccountBalanceOutlined, EditOutlined, DeleteOutline,
+  PhoneAndroidOutlined,
 } from '@mui/icons-material'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
 import ClientForm from '../components/ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { useClientActions } from '../hooks/useClientActions.ts'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 const ClientDetail = () => {
   const {
@@ -131,31 +127,8 @@ const ClientDetail = () => {
               gap: 2,
               justifyContent: 'flex-end',
             }}>
-              <Button
-                variant="contained"
-                startIcon={<EditOutlined />}
-                onClick={() => handleOpen()}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-              >
-                Редактировать
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteOutline />}
-                sx={{
-                  px: 3,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                }}
-                onClick={() => handleConfirmationOpen(client._id)}
-              >
-                Удалить
-              </Button>
+              <EditButton onClick={() => handleOpen()} />
+              <DeleteButton onClick={() => handleConfirmationOpen(client._id)} />
             </Box>
           </Card>
 

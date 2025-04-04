@@ -1,14 +1,19 @@
 import {
   Box,
-  Button,
-  Card, Chip, CircularProgress,
+  Card,
+  Chip,
+  CircularProgress,
   Container,
   Divider,
   IconButton,
-  Step, StepLabel, Stepper, Tab, Tabs,
+  Step,
+  StepLabel,
+  Stepper,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material'
-import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { ArrowBack } from '@mui/icons-material'
 import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
 import Modal from '../../../components/UI/Modal/Modal'
@@ -22,6 +27,8 @@ import LogsTable from '../../../components/Tables/LogsTable.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
 import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -185,33 +192,8 @@ const ArrivalDetails = () => {
               justifyContent: 'flex-end',
             }}
           >
-            <Button
-              type={'button'}
-              variant="contained"
-              startIcon={<EditOutlined />}
-              sx={{
-                px: 3,
-                borderRadius: 2,
-                textTransform: 'none',
-              }}
-              onClick={() => setEditModalOpen(true)}
-            >
-              Редактировать
-            </Button>
-            <Button
-              type={'button'}
-              variant="contained"
-              color="error"
-              startIcon={<DeleteOutline />}
-              sx={{
-                px: 3,
-                borderRadius: 2,
-                textTransform: 'none',
-              }}
-              onClick={() => setConfirmDeleteModalOpen(true)}
-            >
-              Удалить
-            </Button>
+            <EditButton onClick={() => setEditModalOpen(true)} />
+            <DeleteButton onClick={() => setConfirmDeleteModalOpen(true)} />
           </Box>
         </Card>
       </Container>

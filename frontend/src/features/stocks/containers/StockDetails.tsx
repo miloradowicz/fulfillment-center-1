@@ -3,9 +3,11 @@ import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
 import Grid from '@mui/material/Grid2'
-import { ArrowBack, DeleteOutline, EditOutlined } from '@mui/icons-material'
+import { ArrowBack } from '@mui/icons-material'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
+import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
+import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
 
 const StockDetails = () => {
   const {
@@ -107,31 +109,8 @@ const StockDetails = () => {
         </Box>
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
-          <Button
-            variant="contained"
-            startIcon={<EditOutlined />}
-            sx={{
-              px: 3,
-              borderRadius: 2,
-              textTransform: 'none',
-            }}
-            onClick={() => setEditModalOpen(true)}
-          >
-            Редактировать
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DeleteOutline />}
-            sx={{
-              px: 3,
-              borderRadius: 2,
-              textTransform: 'none',
-            }}
-            onClick={showDeleteModal}
-          >
-            Удалить
-          </Button>
+          <EditButton onClick={() => setEditModalOpen(true)} />
+          <DeleteButton onClick={showDeleteModal}/>
         </Box>
       </div>
     </>
