@@ -6,7 +6,7 @@ export type HydratedUser = HydratedDocument<User>
 
 export type RequestWithUser = Request & { user: HydratedUser }
 
-export type JwtToken = { id: sring }
+export type JwtToken = { id: string }
 
 interface UserTaskReport {
   user: string
