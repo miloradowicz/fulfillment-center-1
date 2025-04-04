@@ -30,10 +30,6 @@ export const useStockDetails = () => {
     }
   }, [dispatch, stockId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleDelete = async () => {
     if (stockId) {
       try {
@@ -70,7 +66,6 @@ export const useStockDetails = () => {
     showDeleteModal,
     hideDeleteModal,
     handleDelete,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
   }

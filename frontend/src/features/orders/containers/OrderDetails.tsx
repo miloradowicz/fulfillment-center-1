@@ -25,8 +25,8 @@ import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.ts
 import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
+import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
 import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
 
 const OrderDetails = () => {

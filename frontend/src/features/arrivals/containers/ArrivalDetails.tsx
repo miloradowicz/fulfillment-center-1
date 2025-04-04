@@ -25,8 +25,8 @@ import LogsTable from '../../../components/Tables/LogsTable.tsx'
 import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
 import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
+import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
 import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
 
 
