@@ -5,14 +5,14 @@ import { fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderT
 import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 
-export interface Props  {
+export interface Props {
   row: OrderWithClient,
 }
 
-const StatusOrderCell:React.FC<Props> =({ row })  => {
+const StatusOrderCell: React.FC<Props> = ({ row }) => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const statusColors: Record<string,StatusColor> = {
+  const statusColors: Record<string, StatusColor> = {
     'в сборке': 'warning',
     'доставлен': 'success',
     'в пути': 'info',
@@ -31,6 +31,7 @@ const StatusOrderCell:React.FC<Props> =({ row })  => {
       const updatedData = {
         ...row,
         client: row.client._id,
+        stock: row.stock._id,
         status: newStatus,
       }
       await dispatch(updateOrder({ orderId: row._id, data: updatedData })).unwrap()

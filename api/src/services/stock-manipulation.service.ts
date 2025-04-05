@@ -56,5 +56,7 @@ export class StockManipulationService<T extends ProductWithAmount = ProductWithA
         stock.products.splice(stockProductIndex, 1)
       }
     }
+
+    await stock.save()
   }
 }

@@ -34,8 +34,8 @@ import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { ItemType } from '../../../constants.ts'
-import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
-import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { selectAllStocks, selectOneStock } from '../../../store/slices/stocksSlice.ts'
+import { fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
@@ -54,7 +54,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         defects: [],
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
-        documents: initialData.documents? initialData.documents : [],
+        documents: initialData.documents ? initialData.documents : [],
       }
       : { ...initialStateOrder },
   )
@@ -64,7 +64,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [newFieldDefects, setNewFieldDefects] = useState<Defect>(initialStateDefectForOrder)
   const [modalOpenDefects, setModalOpenDefects] = useState(false)
   const [isButtonDefectVisible, setButtonDefectVisible] = useState(true)
-  const [currentClient, setCurrentClient] = useState<string>('')
   const [newField, setNewField] = useState<ProductOrder>(initialStateProductForOrder)
   const [modalOpen, setModalOpen] = useState(false)
   const dispatch = useAppDispatch()
@@ -77,7 +76,9 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
   const stocks = useAppSelector(selectAllStocks)
+  const stock = useAppSelector(selectOneStock)
 
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
   useEffect(() => {
@@ -97,8 +98,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpen(true)
       setButtonVisible(false)
@@ -111,8 +114,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonDefectClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpenDefects(true)
       setButtonDefectVisible(false)
@@ -132,7 +137,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
     const validFiles = selectedFiles.filter(file => {
       if (file.size > maxFileSize) {
-        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
+        toast.warn(`Файл "${file.name}" слишком большой (макс. 10MB)`)
         return false
       }
       return true
@@ -148,14 +153,22 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
   useEffect(() => {
     if (form.client) {
-      clients?.map(client => {
-        if (form.client === client._id) {
-          setCurrentClient(client._id)
-        }
-      })
-      dispatch(fetchProductsByClientId(currentClient))
+      dispatch(fetchProductsByClientId(form.client))
     }
-  }, [clients, currentClient, dispatch, form.client])
+  }, [dispatch, form.client])
+
+  useEffect(() => {
+    if (form.stock) {
+      dispatch(fetchStockById(form.stock))
+    }
+  }, [dispatch, form.stock])
+
+  useEffect(() => {
+    if (clientProducts && stock?.products) {
+      const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
+      void getAvailableItems(clientProducts, stockProducts, [], setAvailableProducts)
+    }
+  }, [clientProducts, stock])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -315,14 +328,13 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setButtonDefectVisible,
     isButtonVisible,
     setButtonVisible,
-    currentClient,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
     clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,

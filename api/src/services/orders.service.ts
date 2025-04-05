@@ -132,19 +132,11 @@ export class OrdersService {
       await this.stockManipulationService.increaseProductStock(existingOrder.stock, existingOrder.products)
     }
 
-    if (existingOrder.status === 'доставлен') {
-      await this.stockManipulationService.decreaseProductStock(existingOrder.stock, existingOrder.defects)
-    }
-
-    const updatedOrder = existingOrder.set(id, orderDto, { new: true })
+    const updatedOrder = existingOrder.set(orderDto)
     await updatedOrder.save()
 
     if (updatedOrder.status === 'в пути' || updatedOrder.status === 'доставлен') {
       await this.stockManipulationService.decreaseProductStock(updatedOrder.stock, updatedOrder.products)
-    }
-
-    if (updatedOrder.status === 'доставлен') {
-      await this.stockManipulationService.increaseProductStock(updatedOrder.stock, updatedOrder.defects)
     }
   }
 
