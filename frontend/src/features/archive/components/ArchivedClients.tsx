@@ -122,6 +122,19 @@ const ArchivedClients = () => {
           pageSizeOptions={[5, 10, 20]}
           checkboxSelection
           disableRowSelectionOnClick
+          sx={{
+            '& .center-cell': {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 !important',
+            },
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px 16px',
+            },
+          }}
         />
       ) : (
         <Typography className="text-center mt-5">Клиентов нет</Typography>
