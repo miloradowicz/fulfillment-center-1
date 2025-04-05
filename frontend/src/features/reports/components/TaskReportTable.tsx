@@ -19,7 +19,7 @@ const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
           sx={{
             marginInline:'auto',
             width:{ xs:'90%', sm: '80%', xl: '95%', lg: '95%', md:'95%' },
-            marginBottom: { xs: '5px', sm: '10px' },
+            marginBottom: { xs: '15px', sm: '15px' },
             fontSize: { xs: '1rem', sm: '1.25rem' },
             textAlign: 'center',
           }}
