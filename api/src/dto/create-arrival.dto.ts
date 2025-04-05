@@ -37,7 +37,7 @@ class LogDto {
 
 export class DefectDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: mongoose.Schema.Types.ObjectId
+  product: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните описание дефекта.' })
   defect_description: string
@@ -49,7 +49,7 @@ export class DefectDto {
 
 export class ReceivedProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: mongoose.Schema.Types.ObjectId
+  product: mongoose.Types.ObjectId
 
   @IsOptional({ message: 'Заполните описание товара.' })
   @IsOptional()
@@ -62,10 +62,10 @@ export class ReceivedProductDto {
 
 export class CreateArrivalDto {
   @IsNotEmpty({ message: 'Заполните поле клиента.' })
-  client: mongoose.Schema.Types.ObjectId
+  client: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните склад, на который прибыла поставка.' })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @ArrayNotEmpty({ message: 'Заполните список товаров' })
   @IsArray({ message: 'Заполните список товаров.' })
@@ -89,7 +89,7 @@ export class CreateArrivalDto {
   pickup_location: string
 
   @IsOptional()
-  shipping_agent?: mongoose.Schema.Types.ObjectId | null
+  shipping_agent?: mongoose.Types.ObjectId | null
 
   @IsOptional()
   documents?: Array<{ document: string }> | string[] | string
