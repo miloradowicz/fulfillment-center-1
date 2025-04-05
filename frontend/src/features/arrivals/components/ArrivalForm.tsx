@@ -1,17 +1,27 @@
 import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, Divider, IconButton, InputLabel, TextField, Typography } from '@mui/material'
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  FormHelperText,
+  IconButton,
+  InputLabel,
+  TextField,
+  Typography,
+} from '@mui/material'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
-import { ArrivalData, useArrivalForm } from '../hooks/useArrivalForm.ts'
+import { useArrivalForm } from '../hooks/useArrivalForm.ts'
 import { Defect, ProductArrival } from '../../../types'
-import { initialItemState } from '../state/arrivalState.ts'
+import { initialItemState, initialServiceState } from '../state/arrivalState.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import React from 'react'
-import { getProductNameById } from '../../../utils/getProductName.ts'
-import { getItemNameById } from '../../../utils/getItemNameById.ts'
+import { getArrayItemNameById } from '../../../utils/getArrayItemName.ts'
+import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
 import { ItemType } from '../../../constants.ts'
+import { ArrivalData } from '../utils/arrivalTypes.ts'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -21,6 +31,7 @@ interface Props {
 const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     products,
+    services,
     isLoading,
     form,
     setForm,
@@ -39,6 +50,12 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     setReceivedModalOpen,
     defectsModalOpen,
     setDefectsModalOpen,
+    servicesModalOpen,
+    setServicesModalOpen,
+    newService,
+    setNewService,
+    servicesForm,
+    setServicesForm,
     openModal,
     addItem,
     deleteItem,
@@ -70,12 +87,12 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Autocomplete
             id="client"
-            value={getItemNameById(clients, 'name', '_id').find(option => option.id === form.client) || null}
+            value={getAutocompleteItemName(clients, 'name', '_id').find(option => option.id === form.client) || null}
             onChange={(_, newValue) => setForm(prevState => ({ ...prevState, client: newValue?.id || '' }))}
             size="small"
             fullWidth
             disablePortal
-            options={getItemNameById(clients, 'name', '_id')}
+            options={getAutocompleteItemName(clients, 'name', '_id')}
             getOptionKey={option => option.id}
             sx={{ width: '100%' }}
             renderInput={params => (
@@ -93,12 +110,12 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Autocomplete
             id="stock"
-            value={getItemNameById(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+            value={getAutocompleteItemName(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
             onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
             size="small"
             fullWidth
             disablePortal
-            options={getItemNameById(stocks, 'name', '_id')}
+            options={getAutocompleteItemName(stocks, 'name', '_id')}
             getOptionKey={option => option.id}
             sx={{ width: '100%' }}
             renderInput={params => (
@@ -117,7 +134,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           <Autocomplete
             id="shipping_agent"
             value={
-              getItemNameById(counterparties, 'name', '_id').find(option => option.id === form.shipping_agent) || null
+              getAutocompleteItemName(counterparties, 'name', '_id').find(option => option.id === form.shipping_agent) || null
             }
             onChange={(_, newValue) => {
               const value = newValue?.id || ''
@@ -129,7 +146,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             size="small"
             fullWidth
             disablePortal
-            options={getItemNameById(counterparties, 'name', '_id')}
+            options={getAutocompleteItemName(counterparties, 'name', '_id')}
             getOptionKey={option => option.id}
             sx={{ width: '100%' }}
             renderInput={params => <TextField {...params} label="Компания-перевозчик" />}
@@ -222,10 +239,10 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
         <Grid>
           <Typography fontWeight="bold">Отправленные товары</Typography>
-          <ItemsList
+          <ItemsList<ProductArrival>
             items={productsForm}
             onDelete={i => deleteItem(i, setProductsForm)}
-            getProductNameById={i => getProductNameById(products, i)}
+            getNameById={i => getArrayItemNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal(ItemType.PRODUCTS, initialItemState)}>
             + Добавить товары
@@ -303,10 +320,10 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Полученные товары</Typography>
-          <ItemsList
+          <ItemsList<ProductArrival>
             items={receivedForm}
             onDelete={i => deleteItem(i, setReceivedForm)}
-            getProductNameById={i => getProductNameById(products, i)}
+            getNameById={i => getArrayItemNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal(ItemType.RECEIVED_AMOUNT, initialItemState)}>
             + Добавить полученные товары
@@ -384,10 +401,10 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <Grid>
           <Divider sx={{ width: '100%', marginBottom: '15px' }} />
           <Typography fontWeight="bold">Дефекты</Typography>
-          <ItemsList
+          <ItemsList<Defect>
             items={defectsForm}
             onDelete={i => deleteItem(i, setDefectForm)}
-            getProductNameById={i => getProductNameById(products, i)}
+            getNameById={i => getArrayItemNameById(products, i)}
           />
           <Button type="button" onClick={() => openModal(ItemType.DEFECTS, initialItemState)}>
             + Добавить дефекты
@@ -465,6 +482,101 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </Grid>
         )}
 
+        <Grid>
+          <Divider sx={{ width: '100%', marginBottom: '15px' }} />
+          <Typography fontWeight="bold">Услуги</Typography>
+          <ItemsList
+            items={servicesForm}
+            onDelete={i => deleteItem(i, setServicesForm)}
+            getNameById={i => getArrayItemNameById(services, i, true)}
+          />
+
+          <Button type="button" onClick={() => openModal(ItemType.SERVICES, initialServiceState)}>
+            + Добавить услуги
+          </Button>
+        </Grid>
+
+        {servicesModalOpen && (
+          <Grid>
+            <Typography sx={{ marginBottom: '15px' }}>Укажите услуги</Typography>
+            <Autocomplete
+              fullWidth
+              size="small"
+              disablePortal
+              options={getAutocompleteItemName(services, 'name', '_id')}
+              onChange={(_, newValue) => {
+                if (newValue) {
+                  setNewService(prev => ({ ...prev, service: newValue.id }))
+                }
+              }}
+              getOptionLabel={option => `${ option.label }`}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Услуга"
+                  error={Boolean(errors.service || getFieldError('service', error))}
+                  helperText={errors.service || getFieldError('service', error)}
+                  onBlur={e => handleBlur('service', e.target.value)}
+                />
+              )}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              type="number"
+              fullWidth
+              size="small"
+              label="Количество услуги"
+              name="service_amount"
+              value={newService.service_amount || ''}
+              onChange={e => setNewService(prev => ({ ...prev, service_amount: +e.target.value }))}
+              error={Boolean(errors.service_amount || getFieldError('service_amount', error))}
+              helperText={errors.service_amount || getFieldError('service_amount', error)}
+              onBlur={e => handleBlur('service_amount', e.target.value)}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            <TextField
+              type="number"
+              fullWidth
+              size="small"
+              label="Цена услуги"
+              name="service_price"
+              value={
+                newService.service_price ||
+                services.find(s => s._id === newService.service)?.price || ''
+              }
+              onChange={e => {
+                const newPrice = +e.target.value
+                setNewService(prev => ({
+                  ...prev,
+                  service_price: newPrice >= 0 ? newPrice : prev.service_price,
+                }))
+              }}
+              error={Boolean(errors.service_price || getFieldError('service_price', error))}
+              helperText={errors.service_price || getFieldError('service_price', error)}
+              sx={{ marginBottom: '15px' }}
+            />
+
+            {newService.service_price !== undefined && newService.service_price !== null && newService.service_price !== 0 && (
+              <FormHelperText sx={{ color: 'red', mb: 2, fontWeight: 'bold' }}>
+                Указанная цена перезапишет стандартную стоимость услуги при выставлении счёта!
+              </FormHelperText>
+            )}
+
+            <Grid container spacing={2}>
+              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.SERVICES)}>
+                Добавить
+              </Button>
+
+              <Button type="button" variant="outlined" onClick={() => setServicesModalOpen(false)}>
+                Закрыть
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+
         <Divider sx={{ width: '100%', marginBottom: '10px' }} />
 
         <Grid className="flex gap-2 content-between items-center">
@@ -477,13 +589,14 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             {files.length > 0 && (
               <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 {files.map((file, index) => (
-                  <Typography key={index} variant="body2">{file.name}</Typography>
+                  <Typography key={index} variant="body2">
+                    {file.name}
+                  </Typography>
                 ))}
               </Grid>
             )}
           </Grid>
         </Grid>
-
 
         <Grid>
           <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
