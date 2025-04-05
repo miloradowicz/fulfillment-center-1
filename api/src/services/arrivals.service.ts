@@ -58,7 +58,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent services.service')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
@@ -77,7 +77,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent services.service')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
@@ -156,7 +156,11 @@ export class ArrivalsService {
       arrivalDto.documents = [...(existingArrival.documents || []), ...documentPaths]
     }
 
-    const updateData = { ...arrivalDto }
+    if (!Array.isArray(arrivalDto.services)) {
+      arrivalDto.services = []
+    }
+
+    const updateData = { ...arrivalDto, services: arrivalDto.services }
 
     const stock = await this.stockModel.findById(existingArrival.stock)
     if (!stock) throw new NotFoundException('Склад не найден')
