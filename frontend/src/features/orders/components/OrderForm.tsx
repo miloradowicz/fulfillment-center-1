@@ -17,7 +17,7 @@ import React from 'react'
 import { ErrorMessagesList } from '../../../messages.ts'
 import { OrderStatus } from '../../../constants.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import { getItemNameById } from '../../../utils/getItemNameById.ts'
+import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -109,12 +109,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
             <Grid>
               <Autocomplete
                 id="stock"
-                value={getItemNameById(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+                value={getAutocompleteItemName(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
                 onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
                 size="small"
                 fullWidth
                 disablePortal
-                options={getItemNameById(stocks, 'name', '_id')}
+                options={getAutocompleteItemName(stocks, 'name', '_id')}
                 getOptionKey={option => option.id}
                 sx={{ width: '100%' }}
                 renderInput={params => (
