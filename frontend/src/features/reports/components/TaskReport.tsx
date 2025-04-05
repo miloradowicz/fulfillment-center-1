@@ -9,7 +9,7 @@ import { useTaskReport } from '../hooks/useTaskReport.ts'
 
 const TaskReport = () => {
 
-  const {   report,
+  const { report,
     endDate,
     startDate,
     loadingReport,
@@ -18,14 +18,36 @@ const TaskReport = () => {
 
   return (
     <Box>
-      <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="center" flexWrap={'wrap'}>
-        <DateRangePicker />
+      <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="center" gap={2} flexWrap={'wrap'} mb={3}>
+        <Box sx={{
+          flex: 1,
+          display:'flex',
+          justifyContent:'center',
+          minWidth: '500px',
+          maxWidth: '700px',
+          width: '100%',
+          '@media (max-width: 900px)': {
+            width: '100%',
+            minWidth: '100%',
+          },
+        }}>
+          <DateRangePicker />
+        </Box>
         {loadingTasks ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
             <CircularProgress />
           </Grid>
         ) : (
-          <Box width={'650px'}>
+          <Box sx={{
+            flex: 1,
+            minWidth: '650px',
+            maxWidth:'650px',
+            width: '100%',
+            '@media (max-width: 900px)': {
+              width: '100%',
+              minWidth: '100%',
+            },
+          }}>
             <TaskSummary tasks={tasks} />
           </Box>
         )}
@@ -47,10 +69,30 @@ const TaskReport = () => {
               flexWrap="wrap"
               mt={2}
             >
-              <Box width="700px">
+              <Box sx={{
+                flex: 1,
+                minWidth: '500px',
+                maxWidth: '700px',
+                width: '100%',
+                '@media (max-width: 900px)': {
+                  width: '100%',
+                  minWidth: '100%',
+                },
+              }}>
                 <TaskCountAreaChart data={report.dailyTaskCounts} />
               </Box>
-              <Box flexGrow={1} width="500px">
+              <Box flexGrow={1}  sx={{
+                flex: 1,
+                marginLeft: '40px',
+                minWidth: '540px',
+                maxWidth: '600px',
+                width: '100%',
+                '@media (max-width: 900px)': {
+                  marginLeft:'0',
+                  width: '100%',
+                  minWidth: '100%',
+                },
+              }}>
                 <TaskReportTable userTaskReports={report.userTaskReports} />
               </Box>
             </Box>

@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { NavLink } from 'react-router-dom'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Box from '@mui/material/Box'
+import useIMobile from '../utils/UseIMobile.ts'
 
 const TaskDropdown = ({ tasks }: { tasks: { _id: string; taskNumber: string; }[] }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -21,12 +22,13 @@ const TaskDropdown = ({ tasks }: { tasks: { _id: string; taskNumber: string; }[]
   const clearSearch = () => {
     setSearchTask('')
   }
+  const isMobile = useIMobile()
   return (
-    <Box width={180}>
+    <Box width={'auto'}>
       <IconButton
         onClick={handleMenuOpen}
         sx={{
-          fontSize:'14px',
+          fontSize: { xs: '0.875rem', md: '1rem' },
           backgroundColor: '#639dc6',
           borderRadius: '8px',
           color: 'white',
@@ -35,7 +37,7 @@ const TaskDropdown = ({ tasks }: { tasks: { _id: string; taskNumber: string; }[]
           },
         }}
       >
-       Список задач <ArrowDropDownIcon />
+        {isMobile ? 'Задачи' : 'Список задач'}<ArrowDropDownIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem disableRipple>
