@@ -4,7 +4,7 @@ import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
 
 const ProductDetails = () => {
   const {
@@ -104,7 +104,7 @@ const ProductDetails = () => {
 
             <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
               <EditButton onClick={() => handleOpen()} />
-              <DeleteButton onClick={() => deleteOneProduct(product._id)} />
+              <ArchiveButton onClick={() => deleteOneProduct(product._id)} />
             </Box>
           </Card>
         )}

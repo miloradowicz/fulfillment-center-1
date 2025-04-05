@@ -28,7 +28,7 @@ import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.ts
 import { basename } from 'path-browserify'
 import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -193,7 +193,7 @@ const ArrivalDetails = () => {
             }}
           >
             <EditButton onClick={() => setEditModalOpen(true)} />
-            <DeleteButton onClick={() => setConfirmDeleteModalOpen(true)} />
+            <ArchiveButton onClick={() => setConfirmDeleteModalOpen(true)} />
           </Box>
         </Card>
       </Container>

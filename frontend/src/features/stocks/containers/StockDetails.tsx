@@ -7,7 +7,7 @@ import { ArrowBack } from '@mui/icons-material'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
 
 const StockDetails = () => {
   const {
@@ -110,7 +110,7 @@ const StockDetails = () => {
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
           <EditButton onClick={() => setEditModalOpen(true)} />
-          <DeleteButton onClick={showDeleteModal}/>
+          <ArchiveButton onClick={showDeleteModal}/>
         </Box>
       </div>
     </>

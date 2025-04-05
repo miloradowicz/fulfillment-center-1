@@ -28,7 +28,7 @@ import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
 
 const OrderDetails = () => {
   const {
@@ -166,7 +166,7 @@ const OrderDetails = () => {
           }}
         >
           <EditButton onClick={() => handleOpenEdit()} />
-          <DeleteButton  onClick={() => setOpenDeleteModal(true)} />
+          <ArchiveButton onClick={() => setOpenDeleteModal(true)} />
 
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />

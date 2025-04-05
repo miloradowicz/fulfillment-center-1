@@ -1,18 +1,17 @@
 import React from 'react'
 import { Button } from '@mui/material'
-import { DeleteOutline } from '@mui/icons-material'
+import ArchiveIcon from '@mui/icons-material/Archive'
 
 interface Props {
   onClick: () => void;
 }
 
-const DeleteButton: React.FC<Props> = ({ onClick }) => {
+const ArchiveButton: React.FC<Props> = ({ onClick }) => {
   return (
     <>
       <Button
         variant="contained"
-        color="error"
-        startIcon={<DeleteOutline />}
+        startIcon={<ArchiveIcon />}
         sx={{
           px: 3,
           borderRadius: 2,
@@ -20,10 +19,10 @@ const DeleteButton: React.FC<Props> = ({ onClick }) => {
         }}
         onClick={onClick}
       >
-        Удалить
+        Архивировать
       </Button>
     </>
   )
 }
 
-export default DeleteButton
+export default ArchiveButton
