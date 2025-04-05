@@ -37,12 +37,12 @@ const ArrivalDetails = () => {
     loading,
     infoTab,
     productsTab,
-    confirmDeleteModalOpen,
+    confirmArchiveModalOpen,
     navigateBack,
-    handleDelete,
+    handleArchive,
     editModalOpen,
     setEditModalOpen,
-    setConfirmDeleteModalOpen,
+    setConfirmArchiveModalOpen,
     setInfoTab,
     setProductsTabs,
     getStepDescription,
@@ -75,11 +75,11 @@ const ArrivalDetails = () => {
       </Modal>
 
       <ConfirmationModal
-        open={confirmDeleteModalOpen}
+        open={confirmArchiveModalOpen}
         entityName="эту поставку"
-        actionType="delete"
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmDeleteModalOpen(false)}
+        actionType="archive"
+        onConfirm={handleArchive}
+        onCancel={() => setConfirmArchiveModalOpen(false)}
       />
 
       <Container maxWidth="md">
@@ -193,7 +193,7 @@ const ArrivalDetails = () => {
             }}
           >
             <EditButton onClick={() => setEditModalOpen(true)} />
-            <ArchiveButton onClick={() => setConfirmDeleteModalOpen(true)} />
+            <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
           </Box>
         </Card>
       </Container>

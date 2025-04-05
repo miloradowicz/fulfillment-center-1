@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const { arrivals, handleDeleteClick, handleConfirmDelete, handleClose, isOpen, deleteModalOpen } = useArrivalsList()
+  const { arrivals, handleArchiveClick, handleConfirmArchive, handleClose, isOpen, archiveModalOpen } = useArrivalsList()
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -87,7 +87,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       field: 'Actions',
       headerName: 'Действия',
       flex: 1,
-      minWidth: isMediumScreen ? 220 : 160,
+      minWidth: isMediumScreen ? 80 : 80,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
@@ -97,7 +97,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
           <IconButton onClick={() => onEdit(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleDeleteClick(row._id)}>
+          <IconButton onClick={() => handleArchiveClick(row._id)}>
             <ClearIcon />
           </IconButton>
         </>
@@ -129,10 +129,10 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       )}
 
       <ConfirmationModal
-        open={deleteModalOpen}
+        open={archiveModalOpen}
         entityName="эту поставку"
-        actionType="delete"
-        onConfirm={handleConfirmDelete}
+        actionType="archive"
+        onConfirm={handleConfirmArchive}
         onCancel={handleClose}
       />
 
