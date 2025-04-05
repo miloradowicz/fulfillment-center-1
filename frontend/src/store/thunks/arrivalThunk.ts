@@ -16,6 +16,16 @@ export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals
   return response.data
 })
 
+export const fetchArchivedArrivals = createAsyncThunk<ArrivalWithClient[]>(
+  'arrivals/fetchArchivedArrivals',
+  async () => {
+    const response = await axiosAPI.get('/arrivals/archived/all', {
+      params: { populate: '1' },
+    })
+    return response.data
+  },
+)
+
 export const fetchArrivalById = createAsyncThunk<Arrival, string>(
   'arrivals/fetchArrivalById',
   async (arrivalId: string) => {
@@ -73,6 +83,21 @@ export const archiveArrival = createAsyncThunk<{ id: string }, string, { rejectV
   async (arrivalId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/arrivals/${ arrivalId }/archive`)
+      return { id: arrivalId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveArrival = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'arrivals/unarchiveArrival',
+  async (arrivalId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/arrivals/${ arrivalId }/unarchive`)
       return { id: arrivalId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
