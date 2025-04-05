@@ -66,6 +66,11 @@ export class ArrivalsController {
     return await this.arrivalsService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveArrival(@Param('id') id: string) {
+    return this.arrivalsService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteArrival(@Param('id') id: string) {
     return this.arrivalsService.delete(id)
