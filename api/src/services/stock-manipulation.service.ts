@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import mongoose, { Model } from 'mongoose'
+import mongoose, { HydratedDocument, Model } from 'mongoose'
 import { Stock } from 'src/schemas/stock.schema'
 
 type ObjectId = mongoose.Types.ObjectId
@@ -12,18 +12,26 @@ interface ProductWithAmount {
 
 @Injectable()
 export class StockManipulationService<T extends ProductWithAmount = ProductWithAmount> {
-  constructor(
-    @InjectModel(Stock.name) private readonly stockModel: Model<Stock>,
-  ) { }
+  private stocks: {
+    [key: string]: HydratedDocument<Stock>
+  } = {}
+
+  constructor(@InjectModel(Stock.name) private readonly stockModel: Model<Stock>) {}
 
   async increaseProductStock(stockId: ObjectId, products: T[]) {
-    const stock = await this.stockModel.findById(stockId)
-    if (!stock) throw new NotFoundException('Указанный склад не найден')
+    let stock: HydratedDocument<Stock>
+
+    if (String(stockId) in this.stocks) {
+      stock = this.stocks[String(stockId)]
+    } else {
+      const _stock = await this.stockModel.findById(stockId)
+      if (!_stock) throw new NotFoundException('Указанный склад не найден')
+      stock = _stock
+      this.stocks = { ...this.stocks, [String(stockId)]: stock }
+    }
 
     for (const product of products) {
-      const existingProduct = stock.products.find(
-        p => p.product.equals(product.product)
-      )
+      const existingProduct = stock.products.find(p => p.product.equals(product.product))
 
       if (existingProduct) {
         existingProduct.amount += product.amount
@@ -34,29 +42,53 @@ export class StockManipulationService<T extends ProductWithAmount = ProductWithA
         } as T)
       }
     }
-
-    await stock.save()
   }
 
   async decreaseProductStock(stockId: ObjectId, products: T[]) {
-    const stock = await this.stockModel.findById(stockId)
-    if (!stock) throw new NotFoundException('Указанный склад не найден')
+    let stock: HydratedDocument<Stock>
 
-    for (const product of products) {
-      const stockProductIndex = stock.products.findIndex(
-        p => p.product.equals(product.product)
-      )
-      if (stockProductIndex === -1) continue
-
-      const stockProduct = stock.products[stockProductIndex]
-
-      stockProduct.amount -= product.amount
-
-      if (stockProduct.amount <= 0) {
-        stock.products.splice(stockProductIndex, 1)
-      }
+    if (String(stockId) in this.stocks) {
+      stock = this.stocks[String(stockId)]
+    } else {
+      const _stock = await this.stockModel.findById(stockId)
+      if (!_stock) throw new NotFoundException('Указанный склад не найден')
+      stock = _stock
+      this.stocks = { ...this.stocks, [String(stockId)]: stock }
     }
 
-    await stock.save()
+    for (const product of products) {
+      const existingProduct = stock.products.find(p => p.product.equals(product.product))
+      if (existingProduct) {
+        existingProduct.amount -= product.amount
+      } else {
+        stock.products.push({
+          product: product.product,
+          amount: -product.amount,
+        } as T)
+      }
+    }
+  }
+
+  init() {
+    this.stocks = {}
+  }
+
+  testStock(stockId: ObjectId) {
+    if (String(stockId) in this.stocks) {
+      return this.stocks[String(stockId)].products.every(x => x.amount >= 0)
+    } else
+    {
+      return true
+    }
+  }
+
+  async saveStock(stockId: ObjectId) {
+    if (String(stockId) in this.stocks) {
+      const stock = this.stocks[String(stockId)]
+
+      stock.products = stock.products.filter(x => x.amount > 0)
+
+      await stock.save()
+    }
   }
 }

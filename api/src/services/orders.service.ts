@@ -64,6 +64,18 @@ export class OrdersService {
     return order
   }
 
+  async doStocking(order: OrderDocument) {
+    if (order.status === 'в пути' || order.status === 'доставлен') {
+      await this.stockManipulationService.decreaseProductStock(order.stock, order.products)
+    }
+  }
+
+  async undoStocking(order: OrderDocument) {
+    if (order.status === 'в пути' || order.status === 'доставлен') {
+      await this.stockManipulationService.increaseProductStock(order.stock, order.products)
+    }
+  }
+
   async create(orderDto: CreateOrderDto, files: Array<Express.Multer.File> = []) {
     try {
       let documents: DocumentObject[] = []
@@ -91,19 +103,23 @@ export class OrdersService {
       }
 
       const sequenceNumber = await this.counterService.getNextSequence('order')
-      const newOrder = await this.orderModel.create({
+      const newOrder = new this.orderModel({
         ...orderDto,
         documents,
         orderNumber: `ORD-${ sequenceNumber }`,
       })
 
-      if (newOrder.status === 'в пути' || newOrder.status === 'доставлен') {
-        await this.stockManipulationService.decreaseProductStock(newOrder.stock, newOrder.products)
+      this.stockManipulationService.init()
+
+      await this.doStocking(newOrder)
+
+      if (!this.stockManipulationService.testStock(newOrder.stock)) {
+        throw new BadRequestException('На данном складе нет необходимого количества товара')
       }
 
-      if (newOrder.status === 'доставлен') {
-        await this.stockManipulationService.increaseProductStock(newOrder.stock, newOrder.products)
-      }
+      await this.stockManipulationService.saveStock(newOrder.stock)
+      await newOrder.save()
+      return newOrder
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
@@ -128,16 +144,23 @@ export class OrdersService {
       orderDto.documents = [...(existingOrder.documents || []), ...documentPaths]
     }
 
-    if (existingOrder.status === 'в пути' || existingOrder.status === 'доставлен') {
-      await this.stockManipulationService.increaseProductStock(existingOrder.stock, existingOrder.products)
-    }
+    this.stockManipulationService.init()
+
+    const previousStock = existingOrder.stock
+    await this.undoStocking(existingOrder)
 
     const updatedOrder = existingOrder.set(orderDto)
-    await updatedOrder.save()
+    const newStock = updatedOrder.stock
+    await this.doStocking(updatedOrder)
 
-    if (updatedOrder.status === 'в пути' || updatedOrder.status === 'доставлен') {
-      await this.stockManipulationService.decreaseProductStock(updatedOrder.stock, updatedOrder.products)
+    if (!this.stockManipulationService.testStock(newStock)){
+      throw new BadRequestException('На данном складе нет необходимого количества товара')
     }
+
+    await this.stockManipulationService.saveStock(previousStock)
+    await this.stockManipulationService.saveStock(newStock)
+    await updatedOrder.save()
+    return updatedOrder
   }
 
   async archive(id: string) {
@@ -153,6 +176,12 @@ export class OrdersService {
   async delete(id: string) {
     const order = await this.orderModel.findByIdAndDelete(id)
     if (!order) throw new NotFoundException('Заказ не найден')
+
+    this.stockManipulationService.init()
+
+    await this.undoStocking(order)
+
+    await this.stockManipulationService.saveStock(order.stock)
     return { message: 'Заказ успешно удалён' }
   }
 }

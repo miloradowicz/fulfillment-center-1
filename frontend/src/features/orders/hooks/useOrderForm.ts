@@ -36,6 +36,7 @@ import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { ItemType } from '../../../constants.ts'
 import { selectAllStocks, selectOneStock } from '../../../store/slices/stocksSlice.ts'
 import { fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
@@ -82,10 +83,11 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
   useEffect(() => {
-    if (productsForm.length > 0 && clientProducts) {
-      getAvailableItems(clientProducts, productsForm, availableDefects, setAvailableDefects, '_id')
+    if (availableProducts.length > 0) {
+      const availableDefects = availableProducts.filter(x => productsForm.some(y => x._id === y.product._id))
+      setAvailableDefects(availableDefects)
     }
-  }, [productsForm, clientProducts, availableDefects])
+  }, [availableProducts, productsForm])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -137,7 +139,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
     const validFiles = selectedFiles.filter(file => {
       if (file.size > maxFileSize) {
-        toast.warn(`Файл "${file.name}" слишком большой (макс. 10MB)`)
+        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
         return false
       }
       return true
@@ -166,7 +168,8 @@ export const useOrderForm = (onSuccess?: () => void) => {
   useEffect(() => {
     if (clientProducts && stock?.products) {
       const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
-      void getAvailableItems(clientProducts, stockProducts, [], setAvailableProducts)
+      const availableProducts = clientProducts.filter(x => stockProducts.some(y => x._id === y.product._id))
+      setAvailableProducts(availableProducts)
     }
   }, [clientProducts, stock])
 
@@ -238,6 +241,11 @@ export const useOrderForm = (onSuccess?: () => void) => {
         await dispatch(fetchOrdersWithClient())
       }
     } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
+      }
       console.error(e)
     }
   }

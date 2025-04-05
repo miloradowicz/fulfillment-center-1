@@ -88,6 +88,32 @@ export class ArrivalsService {
     return arrival
   }
 
+  async doStocking(arrival: ArrivalDocument) {
+    if (
+      (arrival.arrival_status === 'получена' || arrival.arrival_status === 'отсортирована') &&
+      arrival.received_amount?.length
+    ) {
+      await this.stockManipulationService.increaseProductStock(arrival.stock, arrival.received_amount)
+    }
+
+    if (arrival.arrival_status === 'отсортирована' && arrival.defects?.length) {
+      await this.stockManipulationService.decreaseProductStock(arrival.stock, arrival.defects)
+    }
+  }
+
+  async undoStocking(arrival: ArrivalDocument) {
+    if (
+      (arrival.arrival_status === 'получена' || arrival.arrival_status === 'отсортирована') &&
+      arrival.received_amount.length
+    ) {
+      await this.stockManipulationService.decreaseProductStock(arrival.stock, arrival.received_amount)
+    }
+
+    if (arrival.arrival_status === 'отсортирована' && arrival.defects.length) {
+      await this.stockManipulationService.increaseProductStock(arrival.stock, arrival.defects)
+    }
+  }
+
   async create(arrivalDto: CreateArrivalDto, files: Array<Express.Multer.File> = []) {
     let documents: DocumentObject[] = []
 
@@ -123,18 +149,18 @@ export class ArrivalsService {
       arrivalNumber: `ARL-${ sequenceNumber }`,
     })
 
-    if ((arrivalDto.arrival_status === 'получена' || arrivalDto.arrival_status === 'отсортирована') && !arrivalDto.received_amount?.length) {
+    if (
+      (newArrival.arrival_status === 'получена' || newArrival.arrival_status === 'отсортирована') &&
+      !newArrival.received_amount?.length
+    ) {
       throw new BadRequestException('Заполните список полученных товаров.')
     }
 
-    if ((arrivalDto.arrival_status === 'получена' || arrivalDto.arrival_status === 'отсортирована') && arrivalDto.received_amount?.length) {
-      await this.stockManipulationService.increaseProductStock(arrivalDto.stock, arrivalDto.received_amount)
-    }
+    this.stockManipulationService.init()
 
-    if (arrivalDto.arrival_status === 'отсортирована' && arrivalDto.defects?.length) {
-      await this.stockManipulationService.decreaseProductStock(arrivalDto.stock, arrivalDto.defects)
-    }
+    await this.doStocking(newArrival)
 
+    await this.stockManipulationService.saveStock(newArrival.stock)
     return newArrival
   }
 
@@ -150,7 +176,9 @@ export class ArrivalsService {
     }
 
     const previousStatus = existingArrival.arrival_status
-    const newStatus = arrivalDto.arrival_status
+    const newStatus = arrivalDto.arrival_status ?? previousStatus
+
+    this.stockManipulationService.init()
 
     if (previousStatus === 'ожидается доставка' && (newStatus === 'отсортирована' || newStatus === 'получена')) {
       if (!arrivalDto.received_amount?.length) {
@@ -162,25 +190,16 @@ export class ArrivalsService {
       throw new BadRequestException('Для статуса "получена" укажите полученные товары')
     }
 
-    if ((previousStatus === 'получена' || previousStatus === 'отсортирована') && existingArrival.received_amount.length) {
-      await this.stockManipulationService.decreaseProductStock(existingArrival.stock, existingArrival.received_amount)
-    }
-
-    if (previousStatus === 'отсортирована' && existingArrival.defects.length) {
-      await this.stockManipulationService.increaseProductStock(existingArrival.stock, existingArrival.defects)
-    }
+    const previousStock = existingArrival.stock
+    await this.undoStocking(existingArrival)
 
     const updatedArrival = existingArrival.set(arrivalDto)
+    const newStock = updatedArrival.stock
+    await this.doStocking(updatedArrival)
+
+    await this.stockManipulationService.saveStock(previousStock)
+    await this.stockManipulationService.saveStock(newStock)
     await updatedArrival.save()
-
-    if ((newStatus === 'получена' || newStatus === 'отсортирована') && updatedArrival.received_amount.length) {
-      await this.stockManipulationService.increaseProductStock(updatedArrival.stock, updatedArrival.received_amount)
-    }
-
-    if (newStatus === 'отсортирована' && updatedArrival.defects.length) {
-      await this.stockManipulationService.decreaseProductStock(updatedArrival.stock, updatedArrival.defects)
-    }
-
     return await updatedArrival.populate('received_amount.product')
   }
 
@@ -197,6 +216,13 @@ export class ArrivalsService {
   async delete(id: string) {
     const arrival = await this.arrivalModel.findByIdAndDelete(id)
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
+
+
+    this.stockManipulationService.init()
+
+    await this.undoStocking(arrival)
+
+    await this.stockManipulationService.saveStock(arrival.stock)
     return { message: 'Поставка успешно удалена.' }
   }
 }
