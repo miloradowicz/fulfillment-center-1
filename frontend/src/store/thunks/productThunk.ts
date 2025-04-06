@@ -14,7 +14,7 @@ export const fetchProducts = createAsyncThunk<Product[]>(
 export const fetchArchivedProducts = createAsyncThunk<ProductWithPopulate[]>(
   'clients/fetchArchivedProducts',
   async () => {
-    const response = await axiosAPI.get('/products/archived/all')
+    const response = await axiosAPI.get('/products/archived/all?populate=1')
     return response.data
   },
 )

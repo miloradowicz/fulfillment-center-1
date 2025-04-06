@@ -14,6 +14,8 @@ import { useAppSelector } from '../../../app/hooks.ts'
 import ArchivedClients from '../components/ArchivedClients.tsx'
 import ArchivedArrivals from '../components/ArchivedArrivals.tsx'
 import { selectLoadingFetchArchivedArrivals } from '../../../store/slices/arrivalSlice.ts'
+import ArchivedProducts from '../components/ArchivedProducts.tsx'
+import { selectLoadingFetchArchivedProduct } from '../../../store/slices/productSlice.ts'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -21,6 +23,7 @@ const ArchivePage = () =>  {
   const navigate = useNavigate()
   const loadingClients = useAppSelector(selectLoadingArchiveClient)
   const loadingArrivals = useAppSelector(selectLoadingFetchArchivedArrivals)
+  const loadingProducts = useAppSelector(selectLoadingFetchArchivedProduct)
 
   const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
 
@@ -50,10 +53,12 @@ const ArchivePage = () =>  {
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
           <Tab label="Клиенты" sx={{ fontSize:'1rem' }} {...TabProps(0)} />
-          <Tab label="Поставки" sx={{ fontSize:'1rem' }}  {...TabProps(1)} />
-          <Tab label="Заказы" sx={{ fontSize:'1rem' }} {...TabProps(2)} />
-          <Tab label="Задачи" sx={{ fontSize:'1rem' }} {...TabProps(3)} />
-          <Tab label="Склады" sx={{ fontSize:'1rem' }} {...TabProps(4)} />
+          <Tab label="Товары" sx={{ fontSize:'1rem' }} {...TabProps(1)} />
+          <Tab label="Поставки" sx={{ fontSize:'1rem' }}  {...TabProps(2)} />
+          <Tab label="Заказы" sx={{ fontSize:'1rem' }} {...TabProps(3)} />
+          <Tab label="Задачи" sx={{ fontSize:'1rem' }} {...TabProps(4)} />
+          <Tab label="Склады" sx={{ fontSize:'1rem' }} {...TabProps(5)} />
+          <Tab label="Контрагенты" sx={{ fontSize:'1rem' }} {...TabProps(6)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -68,6 +73,17 @@ const ArchivePage = () =>  {
         )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
+        {loadingProducts ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedProducts/>
+          </>
+        )}
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={2}>
         {loadingArrivals ? (
           <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
             <CircularProgress />
@@ -78,15 +94,19 @@ const ArchivePage = () =>  {
           </>
         )}
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
+      <CustomTabPanel value={value} index={3}>
         Заказы
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={3}>
+      <CustomTabPanel value={value} index={4}>
         Задачи
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={4}>
+      <CustomTabPanel value={value} index={5}>
         Склады
       </CustomTabPanel>
+      <CustomTabPanel value={value} index={6}>
+        Контрагенты
+      </CustomTabPanel>
+
     </Box>
   )
 }
