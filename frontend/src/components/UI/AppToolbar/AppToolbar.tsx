@@ -2,7 +2,7 @@ import { AppBar,  Container , styled, Toolbar, Typography } from '@mui/material'
 import { Link as NavLink } from 'react-router-dom'
 import UserMenu from './UserMenu.tsx'
 import SideBar from '../SideBar/SideBar.tsx'
-import { selectUser } from '../../../store/slices/userSlice.ts'
+import { selectUser } from '../../../store/slices/authSlice.ts'
 import { useAppSelector } from '../../../app/hooks.ts'
 
 const Link = styled(NavLink)({

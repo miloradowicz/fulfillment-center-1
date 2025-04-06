@@ -30,10 +30,6 @@ const useArrivalDetails = () => {
     }
   }, [dispatch, arrivalId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleDelete = async () => {
     if (arrivalId) {
       try {
@@ -73,7 +69,6 @@ const useArrivalDetails = () => {
     confirmDeleteModalOpen,
     isDeleted,
     handleDelete,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
     setProductsTabs,

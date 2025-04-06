@@ -57,7 +57,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent services.service')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
@@ -76,7 +76,7 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent services.service')
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
@@ -175,25 +175,31 @@ export class ArrivalsService {
       arrivalDto.documents = [...(existingArrival.documents || []), ...documentPaths]
     }
 
+    if (!Array.isArray(arrivalDto.services)) {
+      arrivalDto.services = []
+    }
+
+    const updateData = { ...arrivalDto, services: arrivalDto.services }
+
     const previousStatus = existingArrival.arrival_status
-    const newStatus = arrivalDto.arrival_status ?? previousStatus
+    const newStatus = updateData.arrival_status ?? previousStatus
 
     this.stockManipulationService.init()
 
     if (previousStatus === 'ожидается доставка' && (newStatus === 'отсортирована' || newStatus === 'получена')) {
-      if (!arrivalDto.received_amount?.length) {
+      if (!updateData.received_amount?.length) {
         throw new BadRequestException('Заполните список полученных товаров для смены статуса поставки.')
       }
     }
 
-    if (previousStatus === 'получена' && newStatus === 'получена' && !arrivalDto.received_amount?.length) {
+    if (previousStatus === 'получена' && newStatus === 'получена' && !updateData.received_amount?.length) {
       throw new BadRequestException('Для статуса "получена" укажите полученные товары')
     }
 
     const previousStock = existingArrival.stock
     await this.undoStocking(existingArrival)
 
-    const updatedArrival = existingArrival.set(arrivalDto)
+    const updatedArrival = existingArrival.set(updateData)
     const newStock = updatedArrival.stock
     await this.doStocking(updatedArrival)
 

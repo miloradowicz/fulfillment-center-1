@@ -8,9 +8,13 @@ export type RequestWithUser = Request & { user: HydratedUser }
 
 export type JwtToken = { id: string }
 
-interface UserTaskReport {
+export interface UserTaskReport {
   user: string
-  taskCount: number;
+  taskCount: number
+  tasks: {
+    _id: string
+    taskNumber: string
+  }[]
 }
 
 interface DailyTaskCount {

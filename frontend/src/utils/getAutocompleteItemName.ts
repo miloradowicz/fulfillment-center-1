@@ -1,4 +1,4 @@
-export function getItemNameById<T extends object>(
+export function getAutocompleteItemName<T extends object>(
   items: T[] | null,
   labelKey: keyof T,
   idKey: keyof T,

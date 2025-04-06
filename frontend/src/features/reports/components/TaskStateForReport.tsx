@@ -3,45 +3,96 @@ import { PieChart } from '@mui/x-charts'
 import Box from '@mui/material/Box'
 import { Card, Typography } from '@mui/material'
 import { TaskSummaryProps } from '../utils/TypesProps.ts'
+import { useTaskStateForReport } from '../hooks/useTaskStateForReport.ts'
 
 const TaskStateForReport: React.FC<TaskSummaryProps> = ({ tasks }) => {
-  const taskStats = tasks?.reduce(
-    (acc, task) => {
-      if (task.status === 'к выполнению') acc.toDo++
-      else if (task.status === 'в работе') acc.inProgress++
-      else if (task.status === 'готово') acc.completed++
-      return acc
-    },
-    { toDo: 0, inProgress: 0, completed: 0 },
-  ) || { toDo: 0, inProgress: 0, completed: 0 }
-
-  const totalTasks = taskStats.toDo + taskStats.inProgress + taskStats.completed
-
-  const chartData = [
-    { id: 0, value: taskStats.toDo, label: 'К выполнению' },
-    { id: 1, value: taskStats.inProgress, label: 'В работе' },
-    { id: 2, value: taskStats.completed, label: 'Готово' },
-  ]
+  const {
+    totalTasks,
+    chartData,
+    chartWidth,
+    taskStats,
+    isMobile,
+  } = useTaskStateForReport({ tasks })
 
   return (
-    <Card style={{ height:'360px' }} >
-      <Typography variant={'h6'} className="text-xl text-center font-bold pt-2.5">Всего задач: {totalTasks}</Typography>
-      <Box className="flex flex-row items-center p-4  ">
-        <Box className="flex flex-col mb-4 w-[35%]">
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
-            <h4 className="text-lg font-bold">К выполнению</h4>
-            <p className="text-lg">{taskStats.toDo} задач(a)</p>
+    <Card sx={{
+      height: 'auto',
+      minHeight: '200px',
+      '@media (min-width: 768px)': {
+        height: 'auto',
+      },
+      '@media (min-width: 1280px)': {
+        height: '360px',
+      },
+    }}  >
+      <Typography
+        variant="h6"
+        sx={{
+          marginTop: { xs: '15px', sm: '10px' },
+          fontSize: { xs: '1rem', sm: '1.25rem' },
+          textAlign: 'center',
+        }}
+      >
+        Всего задач {totalTasks}
+      </Typography>
+      <Box className="flex xl:flex-row sm:flex-col items-center xl:p-3 md:p-2 sm:p-0 xs:p-0  ">
+        <Box
+          className="hidden sm:hidden md:flex xl:w-[35%] xl:flex-col md:flex-row sm:w-[100%] mb-4 md:mb-4 md:justify-between sm:justify-between">
+          <Box
+            className="text-center bg-white p-4 rounded-lg shadow-sm xl:mt-2 md:mt-0 xl:w-[170px]  md:w-[30%] sm:w-[30%]"
+            sx={{
+              padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+              fontSize: { xs: '0.875rem', md: '1rem' },
+            }}>
+            <h4 className="text-base md:text-lg font-bold">К выполнению</h4>
+            <p className="ext-sm sm:text-lg">{taskStats.toDo} задач(a)</p>
           </Box>
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
-            <h4 className="text-lg font-bold ">В работе</h4>
-            <p className=" text-lg">{taskStats.inProgress} задач(a)</p>
+          <Box
+            className="text-center bg-white p-4 rounded-lg shadow-sm xl:mt-2 md:mt-0 xl:w-[170px] md:w-[30%] sm:w-[30%]"
+            sx={{
+              padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+              fontSize: { xs: '0.875rem', md: '1rem' },
+            }}>
+            <h4 className="text-base md:text-lg font-bold">В работе</h4>
+            <p className=" ext-sm sm:text-lg">{taskStats.inProgress} задач(a)</p>
           </Box>
-          <Box className="text-center bg-white p-4 rounded-lg shadow-sm mt-2">
-            <h4 className="text-lg font-bold">Готово</h4>
-            <p className=" text-lg">{taskStats.completed} задач(a)</p>
+          <Box
+            className="text-center bg-white rounded-lg shadow-sm xl:mt-2 xl:w-[170px] md:mt-0 md:w-[30%] sm:w-[30%]"
+            sx={{
+              padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+              fontSize: { xs: '0.875rem', md: '1rem' },
+            }}
+          >
+            <h4 className="text-base md:text-lg font-bold">Готово</h4>
+            <p className="text-sm sm:text-lg">{taskStats.completed} задач(a)</p>
           </Box>
         </Box>
-        <PieChart series={[{ data: chartData }]} width={550} height={300}   colors={['#FFA07A', '#3679a1', '#008B8B']} />
+
+        <PieChart
+          series={[{ data: chartData }]}
+          width={chartWidth}
+          height={isMobile ? 250 : 300}
+          colors={['#FFA07A', '#3679a1', '#008B8B']}
+          margin={{
+            top:isMobile ? 80 : 5 ,
+            right: isMobile ? 5: 180,
+            bottom: 10,
+            left: 5,
+          }}
+          slotProps={{
+            legend: {
+              labelStyle: {
+                tableLayout: 'fixed',
+                textAlign: 'center',
+              },
+              direction: isMobile ? 'row' : 'column',
+              position: {
+                horizontal: isMobile ?'middle' : 'right',
+                vertical: isMobile ? 'top' : 'middle',
+              },
+            },
+          }}/>
+
       </Box>
     </Card>
   )

@@ -41,7 +41,7 @@ export class SeederService {
     private readonly counterpartyModel: Model<CounterpartyDocument>,
     @InjectModel(ServiceCategory.name)
     private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
-  ) { }
+  ) {}
 
   async seed() {
     await this.connection.dropDatabase()
@@ -114,6 +114,40 @@ export class SeederService {
       banking_data: '123123',
       ogrn: '123123',
     })
+
+    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
+      {
+        name: 'Работа с товаром',
+        isArchived: false,
+      },
+      {
+        name: 'Дополнительные услуги',
+        isArchived: false,
+      },
+    ])
+
+    const [_service1, _service2, _service3, _service4] = await this.serviceModel.create([
+      {
+        name: 'Приемка, пересчет товара',
+        price: 50000,
+        serviceCategory: _serviceCat1._id,
+      },
+      {
+        name: 'Маркировка двойная',
+        price: 30000,
+        serviceCategory: _serviceCat1._id,
+      },
+      {
+        name: 'Погрузка-Разгрузка на складе фулфилмента',
+        price: 70000,
+        serviceCategory: _serviceCat2._id,
+      },
+      {
+        name: 'Забор с другого адреса',
+        serviceCategory: _serviceCat2._id,
+        price: 100000,
+      },
+    ])
 
     const [_product1, _product2, _product3] = await this.productModel.create([
       {
@@ -209,12 +243,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'order' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
-
+    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 3 } }, { upsert: true })
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
@@ -245,6 +274,18 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty2._id,
         pickup_location: 'Ул. Пушкина, д. 67',
+        services: [
+          {
+            service: _service1._id,
+            service_price: _service1.price,
+            service_amount: 2,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 4,
+          },
+        ],
       },
       {
         arrivalNumber: 'ARL-2',
@@ -255,6 +296,17 @@ export class SeederService {
         arrival_date: new Date().toISOString(),
         sent_amount: '2 мешка',
         stock: _stock2._id,
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         logs: [
           { user: _User2, change: 'record #1', date: new Date().toISOString() },
           { user: _User1, change: 'record #2', date: new Date().toISOString() },
@@ -276,11 +328,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'arrival' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
+    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 3 } }, { upsert: true })
 
     await this.taskModel.create([
       {
@@ -379,44 +427,6 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'task' },
-      { $set: { seq: 11 } },
-      { upsert: true }
-    )
-
-    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
-      {
-        name: 'Работа с товаром',
-        isArchived: false,
-      },
-      {
-        name: 'Дополнительные услуги',
-        isArchived: false,
-      }]
-    )
-
-    await this.serviceModel.create([
-      {
-        name: 'Приемка, пересчет товара',
-        price: 50000,
-        serviceCategory: _serviceCat1._id,
-      },
-      {
-        name: 'Маркировка двойная',
-        price: 30000,
-        serviceCategory: _serviceCat1._id,
-      },
-      {
-        name: 'Погрузка-Разгрузка на складе фулфилмента',
-        price: 70000,
-        serviceCategory: _serviceCat2._id,
-      },
-      {
-        name: 'Забор с другого адреса',
-        serviceCategory: _serviceCat2._id,
-        price: 100000,
-      },
-    ])
+    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 11 } }, { upsert: true })
   }
 }

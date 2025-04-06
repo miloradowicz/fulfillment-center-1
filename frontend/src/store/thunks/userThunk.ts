@@ -113,7 +113,7 @@ export const logoutUser = createAsyncThunk<void, void, { state: RootState; rejec
   'users/logoutUser',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const token = getState().users.user?.token
+      const token = getState().auth.user?.token
 
       if (token) {
         await axiosAPI.delete('/users/sessions', {

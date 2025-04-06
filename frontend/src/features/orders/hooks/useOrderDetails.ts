@@ -41,10 +41,6 @@ export const useOrderDetails = () => {
     setOpen(true)
   }
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const getStepDescription = (index: number, order: OrderWithProductsAndClients) => {
     const descriptions = [
       'Товар собирается на складе',
@@ -62,7 +58,6 @@ export const useOrderDetails = () => {
     handleDelete,
     handleOpenEdit,
     setOpen,
-    navigateBack,
     getStepDescription,
     setOpenDeleteModal,
     infoTab,

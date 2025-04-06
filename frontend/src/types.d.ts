@@ -98,6 +98,16 @@ export type ProductArrivalWithPopulate = Omit<ProductArrival, 'product'> & {
   product: Product
 }
 
+export interface ServiceArrival {
+  service: string
+  service_amount: number
+  service_price: number
+}
+
+export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
+  service: Service
+}
+
 export interface Arrival {
   _id: string
   client: string
@@ -109,6 +119,7 @@ export interface Arrival {
   shipping_agent?: string | null
   pickup_location?: string
   defects?: Defect[]
+  services?: ServiceArrival[]
   arrival_status: string
   received_amount?: ProductArrival[]
   logs?: Log[]
@@ -116,14 +127,15 @@ export interface Arrival {
   documents?: { document: string }[]
 }
 
-export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent'> & {
+export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent' | 'services'> & {
   client: Client
   products: ProductArrivalWithPopulate[]
-  defects: DefectWithPopulate[]
+  defects?: DefectWithPopulate[]
   received_amount: ProductArrivalWithPopulate[]
   logs?: LogWithPopulate[]
   stock: Stock
   shipping_agent?: Counterparty
+  services?: ServiceArrivalWithPopulate[]
   documents?: { document: string }[]
 }
 
@@ -208,6 +220,9 @@ export interface ErrorsFields {
   arrival_status?: string
   sent_at: string
   status?: string
+  service?: string
+  service_amount?: string
+  service_price?: string
 }
 
 export interface ProductForOrderForm {
@@ -342,6 +357,10 @@ export interface UserTaskReport {
     _id: string;
     displayName: string;
   };
+  tasks: {
+    _id: string
+    taskNumber: string
+  }[],
   taskCount: number;
 }
 

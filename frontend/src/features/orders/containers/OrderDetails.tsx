@@ -5,7 +5,6 @@ import {
   CircularProgress,
   Container,
   Divider,
-  IconButton,
   Step,
   StepLabel,
   Stepper,
@@ -16,7 +15,6 @@ import {
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
 import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
-import { ArrowBack } from '@mui/icons-material'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import { Link } from 'react-router-dom'
@@ -27,8 +25,9 @@ import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.ts
 import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import DeleteButton from '../../../components/UI/DeleteButton/DeleteButton.tsx'
+import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
+import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
+import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
 
 const OrderDetails = () => {
   const {
@@ -39,7 +38,6 @@ const OrderDetails = () => {
     handleOpenEdit,
     handleDelete,
     setOpen,
-    navigateBack,
     getStepDescription,
     setOpenDeleteModal,
     infoTab,
@@ -64,14 +62,7 @@ const OrderDetails = () => {
   return (
     <Container maxWidth="md">
       <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
-          <IconButton >
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="caption" className="!text-sm">
-            Заказы
-          </Typography>
-        </Box>
+        <BackButton/>
         <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
           <Box>
             <Chip label={order.status}
