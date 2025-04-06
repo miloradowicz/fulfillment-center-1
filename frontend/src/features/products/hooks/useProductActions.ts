@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import {
-  deleteProduct,
+  archiveProduct,
   fetchProductByIdWithPopulate,
   fetchProductsWithPopulate,
 } from '../../../store/thunks/productThunk.ts'
@@ -21,7 +21,7 @@ const useProductActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const [productToDeleteId, setProductToDeleteId] = useState<string | null>(null)
+  const [productToArchiveId, setProductToArchiveId] = useState<string | null>(null)
   const products = useAppSelector(selectProductsWithPopulate)
   const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
   const { id } = useParams()
@@ -56,20 +56,20 @@ const useProductActions = (fetchOnDelete: boolean) => {
     }
   }, [id, fetchProduct])
 
-  const deleteOneProduct = async (id: string) => {
+  const archiveOneProduct = async (id: string) => {
     try {
-      await dispatch(deleteProduct(id)).unwrap()
+      await dispatch(archiveProduct(id)).unwrap()
       if (fetchOnDelete) {
         await fetchAllProducts()
       } else {
         navigate('/products')
       }
-      toast.success('Товар успешно удалён!')
+      toast.success('Товар успешно архивирован!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
       } else {
-        toast.error('Не удалось удалить товар')
+        toast.error('Не удалось архивировать товар')
       }
       console.error(e)
     }
@@ -88,17 +88,17 @@ const useProductActions = (fetchOnDelete: boolean) => {
   }
 
   const handleConfirmationOpen = (id: string) => {
-    setProductToDeleteId(id)
+    setProductToArchiveId(id)
     setConfirmationOpen(true)
   }
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false)
-    setProductToDeleteId(null)
+    setProductToArchiveId(null)
   }
 
-  const handleConfirmationDelete = async () => {
-    if (productToDeleteId) await deleteOneProduct(productToDeleteId)
+  const handleConfirmationArchive = async () => {
+    if (productToArchiveId) await archiveOneProduct(productToArchiveId)
     handleConfirmationClose()
   }
 
@@ -106,7 +106,7 @@ const useProductActions = (fetchOnDelete: boolean) => {
     products,
     product,
     selectedProduct,
-    deleteOneProduct,
+    archiveOneProduct,
     fetchAllProducts,
     fetchProduct,
     open,
@@ -119,8 +119,8 @@ const useProductActions = (fetchOnDelete: boolean) => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    productToDeleteId,
+    handleConfirmationArchive,
+    productToArchiveId,
   }
 }
 

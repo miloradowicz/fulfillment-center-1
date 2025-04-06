@@ -5,6 +5,7 @@ import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
 import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ProductDetails = () => {
   const {
@@ -13,11 +14,14 @@ const ProductDetails = () => {
     product,
     error,
     loading,
-    deleteOneProduct,
     open,
     handleClose,
     handleOpen,
     fetchProduct,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationArchive,
   } = useProductActions(false)
 
   return (
@@ -29,9 +33,17 @@ const ProductDetails = () => {
             if (id) await fetchProduct(id)
             handleClose()
           }}
-
         />
       </Modal>
+
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этот товар"
+        actionType="archive"
+        onConfirm={handleConfirmationArchive}
+        onCancel={handleConfirmationClose}
+      />
+
       <Box className="max-w-2xl mx-auto p-4 sm:p-8">
         <Box
           sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
@@ -104,7 +116,7 @@ const ProductDetails = () => {
 
             <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
               <EditButton onClick={() => handleOpen()} />
-              <ArchiveButton onClick={() => deleteOneProduct(product._id)} />
+              <ArchiveButton onClick={() => handleConfirmationOpen(product._id)} />
             </Box>
           </Card>
         )}
