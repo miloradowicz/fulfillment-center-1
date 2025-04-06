@@ -13,11 +13,12 @@ import { counterpartyReducer } from '../store/slices/counterpartySlices.ts'
 import { reportReducer } from '../store/slices/reportSlice.ts'
 import { serviceCategoryReducer } from '../store/slices/serviceCategorySlice.ts'
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist/es/constants'
+import { authReducer } from '../store/slices/authSlice.ts'
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['users'],
+  whitelist: ['auth'],
 }
 
 const rootReducer = combineReducers({
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   products: productReducer,
   arrivals: arrivalReducer,
   orders: orderReducer,
+  auth: authReducer,
   users: userReducer,
   tasks: taskReducer,
   services: serviceReducer,

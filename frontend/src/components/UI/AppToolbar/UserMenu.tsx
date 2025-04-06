@@ -3,7 +3,7 @@ import { Button, Menu, MenuItem } from '@mui/material'
 import { User } from '../../../types'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { logoutUser } from '../../../store/thunks/userThunk.ts'
-import { unsetUser } from '../../../store/slices/userSlice.ts'
+import { unsetUser } from '../../../store/slices/authSlice.ts'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import { toast } from 'react-toastify'
 
