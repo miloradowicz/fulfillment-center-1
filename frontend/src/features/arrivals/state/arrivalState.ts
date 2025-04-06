@@ -8,6 +8,7 @@ export const initialState = {
   shipping_agent: '',
   products: [],
   defects: [],
+  services: [],
   received_amount: [],
   arrival_status: '',
   documents: [],
@@ -16,7 +17,14 @@ export const initialState = {
 export const initialItemState = {
   product: '',
   description: '',
+  defect_description:'',
   amount: 0,
+}
+
+export const initialServiceState = {
+  service: '',
+  service_amount: 1,
+  service_price: 0,
 }
 
 export const initialErrorState = {
@@ -26,6 +34,8 @@ export const initialErrorState = {
   arrival_date: '',
   amount: '',
   stock: '',
+  service: '',
+  service_amount: '',
   defect_description: '',
   arrival_status: '',
 }

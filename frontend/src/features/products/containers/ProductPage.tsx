@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import ProductsDataList from '../components/ProductsDataList.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
@@ -7,10 +7,16 @@ import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
 import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
 
 const ProductPage = () => {
-  const { open, handleOpen, handleClose, fetchAllProducts } = useProductActions(true)
+  const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)
 
   return (
     <>
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
+          <CircularProgress />
+        </Box>
+      )}
+
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
           onSuccess={fetchAllProducts}

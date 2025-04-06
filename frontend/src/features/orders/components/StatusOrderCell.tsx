@@ -31,6 +31,7 @@ const StatusOrderCell:React.FC<Props> =({ row })  => {
       const updatedData = {
         ...row,
         client: row.client._id,
+        stock: row.stock._id,
         status: newStatus,
       }
       await dispatch(updateOrder({ orderId: row._id, data: updatedData })).unwrap()

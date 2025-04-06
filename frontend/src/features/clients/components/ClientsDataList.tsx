@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material'
+import { Box, IconButton, useTheme, useMediaQuery, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Client } from '../../../types'
@@ -17,7 +17,6 @@ const ClientsDataList = () => {
     open,
     handleOpen,
     handleClose,
-    loading,
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
@@ -112,11 +111,7 @@ const ClientsDataList = () => {
 
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : clients && clients.length > 0 ? (
+      {clients ? (
         <DataGrid
           getRowId={row => row._id}
           rows={clients}
@@ -134,7 +129,7 @@ const ClientsDataList = () => {
           disableRowSelectionOnClick
         />
       ) : (
-        <Typography className="text-center mt-5">Клиентов нет</Typography>
+        <Typography className="text-center mt-5">Клиенты не найдены</Typography>
       )}
 
       <ConfirmationModal
