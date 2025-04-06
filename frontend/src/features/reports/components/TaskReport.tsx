@@ -59,8 +59,9 @@ const TaskReport = () => {
         </Grid>
       ) : (
         report && report.userTaskReports && (
-          <>{!startDate || !endDate? <Typography variant={'h6'} textAlign={'center'} mt={3}>Период не выбран</Typography>:  <> {(report.userTaskReports.length === 0 && report.dailyTaskCounts.length === 0 ) ? (
-            <Typography variant={'h6'} textAlign={'center'} mt={3}>В выбранном периоде нет выполненных задач</Typography>
+          <>{!startDate || !endDate? <Typography variant={'h6'} textAlign={'center'} mt={3} sx={{ fontSize: { xs: '14px', sm: '16px' } }}>Период не выбран</Typography>:  <> {(report.userTaskReports.length === 0 && report.dailyTaskCounts.length === 0 ) ? (
+            <Typography variant={'h6'} textAlign={'center'} mt={3} mb={5} sx={{ fontSize: { xs: '14px', sm: '16px' },
+            }}>В выбранном периоде нет выполненных задач</Typography>
           ) : (
             <Box
               display="flex"
