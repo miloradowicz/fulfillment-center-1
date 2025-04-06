@@ -6,7 +6,7 @@ import { User } from '../schemas/user.schema'
 import { RequestWithUser } from 'src/types'
 import { ROLES_KEY } from 'src/decorators/roles.decorator'
 import config from 'src/config'
-import { Environment, RolesType } from 'src/enums'
+import { RolesType } from 'src/enums'
 
 @Injectable()
 export class RolesService {
@@ -21,7 +21,7 @@ export class RolesService {
       [context.getHandler(), context.getClass()],
     )
 
-    if (config.environment === Environment.development) {
+    if (!config.endpointProtection) {
       return true
     }
 

@@ -1,8 +1,7 @@
 import { join } from 'path'
-import { Environment } from './enums'
 
 const config = {
-  environment: process.env.ENVIRONMENT as Environment,
+  endpointProtection: process.env.DISABLE_ENDPOINT_PROTECTION !== '1',
   server: {
     port: 8000,
   },
