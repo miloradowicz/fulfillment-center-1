@@ -76,10 +76,10 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
           <IconButton
             onClick={() => handleUserClick(user._id)}
             sx={{
-              width: screenWidth < 1100 ? '60px' : '80px', // Изменение размера в зависимости от ширины экрана
+              width: screenWidth < 1100 ? '60px' : '80px',
               border: selectedUser === user._id ? '2px solid #75BDEC' : 'none',
-              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px', // Изменение отступов
-              fontSize: screenWidth < 1100 ? '14px' : '16px', // Изменение размера шрифта
+              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px',
+              fontSize: screenWidth < 1100 ? '14px' : '16px',
               backgroundColor: selectedUser === user._id ? '#A2D2F2' : '#CFE8F8',
               borderRadius: '8px',
               color: 'black',

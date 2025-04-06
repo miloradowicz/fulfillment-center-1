@@ -3,12 +3,13 @@ import { useAppDispatch } from '../../../app/hooks.ts'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fetchTaskReport } from '../../../store/thunks/reportThunk.ts'
 import { toast } from 'react-toastify'
+import useIMobile from '../utils/UseIMobile.ts'
 
 export const useTaskRangePicker = () => {
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const dispatch = useAppDispatch()
-  const location = useLocation() // Для получения параметров из URL
+  const location = useLocation()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -38,6 +39,8 @@ export const useTaskRangePicker = () => {
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
     return [startOfMonth, endOfMonth]
   }
+
+  const isMobile = useIMobile()
 
   const getCurrentYear = () => {
     const today = new Date()
@@ -101,5 +104,6 @@ export const useTaskRangePicker = () => {
     handleChange,
     startDate,
     endDate,
+    isMobile,
   }
 }

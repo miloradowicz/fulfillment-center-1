@@ -1,27 +1,37 @@
 import React from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import Box from '@mui/material/Box'
-import { Typography } from '@mui/material'
-import { useSearchParams } from 'react-router-dom'
-import { formatDate } from '../utils/FormattedDateForTitle.ts'
+import {  Typography } from '@mui/material'
 import { PropsCountChart } from '../utils/TypesProps.ts'
 
-const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
-  const chartData = data.map(item => ({
-    date: item.date,
-    taskCount: item.taskCount,
-  }))
+import { useTaskCountAreaChart } from '../hooks/useTaskCountAreaChart.ts'
 
-  const [searchParams] = useSearchParams()
-  const startDate = formatDate(searchParams.get('startDate'))
-  const endDate = formatDate(searchParams.get('endDate'))
+const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
+
+  const { containerHeight,
+    chartData,
+    startDate,
+    endDate } = useTaskCountAreaChart({ data })
 
   return (
-    <>{data.length === 0 ? null: <Box style={{ textAlign: 'center', marginBottom: '20px', width: '100%' }}>
-      <Typography variant={'h6'} style={{ marginBottom: '10px' }}>Ежедневная динамика общего количества <br/> выполненных задач за период c {startDate} по {endDate}</Typography>
-      <ResponsiveContainer width={'100%'}  height={400}
-        style={{ margin: '20px 0', paddingBottom: '30px' }}>
-        <AreaChart data={chartData} margin={{ bottom: 50 }}>
+    <>{data.length === 0 ? null: <Box style={{ textAlign: 'center', width: '100%' }}>
+      <Typography
+        variant="h6"
+        sx={{
+          marginInline:'auto',
+          width:{ xs:'90%', sm: '85%', xl: '85%', lg: '85%', md:'85%' },
+          marginBottom: { xs: '5px', sm: '10px' },
+          fontSize: { xs: '1rem', sm: '1.25rem' },
+          textAlign: 'center',
+        }}
+      >
+        Ежедневная динамика общего количества {' '}
+       выполненных задач за период c {startDate} по {endDate}
+      </Typography>
+      <ResponsiveContainer width="100%"
+        height={containerHeight}
+        style={{ margin: '20px 0', paddingBottom: '10px' }}>
+        <AreaChart data={chartData} margin={{ bottom: 10 }}>
           <defs>
             <linearGradient id="colorTaskCount" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
@@ -31,13 +41,18 @@ const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
           <CartesianGrid strokeDasharray="3 3"/>
           <XAxis
             dataKey="date"
-            angle={-45}
-            textAnchor="end"
+            angle={0}
+            textAnchor={ 'middle'}
             tickSize={10}
-            height={50}
+            tickMargin={ 15 }
+            height={ 30 }
             interval={Math.ceil(data.length / 10)}
           />
-          <YAxis/>
+          <YAxis
+            tickMargin={ 15 }
+            tickFormatter={(tick: number) => {
+              return Number.isInteger(tick) ? tick.toString() : ''
+            }}/>
           <Tooltip formatter={value => [`${ value }`, 'Количество задач']}/>
           <Area
             type="monotone"

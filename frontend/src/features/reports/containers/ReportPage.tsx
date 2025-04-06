@@ -51,7 +51,37 @@ export default function ReportTabs() {
         <CustomTitle text={'Отчеты'} />
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+          scrollButtons="auto"
+          sx={{
+            '.MuiTabs-flexContainer': {
+              display: 'flex',
+              flexWrap: 'nowrap',
+              scrollBehavior: 'smooth',
+              '@media (max-width: 470px)': {
+                overflowX: 'auto',
+                justifyContent: 'flex-start',
+              },
+              '@media (min-width: 471px)': {
+                justifyContent: 'center',
+              },
+            },
+            '.MuiTab-root': {
+              fontSize: '1rem',
+              padding: '4px 16px',
+              width: 'auto',
+            },
+            '@media (max-width: 630px)': {
+              '.MuiTab-root': {
+                fontSize: '0.8rem',
+                padding: '2px 4px',
+              },
+            },
+          }}
+        >
           <Tab label="Задачи" sx={{ fontSize:'1rem' }} {...TabProps(0)} />
           <Tab label="Клиенты" sx={{ fontSize:'1rem' }} {...TabProps(1)} />
           <Tab label="Заказы" sx={{ fontSize:'1rem' }} {...TabProps(2)} />
