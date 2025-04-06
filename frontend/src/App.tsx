@@ -18,8 +18,13 @@ import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
+import { useAppSelector } from './app/hooks.ts'
+import { selectUser } from './store/slices/userSlice.ts'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
 
 const App = () => {
+  const user = useAppSelector(selectUser)
+
   const theme = createTheme({
     typography: {
       fontFamily: '\'Inter\', sans-serif',
@@ -31,24 +36,94 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <Layout>
           <Routes>
-            <Route path="/" element={<ClientPage />} />
-            <Route path="/clients" element={<ClientPage />} />
-            <Route path="/clients/:id" element={<ClientDetail />} />
-            <Route path="/arrivals" element={<ArrivalPage />} />
-            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
-            <Route path="/products" element={<ProductPage />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/orders" element={<OrderPage />} />
-            <Route path="/orders/:id" element={<OrderDetails />} />
-            <Route path="/reports" element={<ReportPage />} />
-            <Route path="/tasks" element={<TaskBoard />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/add-new-client" element={<ClientForm />} />
-            <Route path="/counterparties" element={<CounterpartiesPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute isAllowed={!!user}>
+                  <ClientPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/clients" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ClientPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/clients/:id" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/arrivals" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ArrivalPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/arrivals/:arrivalId" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ArrivalDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/products" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ProductPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/products/:id" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ProductDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={                <ProtectedRoute isAllowed={!!user}>
+              <OrderPage />
+            </ProtectedRoute>
+            } />
+            <Route path="/orders/:id" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <OrderDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ReportPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/tasks" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <TaskBoard />
+              </ProtectedRoute>
+            } />
+            <Route path="/services" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ServicesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/add-new-client" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <ClientForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/counterparties" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <CounterpartiesPage />
+              </ProtectedRoute>
+            } />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegistrationPage />} />
-            <Route path="/stocks" element={<StockPage />} />
-            <Route path="/stocks/:stockId" element={<StockDetails />} />
+            <Route path="/register" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <RegistrationPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/stocks" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <StockPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/stocks/:stockId" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <StockDetails />
+              </ProtectedRoute>
+            } />
             <Route
               path="/*"
               element={

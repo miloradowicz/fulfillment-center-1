@@ -25,7 +25,9 @@ export const addAuthorization = (store: Store<RootState>) => {
   axiosAPI.interceptors.request.use(config => {
     const token = store.getState().users.user?.token
 
-    config.headers.set('Authorization', `Bearer ${ token }`)
+    if (token) {
+      config.headers.set('Authorization', `Bearer ${ token }`)
+    }
 
     return config
   })

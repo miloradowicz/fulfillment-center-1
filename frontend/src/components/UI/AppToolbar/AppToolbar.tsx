@@ -4,6 +4,7 @@ import UserMenu from './UserMenu.tsx'
 import SideBar from '../SideBar/SideBar.tsx'
 import { selectUser } from '../../../store/slices/userSlice.ts'
 import { useAppSelector } from '../../../app/hooks.ts'
+import { featureProtection } from '../../../constants.ts'
 
 const Link = styled(NavLink)({
   color: 'inherit',
@@ -37,7 +38,7 @@ const AppToolbar = () => {
         zIndex: 1201,
       }}
     >
-      <SideBar />
+      {(!featureProtection || user) && <SideBar />}
       <Container>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
