@@ -11,6 +11,14 @@ export const fetchProducts = createAsyncThunk<Product[]>(
   },
 )
 
+export const fetchArchivedProducts = createAsyncThunk<ProductWithPopulate[]>(
+  'clients/fetchArchivedProducts',
+  async () => {
+    const response = await axiosAPI.get('/products/archived/all')
+    return response.data
+  },
+)
+
 export const fetchProductById = createAsyncThunk<Product, string>(
   'products/fetchProductById',
   async (productId: string) => {
@@ -63,6 +71,21 @@ export const archiveProduct = createAsyncThunk<{ id: string }, string, { rejectV
   async (productId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/products/${ productId }/archive`)
+      return { id: productId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveProduct = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'products/unarchiveProduct',
+  async (productId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/products/${ productId }/unarchive`)
       return { id: productId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
