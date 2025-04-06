@@ -97,4 +97,16 @@ export const updateTask = createAsyncThunk<
   }
 })
 
-
+export const updateTaskStatus = createAsyncThunk<void, { taskId: string; data: TaskMutation }, { rejectValue: GlobalError }>(
+  'tasks/updateTaskStatus',
+  async ({ taskId, data }, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/tasks/${ taskId }/status`, data)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)

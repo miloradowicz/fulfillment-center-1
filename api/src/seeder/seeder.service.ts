@@ -76,7 +76,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Артем Иванов',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -84,7 +84,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Игорь',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -92,7 +92,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Кристина',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
       {
@@ -100,7 +100,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Саша',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
     ])

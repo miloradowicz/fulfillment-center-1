@@ -5,7 +5,7 @@ import { persistor, store } from './app/store.ts'
 import { CssBaseline } from '@mui/material'
 import { ToastContainer } from 'react-toastify'
 import { BrowserRouter } from 'react-router-dom'
-import { addCsrf } from './utils/axiosAPI.ts'
+import { addAuthorization, addCsrf } from './utils/axiosAPI.ts'
 import './index.css'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
@@ -13,6 +13,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 import { PersistGate } from 'redux-persist/integration/react'
 
 addCsrf()
+addAuthorization(store)
 dayjs.extend(localizedFormat)
 dayjs.locale('ru')
 

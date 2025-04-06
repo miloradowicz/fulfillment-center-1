@@ -8,6 +8,7 @@ import {
   fetchTasks, fetchTasksByUserId, fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate,
   updateTask,
+  updateTaskStatus,
 } from '../thunks/tasksThunk.ts'
 
 interface TaskState {
@@ -147,6 +148,20 @@ const taskSlice = createSlice({
         state.loadingUpdate = false
         state.error = true
       })
+
+      .addCase(updateTaskStatus.pending, state => {
+        state.loadingUpdate = true
+        state.error = false
+      })
+      .addCase(updateTaskStatus.fulfilled, state => {
+        state.loadingUpdate = false
+        state.error = false
+      })
+      .addCase(updateTaskStatus.rejected, state => {
+        state.loadingUpdate = false
+        state.error = true
+      })
+
       .addCase(archiveTask.pending, state => {
         state.loadingArchive = true
         state.error = false

@@ -1,6 +1,8 @@
 import { join } from 'path'
+import { Environment } from './enums'
 
 const config = {
+  environment: process.env.ENVIRONMENT as Environment,
   server: {
     port: 8000,
   },

@@ -8,4 +8,12 @@ class Expressions {
   }
 }
 
-export const Regex = new Expressions
+export const Regex = new Expressions()
+
+export enum Environment {
+  development = 'development',
+  production = 'production',
+}
+
+export const RolesList = ['stock-worker', 'manager', 'admin', 'super-admin'] as const
+export type RolesType = (typeof RolesList)[number]

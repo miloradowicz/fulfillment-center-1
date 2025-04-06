@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
 import { InjectConnection } from '@nestjs/mongoose'
 import { Connection } from 'mongoose'
 import { UpdateLogDto } from 'src/dto/update-log.dto'
@@ -9,20 +9,19 @@ import { LogsService } from 'src/services/logs.service'
 import { User } from 'src/decorators/user.param-decorator'
 import { Roles } from 'src/decorators/roles.decorator'
 import { HydratedUser } from 'src/types'
+import { RolesGuard } from 'src/guards/roles.guard'
 
+@UseGuards(RolesGuard)
+@Roles('super-admin', 'admin', 'manager', 'stock-worker')
 @Controller('logs')
 export class LogsController {
   constructor(
     @InjectConnection() private readonly connection: Connection,
-    private readonly logsService: LogsService
-  ) { }
+    private readonly logsService: LogsService,
+  ) {}
 
-  @Roles('stock-worker', 'super-admin', 'admin', 'manager')
   @Post()
-  async addLogEntry(
-    @Body() logDto: UpdateLogDto,
-    @User() user: HydratedUser,
-  ) {
+  async addLogEntry(@Body() logDto: UpdateLogDto, @User() user: HydratedUser) {
     const { collection, document: id, ...rest } = { ...logDto, user: user._id }
 
     let modelName: string
@@ -50,10 +49,7 @@ export class LogsController {
   }
 
   @Get()
-  async getAllLogEntries(
-    @Query('collection') collection: string,
-    @Query('document') id: string
-  ) {
+  async getAllLogEntries(@Query('collection') collection: string, @Query('document') id: string) {
     if (!collection || !id) {
       throw new BadRequestException('Параметры коллекция и документ обязательны.')
     }
