@@ -7,16 +7,16 @@ import { UpdateOrderDto } from '../dto/update-order.dto'
 import { CounterService } from './counter.service'
 import { DocumentObject } from './arrivals.service'
 import { FilesService } from './files.service'
-import { Stock, StockDocument } from '../schemas/stock.schema'
+import { StockManipulationService } from './stock-manipulation.service'
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>,
-    private counterService: CounterService,
+    private readonly counterService: CounterService,
     private readonly filesService: FilesService,
-  ) {}
+    private readonly stockManipulationService: StockManipulationService,
+  ) { }
 
   async getAll() {
     const orders = await this.orderModel.find({ isArchived: false }).populate('stock').exec()
@@ -64,7 +64,19 @@ export class OrdersService {
     return order
   }
 
-  async create(orderDto: CreateOrderDto,files: Array<Express.Multer.File> = []) {
+  async doStocking(order: OrderDocument) {
+    if (order.status === 'в пути' || order.status === 'доставлен') {
+      await this.stockManipulationService.decreaseProductStock(order.stock, order.products)
+    }
+  }
+
+  async undoStocking(order: OrderDocument) {
+    if (order.status === 'в пути' || order.status === 'доставлен') {
+      await this.stockManipulationService.increaseProductStock(order.stock, order.products)
+    }
+  }
+
+  async create(orderDto: CreateOrderDto, files: Array<Express.Multer.File> = []) {
     try {
       let documents: DocumentObject[] = []
       if (files.length > 0) {
@@ -89,18 +101,25 @@ export class OrdersService {
 
         documents = [...formattedDocs, ...documents]
       }
-      const newOrder = await this.orderModel.create({
-        ...orderDto,
-        documents,
-      })
 
       const sequenceNumber = await this.counterService.getNextSequence('order')
-      newOrder.orderNumber  = `ORD-${ sequenceNumber }`
+      const newOrder = new this.orderModel({
+        ...orderDto,
+        documents,
+        orderNumber: `ORD-${ sequenceNumber }`,
+      })
 
-      const stock = await this.stockModel.findById(orderDto.stock)
-      if (!stock) throw new NotFoundException('Указанный склад не найден')
+      this.stockManipulationService.init()
 
-      return newOrder.save()
+      await this.doStocking(newOrder)
+
+      if (!this.stockManipulationService.testStock(newOrder.stock)) {
+        throw new BadRequestException('На данном складе нет необходимого количества товара')
+      }
+
+      await this.stockManipulationService.saveStock(newOrder.stock)
+      await newOrder.save()
+      return newOrder
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
@@ -118,16 +137,30 @@ export class OrdersService {
       throw new NotFoundException('Заказ не найден')
     }
 
-    const stock = await this.stockModel.findById(orderDto.stock)
-    if (!stock) throw new NotFoundException('Указанный склад не найден')
-
     if (files.length > 0) {
       const documentPaths = files.map(file => ({
         document: this.filesService.getFilePath(file.filename),
       }))
       orderDto.documents = [...(existingOrder.documents || []), ...documentPaths]
     }
-    return this.orderModel.findByIdAndUpdate(id, orderDto, { new: true })
+
+    this.stockManipulationService.init()
+
+    const previousStock = existingOrder.stock
+    await this.undoStocking(existingOrder)
+
+    const updatedOrder = existingOrder.set(orderDto)
+    const newStock = updatedOrder.stock
+    await this.doStocking(updatedOrder)
+
+    if (!this.stockManipulationService.testStock(newStock)){
+      throw new BadRequestException('На данном складе нет необходимого количества товара')
+    }
+
+    await this.stockManipulationService.saveStock(previousStock)
+    await this.stockManipulationService.saveStock(newStock)
+    await updatedOrder.save()
+    return updatedOrder
   }
 
   async archive(id: string) {
@@ -143,6 +176,12 @@ export class OrdersService {
   async delete(id: string) {
     const order = await this.orderModel.findByIdAndDelete(id)
     if (!order) throw new NotFoundException('Заказ не найден')
+
+    this.stockManipulationService.init()
+
+    await this.undoStocking(order)
+
+    await this.stockManipulationService.saveStock(order.stock)
     return { message: 'Заказ успешно удалён' }
   }
 }

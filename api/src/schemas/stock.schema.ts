@@ -27,7 +27,7 @@ export class Stock {
     default: [],
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     amount: number
   }[]
 
@@ -42,7 +42,7 @@ export class Stock {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

@@ -22,14 +22,14 @@ export class Order {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
   })
-  client: string
+  client: mongoose.Types.ObjectId
 
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Stock',
   })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -42,7 +42,7 @@ export class Order {
     required: true,
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     description: string
     amount: number
   }[]
@@ -73,7 +73,7 @@ export class Order {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]
@@ -89,7 +89,7 @@ export class Order {
     default: [],
   })
   defects: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     defect_description: string
     amount: number
   }[]

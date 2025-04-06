@@ -38,13 +38,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     modalOpenDefects,
     isButtonDefectVisible,
     isButtonVisible,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
-    clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,
@@ -86,7 +85,6 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                     onChange={(_, newValue) => {
                       if (newValue) {
                         setForm(prevState => ({ ...prevState, client: newValue._id }))
-                        setCurrentClient(newValue._id)
                       }
                     }}
                     value={clients.find(option => option._id === form.client) || null}
@@ -176,7 +174,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpen && clientProducts && (
+            {modalOpen && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить товар</Typography>
                 <Autocomplete
@@ -184,14 +182,14 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   fullWidth
                   size={'small'}
                   disablePortal
-                  options={clientProducts}
+                  options={availableProducts}
                   getOptionKey={option => option._id}
                   onChange={(_, newValue) => {
                     if (newValue) {
                       setNewField(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
+                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField
@@ -298,7 +296,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                           setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
-                      value={OrderStatus.find(option => option === form.status)|| null}
+                      value={OrderStatus.find(option => option === form.status) || null}
                       getOptionLabel={option => option || ''}
                       isOptionEqualToValue={(option, value) => option === value}
                       renderInput={params => (
@@ -377,7 +375,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpenDefects && clientProducts && (
+            {modalOpenDefects && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить дефекты товаров</Typography>
                 <Autocomplete
@@ -392,7 +390,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       setNewFieldDefects(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
+                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField
@@ -439,9 +437,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             )}
 
-            {initialData && ( <> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
+            {initialData && (<> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
               <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
-            {initialData && initialData.documents && initialData.documents.length>0 && (initialData.documents.map((document, index) => (
+            {initialData && initialData.documents && initialData.documents.length > 0 && (initialData.documents.map((document, index) => (
               <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
                 <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
             )))}
