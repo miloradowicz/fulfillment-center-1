@@ -149,6 +149,7 @@ export class SeederService {
           { label: 'Размер', key: 'size', value: '42' },
           { label: 'Цвет', key: 'color', value: 'Красный' },
         ],
+        isArchived: false,
       },
       {
         client: _client_1._id,
@@ -159,6 +160,7 @@ export class SeederService {
           { label: 'Размер', key: 'size', value: '48' },
           { label: 'Цвет', key: 'color', value: 'Синий' },
         ],
+        isArchived: false,
       },
       {
         client: _client_1._id,
@@ -175,6 +177,29 @@ export class SeederService {
           { user: _User1, change: 'record #3', date: new Date().toISOString() },
           { user: _User2, change: 'record #4', date: new Date().toISOString() },
         ],
+        isArchived: false,
+      },
+      {
+        client: _client_1._id,
+        title: 'Худи',
+        barcode: '987654321012',
+        article: '987654',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+        isArchived: true,
+      },
+      {
+        client: _client_1._id,
+        title: 'Кепка',
+        barcode: '987654321012',
+        article: '987654',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+        isArchived: true,
       },
     ])
 

@@ -58,13 +58,16 @@ export class ProductsService {
   }
 
   async getAllArchived(populate: boolean) {
-    const archived = this.productModel.find({ isArchived: true })
+    const query = this.productModel.find({ isArchived: true })
 
     if (populate) {
-      return (await archived.populate('client')).reverse()
+      query.populate({
+        path: 'client',
+        select: 'name',
+      })
     }
 
-    return (await archived).reverse()
+    return (await query.exec()).reverse()
   }
 
   async getArchivedById(id: string, populate?: boolean) {
@@ -161,6 +164,19 @@ export class ProductsService {
     if (product.isArchived) throw new ForbiddenException('Товар уже в архиве')
 
     return { message: 'Товар перемещен в архив' }
+  }
+
+  async unarchive(id: string) {
+    const product = await this.productModel.findById(id)
+
+    if (!product) throw new NotFoundException('Продукт не найден')
+
+    if (!product.isArchived) throw new ForbiddenException('Продукт не находится в архиве')
+
+    product.isArchived = false
+    await product.save()
+
+    return { message: 'Продукт восстановлен из архива' }
   }
 
   async delete(id: string) {

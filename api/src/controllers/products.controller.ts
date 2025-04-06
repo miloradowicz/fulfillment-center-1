@@ -46,6 +46,11 @@ export class ProductsController {
     return await this.productsService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveProduct(@Param('id') id: string) {
+    return this.productsService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     return await this.productsService.delete(id)
