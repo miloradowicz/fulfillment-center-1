@@ -43,7 +43,7 @@ const authSlice = createSlice({
       }
     },
     clearLoginError: (state, { payload }: PayloadAction<string | undefined>) => {
-      if (state.loginError && payload) {
+      if (state.loginError && state.loginError.errors && payload) {
         delete state.loginError.errors[payload]
         if (!Object.keys(state.loginError.errors).length) {
           state.loginError = null
