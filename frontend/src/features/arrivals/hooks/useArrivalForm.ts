@@ -27,7 +27,7 @@ import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
-import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
+import { fetchAllCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
 import { ErrorMessagesList } from '../../../messages.ts'
 import { ItemType } from '../../../constants.ts'
 
@@ -102,7 +102,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
-    dispatch(fetchCounterparties())
+    dispatch(fetchAllCounterparties())
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
