@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, IconButton, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
@@ -8,15 +8,16 @@ import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
 import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
 import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const StockDetails = () => {
   const {
     stock,
     isLoading,
-    deleteModalOpen,
+    archiveModalOpen,
     showDeleteModal,
     hideDeleteModal,
-    handleDelete,
+    handleArchive,
     navigateBack,
     editModalOpen,
     setEditModalOpen,
@@ -40,26 +41,13 @@ const StockDetails = () => {
         />
       </Modal>
 
-      <Modal open={deleteModalOpen} handleClose={hideDeleteModal}>
-        <Grid container direction="column">
-          <Grid mb={4}>
-            <Typography variant="h6" gutterBottom>
-              Вы действительно хотите удалить склад?
-            </Typography>
-          </Grid>
-
-          <Grid>
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Удалить
-              </Button>
-              <Button variant="outlined" onClick={hideDeleteModal}>
-                Отмена
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Modal>
+      <ConfirmationModal
+        open={archiveModalOpen}
+        entityName="этот склад"
+        actionType="archive"
+        onConfirm={handleArchive}
+        onCancel={hideDeleteModal}
+      />
 
       <div className="flex items-center gap-3">
         <IconButton onClick={() => navigateBack()}>

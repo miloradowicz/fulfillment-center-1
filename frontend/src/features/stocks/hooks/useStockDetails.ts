@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { useEffect, useState } from 'react'
-import { deleteStock, fetchStockById } from '../../../store/thunks/stocksThunk.ts'
+import { archiveStock, fetchArchivedStocks, fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
 import { selectIsStocksLoading, selectOneStock } from '../../../store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
 import { hasMessage } from '../../../utils/helpers.ts'
@@ -13,7 +13,7 @@ export const useStockDetails = () => {
   const isLoading = useAppSelector(selectIsStocksLoading)
   const navigate = useNavigate()
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+  const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
 
   const stockColumns = [
@@ -34,31 +34,32 @@ export const useStockDetails = () => {
     navigate(-1)
   }
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (stockId) {
       try {
-        await dispatch(deleteStock(stockId)).unwrap()
+        await dispatch(archiveStock(stockId)).unwrap()
+        await dispatch(fetchStocks())
+        await dispatch(fetchArchivedStocks())
+        toast.success('Склад успешно архивирован!')
         navigate('/stocks')
-        toast.success('Склад успешно удалён!')
       } catch (e) {
         if (hasMessage(e)) {
-          toast.error(e.message || 'Ошибка удаления')
+          toast.error(e.message || 'Ошибка архивирования')
         } else {
           console.error(e)
           toast.error('Неизвестная ошибка')
         }
       }
     }
-
     hideDeleteModal()
   }
 
   const showDeleteModal = () => {
-    setDeleteModalOpen(true)
+    setArchiveModalOpen(true)
   }
 
   const hideDeleteModal = () => {
-    setDeleteModalOpen(false)
+    setArchiveModalOpen(false)
   }
 
   return {
@@ -66,10 +67,10 @@ export const useStockDetails = () => {
     stockId,
     isLoading,
     stockColumns,
-    deleteModalOpen,
+    archiveModalOpen,
     showDeleteModal,
     hideDeleteModal,
-    handleDelete,
+    handleArchive,
     navigateBack,
     editModalOpen,
     setEditModalOpen,
