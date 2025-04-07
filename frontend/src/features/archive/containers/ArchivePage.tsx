@@ -16,6 +16,8 @@ import ArchivedArrivals from '../components/ArchivedArrivals.tsx'
 import { selectLoadingFetchArchivedArrivals } from '../../../store/slices/arrivalSlice.ts'
 import ArchivedProducts from '../components/ArchivedProducts.tsx'
 import { selectLoadingFetchArchivedProduct } from '../../../store/slices/productSlice.ts'
+import ArchivedStocks from '../components/ArchivedStocks.tsx'
+import { selectLoadingFetchArchivedStocks } from '../../../store/slices/stocksSlice.ts'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -24,6 +26,7 @@ const ArchivePage = () =>  {
   const loadingClients = useAppSelector(selectLoadingArchiveClient)
   const loadingArrivals = useAppSelector(selectLoadingFetchArchivedArrivals)
   const loadingProducts = useAppSelector(selectLoadingFetchArchivedProduct)
+  const loadingStocks = useAppSelector(selectLoadingFetchArchivedStocks)
 
   const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
 
@@ -101,7 +104,15 @@ const ArchivePage = () =>  {
         Задачи
       </CustomTabPanel>
       <CustomTabPanel value={value} index={5}>
-        Склады
+        {loadingStocks ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedStocks/>
+          </>
+        )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={6}>
         Контрагенты
