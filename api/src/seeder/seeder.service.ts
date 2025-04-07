@@ -208,11 +208,25 @@ export class SeederService {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
         products: [{ product: _product1._id, amount: 20 }],
+        isArchived: false,
       },
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
         products: [{ product: _product2._id, amount: 20 }],
+        isArchived: false,
+      },
+      {
+        name: 'Склад Санкт-Петербург',
+        address: 'Ул. Ленина 100',
+        products: [],
+        isArchived: true,
+      },
+      {
+        name: 'Склад Кант',
+        address: 'Ул. Советская 101',
+        products: [],
+        isArchived: true,
       },
     ])
 

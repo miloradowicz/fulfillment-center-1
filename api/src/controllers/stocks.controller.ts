@@ -42,6 +42,11 @@ export class StocksController {
     return await this.stocksService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveStock(@Param('id') id: string) {
+    return this.stocksService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteStock(@Param('id') id: string) {
     return this.stocksService.delete(id)
