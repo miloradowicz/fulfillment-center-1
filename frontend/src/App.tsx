@@ -19,7 +19,7 @@ import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 import { useAppSelector } from './app/hooks.ts'
-import { selectUser } from './store/slices/userSlice.ts'
+import { selectUser } from './store/slices/authSlice.ts'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
 
 const App = () => {
