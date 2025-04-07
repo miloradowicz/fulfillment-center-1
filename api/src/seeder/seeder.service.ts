@@ -284,16 +284,31 @@ export class SeederService {
         name: 'ООО "Фулфилмент Партнер"',
         phone_number: '+7 999 123-45-67',
         address: 'Москва, ул. Достоевского, д. 10',
+        isArchived: false,
       },
       {
         name: 'ИП Осмонов',
         phone_number: '+996 700 456-789',
         address: 'Бишкек, пр. Чуй, д. 55',
+        isArchived: false,
       },
       {
         name: 'OОО "Складской Логистик"',
         phone_number: '+996 500 789-456',
         address: 'Бишкек, пр. Манаса, д. 30',
+        isArchived: false,
+      },
+      {
+        name: 'ОсОО "Магнум"',
+        phone_number: '+996 550 555-555',
+        address: 'Бишкек, ул. Горького, д. 321',
+        isArchived: true,
+      },
+      {
+        name: 'ИП Исаев',
+        phone_number: '+996 999 999-999',
+        address: 'Бишкек, ул. Ахунбаева, д. 54',
+        isArchived: true,
       },
     ])
 

@@ -43,6 +43,11 @@ export class CounterpartiesController {
     return this.counterpartiesService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveClient(@Param('id') id: string) {
+    return this.counterpartiesService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteCounterparty(@Param('id') id: string) {
     return this.counterpartiesService.delete(id)
