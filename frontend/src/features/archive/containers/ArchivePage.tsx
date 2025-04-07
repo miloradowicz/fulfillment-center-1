@@ -18,6 +18,8 @@ import ArchivedProducts from '../components/ArchivedProducts.tsx'
 import { selectLoadingFetchArchivedProduct } from '../../../store/slices/productSlice.ts'
 import ArchivedStocks from '../components/ArchivedStocks.tsx'
 import { selectLoadingFetchArchivedStocks } from '../../../store/slices/stocksSlice.ts'
+import ArchivedCounterparties from '../components/ArchivedCounterparties.tsx'
+import { selectLoadingFetchArchive } from '../../../store/slices/counterpartySlices.ts'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -27,6 +29,7 @@ const ArchivePage = () =>  {
   const loadingArrivals = useAppSelector(selectLoadingFetchArchivedArrivals)
   const loadingProducts = useAppSelector(selectLoadingFetchArchivedProduct)
   const loadingStocks = useAppSelector(selectLoadingFetchArchivedStocks)
+  const loadingCounterparties = useAppSelector(selectLoadingFetchArchive)
 
   const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
 
@@ -115,7 +118,15 @@ const ArchivePage = () =>  {
         )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={6}>
-        Контрагенты
+        {loadingCounterparties ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedCounterparties/>
+          </>
+        )}
       </CustomTabPanel>
 
     </Box>
