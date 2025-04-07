@@ -1,50 +1,56 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {
-  fetchCounterparties,
   fetchAllCounterparties,
   fetchCounterpartyById,
-  fetchCounterpartyByIdWithArchived,
   createCounterparty,
   updateCounterparty,
   archiveCounterparty,
-  deleteCounterparty,
+  deleteCounterparty, fetchAllArchivedCounterparties, unarchiveCounterparty,
 } from '../thunks/counterpartyThunk'
-import { Counterparty, ValidationError } from '../../types'
+import { Counterparty, GlobalError, ValidationError } from '../../types'
 import { RootState } from '../../app/store'
 
 interface CounterpartyState {
   counterparties: Counterparty[] | null
+  archivedCounterparties: Counterparty[] | null
   counterparty: Counterparty | null
   loadingFetch: boolean
+  loadingFetchArchive: boolean
   loadingAdd: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
   loadingArchive: boolean
-  error: boolean
+  loadingUnarchive: boolean
+  error: GlobalError | null
   createError: ValidationError | null
   updateError: ValidationError | null
 }
 
 const initialState: CounterpartyState = {
   counterparties: null,
+  archivedCounterparties: null,
   counterparty: null,
   loadingFetch: false,
+  loadingFetchArchive: false,
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
   loadingArchive: false,
-  error: false,
+  loadingUnarchive: false,
+  error: null,
   createError: null,
   updateError: null,
 }
 
 export const selectAllCounterparties = (state: RootState) => state.counterparties.counterparties
+export const selectAllArchivedCounterparties = (state: RootState) => state.counterparties.archivedCounterparties
 export const selectOneCounterparty = (state: RootState) => state.counterparties.counterparty
 export const selectCounterpartyError = (state: RootState) => state.counterparties.error
 export const selectCounterpartyCreateError = (state: RootState) => state.counterparties.createError
 export const selectCounterpartyUpdateError = (state: RootState) => state.counterparties.updateError
 
 export const selectLoadingFetch = (state: RootState) => state.counterparties.loadingFetch
+export const selectLoadingFetchArchive = (state: RootState) => state.counterparties.loadingFetchArchive
 export const selectLoadingAdd = (state: RootState) => state.counterparties.loadingAdd
 export const selectLoadingDelete = (state: RootState) => state.counterparties.loadingDelete
 export const selectLoadingUpdate = (state: RootState) => state.counterparties.loadingUpdate
@@ -57,61 +63,48 @@ const counterpartiesSlice = createSlice({
     clearErrors: state => {
       state.createError = null
       state.updateError = null
-      state.error = false
+      state.error = null
     },
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchCounterparties.pending, state => {
-        state.loadingFetch = true
-        state.error = false
-      })
-      .addCase(fetchCounterparties.fulfilled, (state, { payload }) => {
-        state.loadingFetch = false
-        state.counterparties = payload
-      })
-      .addCase(fetchCounterparties.rejected, state => {
-        state.loadingFetch = false
-        state.error = true
-      })
-
       .addCase(fetchAllCounterparties.pending, state => {
         state.loadingFetch = true
-        state.error = false
+        state.error = null
       })
       .addCase(fetchAllCounterparties.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
         state.counterparties = payload
       })
-      .addCase(fetchAllCounterparties.rejected, state => {
+      .addCase(fetchAllCounterparties.rejected, (state, { payload: error }) => {
         state.loadingFetch = false
-        state.error = true
+        state.error = error || null
+      })
+
+      .addCase(fetchAllArchivedCounterparties.pending, state => {
+        state.loadingFetchArchive = true
+        state.error = null // Сброс ошибки при запуске запроса
+      })
+      .addCase(fetchAllArchivedCounterparties.fulfilled, (state, action) => {
+        state.loadingFetchArchive = false
+        state.archivedCounterparties = action.payload
+      })
+      .addCase(fetchAllArchivedCounterparties.rejected, (state, { payload: error }) => {
+        state.loadingFetchArchive = false
+        state.error = error || { message: 'Ошибка при загрузке' }
       })
 
       .addCase(fetchCounterpartyById.pending, state => {
         state.loadingFetch = true
-        state.error = false
+        state.error = null
       })
       .addCase(fetchCounterpartyById.fulfilled, (state, { payload }) => {
         state.loadingFetch = false
         state.counterparty = payload
       })
-      .addCase(fetchCounterpartyById.rejected, state => {
+      .addCase(fetchCounterpartyById.rejected, (state, { payload: error }) => {
         state.loadingFetch = false
-        state.error = true
-      })
-
-      .addCase(fetchCounterpartyByIdWithArchived.pending, state => {
-        state.loadingFetch = true
-        state.error = false
-      })
-      .addCase(fetchCounterpartyByIdWithArchived.fulfilled, (state, { payload }) => {
-        state.loadingFetch = false
-        state.counterparty = payload
-      })
-      .addCase(fetchCounterpartyByIdWithArchived.rejected, state => {
-        state.loadingFetch = false
-        state.error = true
+        state.error = error || null
       })
 
       .addCase(createCounterparty.pending, state => {
@@ -142,27 +135,44 @@ const counterpartiesSlice = createSlice({
 
       .addCase(archiveCounterparty.pending, state => {
         state.loadingArchive = true
-        state.error = false
+        state.error = null
       })
       .addCase(archiveCounterparty.fulfilled, state => {
         state.loadingArchive = false
-        state.error = false
+        state.error = null
       })
-      .addCase(archiveCounterparty.rejected, state => {
+      .addCase(archiveCounterparty.rejected, (state, { payload: error }) => {
         state.loadingArchive = false
-        state.error = true
+        state.error = error || null
+      })
+
+      .addCase(unarchiveCounterparty.pending, state => {
+        state.loadingUnarchive = true
+        state.error = null
+      })
+      .addCase(unarchiveCounterparty.fulfilled, (state, action) => {
+        state.loadingUnarchive = false
+        state.error = null
+
+        if (state.archivedCounterparties) {
+          state.archivedCounterparties = state.archivedCounterparties.filter(counterparty => counterparty._id !== action.payload.id)
+        }
+      })
+      .addCase(unarchiveCounterparty.rejected, (state, { payload: error }) => {
+        state.loadingUnarchive = false
+        state.error = error || null
       })
 
       .addCase(deleteCounterparty.pending, state => {
         state.loadingDelete = true
-        state.error = false
+        state.error = null
       })
       .addCase(deleteCounterparty.fulfilled, state => {
         state.loadingDelete = false
       })
-      .addCase(deleteCounterparty.rejected, state => {
+      .addCase(deleteCounterparty.rejected, (state, { payload: error }) => {
         state.loadingDelete = false
-        state.error = true
+        state.error = error || null
       })
   },
 })
