@@ -2,8 +2,8 @@ import React from 'react'
 import { PieChart } from '@mui/x-charts'
 import Box from '@mui/material/Box'
 import { Card, Typography } from '@mui/material'
-import { TaskSummaryProps } from '../utils/TypesProps.ts'
-import { useTaskStateForReport } from '../hooks/useTaskStateForReport.ts'
+import { TaskSummaryProps } from '../../utils/TypesProps.ts'
+import { useTaskStateForReport } from '../../hooks/useTaskStateForReport.ts'
 
 const TaskStateForReport: React.FC<TaskSummaryProps> = ({ tasks }) => {
   const {

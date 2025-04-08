@@ -1,4 +1,4 @@
-import { TaskWithPopulate, UserTaskReport } from '../../../types'
+import { ClientOrderReport, TaskWithPopulate, UserTaskReport } from '../../../types'
 
 export interface DailyTaskCount {
   date: string;
@@ -15,4 +15,8 @@ export interface PropsTaskTable {
 
 export interface TaskSummaryProps {
   tasks: TaskWithPopulate[] | null;
+}
+
+export interface PropsClientTable {
+  clientOrderReport:  ClientOrderReport[]
 }

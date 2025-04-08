@@ -2,26 +2,22 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Task, TaskDocument } from '../schemas/task.schema'
-import { DailyTaskCount, UserTaskReport } from '../types'
+import { clientOrderReport, DailyTaskCount, OrderWithClient, UserTaskReport } from '../types'
+import { Order, OrderDocument } from '../schemas/order.schema'
+import { normalizeDates } from '../utils/normalazeDates'
 
 @Injectable()
 export class ReportService {
-  constructor(@InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>) {}
+  constructor(
+    @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,) {}
 
-  async getReportForPeriod(
-    tab: string,
+  async getReportTaskForPeriod(
     startDate: Date,
     endDate: Date
   ): Promise<{ userTaskReports: UserTaskReport[]; dailyTaskCounts: DailyTaskCount[] }> {
-    startDate.setHours(0, 0, 0, 0)
-    endDate.setHours(23, 59, 59, 999)
-
-    switch (tab) {
-    case 'tasks':
-      return this.getTaskReport(startDate, endDate)
-    default:
-      throw new Error('Invalid tab value')
-    }
+    const [normalizedStart, normalizedEnd] = normalizeDates(startDate, endDate)
+    return this.getTaskReport(normalizedStart, normalizedEnd)
   }
 
   private async getTaskReport(
@@ -66,7 +62,47 @@ export class ReportService {
         })
       }
     })
-
     return { userTaskReports, dailyTaskCounts }
   }
+
+  async getReportClientForPeriod(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ clientOrderReport: clientOrderReport[] }> {
+    const [normalizedStart, normalizedEnd] = normalizeDates(startDate, endDate)
+    return this.getClientReport(normalizedStart, normalizedEnd)
+  }
+
+  private async getClientReport(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ clientOrderReport: clientOrderReport[] }> {
+    const orders = await this.orderModel
+      .find({
+        createdAt: {
+          $gte: startDate.toISOString(),
+          $lte: endDate.toISOString(),
+        },
+      })
+      .populate('client', 'name') as unknown as OrderWithClient[]
+    console.log(orders)
+
+    const clientOrderCount = orders.reduce((acc, order): Record<string, clientOrderReport> => {
+      const clientId = String(order.client._id)
+
+      if (!acc[clientId]) {
+        acc[clientId] = { client: { _id: order.client._id.toString(), name:order.client.name }, orderCount: 0, orders: [] }
+      }
+      acc[clientId].orderCount += 1
+      acc[clientId].orders.push({ _id: String(order._id),  orderNumber: order.orderNumber ?? '', status:order.status })
+      return acc
+
+    }, {} as Record<string, clientOrderReport>)
+
+    const clientOrderReport = Object.values(clientOrderCount)
+
+    return { clientOrderReport }
+  }
 }
+
+

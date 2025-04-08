@@ -3,9 +3,9 @@ import { CircularProgress, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import TaskReportTable from './TaskReportTable.tsx'
 import TaskCountAreaChart from './TaskCountChart.tsx'
-import DateRangePicker from './DateRangePicker.tsx'
+import DateRangePicker from '../../components/DateRangePicker.tsx'
 import TaskSummary from './TaskStateForReport.tsx'
-import { useTaskReport } from '../hooks/useTaskReport.ts'
+import { useTaskReport } from '../../hooks/useTaskReport.ts'
 
 const TaskReport = () => {
 

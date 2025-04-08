@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { fetchTaskReport } from '../../../store/thunks/reportThunk.ts'
+import { fetchClientReport, fetchTaskReport } from '../../../store/thunks/reportThunk.ts'
 import { toast } from 'react-toastify'
 import useIMobile from '../utils/UseIMobile.ts'
 
 export const useTaskRangePicker = () => {
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
+  const [tab, setTab] = useState<string|null>('')
   const dispatch = useAppDispatch()
   const location = useLocation()
 
@@ -15,13 +16,21 @@ export const useTaskRangePicker = () => {
     const searchParams = new URLSearchParams(location.search)
     const startDateParam = searchParams.get('startDate')
     const endDateParam = searchParams.get('endDate')
+    const tabParam = searchParams.get('tab')
+
+    setTab(tabParam)
 
     if (startDateParam && endDateParam) {
       const parsedStartDate = new Date(startDateParam)
       const parsedEndDate = new Date(endDateParam)
       setStartDate(parsedStartDate)
       setEndDate(parsedEndDate)
-      dispatch(fetchTaskReport({ startDate: startDateParam, endDate: endDateParam }))
+
+      if (tabParam === 'tasks') {
+        dispatch(fetchTaskReport({ startDate: startDateParam, endDate: endDateParam }))
+      } else if (tabParam === 'clients') {
+        dispatch(fetchClientReport({ startDate: startDateParam, endDate: endDateParam }))
+      }
     }
   }, [location.search, dispatch])
   const getCurrentWeek = () => {
@@ -87,9 +96,15 @@ export const useTaskRangePicker = () => {
     if(startDate && endDate){
       const startDateStr = formatDate(startDate)
       const endDateStr = formatDate(endDate)
-      const reportUrl = `/reports?tab=tasks&startDate=${ startDateStr }&endDate=${ endDateStr }`
-      navigate(reportUrl, { replace: true })
-      await dispatch(fetchTaskReport({ startDate:startDateStr, endDate:endDateStr }))
+      if(tab === 'clients'){
+        const reportUrl = `/reports?tab=clients&startDate=${ startDateStr }&endDate=${ endDateStr }`
+        navigate(reportUrl, { replace: true })
+        await dispatch(fetchClientReport({ startDate:startDateStr, endDate:endDateStr }))
+      }else{
+        const reportUrl = `/reports?tab=tasks&startDate=${ startDateStr }&endDate=${ endDateStr }`
+        navigate(reportUrl, { replace: true })
+        await dispatch(fetchTaskReport({ startDate:startDateStr, endDate:endDateStr }))
+      }
     }
     else{
       toast.error('Выберите даты')
