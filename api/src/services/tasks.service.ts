@@ -43,7 +43,11 @@ export class TasksService {
     const archived = this.taskModel.find({ isArchived: true })
 
     if (populate) {
-      return (await archived.populate('user', 'email displayName role')).reverse()
+      return (await archived
+        .populate('user', 'email displayName role')
+        .populate('associated_order', 'orderNumber')
+        .populate('associated_arrival', 'arrivalNumber')
+      ).reverse()
     }
 
     return (await archived).reverse()
@@ -116,6 +120,19 @@ export class TasksService {
     if (task.isArchived) throw new ForbiddenException('Задача уже в архиве')
 
     return { message: 'Задача перемещена в архив' }
+  }
+
+  async unarchive(id: string) {
+    const task = await this.taskModel.findById(id)
+
+    if (!task) throw new NotFoundException('Задача не найден')
+
+    if (!task.isArchived) throw new ForbiddenException('Задача не находится в архиве')
+
+    task.isArchived = false
+    await task.save()
+
+    return { message: 'Задача восстановлен из архива' }
   }
 
   async delete(id: string) {

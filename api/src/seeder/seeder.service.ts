@@ -398,6 +398,7 @@ export class SeederService {
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival1._id,
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-2',
@@ -406,6 +407,7 @@ export class SeederService {
         status: 'в работе',
         type: 'заказ',
         associated_order: _order2._id,
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-3',
@@ -414,6 +416,7 @@ export class SeederService {
         status: 'готово',
         type: 'другое',
         date_Done: '2025-03-29T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-4',
@@ -421,6 +424,7 @@ export class SeederService {
         title: 'Проверить складские остатки',
         status: 'в работе',
         type: 'другое',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-5',
@@ -430,6 +434,7 @@ export class SeederService {
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-23T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-6',
@@ -439,6 +444,7 @@ export class SeederService {
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-20T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-7',
@@ -448,6 +454,7 @@ export class SeederService {
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-21T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-8',
@@ -457,6 +464,7 @@ export class SeederService {
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-22T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-9',
@@ -466,6 +474,7 @@ export class SeederService {
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-23T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-10',
@@ -474,6 +483,7 @@ export class SeederService {
         status: 'готово',
         type: 'другое',
         date_Done: '2025-03-26T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-11',
@@ -483,6 +493,27 @@ export class SeederService {
         type: 'поставка',
         associated_arrival: _arrival2._id,
         date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: false,
+      },
+      {
+        taskNumber: 'TSK-12',
+        user: _User2._id,
+        title: 'Разгрузка поставки',
+        status: 'к выполнению',
+        type: 'поставка',
+        associated_arrival: _arrival2._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: true,
+      },
+      {
+        taskNumber: 'TSK-13',
+        user: _User4._id,
+        title: 'Упаковка заказа для отправки',
+        status: 'в работе',
+        type: 'заказ',
+        associated_order: _order1._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: true,
       },
     ])
 

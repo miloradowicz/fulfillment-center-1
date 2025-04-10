@@ -46,6 +46,11 @@ export class TasksController {
     return this.tasksService.archive(id)
   }
 
+  @Patch(':id/unarchive')
+  async unarchiveTask(@Param('id') id: string) {
+    return this.tasksService.unarchive(id)
+  }
+
   @Delete(':id')
   async deleteTask(@Param('id') id: string) {
     return this.tasksService.delete(id)
