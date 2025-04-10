@@ -21,6 +21,11 @@ export const useClientReport = () => {
       setStartDate(startDateParam)
       setEndDate(endDateParam)
     }
+    if (!startDateParam || !endDateParam) {
+      setStartDate(null)
+      setEndDate(null)
+      return
+    }
   }, [location.search, dispatch, startDate, endDate])
 
 

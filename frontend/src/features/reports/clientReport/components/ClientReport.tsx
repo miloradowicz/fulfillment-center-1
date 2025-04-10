@@ -14,7 +14,7 @@ const ClientReport = () => {
   } = useClientReport()
 
   return (
-    <Box>
+    <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="start"  flexWrap={'wrap'} mb={3}>
       <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="center" gap={2} flexWrap={'wrap'} mb={3}>
         <Box sx={{
           flex: 1,
@@ -31,7 +31,6 @@ const ClientReport = () => {
           <DateRangePicker />
         </Box>
       </Box>
-
       {loadingReport ? (
         <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
           <CircularProgress />

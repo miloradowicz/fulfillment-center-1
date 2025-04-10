@@ -5,7 +5,7 @@ import { fetchClientReport, fetchTaskReport } from '../../../store/thunks/report
 import { toast } from 'react-toastify'
 import useIMobile from '../utils/UseIMobile.ts'
 
-export const useTaskRangePicker = () => {
+export const useRangePicker = () => {
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [tab, setTab] = useState<string|null>('')
@@ -13,11 +13,15 @@ export const useTaskRangePicker = () => {
   const location = useLocation()
 
   useEffect(() => {
+    setStartDate(null)
+    setEndDate(null)
+  }, [tab])
+
+  useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const startDateParam = searchParams.get('startDate')
     const endDateParam = searchParams.get('endDate')
     const tabParam = searchParams.get('tab')
-
     setTab(tabParam)
 
     if (startDateParam && endDateParam) {
@@ -88,29 +92,24 @@ export const useTaskRangePicker = () => {
     }
   }
 
-  const minDate = new Date('2025-01-01')
-  const maxDate = new Date('2025-12-31')
+  const currentYear = new Date().getFullYear()
+  const minDate = new Date(currentYear, 0, 1) // Январь = 0
+  const maxDate = new Date(currentYear, 11, 31)
   const navigate = useNavigate()
 
-  const handleReportGeneration = async () =>  {
-    if(startDate && endDate){
+  const handleReportGeneration = async () => {
+    if (startDate && endDate) {
       const startDateStr = formatDate(startDate)
       const endDateStr = formatDate(endDate)
-      if(tab === 'clients'){
-        const reportUrl = `/reports?tab=clients&startDate=${ startDateStr }&endDate=${ endDateStr }`
-        navigate(reportUrl, { replace: true })
-        await dispatch(fetchClientReport({ startDate:startDateStr, endDate:endDateStr }))
-      }else{
-        const reportUrl = `/reports?tab=tasks&startDate=${ startDateStr }&endDate=${ endDateStr }`
-        navigate(reportUrl, { replace: true })
-        await dispatch(fetchTaskReport({ startDate:startDateStr, endDate:endDateStr }))
-      }
-    }
-    else{
+
+      const currentTab = tab === 'clients' ? 'clients' : 'tasks'
+
+      const reportUrl = `/reports?tab=${ currentTab }&startDate=${ startDateStr }&endDate=${ endDateStr }`
+      navigate(reportUrl, { replace: true })
+    } else {
       toast.error('Выберите даты')
     }
   }
-
   return {
     handlePresetRange,
     handleReportGeneration,

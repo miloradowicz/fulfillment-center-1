@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import { useSearchParams } from 'react-router-dom'
 import { PropsClientTable } from '../../utils/TypesProps.ts'
 import { formatDate } from '../../utils/FormattedDateForTitle.ts'
-import GenericDropdown from '../../taskPeport/components/Dropdown.tsx'
+import GenericDropdown from '../../components/Dropdown.tsx'
 
 const ClientReportTable: React.FC<PropsClientTable> = ({ clientOrderReport }) => {
   const [searchParams] = useSearchParams()
@@ -30,17 +30,17 @@ const ClientReportTable: React.FC<PropsClientTable> = ({ clientOrderReport }) =>
             <TableHead>
               <TableRow>
                 <TableCell  sx={{
-                  padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+                  padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                   fontSize: { xs: '0.875rem', md: '1rem' },
                   fontWeight: 550,
                 }}>Клиент</TableCell>
                 <TableCell sx={{
-                  padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+                  padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                   fontSize: { xs: '0.875rem', md: '1rem' },
                   fontWeight: 550,
                 }} align="center">Заказы</TableCell>
                 <TableCell sx={{
-                  padding: { xs: 1, sm: 1, md: 1, xl: 2 },
+                  padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                   fontSize: { xs: '0.875rem', md: '1rem' },
                   fontWeight: 550,
                 }} align="center">Количество заказов</TableCell>
@@ -49,20 +49,25 @@ const ClientReportTable: React.FC<PropsClientTable> = ({ clientOrderReport }) =>
             <TableBody>
               {clientOrderReport.map(report => (
                 <TableRow key={report.client._id}>
-                  <TableCell width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 3 },
+                  <TableCell width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} component="th" scope="row">
                     {report.client.name}
                   </TableCell>
-                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 3 },
+                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} align="center">
-                    <GenericDropdown
-                      items={report.orders}
-                      getLabel={order => order.orderNumber}
-                      getLink={order => `/orders/${ order._id }`}
-                      buttonText="Заказы"
-                    />
+                    {report.orderCount === 0 ? (
+                      <div className={'h-[38px] flex items-center justify-center'}>-</div>
+                    ) : (
+                      <GenericDropdown
+                        items={report.orders}
+                        getLabel={order => order.orderNumber}
+                        getLink={order => `/orders/${ order._id }`}
+                        getStatus={order => order.status}
+                        statusFilterOptions={['в сборке', 'в пути', 'доставлен']}
+                      />
+                    )}
                   </TableCell>
-                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 3 },
+                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} align="center">
                     {report.orderCount}
                   </TableCell>

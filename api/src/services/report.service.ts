@@ -5,12 +5,15 @@ import { Task, TaskDocument } from '../schemas/task.schema'
 import { clientOrderReport, DailyTaskCount, OrderWithClient, UserTaskReport } from '../types'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { normalizeDates } from '../utils/normalazeDates'
+import { Client, ClientDocument } from '../schemas/client.schema'
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
-    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,) {}
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(Client.name) private readonly clientModel: Model<ClientDocument>,) {
+  }
 
   async getReportTaskForPeriod(
     startDate: Date,
@@ -85,24 +88,47 @@ export class ReportService {
         },
       })
       .populate('client', 'name') as unknown as OrderWithClient[]
-    console.log(orders)
 
+    // Группируем заказы по клиентам
     const clientOrderCount = orders.reduce((acc, order): Record<string, clientOrderReport> => {
       const clientId = String(order.client._id)
 
       if (!acc[clientId]) {
-        acc[clientId] = { client: { _id: order.client._id.toString(), name:order.client.name }, orderCount: 0, orders: [] }
+        acc[clientId] = {
+          client: { _id: clientId, name: order.client.name },
+          orderCount: 0,
+          orders: [],
+        }
       }
-      acc[clientId].orderCount += 1
-      acc[clientId].orders.push({ _id: String(order._id),  orderNumber: order.orderNumber ?? '', status:order.status })
-      return acc
 
+      acc[clientId].orderCount += 1
+      acc[clientId].orders.push({
+        _id: String(order._id),
+        orderNumber: order.orderNumber ?? '',
+        status: order.status,
+      })
+
+      return acc
     }, {} as Record<string, clientOrderReport>)
 
-    const clientOrderReport = Object.values(clientOrderCount)
+    const clients = await this.clientModel.find()
+
+    for (const client of clients) {
+      const clientId = String(client._id)
+      if (!clientOrderCount[clientId]) {
+        clientOrderCount[clientId] = {
+          client: { _id: clientId, name: client.name },
+          orderCount: 0,
+          orders: [],
+        }
+      }
+    }
+
+    const clientOrderReport = Object.values(clientOrderCount).sort(
+      (a, b) => b.orderCount - a.orderCount
+    )
 
     return { clientOrderReport }
   }
 }
-
 

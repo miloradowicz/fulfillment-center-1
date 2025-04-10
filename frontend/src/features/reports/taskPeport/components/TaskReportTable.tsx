@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import { useSearchParams } from 'react-router-dom'
 import { formatDate } from '../../utils/FormattedDateForTitle.ts'
 import { PropsTaskTable } from '../../utils/TypesProps.ts'
-import GenericDropdown from './Dropdown.tsx'
+import GenericDropdown from '../../components/Dropdown.tsx'
 
 const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
   const [searchParams] = useSearchParams()
