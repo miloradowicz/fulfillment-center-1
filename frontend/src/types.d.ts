@@ -374,3 +374,20 @@ export interface ReportTaskResponse {
   userTaskReports: UserTaskReport[];
   dailyTaskCounts: DailyTaskCount[];
 }
+
+export interface ClientOrderReport {
+  client: {
+    _id: string;
+    name: string;
+  };
+  orders: {
+    _id: string
+    orderNumber: string
+    status:string
+  }[],
+  orderCount: number;
+}
+
+export interface ReportClientResponse {
+  clientOrderReport: ClientOrderReport[];
+}

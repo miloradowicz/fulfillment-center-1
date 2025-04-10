@@ -1,11 +1,10 @@
-import React from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Card, Typography } from '@mui/material'
-import { useTaskRangePicker } from '../hooks/useTaskRangePicker.ts'
+import { useRangePicker } from '../hooks/useRangePicker.ts'
 import ButtonDataRange from './ButtonDataRange.tsx'
 
-const DateRangePicker: React.FC = () => {
+const DateRangePicker = () => {
 
   const { handlePresetRange,
     handleReportGeneration,
@@ -13,7 +12,8 @@ const DateRangePicker: React.FC = () => {
     minDate,
     handleChange,
     startDate,
-    endDate } = useTaskRangePicker()
+    endDate } = useRangePicker()
+
 
   return (
     <Card

@@ -2,9 +2,9 @@ import React from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import Box from '@mui/material/Box'
 import {  Typography } from '@mui/material'
-import { PropsCountChart } from '../utils/TypesProps.ts'
+import { PropsCountChart } from '../../utils/TypesProps.ts'
 
-import { useTaskCountAreaChart } from '../hooks/useTaskCountAreaChart.ts'
+import { useTaskCountAreaChart } from '../../hooks/useTaskCountAreaChart.ts'
 
 const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
 

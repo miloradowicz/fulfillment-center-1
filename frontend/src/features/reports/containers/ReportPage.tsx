@@ -12,7 +12,8 @@ import { fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
 import { CustomTabPanel } from '../utils/CustomTabPanel.tsx'
 import { TabProps } from '../utils/TabProps.ts'
 import { useNavigate, useLocation } from 'react-router-dom'
-import TaskReport from '../components/TaskReport.tsx'
+import TaskReport from '../taskPeport/components/TaskReport.tsx'
+import ClientReport from '../clientReport/components/ClientReport.tsx'
 
 export default function ReportTabs() {
   const [value, setValue] = React.useState(0)
@@ -101,7 +102,7 @@ export default function ReportTabs() {
         )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Клиенты
+        <ClientReport/>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         Заказы
