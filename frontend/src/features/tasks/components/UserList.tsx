@@ -3,12 +3,12 @@ import { IconButton, Stack, Tooltip, Menu, MenuItem, TextField, InputAdornment }
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import SearchIcon from '@mui/icons-material/Search'
 import ClearIcon from '@mui/icons-material/Clear'
-import { UserStripped } from '../../../types'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { UserStripped } from '@/types'
+import { useAppDispatch } from '@/app/hooks.ts'
 import {
   fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate,
-} from '../../../store/thunks/tasksThunk.ts'
+} from '@/store/thunks/tasksThunk.ts'
 import { UserListProps } from '../hooks/TypesProps'
 
 

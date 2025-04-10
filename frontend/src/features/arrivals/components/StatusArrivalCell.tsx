@@ -1,11 +1,11 @@
-import { ArrivalWithClient, StatusColor } from '../../../types'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { ArrivalWithClient, StatusColor } from '@/types'
+import { useAppDispatch } from '@/app/hooks.ts'
 import React, { useState } from 'react'
 import { Box, Chip, Menu, MenuItem, Tooltip } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { fetchPopulatedArrivals, updateArrival } from '../../../store/thunks/arrivalThunk.ts'
+import { fetchPopulatedArrivals, updateArrival } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
-import { ArrivalStatus } from '../../../constants.ts'
+import { ArrivalStatus } from '@/constants.ts'
 
 
 export interface Props  {

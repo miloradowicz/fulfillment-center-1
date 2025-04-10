@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store'
+import { RootState } from '@/app/store'
 import { loginUser, logoutUser, registerUser } from '../thunks/userThunk'
-import { User, ValidationError, GlobalError } from '../../types'
+import { User, ValidationError, GlobalError } from '@/types'
 
 interface AuthState {
   user: User | null

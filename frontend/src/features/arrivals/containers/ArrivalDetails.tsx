@@ -14,20 +14,20 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
-import Modal from '../../../components/UI/Modal/Modal'
+import Modal from '@/components/ui/Modal/Modal'
 import ArrivalForm from '../components/ArrivalForm.tsx'
 import { Link } from 'react-router-dom'
-import { ArrivalStatus } from '../../../constants.ts'
-import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
-import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
+import { ArrivalStatus } from '@/constants.ts'
+import ProductsTable from '@/components/Tables/ProductsTable.tsx'
+import DefectsTable from '@/components/Tables/DefectsTable.tsx'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import LogsTable from '../../../components/Tables/LogsTable.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import LogsTable from '@/components/Tables/LogsTable.tsx'
+import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
-import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
-import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
-import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
-import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
+import { getArrivalStatusColor } from '@/utils/getOrderStatusColor.ts'
+import EditButton from '@/components/ui/Buttons/EditButton.tsx'
+import DeleteButton from '@/components/ui/Buttons/DeleteButton.tsx'
+import BackButton from '@/components/ui/Buttons/BackButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -152,6 +152,7 @@ const ArrivalDetails = () => {
           </Tabs>
           <Box className="mt-4">
             {infoTab === 0 ? (
+              arrival.defects &&
               <DefectsTable defects={arrival.defects} />
             ) : infoTab === 1 ? (
               <LogsTable logs={arrival.logs || []} />

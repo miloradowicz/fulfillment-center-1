@@ -1,10 +1,10 @@
-import { OrderWithClient, StatusColor } from '../../../types'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { OrderWithClient, StatusColor } from '@/types'
+import { useAppDispatch } from '@/app/hooks.ts'
 import React, { useState } from 'react'
-import { fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderThunk.ts'
+import { fetchOrdersWithClient, updateOrder } from '@/store/thunks/orderThunk.ts'
 import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { toast } from 'react-toastify'
 
 export interface Props {

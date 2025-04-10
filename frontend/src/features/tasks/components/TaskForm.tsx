@@ -1,11 +1,11 @@
 import { Autocomplete, Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 import Grid from '@mui/material/Grid2'
 import { taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
 import React from 'react'
-import { TaskWithPopulate } from '../../../types'
+import { TaskWithPopulate } from '@/types'
 
 interface Props {
   onSuccess?: () => void

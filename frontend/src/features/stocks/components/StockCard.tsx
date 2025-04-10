@@ -1,9 +1,9 @@
 import React from 'react'
 import { Typography } from '@mui/material'
-import { StockPopulate } from '../../../types'
+import { StockPopulate } from '@/types'
 import { NavLink } from 'react-router-dom'
 import { useStockCard } from '../hooks/useStockCard.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import StockForm from './StockForm.tsx'
 
 interface Props {

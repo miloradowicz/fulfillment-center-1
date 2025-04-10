@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import {
   Arrival,
   ArrivalMutation,
@@ -7,9 +7,9 @@ import {
   ArrivalWithPopulate,
   GlobalError,
   ValidationError,
-} from '../../types'
+} from '@/types'
 import { isAxiosError } from 'axios'
-import { createArrivalAndOrderFormData } from '../../utils/createArrivalAndOrderFormData.ts'
+import { createArrivalAndOrderFormData } from '@/utils/createArrivalAndOrderFormData.ts'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
   const response = await axiosAPI.get('/arrivals')

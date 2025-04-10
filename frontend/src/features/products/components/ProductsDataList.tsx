@@ -1,14 +1,14 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, IconButton, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
-import { ProductWithPopulate } from '../../../types'
+import { ProductWithPopulate } from '@/types'
 import EditIcon from '@mui/icons-material/Edit'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import ProductForm from './ProductForm.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 
 const ProductsDataList = () => {
   const {

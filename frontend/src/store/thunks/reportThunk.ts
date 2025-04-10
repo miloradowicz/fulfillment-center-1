@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
-import { ReportTaskResponse } from '../../types'
+import axiosAPI from '@/utils/axiosAPI.ts'
+import { ReportTaskResponse } from '@/types'
 
 export const fetchTaskReport = createAsyncThunk<ReportTaskResponse, { startDate: string, endDate: string }>(
   'reports/fetchTaskReport',

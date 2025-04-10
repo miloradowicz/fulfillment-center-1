@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
-import { deleteOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
+import { deleteOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { OrderWithProductsAndClients } from '../../../types'
+import { OrderWithProductsAndClients } from '@/types'
 import dayjs from 'dayjs'
 
 export const useOrderDetails = () => {

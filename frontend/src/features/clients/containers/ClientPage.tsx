@@ -1,9 +1,9 @@
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import { Box, CircularProgress } from '@mui/material'
 import ClientsDataList from '../components/ClientsDataList.tsx'
 import ClientForm from '../components/ClientForm.tsx'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/ui/CustomTitle/CustomTitle.tsx'
 import { useClientActions } from '../hooks/useClientActions.ts'
 
 const ClientsPage = () => {

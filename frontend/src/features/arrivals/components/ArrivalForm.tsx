@@ -1,6 +1,5 @@
 import Grid from '@mui/material/Grid2'
 import {
-  Button,
   CircularProgress,
   Divider,
   FormHelperText,
@@ -13,15 +12,17 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import Autocomplete from '@mui/material/Autocomplete'
 import ItemsList from './ItemsList.tsx'
 import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { Defect, ProductArrival } from '../../../types'
+import { Defect, ProductArrival } from '@/types'
 import { initialItemState, initialServiceState } from '../state/arrivalState.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
-import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 import React from 'react'
-import { getArrayItemNameById } from '../../../utils/getArrayItemName.ts'
-import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
-import { ItemType } from '../../../constants.ts'
+import { getArrayItemNameById } from '@/utils/getArrayItemName.ts'
+import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
+import { ItemType } from '@/constants.ts'
 import { ArrivalData } from '../utils/arrivalTypes.ts'
+import { Button } from '@/components/ui/button.tsx'
+import { Loader2 } from 'lucide-react'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -306,11 +307,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.PRODUCTS)}>
+              <Button type="button" variant="outline" onClick={() => addItem(ItemType.PRODUCTS)}>
                 Добавить
               </Button>
 
-              <Button type="button" variant="outlined" onClick={() => setProductsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setProductsModalOpen(false)}>
                 Закрыть
               </Button>
             </Grid>
@@ -387,11 +388,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.RECEIVED_AMOUNT)}>
+              <Button type="button" variant="outline" onClick={() => addItem(ItemType.RECEIVED_AMOUNT)}>
                 Добавить
               </Button>
 
-              <Button type="button" variant="outlined" onClick={() => setReceivedModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setReceivedModalOpen(false)}>
                 Закрыть
               </Button>
             </Grid>
@@ -471,11 +472,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             />
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.DEFECTS)}>
+              <Button type="button" variant="outline" onClick={() => addItem(ItemType.DEFECTS)}>
                 Добавить
               </Button>
 
-              <Button type="button" variant="outlined" onClick={() => setDefectsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setDefectsModalOpen(false)}>
                 Закрыть
               </Button>
             </Grid>
@@ -566,11 +567,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             )}
 
             <Grid container spacing={2}>
-              <Button type="button" variant="outlined" onClick={() => addItem(ItemType.SERVICES)}>
+              <Button type="button" variant="outline" onClick={() => addItem(ItemType.SERVICES)}>
                 Добавить
               </Button>
 
-              <Button type="button" variant="outlined" onClick={() => setServicesModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setServicesModalOpen(false)}>
                 Закрыть
               </Button>
             </Grid>
@@ -599,14 +600,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </Grid>
 
         <Grid>
-          <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
-            {isLoading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : initialData ? (
-              'Обновить поставку'
-            ) : (
-              'Создать поставку'
-            )}
+          <Button className="w-100" type="submit" disabled={isLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> :
+              initialData ?
+                'Обновить поставку'
+                : 'Создать поставку'}
           </Button>
         </Grid>
       </Grid>

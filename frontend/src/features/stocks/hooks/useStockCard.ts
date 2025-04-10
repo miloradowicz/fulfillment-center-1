@@ -1,6 +1,6 @@
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { useAppDispatch } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteStock, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { deleteStock, fetchStocks } from '@/store/thunks/stocksThunk.ts'
 import { toast } from 'react-toastify'
 
 export const useStockCard = () => {

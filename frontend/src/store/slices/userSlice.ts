@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store'
+import { RootState } from '@/app/store'
 import { fetchUsers, fetchUserById, updateUser, deleteUser, archiveUser } from '../thunks/userThunk'
-import { UserStripped, GlobalError, User } from '../../types'
+import { UserStripped, GlobalError, User } from '@/types'
 
 interface UsersState {
   users: UserStripped[] | null

@@ -1,4 +1,4 @@
-import { Defect, DefectForOrderForm, Product, ProductForOrderForm, ProductOrder } from '../../../types'
+import { Defect, DefectForOrderForm, Product, ProductForOrderForm, ProductOrder } from '@/types'
 import React from 'react'
 import { toast } from 'react-toastify'
 

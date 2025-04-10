@@ -6,37 +6,36 @@ import {
   Product,
   ProductForOrderForm,
   ProductOrder,
-} from '../../../types'
+} from '@/types'
 import {
   initialStateDefectForOrder,
   initialStateErrorForOrder,
   initialStateOrder,
   initialStateProductForOrder,
 } from './initialState.ts'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectCreateOrderError, selectLoadingAddOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
-import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectCreateOrderError, selectLoadingAddOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
+import { selectAllClients, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
+import { selectAllProducts } from '@/store/slices/productSlice.ts'
 import { validationRules } from './ValidationRulesForBlur.ts'
 import { toast } from 'react-toastify'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
 import {
   addOrder,
   fetchOrderById,
   fetchOrderByIdWithPopulate,
   fetchOrdersWithClient,
   updateOrder,
-} from '../../../store/thunks/orderThunk.ts'
+} from '@/store/thunks/orderThunk.ts'
 import { deleteItem } from './deleteItem.ts'
 import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
-import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
-import { ItemType } from '../../../constants.ts'
-import { selectAllStocks, selectOneStock } from '../../../store/slices/stocksSlice.ts'
-import { fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
+import { ItemType } from '@/constants.ts'
+import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
+import { fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 

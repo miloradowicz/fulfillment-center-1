@@ -1,9 +1,9 @@
-import { StatusColor } from '../../../types'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { StatusColor } from '@/types'
+import { useAppDispatch } from '@/app/hooks.ts'
 import React, { useState } from 'react'
 import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate, updateTask } from '../../../store/thunks/tasksThunk.ts'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate, updateTask } from '@/store/thunks/tasksThunk.ts'
 import { PropsStatus } from '../hooks/TypesProps'
 
 

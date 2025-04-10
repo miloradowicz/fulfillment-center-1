@@ -1,35 +1,35 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
   ArrivalMutation,
   Defect,
   Product,
   ProductArrival, ServiceArrival,
-} from '../../../types'
+} from '@/types'
 import { initialErrorState, initialItemState, initialServiceState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
 import {
   addArrival,
   fetchArrivalByIdWithPopulate,
   fetchPopulatedArrivals,
   updateArrival,
-} from '../../../store/thunks/arrivalThunk.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
-import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
+} from '@/store/thunks/arrivalThunk.ts'
+import { selectAllClients } from '@/store/slices/clientSlice.ts'
+import { selectAllProducts } from '@/store/slices/productSlice.ts'
+import { selectCreateError, selectLoadingAddArrival } from '@/store/slices/arrivalSlice.ts'
 import dayjs from 'dayjs'
-import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
-import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
-import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
-import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
-import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
-import { ErrorMessagesList } from '../../../messages.ts'
-import { ItemType } from '../../../constants.ts'
-import { fetchServices } from '../../../store/thunks/serviceThunk.ts'
+import { fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { selectAllStocks } from '@/store/slices/stocksSlice.ts'
+import { getAvailableItems } from '@/utils/getAvailableItems.ts'
+import { selectAllCounterparties } from '@/store/slices/counterpartySlices.ts'
+import { fetchCounterparties } from '@/store/thunks/counterpartyThunk.ts'
+import { ErrorMessagesList } from '@/messages.ts'
+import { ItemType } from '@/constants.ts'
+import { fetchServices } from '@/store/thunks/serviceThunk.ts'
 import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
-import { selectAllServices } from '../../../store/slices/serviceSlice.ts'
+import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ClientForm from '../features/clients/components/ClientForm'
 import { useClientForm } from '../features/clients/hooks/useClientForm'
-import { Client } from '../types'
+import { Client } from '@/types'
 
 beforeAll(() => {
   Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {

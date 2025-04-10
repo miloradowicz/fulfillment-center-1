@@ -1,12 +1,12 @@
 import { initialErrorState, initialState } from '../state/stockState.ts'
 import React, { useEffect, useState } from 'react'
-import { Stock, StockError, StockMutation } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
-import { selectIsStockCreating, selectStockCreateError } from '../../../store/slices/stocksSlice.ts'
-import { fetchProducts } from '../../../store/thunks/productThunk.ts'
+import { Stock, StockError, StockMutation } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectAllProducts } from '@/store/slices/productSlice.ts'
+import { selectIsStockCreating, selectStockCreateError } from '@/store/slices/stocksSlice.ts'
+import { fetchProducts } from '@/store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
-import { addStock, fetchStockById, fetchStocks, updateStock } from '../../../store/thunks/stocksThunk.ts'
+import { addStock, fetchStockById, fetchStocks, updateStock } from '@/store/thunks/stocksThunk.ts'
 
 export const useStockForm = (initialData?: Stock, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()

@@ -1,6 +1,6 @@
-import { Arrival, ArrivalWithClient, ArrivalWithPopulate, ValidationError } from '../../types'
+import { Arrival, ArrivalWithClient, ArrivalWithPopulate, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addArrival,
   archiveArrival,

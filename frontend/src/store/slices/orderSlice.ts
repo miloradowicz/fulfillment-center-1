@@ -5,9 +5,9 @@ import {
   OrderWithProducts,
   OrderWithProductsAndClients,
   ValidationError,
-} from '../../types'
+} from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addOrder,
   archiveOrder,

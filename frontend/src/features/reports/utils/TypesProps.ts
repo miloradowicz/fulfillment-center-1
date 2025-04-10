@@ -1,4 +1,4 @@
-import { TaskWithPopulate, UserTaskReport } from '../../../types'
+import { TaskWithPopulate, UserTaskReport } from '@/types'
 
 export interface DailyTaskCount {
   date: string;

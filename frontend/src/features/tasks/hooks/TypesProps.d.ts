@@ -1,4 +1,4 @@
-import { TaskWithPopulate, UserStripped } from '../../../types'
+import { TaskWithPopulate, UserStripped } from '@/types'
 
 export interface TaskLineProps {
   title: string;

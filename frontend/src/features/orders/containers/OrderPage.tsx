@@ -1,11 +1,11 @@
 import { Box, CircularProgress } from '@mui/material'
 import OrdersList from '../components/OrdersList.tsx'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import Grid from '@mui/material/Grid2'
 import useOrderPage from '../hooks/useOrderPage.ts'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/ui/CustomTitle/CustomTitle.tsx'
 
 const OrderPage = () => {
   const { orders, open, handleOpen, handleClose, handleDelete, loading, handleOpenEdit } = useOrderPage()
