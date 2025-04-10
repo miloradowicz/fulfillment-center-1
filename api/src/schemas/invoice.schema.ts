@@ -35,10 +35,10 @@ export class Invoice {
 
   @Prop({
     type: String,
-    enum: ['pending', 'paid', 'partially_paid'],
-    default: 'pending',
+    enum: ['в ожидании', 'оплачено', 'частично оплачено'],
+    default: 'в ожидании',
   })
-  status: 'pending' | 'paid' | 'partially_paid'
+  status: 'в ожидании' | 'оплачено' | 'частично оплачено'
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Arrival', required: false })
   associatedArrival?: mongoose.Types.ObjectId
