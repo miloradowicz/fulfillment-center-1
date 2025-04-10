@@ -8,7 +8,9 @@
 
 // Импортируем только типы из хука, а не сам хук
 import { ClientMutation } from '@/types'
-import { emailRegex, phoneNumberRegex } from '@/constants'
+
+export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/
+export const phoneNumberRegex = /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/
 
 // Создаем упрощенную версию валидации
 const validateField = (name: keyof ClientMutation, value: string): string => {

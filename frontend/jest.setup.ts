@@ -1,4 +1,3 @@
-console.log('✅ Jest setup file loaded')
 import '@testing-library/jest-dom'
 Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
   value: function () {

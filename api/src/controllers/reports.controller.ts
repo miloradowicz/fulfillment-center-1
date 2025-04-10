@@ -16,7 +16,13 @@ export class ReportsController {
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       throw new Error('Invalid date format')
     }
-
-    return this.reportService.getReportForPeriod(tab, start, end)
+    switch (tab) {
+    case 'tasks':
+      return this.reportService.getReportTaskForPeriod( start, end)
+    case 'clients':
+      return this.reportService.getReportClientForPeriod( start, end)
+    default:
+      throw new Error('Invalid tab value')
+    }
   }
 }
