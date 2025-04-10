@@ -20,14 +20,14 @@ interface Props {
 
 const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
   return (
-    <nav className="flex flex-col gap-1 p-4">
+    <nav className="flex flex-col gap-1 mt-4 px-2">
       {links.map(({ to, label, icon }) => (
         <NavLink
           key={to}
           to={to}
           onClick={onLinkClick}
           className={({ isActive }) =>
-            `w-full flex items-center gap-2 px-4 py-2 rounded-md transition-colors
+            `w-full flex items-center gap-2 p-2 rounded-md transition-colors
              ${ isActive ? 'bg-slate-200 text-slate-900' : 'text-slate-800 hover:bg-slate-800 hover:text-white' }`
           }
         >
