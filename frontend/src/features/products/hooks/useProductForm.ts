@@ -1,16 +1,16 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { addProduct, updateProduct } from '../../../store/thunks/productThunk.ts'
+import { DynamicField, ProductMutation, ProductWithPopulate } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectAllClients } from '@/store/slices/clientSlice.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { addProduct, updateProduct } from '@/store/thunks/productThunk.ts'
 import {
   selectCreateProductError,
   selectLoadingAddProduct,
   selectLoadingUpdateProduct,
-} from '../../../store/slices/productSlice.ts'
-import { ErrorMessagesList } from '../../../messages.ts'
+} from '@/store/slices/productSlice.ts'
+import { ErrorMessagesList } from '@/messages.ts'
 
 const initialState: ProductMutation = {
   client: '',

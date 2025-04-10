@@ -1,6 +1,6 @@
-import { Task, TaskWithPopulate, ValidationError } from '../../types'
+import { Task, TaskWithPopulate, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addTask, archiveTask,
   deleteTask,

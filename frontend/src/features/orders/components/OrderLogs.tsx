@@ -1,5 +1,5 @@
 import React from 'react'
-import { Log } from '../../../types'
+import { Log } from '@/types'
 import { List, ListItem, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 

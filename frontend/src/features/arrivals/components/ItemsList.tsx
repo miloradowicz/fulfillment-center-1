@@ -1,4 +1,4 @@
-import { Defect, ProductArrival, ServiceArrival } from '../../../types'
+import { Defect, ProductArrival, ServiceArrival } from '@/types'
 import Grid from '@mui/material/Grid2'
 import { Button, Divider, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'

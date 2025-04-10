@@ -10,14 +10,14 @@ import {
   Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
-import { ErrorMessagesList } from '../../../messages.ts'
-import { OrderStatus } from '../../../constants.ts'
+import { ErrorMessagesList } from '@/messages.ts'
+import { OrderStatus } from '@/constants.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
+import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -189,7 +189,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       setNewField(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
+                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField
@@ -390,7 +390,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       setNewFieldDefects(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
+                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField

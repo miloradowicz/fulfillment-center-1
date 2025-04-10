@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { isAxiosError } from 'axios'
-import { GlobalError, PopulatedService, ServiceMutation, ValidationError } from '../../types'
-import axiosAPI from '../../utils/axiosAPI.ts'
-import { isGlobalError } from '../../utils/helpers.ts'
+import { GlobalError, PopulatedService, ServiceMutation, ValidationError } from '@/types'
+import axiosAPI from '@/utils/axiosAPI.ts'
+import { isGlobalError } from '@/utils/helpers.ts'
 
 export const fetchServices = createAsyncThunk<PopulatedService[], void, { rejectValue: GlobalError }>(
   'services/fetchAll',

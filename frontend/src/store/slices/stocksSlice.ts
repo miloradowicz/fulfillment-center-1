@@ -1,7 +1,7 @@
-import { Stock, ValidationError } from '../../types'
+import { Stock, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import { addStock, archiveStock, deleteStock, fetchStockById, fetchStocks, updateStock } from '../thunks/stocksThunk.ts'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 
 interface StockState {
   stocks: Stock[] | null

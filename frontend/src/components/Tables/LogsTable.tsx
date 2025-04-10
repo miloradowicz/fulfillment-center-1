@@ -1,5 +1,5 @@
 import React from 'react'
-import { Log, LogWithPopulate } from '../../types'
+import { Log, LogWithPopulate } from '@/types'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 

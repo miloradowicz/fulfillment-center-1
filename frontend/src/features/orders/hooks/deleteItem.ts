@@ -1,5 +1,5 @@
 import React from 'react'
-import { OrderMutation } from '../../../types'
+import { OrderMutation } from '@/types'
 
 export const deleteItem = <T,>(
   index: number,

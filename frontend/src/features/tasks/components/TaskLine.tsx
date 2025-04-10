@@ -5,8 +5,8 @@ import { TaskLineProps } from '../hooks/TypesProps'
 import TaskCard from './TaskCard.tsx'
 import { getStatusStyles } from '../utils/statusStyle.ts'
 import TaskCardSceleton from './TaskCardSceleton.tsx'
-import { useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchTask } from '../../../store/slices/taskSlice.ts'
+import { useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchTask } from '@/store/slices/taskSlice.ts'
 
 
 const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {

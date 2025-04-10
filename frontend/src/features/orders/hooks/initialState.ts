@@ -1,4 +1,4 @@
-import { OrderMutation } from '../../../types'
+import { OrderMutation } from '@/types'
 
 export const initialStateOrder: OrderMutation = {
   client: '',

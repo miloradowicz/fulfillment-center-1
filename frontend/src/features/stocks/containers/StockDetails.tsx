@@ -1,13 +1,13 @@
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
 import Grid from '@mui/material/Grid2'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
-import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
-import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
-import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
+import EditButton from '@/components/ui/Buttons/EditButton.tsx'
+import DeleteButton from '@/components/ui/Buttons/DeleteButton.tsx'
+import BackButton from '@/components/ui/Buttons/BackButton.tsx'
 
 const StockDetails = () => {
   const {

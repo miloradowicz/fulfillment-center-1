@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Product, ProductMutation, ProductWithPopulate, ValidationError } from '../../types'
+import axiosAPI from '@/utils/axiosAPI.ts'
+import { GlobalError, Product, ProductMutation, ProductWithPopulate, ValidationError } from '@/types'
 import { isAxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk<Product[]>(

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
-import { Counterparty, CounterpartyMutation, GlobalError, ValidationError } from '../../types'
+import { Counterparty, CounterpartyMutation, GlobalError, ValidationError } from '@/types'
 
 export const fetchCounterparties = createAsyncThunk<Counterparty[]>(
   'counterparties/fetchAll',

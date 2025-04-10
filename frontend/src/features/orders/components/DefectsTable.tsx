@@ -1,5 +1,5 @@
 import React from 'react'
-import { DefectMutation } from '../../../types'
+import { DefectMutation } from '@/types'
 import { Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 

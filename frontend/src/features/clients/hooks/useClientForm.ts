@@ -1,11 +1,11 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError, clearCreationAndModificationError } from '../../../store/slices/clientSlice.ts'
-import { addClient, fetchClientById, fetchClients, updateClient } from '../../../store/thunks/clientThunk.ts'
-import { emailRegex, initialClientState, phoneNumberRegex } from '../../../constants.ts'
-import { ClientMutation } from '../../../types'
-import { isValidationError } from '../../../utils/helpers.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError, clearCreationAndModificationError } from '@/store/slices/clientSlice.ts'
+import { addClient, fetchClientById, fetchClients, updateClient } from '@/store/thunks/clientThunk.ts'
+import { emailRegex, initialClientState, phoneNumberRegex } from '@/constants.ts'
+import { ClientMutation } from '@/types'
+import { isValidationError } from '@/utils/helpers.ts'
 
 const requiredFields: (keyof ClientMutation)[] = ['name', 'email', 'phone_number', 'inn']
 

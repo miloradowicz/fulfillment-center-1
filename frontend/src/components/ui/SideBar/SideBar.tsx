@@ -20,7 +20,6 @@ import {
 import { NavLink } from 'react-router-dom'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
-import { featureProtection } from '../../../constants'
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false)

@@ -1,6 +1,6 @@
-import { ReportClientResponse, ReportTaskResponse } from '../../types'
+import { ReportClientResponse, ReportTaskResponse } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import { fetchClientReport, fetchTaskReport } from '../thunks/reportThunk.ts'
 
 interface ReportState {

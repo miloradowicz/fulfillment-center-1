@@ -1,6 +1,5 @@
-
 import React from 'react'
-import { DefectForOrderForm } from '../../types'
+import { DefectForOrderForm } from '@/types'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 
 
