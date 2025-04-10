@@ -23,7 +23,7 @@ export class ReportService {
     return this.getTaskReport(normalizedStart, normalizedEnd)
   }
 
-  private async getTaskReport(
+  async getTaskReport(
     startDate: Date,
     endDate: Date
   ): Promise<{ userTaskReports: UserTaskReport[]; dailyTaskCounts: DailyTaskCount[] }> {
@@ -76,7 +76,7 @@ export class ReportService {
     return this.getClientReport(normalizedStart, normalizedEnd)
   }
 
-  private async getClientReport(
+  async getClientReport(
     startDate: Date,
     endDate: Date
   ): Promise<{ clientOrderReport: clientOrderReport[] }> {
@@ -89,7 +89,6 @@ export class ReportService {
       })
       .populate('client', 'name') as unknown as OrderWithClient[]
 
-    // Группируем заказы по клиентам
     const clientOrderCount = orders.reduce((acc, order): Record<string, clientOrderReport> => {
       const clientId = String(order.client._id)
 
