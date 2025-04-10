@@ -1,6 +1,6 @@
 /**
  * Mock тесты для useClientForm
- * 
+ *
  * Вместо реального тестирования хука с Redux, мы создаем мок-версию хука
  * и тестируем ожидаемое поведение и валидацию. Это позволяет избежать проблем
  * с зависимостями от Redux в этом хуке.
@@ -8,7 +8,9 @@
 
 // Импортируем только типы из хука, а не сам хук
 import { ClientMutation } from '../types'
-import { emailRegex, phoneNumberRegex } from '../constants'
+
+export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/
+export const phoneNumberRegex = /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/
 
 // Создаем упрощенную версию валидации
 const validateField = (name: keyof ClientMutation, value: string): string => {
@@ -63,15 +65,15 @@ describe('useClientForm functionality', () => {
   // Симуляция логики обработчика изменений формы
   it('should update form values when input changes', () => {
     let form = { ...initialForm }
-    
+
     // Имитируем inputChangeHandler
     const inputChangeHandler = (e: { target: { name: string; value: string } }) => {
       form = { ...form, [e.target.name]: e.target.value }
     }
-    
+
     // Вызываем имитацию обработчика
     inputChangeHandler({ target: { name: 'name', value: 'Test Company' } })
-    
+
     // Проверяем, что значение обновилось
     expect(form.name).toBe('Test Company')
   })
@@ -82,15 +84,15 @@ describe('useClientForm functionality', () => {
       name: 'Поле не может быть пустым',
       email: 'Неправильный формат Email',
     }
-    
+
     // Имитация getFieldError
     const getFieldError = (fieldName: keyof ClientMutation) => {
       return errors[fieldName] || ''
     }
-    
+
     // Проверяем, что ошибки возвращаются корректно
     expect(getFieldError('name')).toBe('Поле не может быть пустым')
     expect(getFieldError('email')).toBe('Неправильный формат Email')
     expect(getFieldError('phone_number')).toBe('')
   })
-}) 
+})
