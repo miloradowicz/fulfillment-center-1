@@ -1,7 +1,10 @@
 import { Options } from 'check-password-strength'
 
+export const featureProtection = import.meta.env.VITE_FEATURE_PROTECTION_DISABLED !== '1'
+
 export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/
 export const phoneNumberRegex = /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/
+export const positiveDecimalNumber = /^(0|[1-9]\d*)(\.\d+)?$/
 
 export const roles = [
   { name: 'super-admin', title: 'Супер-пользователь' },
@@ -34,3 +37,15 @@ export const passwordStrengthOptions: Options<string> = [
     minLength: 8,
   },
 ]
+
+export const OrderStatus = ['в сборке', 'в пути', 'доставлен']
+
+export const ArrivalStatus = ['ожидается доставка', 'получена', 'отсортирована']
+
+export enum ItemType {
+  PRODUCTS = 'products',
+  RECEIVED_AMOUNT = 'received_amount',
+  DEFECTS = 'defects',
+  SERVICES = 'services',
+}
+

@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Card, CardContent, IconButton, Menu, MenuItem, Typography } from '@mui/material'
+import { Card, CardContent, IconButton, Menu, MenuItem, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { CSS } from '@dnd-kit/utilities'
 import React, { useState } from 'react'
 import { TaskCardProps } from '../hooks/TypesProps'
@@ -7,10 +7,26 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { useAppDispatch } from '../../../app/hooks.ts'
-import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
+import {
+  archiveTask,
+  fetchTasksByUserIdWithPopulate,
+  fetchTasksWithPopulate,
+} from '../../../store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
+import dayjs from 'dayjs'
+import StatusCell from './StatusCell.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import { NavLink } from 'react-router-dom'
+import Modal from '../../../components/UI/Modal/Modal.tsx'
+import TaskForm from './TaskForm.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openEditModal, setOpenEditModal] = useState(false)
+  const open = Boolean(anchorEl)
+  const dispatch = useAppDispatch()
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
     data: {
@@ -20,11 +36,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     },
   })
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const dispatch = useAppDispatch()
-
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
 
@@ -32,38 +45,43 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     setAnchorEl(null)
   }
 
-  const handleEdit = () => {
-    console.log('Редактирование')
+  const handleEdit = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    setOpenEditModal(true)
     handleMenuClose()
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
-      if (confirm('Вы уверены, что хотите переместить в архив эту задачу?')) {
-        await dispatch(archiveTask(id))
-        if(!selectedUser){
-          await dispatch(fetchTasksWithPopulate())
-        }
-        else {
-          await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
-        }
-        toast.success('Задача перемещена в архив.')
+      await dispatch(archiveTask(task._id))
+      if (!selectedUser) {
+        await dispatch(fetchTasksWithPopulate())
       } else {
-        toast.info('Вы отменили перемещение задачи в архив.')
+        await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
       }
+      toast.success('Задача перемещена в архив.')
     } catch (e) {
       console.error(e)
     }
-    handleMenuClose()
+    setOpenDeleteModal(false)
+  }
+
+  const handleCancelDelete = () => {
+    setOpenDeleteModal(false)
   }
 
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
-    zIndex: isDragging ? 1000 : 'auto',
+    zIndex: isDragging ? 9999 : 'auto',
+    opacity: isDragging ? 0.9 : 1,
   }
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   return (
     <Card
+      id={task._id}
       ref={setNodeRef}
       sx={{
         borderRadius: '12px',
@@ -72,25 +90,75 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         marginBottom: 2,
         transform: style.transform,
         position: 'relative',
+        cursor:  'grab',
         willChange: 'transform',
         zIndex: style.zIndex,
+        opacity: style.opacity,
+        touchAction: 'none',
+        userSelect: 'none',
       }}
       {...attributes}
+      onClick={e => {
+        e.stopPropagation()
+      }}
     >
-      <CardContent {...listeners}>
-        <Typography marginTop={'10px'} variant="body1">
-          Исполнитель: <strong>{task.user.displayName}</strong>
-        </Typography>
-        <Typography variant="body1">{task.title}</Typography>
-        {task.description ? (
-          <Typography variant="body2" color="textSecondary">
-            {task.description}
+      <div
+        {...listeners}
+        style={{ padding: 16 }}
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <CardContent>
+          <Typography variant="body1">
+            #<strong>{task.taskNumber}</strong>
           </Typography>
-        ) : null}
-      </CardContent>
+          <Typography variant="body1" marginTop={1}>
+            Исполнитель: <strong>{task.user.displayName}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Тип: {task.type}
+          </Typography>
+          <Typography variant="body1">{task.title} </Typography>
+          {task.associated_arrival && (
+            <NavLink to={`/arrivals/${ task.associated_arrival._id }`}  style={{
+              textDecoration: 'underline',
+              color: '#1A73E8',
+            }}>
+              {`Поставка ${ task.associated_arrival.arrivalNumber }`}
+            </NavLink>
+          )}
+          {task.associated_order && (
+            <NavLink to={`/orders/${ task.associated_order._id }`} style={{
+              textDecoration: 'underline',
+              color: '#1A73E8',
+            }}>
+              {`Заказ ${ task.associated_order.orderNumber }`}
+            </NavLink>
+          )}
+          {task.description && (
+            <Typography variant="body2" color="textSecondary">
+              {task.description}
+            </Typography>
+          )}
+
+          {task.createdAt && (
+            <Typography variant="body2" color="textSecondary" marginTop={'5px'}>
+              Создано: {dayjs(task.createdAt).format('DD.MM.YYYY HH:mm')}
+            </Typography>
+          )}
+          {task.updatedAt && (
+            <Typography variant="body2" color="textSecondary">
+              Обновлено: {dayjs(task.updatedAt).format('DD.MM.YYYY HH:mm')}
+            </Typography>
+          )}
+        </CardContent>
+        {isMobile && <StatusCell task={task} selectedUser={selectedUser} />}
+      </div>
+
       <IconButton
-        type={'button'}
-        style={{ position: 'absolute', top: '0', right: '0', zIndex: 1000 }}
+        style={{ position: 'absolute', top: 0, right: 0, zIndex: 1000 }}
         onClick={handleMenuOpen}
       >
         <MoreHorizIcon />
@@ -99,10 +167,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         <MenuItem onClick={handleEdit}>
           <EditIcon style={{ marginRight: 8 }} /> Редактировать
         </MenuItem>
-        <MenuItem onClick={() => handleDelete(task._id)}>
-          <DeleteIcon style={{ marginRight: 8 }} /> Удалить
+        <MenuItem
+          onClick={e => {
+            e.stopPropagation()
+            setOpenDeleteModal(true)
+            handleMenuClose()
+          }}
+        >
+          <DeleteIcon style={{ marginRight: 8 }} /> Переместить в архив
         </MenuItem>
       </Menu>
+      <ConfirmationModal
+        open={openDeleteModal}
+        entityName="эту задачу"
+        actionType="archive"
+        onConfirm={handleDelete}
+        onCancel={handleCancelDelete}
+      />
+      <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
+        <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
+      </Modal>
     </Card>
   )
 }

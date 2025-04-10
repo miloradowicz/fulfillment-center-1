@@ -11,11 +11,21 @@ import { Service, ServiceSchema } from '../schemas/service.schema'
 import { Stock, StockSchema } from '../schemas/stock.schema'
 import { Counter, CounterSchema } from '../schemas/counter.schema'
 import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema'
-import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-category.schema'
+import { ServiceCategory, ServiceCategorySchemaFactory } from '../schemas/service-category.schema'
 
 @Module({
   imports: [
     MongooseModule.forRoot(new URL(config.mongo.db, config.mongo.host).href),
+    MongooseModule.forFeature([
+      { name: Arrival.name, schema: ArrivalSchema },
+      { name: Product.name, schema: ProductSchema },
+      { name: Order.name, schema: OrderSchema },
+      { name: Task.name, schema: TaskSchema },
+      { name: Service.name, schema: ServiceSchema },
+      { name: Stock.name, schema: StockSchema },
+      { name: Counter.name, schema: CounterSchema },
+      { name: Counterparty.name, schema: CounterpartySchema },
+    ]),
     MongooseModule.forFeatureAsync([
       {
         name: Client.name,
@@ -23,11 +33,6 @@ import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-categ
         imports: [DbModule],
         inject: [getModelToken(Arrival.name), getModelToken(Order.name), getModelToken(Product.name)],
       },
-    ]),
-    MongooseModule.forFeature([{ name: Arrival.name, schema: ArrivalSchema }]),
-    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
-    MongooseModule.forFeatureAsync([
       {
         name: User.name,
         useFactory: UserSchemaFactory,
@@ -43,13 +48,13 @@ import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-categ
           getModelToken(Task.name),
         ],
       },
+      {
+        name: ServiceCategory.name,
+        useFactory: ServiceCategorySchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Service.name)],
+      },
     ]),
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
-    MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
-    MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
-    MongooseModule.forFeature([{ name: Counter.name, schema: CounterSchema }]),
-    MongooseModule.forFeature([{ name: Counterparty.name, schema: CounterpartySchema }]),
-    MongooseModule.forFeature([{ name: ServiceCategory.name, schema: ServiceCategorySchema }]),
   ],
   exports: [MongooseModule],
 })

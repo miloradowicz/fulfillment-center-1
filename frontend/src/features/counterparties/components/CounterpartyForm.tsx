@@ -16,8 +16,8 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
   } = useCounterpartyForm(counterparty?._id, onClose)
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
+    <form onSubmit={onSubmit}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         {counterparty ? 'Редактировать контрагента' : 'Добавить нового контрагента'}
       </Typography>
       <Grid container direction="column" spacing={2}>
@@ -70,7 +70,7 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
         </Grid>
 
         <Grid>
-          <Button type="submit" disabled={loading} variant="contained" sx={{ mt: 2 }}>
+          <Button type="submit" disabled={loading} variant="contained" sx={{ mt: 2, mb: 2 }}>
             {loading ? <CircularProgress size={24} /> : counterparty ? 'Сохранить' : 'Создать'}
           </Button>
         </Grid>

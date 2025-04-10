@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Model } from 'mongoose'
-import { InjectModel } from '@nestjs/mongoose'
+import { Connection, Model } from 'mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { Client, ClientDocument } from '../schemas/client.schema'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { User, UserDocument } from 'src/schemas/user.schema'
@@ -17,6 +17,8 @@ import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-cat
 @Injectable()
 export class SeederService {
   constructor(
+    @InjectConnection()
+    private readonly connection: Connection,
     @InjectModel(Client.name)
     private readonly clientModel: Model<ClientDocument>,
     @InjectModel(Product.name)
@@ -42,17 +44,7 @@ export class SeederService {
   ) {}
 
   async seed() {
-    await this.userModel.deleteMany()
-    await this.clientModel.deleteMany({})
-    await this.productModel.deleteMany({})
-    await this.taskModel.deleteMany({})
-    await this.orderModel.deleteMany({})
-    await this.arrivalModel.deleteMany({})
-    await this.serviceModel.deleteMany({})
-    await this.stockModel.deleteMany({})
-    await this.counterModel.deleteMany({})
-    await this.counterpartyModel.deleteMany({})
-    await this.serviceCategoryModel.deleteMany({})
+    await this.connection.dropDatabase()
 
     const [_User1, _User2, _admin, _User3, _User4, _User5, _User6, _User7] = await this.userModel.create([
       {
@@ -84,7 +76,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Артем Иванов',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -92,7 +84,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Игорь',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -100,7 +92,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Кристина',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
       {
@@ -108,7 +100,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Саша',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
     ])
@@ -123,11 +115,44 @@ export class SeederService {
       ogrn: '123123',
     })
 
+    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
+      {
+        name: 'Работа с товаром',
+        isArchived: false,
+      },
+      {
+        name: 'Дополнительные услуги',
+        isArchived: false,
+      },
+    ])
+
+    const [_service1, _service2, _service3, _service4] = await this.serviceModel.create([
+      {
+        name: 'Приемка, пересчет товара',
+        price: 50000,
+        serviceCategory: _serviceCat1._id,
+      },
+      {
+        name: 'Маркировка двойная',
+        price: 30000,
+        serviceCategory: _serviceCat1._id,
+      },
+      {
+        name: 'Погрузка-Разгрузка на складе фулфилмента',
+        price: 70000,
+        serviceCategory: _serviceCat2._id,
+      },
+      {
+        name: 'Забор с другого адреса',
+        serviceCategory: _serviceCat2._id,
+        price: 100000,
+      },
+    ])
+
     const [_product1, _product2, _product3] = await this.productModel.create([
       {
         client: _clients._id,
         title: 'Сарафан',
-        amount: 7,
         barcode: '012345678901',
         article: '01234567',
         dynamic_fields: [
@@ -138,7 +163,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Джинсы',
-        amount: 10,
         barcode: '987654321012',
         article: '987654',
         dynamic_fields: [
@@ -149,7 +173,6 @@ export class SeederService {
       {
         client: _clients._id,
         title: 'Футболка',
-        amount: 15,
         barcode: '567890123456',
         article: '567890',
         dynamic_fields: [
@@ -165,10 +188,24 @@ export class SeederService {
       },
     ])
 
+    const [_stock1, _stock2] = await this.stockModel.create([
+      {
+        name: 'Склад Бишкек',
+        address: 'Ул. Малдыбаева 7/1',
+        products: [{ product: _product1._id, amount: 20 }],
+      },
+      {
+        name: 'Склад Москва',
+        address: 'Ул. Гагарина 102',
+        products: [{ product: _product2._id, amount: 20 }],
+      },
+    ])
+
     const [_order1, _order2, _order3] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
         client: _clients._id,
+        stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
           { product: _product2._id, description: 'Заказ 1 - Джинсы', amount: 1 },
@@ -181,6 +218,7 @@ export class SeederService {
       {
         orderNumber: 'ORD-2',
         client: _clients._id,
+        stock: _stock2._id,
         products: [
           { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
           { product: _product3._id, description: 'Заказ 2 - Футболка', amount: 3 },
@@ -193,6 +231,7 @@ export class SeederService {
       {
         orderNumber: 'ORD-3',
         client: _clients._id,
+        stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
           { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
@@ -204,24 +243,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'order' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
-
-    const [_stock1, _stock2] = await this.stockModel.create([
-      {
-        name: 'Склад Бишкек',
-        address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, description: '', amount: 20 }],
-      },
-      {
-        name: 'Склад Москва',
-        address: 'Ул. Гагарина 102',
-        products: [{ product: _product2._id, description: '', amount: 20 }],
-      },
-    ])
+    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 3 } }, { upsert: true })
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
@@ -252,6 +274,18 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty2._id,
         pickup_location: 'Ул. Пушкина, д. 67',
+        services: [
+          {
+            service: _service1._id,
+            service_price: _service1.price,
+            service_amount: 2,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 4,
+          },
+        ],
       },
       {
         arrivalNumber: 'ARL-2',
@@ -262,6 +296,17 @@ export class SeederService {
         arrival_date: new Date().toISOString(),
         sent_amount: '2 мешка',
         stock: _stock2._id,
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         logs: [
           { user: _User2, change: 'record #1', date: new Date().toISOString() },
           { user: _User1, change: 'record #2', date: new Date().toISOString() },
@@ -283,94 +328,105 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'arrival' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
+    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 3 } }, { upsert: true })
 
     await this.taskModel.create([
       {
+        taskNumber: 'TSK-1',
         user: _User1._id,
-        title: 'Принять товар из поставки №2248239487',
+        title: 'Принять товар из поставки',
         description: 'Проверить товар на дефекты и внести информацию в базу',
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival1._id,
       },
       {
+        taskNumber: 'TSK-2',
         user: _User2._id,
-        title: 'Собрать заказ №12423424',
+        title: 'Собрать заказ',
         status: 'в работе',
         type: 'заказ',
         associated_order: _order2._id,
       },
       {
+        taskNumber: 'TSK-3',
         user: _User1._id,
-        title: 'Упаковка товара для заказа №12423424',
+        title: 'Упаковка товара для заказа',
         status: 'готово',
         type: 'другое',
+        date_Done: '2025-03-29T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-4',
         user: _User2._id,
         title: 'Проверить складские остатки',
         status: 'в работе',
         type: 'другое',
       },
       {
+        taskNumber: 'TSK-5',
         user: _User1._id,
-        title: 'Связаться с клиентом по заказу №556677',
+        title: 'Связаться с клиентом по заказу',
         status: 'готово',
-        type: 'другое',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-6',
+        user: _User4._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-20T08:27:17.078Z',
+      },
+      {
+        taskNumber: 'TSK-7',
+        user: _User3._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-21T08:27:17.078Z',
+      },
+      {
+        taskNumber: 'TSK-8',
+        user: _User3._id,
+        title: 'Связаться с клиентом по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-22T08:27:17.078Z',
+      },
+      {
+        taskNumber: 'TSK-9',
+        user: _User1._id,
+        title: 'Решить вопрос по начислению оплаты по заказу',
+        status: 'готово',
+        type: 'заказ',
+        associated_order: _order2._id,
+        date_Done: '2025-03-23T08:27:17.078Z',
+      },
+      {
+        taskNumber: 'TSK-10',
         user: _User5._id,
         title: 'Связаться с клиентом ',
         status: 'готово',
+        type: 'другое',
+        date_Done: '2025-03-26T08:27:17.078Z',
       },
       {
+        taskNumber: 'TSK-11',
         user: _User6._id,
-        title: 'Связаться с клиентом ',
+        title: 'Узнать информацию у клиента по прибытию поставки ',
         status: 'к выполнению',
+        type: 'поставка',
+        associated_arrival: _arrival2._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
       },
     ])
 
-    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
-      {
-        name: 'Работа с товаром',
-        isArchived: false,
-      },
-      {
-        name: 'Дополнительные услуги',
-        isArchived: false,
-      }]
-    )
-
-    await this.serviceModel.create([
-      {
-        name: 'Работа с товаром по прибытию на склад',
-        serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '5', label: 'Приемка, пересчёт товара', value: '500 сом' },
-          { key: '6', label: 'Маркировка двойная', value: '300 сом' },
-        ],
-      },
-      {
-        name: 'Замена/установка бирки',
-        serviceCategory: _serviceCat1._id,
-        dynamic_fields: [
-          { key: '7', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '8', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
-      },
-      {
-        name: 'Создание поставки в ЛК селлера (до 10 артикулов)',
-        serviceCategory: _serviceCat2._id,
-        dynamic_fields: [
-          { key: '9', label: 'Погрузка-Разгрузка на складе фулфилмента', value: '700 сом' },
-          { key: '10', label: 'Забор с другого адреса', value: '1000 сом' },
-        ],
-      },
-    ])
+    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 11 } }, { upsert: true })
   }
 }

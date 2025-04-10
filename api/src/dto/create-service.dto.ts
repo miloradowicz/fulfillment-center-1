@@ -1,6 +1,8 @@
 import {
   IsNotEmpty,
   IsOptional,
+  IsPositive,
+  IsString,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -17,17 +19,6 @@ class LogDto {
   date: Date
 }
 
-class DynamicFieldDto {
-  @IsNotEmpty({ message: 'Поле ключ обязательно для заполнения' })
-  key: string
-
-  @IsNotEmpty({ message: 'Поле лейбл обязательно для заполнения' })
-  label: string
-
-  @IsNotEmpty({ message: 'Поле значение обязательно для заполнения' })
-  value: string
-}
-
 export class CreateServiceDto {
   @IsNotEmpty({ message: 'Поле наименование обязательно для заполнения.' })
   name: string
@@ -35,9 +26,13 @@ export class CreateServiceDto {
   @IsNotEmpty({ message: 'Поле категория услуги обязательно для заполнения.' })
   serviceCategory: mongoose.Schema.Types.ObjectId
 
-  @ValidateNested({ each: true })
-  @Type(() => DynamicFieldDto)
-  dynamic_fields: DynamicFieldDto[]
+  @IsNotEmpty({ message: 'Поле цена обязательно для заполнения.' })
+  @IsPositive({ message: 'Поле цена должно быть положительным числом.' })
+  price: number
+
+  @IsOptional()
+  @IsString({ message: 'Поле описание должно быть текстом.' })
+  description: string
 
   @IsOptional()
   @ValidateNested({ each: true })

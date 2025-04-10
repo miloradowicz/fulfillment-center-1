@@ -1,39 +1,65 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
-  Button,
   Card,
+  Chip,
+  CircularProgress,
   Container,
   Divider,
-  Grid2 as Grid,
-  IconButton,
-  Stack,
+  Step,
+  StepLabel,
+  Stepper,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material'
-import { ArrowBack, DeleteOutline, EditOutlined, ExpandMore } from '@mui/icons-material'
-import ClientInfoItem from '../../clients/components/ClientInfoItem'
-import ArrivalProductItem from '../components/ArrivalProductItem'
-import ArrivalDetailsTextItem from '../components/ArrivalDetailsTextItem'
 import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
 import Modal from '../../../components/UI/Modal/Modal'
 import ArrivalForm from '../components/ArrivalForm.tsx'
+import { Link } from 'react-router-dom'
+import { ArrivalStatus } from '../../../constants.ts'
+import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
+import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import LogsTable from '../../../components/Tables/LogsTable.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import { basename } from 'path-browserify'
+import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
+import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
+import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
+import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
+
 
 const ArrivalDetails = () => {
   const {
     arrival,
     loading,
+    infoTab,
+    productsTab,
     confirmDeleteModalOpen,
-    isDeleted,
-    navigateBack,
-    showConfirmDeleteModal,
-    hideConfirmDeleteModal,
     handleDelete,
     editModalOpen,
     setEditModalOpen,
+    setConfirmDeleteModalOpen,
+    setInfoTab,
+    setProductsTabs,
+    getStepDescription,
   } = useArrivalDetails()
+
+  const statuses = Object.values(ArrivalStatus)
+  const activeStep = arrival ? statuses.indexOf(arrival.arrival_status as string) : 0
+
+  if (loading) {
+    return (
+      <Box className="flex justify-center mt-4">
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (!arrival) {
+    return <Typography className="text-center mt-4">Поставка не найдена</Typography>
+  }
 
   return (
     <>
@@ -46,183 +72,121 @@ const ArrivalDetails = () => {
         />
       </Modal>
 
-      <Modal open={confirmDeleteModalOpen} handleClose={hideConfirmDeleteModal}>
-        <Grid container direction="column">
-          <Grid mb={4}>
-            <Typography variant="h6" gutterBottom>
-              Вы действительно хотите удалить поставку?
-            </Typography>
-          </Grid>
-          <Grid>
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Удалить
-              </Button>
-              <Button variant="outlined" onClick={hideConfirmDeleteModal}>
-                Отмена
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Modal>
-      <Container maxWidth="lg">
-        <Box sx={{ mx: 'auto', p: { xs: 1, md: 3 } }}>
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton onClick={() => navigateBack()}>
-              <ArrowBack />
-            </IconButton>
-            <Typography variant="h5" fontWeight={700}>
-              Назад
-            </Typography>
+      <ConfirmationModal
+        open={confirmDeleteModalOpen}
+        entityName="эту поставку"
+        actionType="delete"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDeleteModalOpen(false)}
+      />
+
+      <Container maxWidth="md">
+        <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
+          <BackButton/>
+          <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
+            <Box>
+              <Chip label={arrival.arrival_status}
+                color={getArrivalStatusColor(arrival.arrival_status)}
+                className="mb-5"
+                sx={{
+                  borderRadius: '4px',
+                  height: '28px',
+                }}
+                variant="outlined" />
+              <Typography variant="h5" className="!font-bold">Детали поставки #{arrival.arrivalNumber}</Typography>
+              <Typography variant="h6" >{arrival.stock.name}</Typography>
+              <Typography variant="caption" className="text-gray-600 text-sm">Создана: {dayjs(arrival.arrival_date).format('D MMMM YYYY')}
+              </Typography>
+            </Box>
+
+            <Box className="ml-auto flex flex-col gap-2 items-center !self-end !me-10">
+              <Typography className="!text-xs">Заказчик</Typography>
+              <Typography component={Link} to={`/clients/${ arrival.client._id }`} target="_blank" className="!font-bold underline underline-offset-4">{arrival.client.name}</Typography>
+              <Typography className="!font-light !mb-3">{arrival.client.phone_number}</Typography>
+
+              {arrival.shipping_agent && (
+                <>
+                  <Typography className="!text-xs">Контрагент</Typography>
+                  <Typography component={Link} to={'/counterparties'} target="_blank" className="!font-bold underline underline-offset-4">{arrival.shipping_agent.name}</Typography>
+                  <Typography className="!font-light">{arrival.shipping_agent.phone_number}</Typography>
+                </>
+              )}
+            </Box>
           </Box>
 
-          {!loading && !arrival ? (
-            <Typography>Поставка не найдена</Typography>
-          ) : isDeleted ? (
-            <Typography>Поставка удалена</Typography>
-          ) : (
-            <Card
-              sx={{
-                p: { xs: 2, md: 4 },
-                borderRadius: 3,
-                boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.2)',
-              }}
-            >
-              <Box sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  <Grid>
-                    <ClientInfoItem loading={loading} label="Имя клиента" value={arrival?.client?.name || '—'} />
-                  </Grid>
-                </Grid>
+          <Box>
+            <Stepper  activeStep={activeStep} alternativeLabel>
+              {ArrivalStatus.map((label, index) => (
+                <Step key={index}>
+                  <StepLabel
+                    optional={<span style={{ fontSize: '12px', color: '#888' }}>{getStepDescription(index)}</span>}
+                  >
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper >
+          </Box>
+
+          <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Товары</Divider>
+
+          <Tabs value={productsTab} onChange={(_, newValue) => setProductsTabs(newValue)} className="mt-4">
+            <Tab label="Отправленные" />
+            <Tab label="Полученные" />
+          </Tabs>
+
+          <Box className="mt-2 rounded-lg">
+            {productsTab === 0 ? (
+              <ProductsTable products={arrival.products} />
+            ) : (
+              <ProductsTable products={arrival.received_amount} />
+            )}
+          </Box>
+
+          <Divider className="!mt-10 !mb-4 !mx-40 uppercase text-l font-bold text-gray-600">Дополнительно</Divider>
+
+          <Tabs value={infoTab} onChange={(_, newValue) => setInfoTab(newValue)} className="mt-6">
+            <Tab label="Дефекты" />
+            <Tab label="История" />
+            <Tab label="Документы" />
+          </Tabs>
+          <Box className="mt-4">
+            {infoTab === 0 ? (
+              <DefectsTable defects={arrival.defects} />
+            ) : infoTab === 1 ? (
+              <LogsTable logs={arrival.logs || []} />
+            ) : (
+              <Box  className="flex gap-3 items-center">
+                {arrival?.documents?.length ? (
+                  arrival.documents.map((doc, index) => (
+                    <Link
+                      key={index}
+                      to={doc.document}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1 hover:text-blue-500"
+                    >
+                      <InsertDriveFileIcon fontSize="large" color="primary" />
+                      <Typography variant="caption" className="!text-sm !truncate !w-40">{basename(doc.document)}</Typography>
+                    </Link>
+                  ))
+                ) : null}
               </Box>
-
-              <Box sx={{ mb: 3 }}>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  <Grid>
-                    <ClientInfoItem loading={loading} label="Склад" value={arrival?.stock.name || '—'} />
-                  </Grid>
-                </Grid>
-              </Box>
-
-              {arrival?.shipping_agent ?
-                <Box sx={{ mb: 3 }}>
-                  <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid>
-                      <ClientInfoItem loading={loading} label="Компания-перевозчик" value={arrival?.shipping_agent.name} />
-                    </Grid>
-                  </Grid>
-                </Box> : null}
-
-              {arrival?.pickup_location ?
-                <Box sx={{ mb: 3 }}>
-                  <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid>
-                      <ClientInfoItem loading={loading} label="Адрес доставки" value={arrival?.pickup_location} />
-                    </Grid>
-                  </Grid>
-                </Box> : null}
-
-              <Divider sx={{ my: 3 }} />
-
-              <ArrivalDetailsTextItem label="Цена" value={arrival?.arrival_price} loading={loading} />
-              <ArrivalDetailsTextItem label="Статус" value={arrival?.arrival_status} loading={loading} />
-              {arrival?.arrival_date && (
-                <ArrivalDetailsTextItem
-                  label="Дата поставки"
-                  value={dayjs(arrival.arrival_date).format('DD.MM.YYYY')}
-                  loading={loading}
-                />
-              )}
-              <ArrivalDetailsTextItem label="Отправлено" value={arrival?.sent_amount} loading={loading} />
-
-              <Divider sx={{ my: 3 }} />
-
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography>Товары</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    {arrival?.products?.map((x, i) => (
-                      <Grid key={i}>
-                        <ArrivalProductItem product={x} loading={loading} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-
-              {arrival?.defects?.length ? (
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography>Брак</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={2}>
-                      {arrival?.defects?.map((x, i) => (
-                        <Grid key={i}>
-                          <ArrivalProductItem product={x} loading={loading} />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </AccordionDetails>
-                </Accordion>
-              ) : null}
-
-              {arrival?.received_amount?.length ? (
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography>Получено</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={2}>
-                      {arrival?.received_amount?.map((x, i) => (
-                        <Grid key={i}>
-                          <ArrivalProductItem product={x} loading={loading} />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </AccordionDetails>
-                </Accordion>
-              ) : null}
-
-              <Box
-                sx={{
-                  mt: 4,
-                  display: 'flex',
-                  gap: 2,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <Button
-                  variant="contained"
-                  startIcon={<EditOutlined />}
-                  sx={{
-                    px: 3,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                  }}
-                  onClick={() => setEditModalOpen(true)}
-                >
-                  Редактировать
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={<DeleteOutline />}
-                  sx={{
-                    px: 3,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                  }}
-                  onClick={showConfirmDeleteModal}
-                >
-                  Удалить
-                </Button>
-              </Box>
-            </Card>
-          )}
-        </Box>
+            )}
+          </Box>
+          <Box
+            sx={{
+              mt: 4,
+              display: 'flex',
+              gap: 2,
+              justifyContent: 'flex-end',
+            }}
+          >
+            <EditButton onClick={() => setEditModalOpen(true)} />
+            <DeleteButton onClick={() => setConfirmDeleteModalOpen(true)} />
+          </Box>
+        </Card>
       </Container>
     </>
   )

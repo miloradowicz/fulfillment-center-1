@@ -1,7 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import axiosAPI from '../../utils/axiosAPI.ts'
-import { Arrival, ArrivalMutation, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
+import {
+  Arrival,
+  ArrivalMutation,
+  ArrivalWithClient,
+  ArrivalWithPopulate,
+  GlobalError,
+  ValidationError,
+} from '../../types'
 import { isAxiosError } from 'axios'
+import { createArrivalAndOrderFormData } from '../../utils/createArrivalAndOrderFormData.ts'
 
 export const fetchArrivals = createAsyncThunk<Arrival[]>('arrivals/fetchArrivals', async () => {
   const response = await axiosAPI.get('/arrivals')
@@ -40,19 +48,25 @@ export const fetchPopulatedArrivals = createAsyncThunk<ArrivalWithClient[]>(
   },
 )
 
-export const addArrival = createAsyncThunk<void, ArrivalMutation, { rejectValue: ValidationError }>(
-  'arrivals/addArrival',
-  async (data: ArrivalMutation, { rejectWithValue }) => {
-    try {
-      await axiosAPI.post('/arrivals', data)
-    } catch (error) {
-      if (isAxiosError(error) && error.response && error.response.status === 400) {
-        return rejectWithValue(error.response.data as ValidationError)
-      }
-      throw error
+export const addArrival = createAsyncThunk<
+  Arrival,
+  ArrivalMutation & { files?: File[] },
+  { rejectValue: ValidationError }
+>('arrivals/addArrival', async (data, { rejectWithValue }) => {
+  try {
+    const formData = createArrivalAndOrderFormData(data, data.files)
+
+    const response = await axiosAPI.post('/arrivals', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 400) {
+      return rejectWithValue(error.response.data as ValidationError)
     }
-  },
-)
+    throw error
+  }
+})
 
 export const archiveArrival = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'arrivals/archiveArrival',
@@ -84,14 +98,18 @@ export const deleteArrival = createAsyncThunk<void, string, { rejectValue: Globa
 )
 
 export const updateArrival = createAsyncThunk<
-  void,
-  { arrivalId: string; data: ArrivalMutation },
-  {  rejectValue: ValidationError  }
+  Arrival,
+  { arrivalId: string; data: ArrivalMutation & { files?: File[] } },
+  { rejectValue: ValidationError }
 >('arrivals/updateArrival', async ({ arrivalId, data }, { rejectWithValue }) => {
   try {
-    await axiosAPI.put(`/arrivals/${ arrivalId }`, data)
+    const formData = createArrivalAndOrderFormData(data, data.files)
+    const response = await axiosAPI.put(`/arrivals/${ arrivalId }`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
   } catch (e) {
-    if (isAxiosError(e) && e.response) {
+    if (isAxiosError(e) && e.response?.status === 400) {
       return rejectWithValue(e.response.data as ValidationError)
     }
     throw e

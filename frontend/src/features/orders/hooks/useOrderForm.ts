@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import {
-  Defect,
+  Defect, ErrorsFields,
   DefectForOrderForm,
-  ErrorForOrder,
   OrderMutation,
   Product,
   ProductForOrderForm,
@@ -34,9 +33,16 @@ import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
+import { ItemType } from '../../../constants.ts'
+import { selectAllStocks, selectOneStock } from '../../../store/slices/stocksSlice.ts'
+import { fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
+
+type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
 export const useOrderForm = (onSuccess?: () => void) => {
   const initialData = useAppSelector(selectPopulateOrder)
+  const [files, setFiles] = useState<File[]>([])
   const [form, setForm] = useState<OrderMutation>(
     initialData
       ? {
@@ -44,10 +50,12 @@ export const useOrderForm = (onSuccess?: () => void) => {
         sent_at: dayjs(initialData.sent_at).format('YYYY-MM-DD'),
         delivered_at: initialData.delivered_at ? dayjs(initialData.delivered_at).format('YYYY-MM-DD') : '',
         price: initialData.price,
+        stock: initialData.stock._id,
         products: [],
         defects: [],
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
+        documents: initialData.documents ? initialData.documents : [],
       }
       : { ...initialStateOrder },
   )
@@ -57,7 +65,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [newFieldDefects, setNewFieldDefects] = useState<Defect>(initialStateDefectForOrder)
   const [modalOpenDefects, setModalOpenDefects] = useState(false)
   const [isButtonDefectVisible, setButtonDefectVisible] = useState(true)
-  const [currentClient, setCurrentClient] = useState<string>('')
   const [newField, setNewField] = useState<ProductOrder>(initialStateProductForOrder)
   const [modalOpen, setModalOpen] = useState(false)
   const dispatch = useAppDispatch()
@@ -69,15 +76,18 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [isButtonVisible, setButtonVisible] = useState(true)
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
-  const status = ['в сборке', 'в пути', 'доставлен']
+  const stocks = useAppSelector(selectAllStocks)
+  const stock = useAppSelector(selectOneStock)
 
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
   useEffect(() => {
-    if (productsForm.length > 0 && clientProducts) {
-      getAvailableItems(clientProducts, productsForm, availableDefects, setAvailableDefects, '_id')
+    if (availableProducts.length > 0) {
+      const availableDefects = availableProducts.filter(x => productsForm.some(y => x._id === y.product._id))
+      setAvailableDefects(availableDefects)
     }
-  }, [productsForm, clientProducts, availableDefects])
+  }, [availableProducts, productsForm])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -90,8 +100,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpen(true)
       setButtonVisible(false)
@@ -104,8 +116,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonDefectClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpenDefects(true)
       setButtonDefectVisible(false)
@@ -117,20 +131,47 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setButtonVisible(true)
   }
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    const maxFileSize = 10 * 1024 * 1024
+    const selectedFiles = Array.from(e.target.files)
+
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > maxFileSize) {
+        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
+        return false
+      }
+      return true
+    })
+
+    setFiles(prevFiles => [...prevFiles, ...validFiles])
+  }
+
   useEffect(() => {
     dispatch(fetchClients())
+    dispatch(fetchStocks())
   }, [dispatch])
 
   useEffect(() => {
     if (form.client) {
-      clients?.map(client => {
-        if (form.client === client._id) {
-          setCurrentClient(client._id)
-        }
-      })
-      dispatch(fetchProductsByClientId(currentClient))
+      dispatch(fetchProductsByClientId(form.client))
     }
-  }, [clients, currentClient, dispatch, form.client])
+  }, [dispatch, form.client])
+
+  useEffect(() => {
+    if (form.stock) {
+      dispatch(fetchStockById(form.stock))
+    }
+  }, [dispatch, form.stock])
+
+  useEffect(() => {
+    if (clientProducts && stock?.products) {
+      const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
+      const availableProducts = clientProducts.filter(x => stockProducts.some(y => x._id === y.product._id))
+      setAvailableProducts(availableProducts)
+    }
+  }, [clientProducts, stock])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -151,6 +192,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         const updatedForm = {
           ...form,
           delivered_at: updated_delivered_at,
+          files: files || [],
           products: transformToOrder(productsForm, item => ({
             product: item.product._id,
             description: item.description,
@@ -168,7 +210,12 @@ export const useOrderForm = (onSuccess?: () => void) => {
           return
         }
 
-        await dispatch(updateOrder({ orderId: initialData._id, data: updatedForm })).unwrap()
+        if (Object.values(errors).filter(Boolean).length) {
+          toast.error('Заполните все обязательные поля.')
+          return
+        }
+
+        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm, files } })).unwrap()
 
         if (params.id) {
           onSuccess?.()
@@ -185,8 +232,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           toast.error('Добавьте товары')
           return
         }
-
-        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at })).unwrap()
+        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at, files })).unwrap()
         onSuccess?.()
         toast.success('Заказ успешно создан!')
         setForm({ ...initialStateOrder })
@@ -195,15 +241,20 @@ export const useOrderForm = (onSuccess?: () => void) => {
         await dispatch(fetchOrdersWithClient())
       }
     } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
+      }
       console.error(e)
     }
   }
 
   const deleteProduct = (index: number) => {
-    deleteItem(index, setProductsForm, setForm, 'products')
+    deleteItem(index, setProductsForm, setForm, ItemType.PRODUCTS)
   }
   const deleteDefect = (index: number) => {
-    deleteItem(index, setDefectForm, setForm, 'defects')
+    deleteItem(index, setDefectForm, setForm, ItemType.DEFECTS)
   }
 
   type FormData = OrderMutation | ProductOrder | Defect
@@ -214,7 +265,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
     formData: FormData,
     errorMessage: string,
   ) => {
-    if ('client' in formData || 'products' in formData || 'product' in formData) {
+    if ('client' in formData || ItemType.PRODUCTS in formData || 'product' in formData) {
       const keys = Object.keys(formData) as (keyof FormData)[]
       if (keys.includes(field as keyof FormData)) {
         if (!formData[field as keyof FormData]) {
@@ -269,7 +320,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   return {
     form,
     setForm,
-    status,
     productsForm,
     setProductsForm,
     defectForm,
@@ -286,14 +336,13 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setButtonDefectVisible,
     isButtonVisible,
     setButtonVisible,
-    currentClient,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
     clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,
@@ -308,5 +357,8 @@ export const useOrderForm = (onSuccess?: () => void) => {
     onSubmit,
     initialData,
     availableDefects,
+    files,
+    handleFileChange,
+    stocks,
   }
 }

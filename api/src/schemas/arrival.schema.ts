@@ -22,7 +22,7 @@ export class Arrival {
     ref: 'Client',
     required: true,
   })
-  client: mongoose.Schema.Types.ObjectId
+  client: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -35,7 +35,7 @@ export class Arrival {
     required: true,
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     description: string
     amount: number
   }[]
@@ -59,19 +59,22 @@ export class Arrival {
   @Prop({ default: null })
   pickup_location: string
 
+  @Prop({ default: null })
+  documents: [{ document: string }]
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Counterparty',
     required: false,
   })
-  shipping_agent?: mongoose.Schema.Types.ObjectId | null
+  shipping_agent?: mongoose.Types.ObjectId | null
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Stock',
     required: true,
   })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -84,7 +87,7 @@ export class Arrival {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]
@@ -100,7 +103,7 @@ export class Arrival {
     default: [],
   })
   defects: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     defect_description: string
     amount: number
   }[]
@@ -116,13 +119,26 @@ export class Arrival {
     default: [],
   })
   received_amount: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     description: string
     amount: number
+  }[]
+
+  @Prop({
+    type: [
+      {
+        service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
+        service_amount: { type: Number, required: true, default: 1 },
+        service_price: { type: Number, required: false },
+      },
+    ],
+    default: [],
+  })
+  services: {
+    service: mongoose.Schema.Types.ObjectId
+    service_amount: number
+    service_price: number
   }[]
 }
 
 export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
-
-
-

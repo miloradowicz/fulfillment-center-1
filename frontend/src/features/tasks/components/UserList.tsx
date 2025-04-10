@@ -3,7 +3,7 @@ import { IconButton, Stack, Tooltip, Menu, MenuItem, TextField, InputAdornment }
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import SearchIcon from '@mui/icons-material/Search'
 import ClearIcon from '@mui/icons-material/Clear'
-import { User } from '../../../types'
+import { UserStripped } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import {
   fetchTasksByUserIdWithPopulate,
@@ -16,8 +16,8 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const dispatch = useAppDispatch()
-  const [topUsers, setTopUsers] = useState<User[]>(users.slice(0, 4))
-  const [remainingUsers, setRemainingUsers] = useState<User[]>(users.slice(4))
+  const [topUsers, setTopUsers] = useState<UserStripped[]>(users.slice(0, 4))
+  const [remainingUsers, setRemainingUsers] = useState<UserStripped[]>(users.slice(4))
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -59,7 +59,16 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
   const clearSearch = () => {
     setSearchTerm('')
   }
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       {topUsers.map(user => (
@@ -67,10 +76,10 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
           <IconButton
             onClick={() => handleUserClick(user._id)}
             sx={{
-              width: '80px',
+              width: screenWidth < 1100 ? '60px' : '80px',
               border: selectedUser === user._id ? '2px solid #75BDEC' : 'none',
-              padding: '6px 12px',
-              fontSize: '16px',
+              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px',
+              fontSize: screenWidth < 1100 ? '14px' : '16px',
               backgroundColor: selectedUser === user._id ? '#A2D2F2' : '#CFE8F8',
               borderRadius: '8px',
               color: 'black',
@@ -103,9 +112,9 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
           <IconButton
             onClick={handleMenuOpen}
             sx={{
-              width: '70px',
-              padding: '6px 12px',
-              fontSize: '17px',
+              width: screenWidth < 1100 ? '50px' : '70px',
+              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px',
+              fontSize: screenWidth < 1100 ? '15px' : '17px',
               backgroundColor: '#CFE8F8',
               borderRadius: '8px',
               color: 'black',

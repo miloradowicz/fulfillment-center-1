@@ -1,18 +1,20 @@
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient, StatusColor } from '../../../types'
 import { useAppDispatch } from '../../../app/hooks.ts'
 import React, { useState } from 'react'
 import { fetchOrdersWithClient, updateOrder } from '../../../store/thunks/orderThunk.ts'
 import { Box, Chip, Menu, MenuItem } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
+import { toast } from 'react-toastify'
 
-export interface Props  {
+export interface Props {
   row: OrderWithClient,
 }
 
-const StatusOrderCell:React.FC<Props> =({ row })  => {
+const StatusOrderCell: React.FC<Props> = ({ row }) => {
   const dispatch = useAppDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const statusColors: Record<string, 'warning' | 'success' | 'info' | 'default'> = {
+  const statusColors: Record<string, StatusColor> = {
     'в сборке': 'warning',
     'доставлен': 'success',
     'в пути': 'info',
@@ -26,15 +28,24 @@ const StatusOrderCell:React.FC<Props> =({ row })  => {
   }
 
   const handleClose = async (newStatus?: string) => {
-    setAnchorEl(null)
-    if (newStatus && newStatus !== row.status) {
-      const updatedData = {
-        ...row,
-        client: row.client._id,
-        status: newStatus,
+    try {
+      setAnchorEl(null)
+      if (newStatus && newStatus !== row.status) {
+        const updatedData = {
+          ...row,
+          client: row.client._id,
+          stock: row.stock._id,
+          status: newStatus,
+        }
+        await dispatch(updateOrder({ orderId: row._id, data: updatedData })).unwrap()
+        dispatch(fetchOrdersWithClient())
       }
-      await dispatch(updateOrder({ orderId: row._id, data: updatedData })).unwrap()
-      dispatch(fetchOrdersWithClient())
+    } catch (e) {
+      if (isGlobalError(e) ) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
+      }
     }
   }
   const status = row.status ?? 'в сборке'

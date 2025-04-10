@@ -5,6 +5,8 @@ import { Model } from 'mongoose'
 import { User } from '../schemas/user.schema'
 import { RequestWithUser } from 'src/types'
 import { ROLES_KEY } from 'src/decorators/roles.decorator'
+import config from 'src/config'
+import { RolesType } from 'src/enums'
 
 @Injectable()
 export class RolesService {
@@ -13,28 +15,27 @@ export class RolesService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async checkAuthorization(context: ExecutionContext) {
-    const requiredRoles = this.reflector.getAllAndOverride<string[] | undefined>(
+  checkAuthorization(context: ExecutionContext) {
+    const requiredRoles = this.reflector.getAllAndOverride<RolesType[] | undefined>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     )
 
-    if (!requiredRoles) {
+    if (!config.endpointProtection) {
       return true
     }
 
-    if (!requiredRoles.length) {
-      return false
+    if (!requiredRoles || !requiredRoles.length) {
+      return true
     }
 
     const request = context.switchToHttp().getRequest<RequestWithUser>()
-    const _user = request.user
+    const user = request.user
 
-    if (!_user) {
+    if (!user) {
       return false
     }
 
-    const user = await this.userModel.findById(_user._id)
     return !!user && requiredRoles.includes(user.role)
   }
 }

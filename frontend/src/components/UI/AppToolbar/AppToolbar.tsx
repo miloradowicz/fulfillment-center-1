@@ -2,8 +2,9 @@ import { AppBar,  Container , styled, Toolbar, Typography } from '@mui/material'
 import { Link as NavLink } from 'react-router-dom'
 import UserMenu from './UserMenu.tsx'
 import SideBar from '../SideBar/SideBar.tsx'
-import { selectUser } from '../../../store/slices/userSlice.ts'
+import { selectUser } from '../../../store/slices/authSlice.ts'
 import { useAppSelector } from '../../../app/hooks.ts'
+import { featureProtection } from '../../../constants.ts'
 
 const Link = styled(NavLink)({
   color: 'inherit',
@@ -24,8 +25,20 @@ const AppToolbar = () => {
   const user = useAppSelector(selectUser)
 
   return (
-    <AppBar position="sticky" sx={{ mb: 2, backgroundColor: '#32363F', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-      <SideBar />
+    <AppBar
+      position="fixed"
+      sx={{
+        mb: 2,
+        backgroundColor: '#32363F',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        zIndex: 1201,
+      }}
+    >
+      {(!featureProtection || user) && <SideBar />}
       <Container>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

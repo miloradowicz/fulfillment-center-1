@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import {
-  ArrivalError,
   ArrivalMutation,
-  ArrivalWithClient,
-  ArrivalWithPopulate,
   Defect,
   Product,
-  ProductArrival,
+  ProductArrival, ServiceArrival,
 } from '../../../types'
-import { initialErrorState, initialItemState, initialState } from '../state/arrivalState'
+import { initialErrorState, initialItemState, initialServiceState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
 import { fetchClients } from '../../../store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
@@ -28,8 +25,11 @@ import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
 import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
 import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
 import { fetchCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
-
-export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
+import { ErrorMessagesList } from '../../../messages.ts'
+import { ItemType } from '../../../constants.ts'
+import { fetchServices } from '../../../store/thunks/serviceThunk.ts'
+import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
+import { selectAllServices } from '../../../store/slices/serviceSlice.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -40,6 +40,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const status = ['ожидается доставка', 'получена', 'отсортирована']
+  const services = useAppSelector(selectAllServices)
 
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
@@ -55,39 +56,54 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         defects: [],
         received_amount: [],
         arrival_status: initialData.arrival_status,
+        documents: [],
+        services: [],
       }
       : { ...initialState },
   )
 
-  const normalizeProductField = <T extends { product: string | { _id: string } }>(items?: T[]): T[] =>
+  const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
       ...item,
-      product: typeof item.product === 'string' ? item.product : item.product._id,
+      ...(item.product !== undefined && {
+        product: typeof item.product === 'string' ? item.product : item.product._id,
+      }),
+      ...(item.service !== undefined && {
+        service: typeof item.service === 'string' ? item.service : item.service._id,
+      }),
     })) || []
 
+
   const [productsForm, setProductsForm] = useState<ProductArrival[]>(
-    normalizeProductField((initialData?.products as ProductArrival[]) || []),
+    normalizeField((initialData?.products as ProductArrival[]) || []),
   )
   const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(
-    normalizeProductField((initialData?.received_amount as ProductArrival[]) || []),
+    normalizeField((initialData?.received_amount as ProductArrival[]) || []),
   )
   const [defectsForm, setDefectForm] = useState<Defect[]>(
-    normalizeProductField((initialData?.defects as Defect[]) || []),
+    normalizeField((initialData?.defects as Defect[]) || []),
+  )
+  const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
 
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
-  const [errors, setErrors] = useState<ArrivalError>({ ...initialErrorState })
+  const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
+  const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
+  const [availableItem, setAvailableItem] = useState<Product[]>([])
+  const [files, setFiles] = useState<File[]>([])
 
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
   const [defectsModalOpen, setDefectsModalOpen] = useState(false)
-
-  const [availableItem, setAvailableItem] = useState<Product[]>([])
+  const [servicesModalOpen, setServicesModalOpen] = useState(false)
 
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
     dispatch(fetchCounterparties())
+    dispatch(fetchServices())
+
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
@@ -109,67 +125,101 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = (type: 'products' | 'received_amount' | 'defects', initialState: ProductArrival | Defect) => {
-    setNewItem(initialState)
+  const openModal = <T extends ItemType>(
+    type: T,
+    initialState: ItemInitialStateMap[T],
+  ) => {
+    if (type === ItemType.SERVICES) {
+      setNewService(initialState as ServiceArrival)
+    } else {
+      setNewItem(initialState as ProductArrival | Defect)
+    }
 
-    const modalSetters = {
-      products: setProductsModalOpen,
-      received_amount: setReceivedModalOpen,
-      defects: setDefectsModalOpen,
+    const modalSetters: Record<ItemType, React.Dispatch<React.SetStateAction<boolean>>> = {
+      [ItemType.PRODUCTS]: setProductsModalOpen,
+      [ItemType.RECEIVED_AMOUNT]: setReceivedModalOpen,
+      [ItemType.DEFECTS]: setDefectsModalOpen,
+      [ItemType.SERVICES]: setServicesModalOpen,
     }
 
     Object.values(modalSetters).forEach(setter => setter(false))
     modalSetters[type](true)
   }
 
-  const addItem = (type: 'products' | 'received_amount' | 'defects') => {
+  const addItem = (type: ItemType) => {
     const baseItem = {
       product: newItem.product,
       amount: Number(newItem.amount),
-      ...(type !== 'defects' && { description: (newItem as ProductArrival).description }),
-      ...(type === 'defects' && { defect_description: (newItem as Defect).defect_description }),
+      ...(type !== ItemType.DEFECTS && { description: (newItem as ProductArrival).description }),
+      ...(type === ItemType.DEFECTS && { defect_description: (newItem as Defect).defect_description }),
     }
 
-    if (!baseItem.product || baseItem.amount <= 0 || (type === 'defects' && !(baseItem as Defect).defect_description)) {
+    const selectedService = services.find(s => s._id === newService.service)
+
+    const baseService = {
+      service: newService.service,
+      service_amount: Number(newService.service_amount),
+      service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+    }
+
+    if (
+      type !== ItemType.SERVICES &&
+      (
+        !baseItem.product ||
+        baseItem.amount <= 0 ||
+        (type === ItemType.DEFECTS && !(baseItem as Defect).defect_description)
+      )
+    ) {
       toast.warn('Заполните все обязательные поля.')
       return
     }
 
+    if (
+      type === ItemType.SERVICES &&
+      (!baseService.service || baseService.service_amount <= 0)
+    ) {
+      toast.warn('Заполните обязательные поля услуги.')
+      return
+    }
+
     switch (type) {
-    case 'products':
+    case ItemType.PRODUCTS:
       setProductsForm(prev => [...prev, baseItem as ProductArrival])
       setProductsModalOpen(false)
       break
-    case 'received_amount':
+    case ItemType.RECEIVED_AMOUNT:
       setReceivedForm(prev => [...prev, baseItem as ProductArrival])
       setReceivedModalOpen(false)
       break
-    case 'defects':
+    case ItemType.DEFECTS:
       setDefectForm(prev => [...prev, baseItem as Defect])
       setDefectsModalOpen(false)
+      break
+    case ItemType.SERVICES:
+      setServicesForm(prev => [...prev, baseService as ServiceArrival])
+      setServicesModalOpen(false)
       break
     }
 
     setNewItem({ ...initialItemState })
+    setNewService({ ...initialServiceState })
   }
 
   const deleteItem = <T>(index: number, setter: React.Dispatch<React.SetStateAction<T[]>>) => {
     setter(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleBlur = (field: keyof ArrivalError, value: string | number) => {
-    type ErrorMessages = {
-      [key in keyof ArrivalError]: string
-    }
-
+  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
     const errorMessages: ErrorMessages = {
-      product: !value ? 'Выберите товар' : '',
-      amount: Number(value) <= 0 ? 'Количество должно быть больше 0' : '',
-      arrival_price: Number(value) <= 0 ? 'Цена должна быть больше 0' : '',
-      defect_description: !value ? 'Заполните описание дефекта' : '',
-      client: !value ? 'Выберите клиента' : '',
-      arrival_date: !value ? 'Укажите дату прибытия' : '',
-      stock: !value ? 'Выберите склад' : '',
+      product: !value ? ErrorMessagesList.ProductErr : ErrorMessagesList.Default,
+      amount: Number(value) <= 0 ? ErrorMessagesList.Amount : ErrorMessagesList.Default,
+      defect_description: !value ? ErrorMessagesList.DefectDescription : ErrorMessagesList.Default,
+      client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
+      arrival_date: !value ? ErrorMessagesList.ArrivalDate : ErrorMessagesList.Default,
+      stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
+      arrival_price: Number(value) <= 0 ? ErrorMessagesList.ArrivalPrice : ErrorMessagesList.Default,
+      service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
+      service_amount: Number(value) <= 0 ? ErrorMessagesList.ServiceAmount : ErrorMessagesList.Default,
     }
 
     setErrors(prev => ({
@@ -178,39 +228,62 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }))
   }
 
+  const handleServiceChange = (serviceId: string) => {
+    const selectedService = services.find(s => s._id === serviceId)
+    setNewService(prev => ({
+      ...prev,
+      service: serviceId,
+      service_price: selectedService?.price || prev.service_price,
+    }))
+  }
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    const selectedFiles = Array.from(e.target.files)
+    const maxFileSize = 10 * 1024 * 1024
+
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > maxFileSize) {
+        toast.warn(`Файл "${ file.name }" слишком большой (макс. 10MB)`)
+        return false
+      }
+      return true
+    })
+
+    setFiles(prevFiles => [...prevFiles, ...validFiles])
+  }
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (Object.values(errors).filter(Boolean).length) {
+      toast.error('Заполните все обязательные поля.')
+      return
+    }
+
     if (productsForm.length === 0) {
-      toast.error('Добавьте товары.')
+      toast.error('Добавьте отправленные товары.')
       return
     }
 
     try {
-      let updated_shipping_agent: string |  null = ''
-
-      if (form.shipping_agent ) {
-        updated_shipping_agent = form.shipping_agent
-      } else if (form.shipping_agent === '') {
-        updated_shipping_agent = null
-      }
-
       const updatedForm = {
         ...form,
-        shipping_agent: updated_shipping_agent,
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
-        arrival_price: Number(form.arrival_price),
+        files: files || [],
+        services: servicesForm,
+        shipping_agent: form.shipping_agent || null,
       }
 
       if (initialData) {
-        await dispatch(updateArrival({ arrivalId: initialData._id, data: updatedForm })).unwrap()
+        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm, files } })).unwrap()
         onSuccess?.()
         await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
         toast.success('Поставка успешно обновлена!')
       } else {
-        await dispatch(addArrival({ ...updatedForm, shipping_agent: updated_shipping_agent })).unwrap()
+        await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
         await dispatch(fetchPopulatedArrivals())
       }
@@ -219,8 +292,19 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setProductsForm([])
       setReceivedForm([])
       setDefectForm([])
-    } catch (e) {
-      console.error(e)
+
+      if (onSuccess) onSuccess()
+
+    } catch (error) {
+      console.error(error)
+
+      if (error instanceof Error) {
+        return error.message
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        toast.error((error as { message: string }).message)
+      } else if (typeof error === 'string') {
+        toast.error(error)
+      }
     }
   }
 
@@ -244,6 +328,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     setReceivedModalOpen,
     defectsModalOpen,
     setDefectsModalOpen,
+    services,
+    newService,
+    setNewService,
+    servicesModalOpen,
+    setServicesModalOpen,
+    servicesForm,
+    setServicesForm,
     openModal,
     addItem,
     deleteItem,
@@ -255,5 +346,8 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     stocks,
     counterparties,
     availableItem,
+    files,
+    handleFileChange,
+    handleServiceChange,
   }
 }

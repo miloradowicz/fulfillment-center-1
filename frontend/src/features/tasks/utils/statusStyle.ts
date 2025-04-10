@@ -2,18 +2,18 @@ export const getStatusStyles = (status: string) => {
   switch (status) {
   case 'к выполнению':
     return {
-      backgroundColor: '#D1D3D8',
-      color: '#6B7280',
+      backgroundColor: '#091E420F',
+      color: '#42526E',
     }
   case 'в работе':
     return {
-      backgroundColor: '#0052CC',
-      color: '#FFFFFF',
+      backgroundColor: '#E9F2FF',
+      color: '#0052CC',
     }
   case 'готово':
     return {
-      backgroundColor: '#36B37E',
-      color: '#FFFFFF',
+      backgroundColor: '#DCFFF1',
+      color: '#216E4E',
     }
   default:
     return {

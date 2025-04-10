@@ -13,8 +13,16 @@ export class ServicesService {
     return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
   }
 
+  async getAllArchived() {
+    return this.serviceModel.find({ isArchived: true }).populate('serviceCategory').exec()
+  }
+
   async getAllByName(name: string) {
-    return this.serviceModel.find({ isArchived: false }).find({ name: { $regex: name, $options: 'i' } }).populate('serviceCategory').exec()
+    return this.serviceModel
+      .find({ isArchived: false })
+      .find({ name: { $regex: name, $options: 'i' } })
+      .populate('serviceCategory')
+      .exec()
   }
 
   async getById(id: string) {
@@ -27,24 +35,58 @@ export class ServicesService {
     return service
   }
 
-  async create(serviceDto: CreateServiceDto) {
-    return await this.serviceModel.create(serviceDto)
+  async getAllArchivedByName(name: string) {
+    return this.serviceModel
+      .find({ isArchived: true })
+      .find({ name: { $regex: name, $options: 'i' } })
+      .populate('serviceCategory')
+      .exec()
   }
 
-  async update(id: string, serviceDto: UpdateServiceDto) {
-    const service = await this.serviceModel.findByIdAndUpdate(id, serviceDto, { new: true })
-    if (!service) {
-      throw new NotFoundException('Услуга не найдена')
-    }
+  async getArchivedById(id: string) {
+    const service = await this.serviceModel.findById(id).populate('serviceCategory').exec()
+
+    if (!service) throw new NotFoundException('Услуга не найдена')
+
+    if (!service.isArchived) throw new ForbiddenException('Эта услуга не в архиве')
+
     return service
   }
 
+  async create(serviceDto: CreateServiceDto) {
+    return (await this.serviceModel.create(serviceDto)).populate('serviceCategory')
+  }
+
+  async update(id: string, serviceDto: UpdateServiceDto, force: boolean = false) {
+    const service = await this.serviceModel.findById(id)
+
+    if (!service) throw new NotFoundException('Услуга не найдена')
+
+    if (!force && service.isArchived) throw new ForbiddenException('Услуга в архиве')
+
+    service.set(serviceDto)
+    await service.save()
+
+    return service.populate('serviceCategory')
+  }
+
+  async isLocked(id: string) {
+    const service = await this.serviceModel.findById(id)
+
+    if (!service) throw new NotFoundException('Товар не найден')
+
+    return true
+  }
+
   async archive(id: string) {
-    const service = await this.serviceModel.findByIdAndUpdate(id, { isArchived: true })
+    const service = await this.serviceModel.findById(id)
 
     if (!service) throw new NotFoundException('Услуга не найдена')
 
     if (service.isArchived) throw new ForbiddenException('Услуга уже в архиве')
+
+    service.isArchived = true
+    await service.save()
 
     return { message: 'Услуга перемещена в архив' }
   }

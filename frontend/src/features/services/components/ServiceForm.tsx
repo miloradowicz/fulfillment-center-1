@@ -1,101 +1,113 @@
 import useServiceForm from '../hooks/useServiceForm'
-import { Button, CircularProgress, TextField, Typography } from '@mui/material'
+import { Autocomplete as _Autocomplete, Box, Button, createFilterOptions, LinearProgress, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
+import { isServiceCategory } from '../../../utils/helpers'
+import { ServiceCategory } from '../../../types'
 
-const ServiceForm = ({ onClose }: { onClose: () => void }) => {
+const ServiceForm = ({ serviceId, onClose }: { serviceId: string, onClose: () => void }) => {
   const {
     form,
-    dynamicFields,
-    newField,
-    showNewFieldInputs,
     loading,
-    inputChangeHandler,
-    addDynamicField,
-    onChangeDynamicFieldValue,
+    serviceCategories,
+    addCategoryLoading,
+    fetchCategoryLoading,
+    handleInputChange,
+    handleAutocompleteChange,
     onSubmit,
-    setNewField,
-    setShowNewFieldInputs,
     errors,
-    handleCancel,
-  } = useServiceForm(onClose)
+  } = useServiceForm(serviceId, onClose)
+
+  const Autocomplete = _Autocomplete<ServiceCategory | string>
+
+  const defaultFilterOptions = createFilterOptions<ServiceCategory | string>()
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
+    <form onSubmit={onSubmit}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         Добавить новую услугу
       </Typography>
       <Grid container direction="column" spacing={2}>
+        <Grid>
+          <Autocomplete
+            options={serviceCategories}
+            getOptionKey={option => (isServiceCategory(option) ? option._id : option)}
+            getOptionLabel={option => (isServiceCategory(option) ? option.name : `Добавить категорию "${ option }"`)}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Категория услуги"
+                error={!!errors.serviceCategory}
+                helperText={errors.serviceCategory}
+              />
+            )}
+            onChange={handleAutocompleteChange}
+            value={form.serviceCategory}
+            isOptionEqualToValue={(option, value) =>
+              isServiceCategory(option) && isServiceCategory(value) ? option._id === value._id : option === value
+            }
+            filterOptions={(options, state) => {
+              const results = defaultFilterOptions(options, state)
+
+              if (
+                state.inputValue.trim() !== '' &&
+                !results.some(x => (isServiceCategory(x) && x.name === state.inputValue) || x === state.inputValue)
+              )
+                results.push(state.inputValue)
+
+              return results
+            }}
+          />
+          <Box height={6}>
+            {(addCategoryLoading || fetchCategoryLoading) && <LinearProgress />}
+          </Box>
+        </Grid>
         <Grid>
           <TextField
             name="name"
             label="Название"
             value={form.name}
-            onChange={inputChangeHandler}
+            onChange={handleInputChange}
             fullWidth
             size="small"
             error={!!errors.name}
             helperText={errors.name}
           />
         </Grid>
-        <Typography variant="h6">Дополнительные параметры</Typography>
-        {dynamicFields.map((field, i) => (
-          <Grid key={i} sx={{ mb: 2 }}>
-            <TextField
-              name={field.label}
-              label={field.label}
-              fullWidth
-              size="small"
-              value={field.value || ''}
-              onChange={e => onChangeDynamicFieldValue(i, e)}
-              error={!!errors[`dynamicField_${ i }`]}
-              helperText={errors[`dynamicField_${ i }`] || ''}
-            />
-          </Grid>
-        ))}
-
-        {showNewFieldInputs && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid>
-              <TextField
-                label="Ключ"
-                value={newField.key}
-                onChange={e => setNewField({ ...newField, key: e.target.value })}
-                fullWidth
-                size="small"
-                error={!!errors.newFieldKey}
-                helperText={errors.newFieldKey || ''}
-              />
-            </Grid>
-            <Grid>
-              <TextField
-                label="Название"
-                value={newField.label}
-                onChange={e => setNewField({ ...newField, label: e.target.value })}
-                fullWidth
-                size="small"
-                error={!!errors.newFieldLabel}
-                helperText={errors.newFieldLabel || ''}
-              />
-            </Grid>
-            <Grid>
-              <Button variant="contained" onClick={addDynamicField}>
-                Добавить
-              </Button>
-              <Button variant="outlined" color="error" onClick={handleCancel} sx={{ ml: 1 }}>
-                Отмена
-              </Button>
-            </Grid>
-          </Grid>
-        )}
-
-        <Button type="button" onClick={() => setShowNewFieldInputs(true)}>
-          + Добавить дополнительное свойство
-        </Button>
 
         <Grid>
-          <Button type="submit" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Создать услугу'}
-          </Button>
+          <TextField
+            name="price"
+            label="Цена"
+            type="number"
+            value={form.price}
+            onChange={handleInputChange}
+            fullWidth
+            size="small"
+            error={!!errors.price}
+            helperText={errors.price}
+          />
+        </Grid>
+
+        <Grid>
+          <TextField
+            name="description"
+            label="Описание"
+            value={form.description}
+            onChange={handleInputChange}
+            fullWidth
+            size="small"
+            error={!!errors.description}
+            helperText={errors.description}
+          />
+        </Grid>
+
+        <Grid>
+          <Button
+            type="submit"
+            color="primary"
+            loading={loading}
+            disabled={addCategoryLoading || fetchCategoryLoading}
+          >Создать услугу</Button>
         </Grid>
       </Grid>
     </form>

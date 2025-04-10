@@ -6,9 +6,6 @@ class ProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
   product: mongoose.Schema.Types.ObjectId
 
-  @IsOptional()
-  description: string
-
   @IsNotEmpty({ message: 'Заполните количество товара.' })
   @IsPositive({ message: 'Количество товара должно быть больше 0.' })
   amount: number

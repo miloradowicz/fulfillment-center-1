@@ -2,6 +2,10 @@ import React, { useState } from 'react'
 import { Button, Menu, MenuItem } from '@mui/material'
 import { User } from '../../../types'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { logoutUser } from '../../../store/thunks/userThunk.ts'
+import { unsetUser } from '../../../store/slices/authSlice.ts'
+import { useAppDispatch } from '../../../app/hooks.ts'
+import { toast } from 'react-toastify'
 
 interface Props {
   user: User;
@@ -9,6 +13,8 @@ interface Props {
 
 const UserMenu: React.FC<Props> = ({ user }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const dispatch = useAppDispatch()
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -18,10 +24,13 @@ const UserMenu: React.FC<Props> = ({ user }) => {
     setAnchorEl(null)
   }
 
-  // const HandleLogout = () => {
-  //   dispatch(logout())
-  //   dispatch(unsetUser())
-  // } // добавить после сщздания userSlice
+  const handleLogout = async () => {
+    await dispatch(logoutUser())
+    dispatch(unsetUser())
+    setAnchorEl(null)
+    toast.success('Вы вышли из системы')
+    navigate('/login')
+  }
 
   return (
     <>
@@ -48,8 +57,8 @@ const UserMenu: React.FC<Props> = ({ user }) => {
         )}
 
         <MenuItem
-          // onClick={HandleLogout}
-        >Logout</MenuItem>
+          onClick={handleLogout}
+        >Выйти</MenuItem>
       </Menu>
     </>
   )

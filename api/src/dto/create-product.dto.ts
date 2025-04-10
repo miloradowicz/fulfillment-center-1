@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, IsNotEmpty, IsOptional, Min, MinLength } from 'class-validator'
+import { IsMongoId, IsNotEmpty, IsOptional, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
 class DynamicFieldDto {
@@ -21,11 +21,6 @@ export class CreateProductDto {
   @MinLength(3, { message: 'Название должно состоять минимум из 3 символов' })
   title: string
 
-  @IsNotEmpty({ message: 'Поле количество обязательно для заполнения' })
-  @IsInt({ message: 'Поле количество должно являться числом' })
-  @Min(0, { message: 'Поле количество должно быть положительным числом' })
-  amount: number
-
   @IsNotEmpty({ message: 'Поле штрих-код обязательно для заполнения' })
   barcode: string
 
@@ -35,7 +30,4 @@ export class CreateProductDto {
   @IsOptional()
   @Type(() => DynamicFieldDto)
   dynamic_fields?: DynamicFieldDto[] | string
-
-  @IsOptional()
-  documents?: Array<{ document: string }> | string[] | string
 }

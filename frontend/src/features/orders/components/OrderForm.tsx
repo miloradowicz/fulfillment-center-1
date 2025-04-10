@@ -1,10 +1,23 @@
 import Grid from '@mui/material/Grid2'
-import { Autocomplete, Button, CircularProgress, FormControl, InputLabel, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  Divider,
+  FormControl, IconButton,
+  InputLabel,
+  TextField,
+  Typography,
+} from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
 import { getFieldError } from '../../../utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
+import { ErrorMessagesList } from '../../../messages.ts'
+import { OrderStatus } from '../../../constants.ts'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import { getAutocompleteItemName } from '../../../utils/getAutocompleteItemName.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -15,7 +28,6 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
   const {
     form,
     setForm,
-    status,
     productsForm,
     defectForm,
     newField,
@@ -26,13 +38,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     modalOpenDefects,
     isButtonDefectVisible,
     isButtonVisible,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
-    clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,
@@ -47,6 +58,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     onSubmit,
     initialData,
     availableDefects,
+    files,
+    handleFileChange,
+    stocks,
   } = useOrderForm(onSuccess)
 
   return (
@@ -54,7 +68,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
       {loadingFetchClient ? (
         <CircularProgress />
       ) : (
-        <form onSubmit={onSubmit} style={{ width: '60%', margin: '20px auto' }}>
+        <form onSubmit={onSubmit}>
           <Typography variant="h5" sx={{ mb: 2 }}>
             {initialData ? 'Редактировать данные заказа' : 'Добавить новый заказ'}
           </Typography>
@@ -71,7 +85,6 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                     onChange={(_, newValue) => {
                       if (newValue) {
                         setForm(prevState => ({ ...prevState, client: newValue._id }))
-                        setCurrentClient(newValue._id)
                       }
                     }}
                     value={clients.find(option => option._id === form.client) || null}
@@ -83,13 +96,37 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                         label="Клиент"
                         error={Boolean(errors.client || getFieldError('client', createError))}
                         helperText={errors.client || getFieldError('client', createError)}
-                        onBlur={() => handleBlurAutoComplete('client', setErrors, form, 'Выберите клиента')}
+                        onBlur={() => handleBlurAutoComplete('client', setErrors, form, ErrorMessagesList.ClientErr)}
                       />
                     )}
                   />
                 </FormControl>
               </Grid>
             )}
+
+            <Grid>
+              <Autocomplete
+                id="stock"
+                value={getAutocompleteItemName(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+                onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
+                size="small"
+                fullWidth
+                disablePortal
+                options={getAutocompleteItemName(stocks, 'name', '_id')}
+                getOptionKey={option => option.id}
+                sx={{ width: '100%' }}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label="Склад, с которого будет отправлен товар"
+                    error={Boolean(errors.stock || getFieldError(ErrorMessagesList.StockErr, createError))}
+                    helperText={errors.stock || getFieldError(ErrorMessagesList.StockErr, createError)}
+                    onBlur={() => handleBlurAutoComplete('stock', setErrors, form, ErrorMessagesList.StockErr)}
+                  />
+                )}
+              />
+            </Grid>
+
             <>
               <label className={'fs-4 my-1'}>Товары</label>
               {productsForm.length === 0 ? (
@@ -137,7 +174,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpen && clientProducts && (
+            {modalOpen && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить товар</Typography>
                 <Autocomplete
@@ -145,14 +182,14 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   fullWidth
                   size={'small'}
                   disablePortal
-                  options={clientProducts}
+                  options={availableProducts}
                   getOptionKey={option => option._id}
                   onChange={(_, newValue) => {
                     if (newValue) {
                       setNewField(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
+                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField
@@ -161,7 +198,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       required={true}
                       error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={() => handleBlurAutoComplete('product', setErrors, newField, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newField, ErrorMessagesList.ProductErr)}
                     />
                   )}
                 />
@@ -246,20 +283,20 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               />
             </Grid>
             <Grid container direction="column" spacing={2}>
-              {status && status?.length > 0 && (
+              {OrderStatus && OrderStatus?.length > 0 && (
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
                     <Autocomplete
                       size={'small'}
                       fullWidth
                       disablePortal
-                      options={status}
+                      options={OrderStatus}
                       onChange={(_, newValue) => {
                         if (newValue) {
                           setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
-                      value={status.find(option => option === form.status) || status[0] || null}
+                      value={OrderStatus.find(option => option === form.status) || null}
                       getOptionLabel={option => option || ''}
                       isOptionEqualToValue={(option, value) => option === value}
                       renderInput={params => (
@@ -338,7 +375,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpenDefects && clientProducts && (
+            {modalOpenDefects && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить дефекты товаров</Typography>
                 <Autocomplete
@@ -353,7 +390,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       setNewFieldDefects(prevState => ({ ...prevState, product: newValue._id }))
                     }
                   }}
-                  getOptionLabel={option => `${ option.title }   артикул: ${ option.article }`}
+                  getOptionLabel={option => `${option.title}   артикул: ${option.article}`}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
                   renderInput={params => (
                     <TextField
@@ -361,7 +398,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                       label="Товар"
                       error={Boolean(errors.product || getFieldError('product', createError))}
                       helperText={errors.product || getFieldError('product', createError)}
-                      onBlur={() => handleBlurAutoComplete('product', setErrors, newFieldDefects, 'Выберите товар')}
+                      onBlur={() => handleBlurAutoComplete('product', setErrors, newFieldDefects, ErrorMessagesList.ProductErr)}
                     />
                   )}
                 />
@@ -400,6 +437,30 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             )}
 
+            {initialData && (<> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
+              <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
+            {initialData && initialData.documents && initialData.documents.length > 0 && (initialData.documents.map((document, index) => (
+              <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
+                <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
+            )))}
+
+            <Grid className="flex gap-2 content-between items-center">
+              <Typography>Загрузить документ</Typography>
+              <Grid sx={{ display: 'flex', alignItems: 'center' }}>
+                <IconButton component="label">
+                  <InsertDriveFileIcon fontSize="large" color="primary" />
+                  <input type="file" accept=".pdf, .doc, .docx, .xlsx" multiple hidden onChange={handleFileChange} />
+                </IconButton>
+                {files.length > 0 && (
+                  <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+
+                    {files.map((file, index) => (
+                      <Typography key={index} variant="body2">{file.name}</Typography>
+                    ))}
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
             <Grid>
               <Button type="submit" disabled={loading}>
                 {loading ? (

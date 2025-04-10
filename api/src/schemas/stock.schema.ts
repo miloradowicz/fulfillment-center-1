@@ -21,15 +21,13 @@ export class Stock {
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        description: { type: String },
         amount: { type: Number, required: true },
       },
     ],
     default: [],
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
-    description: string
+    product: mongoose.Types.ObjectId
     amount: number
   }[]
 
@@ -44,7 +42,7 @@ export class Stock {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

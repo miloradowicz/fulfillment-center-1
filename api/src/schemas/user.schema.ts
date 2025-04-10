@@ -12,6 +12,7 @@ import { Order } from './order.schema'
 import { Counterparty } from './counterparty.schema'
 import { Service } from './service.schema'
 import { Stock } from './stock.schema'
+import { RolesList, RolesType } from 'src/enums'
 
 export interface UserDocument extends Document {
   isArchived: boolean;
@@ -50,8 +51,8 @@ export class User {
   })
   displayName: string
 
-  @Prop({ required: true, enum: ['super-admin', 'admin', 'manager', 'stock-worker'] })
-  role: string
+  @Prop({ required: true, enum: RolesList })
+  role: RolesType
 
   @Prop({
     required: true,

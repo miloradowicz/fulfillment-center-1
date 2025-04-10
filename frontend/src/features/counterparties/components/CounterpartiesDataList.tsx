@@ -4,14 +4,21 @@ import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Counterparty } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
-import { NavLink } from 'react-router-dom'
 import { useCounterpartiesList } from '../hooks/useCounterpartiesList.ts'
-import { useState } from 'react'
 import CounterpartyForm from './CounterpartyForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import { useState } from 'react'
 
 const CounterpartiesDataList = () => {
-  const { counterparties, deleteOneCounterparty, isLoading } = useCounterpartiesList()
+  const {
+    counterparties,
+    isLoading,
+    confirmationModalOpen,
+    handleOpenConfirmationModal,
+    handleCloseConfirmationModal,
+    confirmDelete,
+  } = useCounterpartiesList()
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [selectedCounterparty, setSelectedCounterparty] = useState<Counterparty | null>(null)
@@ -64,7 +71,7 @@ const CounterpartiesDataList = () => {
     {
       field: 'Actions',
       headerName: '',
-      minWidth: isMediumScreen ? 220 : 180,
+      minWidth: 150,
       align: 'left',
       headerAlign: 'left',
       sortable: false,
@@ -75,16 +82,9 @@ const CounterpartiesDataList = () => {
           <IconButton onClick={() => handleOpenEditModal(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => deleteOneCounterparty(row._id)}>
+          <IconButton onClick={() => handleOpenConfirmationModal(row)}>
             <ClearIcon />
           </IconButton>
-          <NavLink
-            to={`/counterparties/${ row._id }`}
-            style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Подробнее
-          </NavLink>
         </Box>
       ),
     },
@@ -119,6 +119,14 @@ const CounterpartiesDataList = () => {
       <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
         {selectedCounterparty && <CounterpartyForm counterparty={selectedCounterparty} onClose={handleCloseEditModal} />}
       </Modal>
+
+      <ConfirmationModal
+        open={confirmationModalOpen}
+        entityName="этого контрагента"
+        actionType="delete"
+        onConfirm={confirmDelete}
+        onCancel={handleCloseConfirmationModal}
+      />
     </Box>
   )
 }

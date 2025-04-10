@@ -5,7 +5,7 @@ import { RolesService } from 'src/services/roles.service'
 export class RolesGuard implements CanActivate {
   constructor(private readonly rolesService: RolesService) {}
 
-  async canActivate(context: ExecutionContext) {
+  canActivate(context: ExecutionContext) {
     return this.rolesService.checkAuthorization(context)
   }
 }

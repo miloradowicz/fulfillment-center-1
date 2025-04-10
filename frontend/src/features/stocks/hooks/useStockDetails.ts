@@ -30,16 +30,12 @@ export const useStockDetails = () => {
     }
   }, [dispatch, stockId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleDelete = async () => {
     if (stockId) {
       try {
         await dispatch(deleteStock(stockId)).unwrap()
         navigate('/stocks')
-        toast.success('Склад успешно удален')
+        toast.success('Склад успешно удалён!')
       } catch (e) {
         if (hasMessage(e)) {
           toast.error(e.message || 'Ошибка удаления')
@@ -70,7 +66,6 @@ export const useStockDetails = () => {
     showDeleteModal,
     hideDeleteModal,
     handleDelete,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
   }

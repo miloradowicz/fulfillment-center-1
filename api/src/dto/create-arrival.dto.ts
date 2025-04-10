@@ -3,9 +3,9 @@ import {
   IsArray,
   IsDate,
   IsEnum,
-  IsNotEmpty,
+  IsNotEmpty, IsNumber,
   IsOptional,
-  IsPositive,
+  IsPositive, ValidateIf,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -35,9 +35,9 @@ class LogDto {
   date: Date
 }
 
-class DefectDto {
+export class DefectDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: string
+  product: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните описание дефекта.' })
   defect_description: string
@@ -46,10 +46,24 @@ class DefectDto {
   @IsPositive({ message: 'Количество дефектных товаров должно быть больше 0.' })
   amount: number
 }
+export class ServiceDto {
+  @IsNotEmpty({ message: 'Заполните название услуги.' })
+  service: mongoose.Schema.Types.ObjectId
 
-class ReceivedProductDto {
+  @IsOptional()
+  @IsPositive({ message: 'Количество оказанной услуги должно быть больше 0.' })
+  service_amount: number = 1
+
+  @ValidateIf((o: ServiceDto) => o.service_price !== undefined)
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Цена должна быть числом.' })
+  @IsPositive({ message: 'Цена должна быть больше 0.' })
+  service_price?: number
+}
+
+export class ReceivedProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: string
+  product: mongoose.Types.ObjectId
 
   @IsOptional({ message: 'Заполните описание товара.' })
   @IsOptional()
@@ -62,10 +76,10 @@ class ReceivedProductDto {
 
 export class CreateArrivalDto {
   @IsNotEmpty({ message: 'Заполните поле клиента.' })
-  client: mongoose.Schema.Types.ObjectId
+  client: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните склад, на который прибыла поставка.' })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @ArrayNotEmpty({ message: 'Заполните список товаров' })
   @IsArray({ message: 'Заполните список товаров.' })
@@ -89,7 +103,10 @@ export class CreateArrivalDto {
   pickup_location: string
 
   @IsOptional()
-  shipping_agent?: mongoose.Schema.Types.ObjectId | null
+  shipping_agent?: mongoose.Types.ObjectId | null
+
+  @IsOptional()
+  documents?: Array<{ document: string }> | string[] | string
 
   @IsOptional()
   @IsEnum(['ожидается доставка', 'получена', 'отсортирована'], {
@@ -114,4 +131,10 @@ export class CreateArrivalDto {
   @ValidateNested({ each: true })
   @Type(() => ReceivedProductDto)
   received_amount?: ReceivedProductDto[]
+
+  @IsOptional()
+  @IsArray({ message: 'Заполните список оказанных услуг.' })
+  @ValidateNested({ each: true })
+  @Type(() => ServiceDto)
+  services?: ServiceDto[]
 }

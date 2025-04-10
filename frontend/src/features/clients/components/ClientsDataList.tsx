@@ -1,30 +1,27 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material'
+import { Box, IconButton, useTheme, useMediaQuery, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
 import { Client } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
-import { useClientsList } from '../hooks/useClientsList.ts'
-import { useState } from 'react'
+import { useClientActions } from '../hooks/useClientActions.ts'
 import ClientForm from './ClientForm.tsx'
 import Modal from '../../../components/UI/Modal/Modal.tsx'
+import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 
 const ClientsDataList = () => {
-  const { clients, deleteOneClient, isLoading } = useClientsList()
-
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-
-  const handleOpenEditModal = (client: Client) => {
-    setSelectedClient(client)
-    setEditModalOpen(true)
-  }
-
-  const handleCloseEditModal = () => {
-    setEditModalOpen(false)
-    setSelectedClient(null)
-  }
+  const {
+    clients,
+    selectedClient,
+    open,
+    handleOpen,
+    handleClose,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationDelete,
+  } = useClientActions(true)
 
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
@@ -94,10 +91,10 @@ const ClientsDataList = () => {
       filterable: false,
       renderCell: ({ row }) => (
         <Box display="flex" alignItems="center">
-          <IconButton onClick={() => handleOpenEditModal(row)}>
+          <IconButton onClick={() => handleOpen(row)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => deleteOneClient(row._id)}>
+          <IconButton onClick={() => handleConfirmationOpen(row._id)}>
             <ClearIcon />
           </IconButton>
           <NavLink
@@ -114,11 +111,7 @@ const ClientsDataList = () => {
 
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : clients && clients.length > 0 ? (
+      {clients ? (
         <DataGrid
           getRowId={row => row._id}
           rows={clients}
@@ -136,10 +129,19 @@ const ClientsDataList = () => {
           disableRowSelectionOnClick
         />
       ) : (
-        <Typography className="text-center mt-5">Клиентов нет</Typography>
+        <Typography className="text-center mt-5">Клиенты не найдены</Typography>
       )}
-      <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
-        {selectedClient && <ClientForm client={selectedClient} onClose={handleCloseEditModal} />}
+
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этого клиента"
+        actionType="delete"
+        onConfirm={handleConfirmationDelete}
+        onCancel={handleConfirmationClose}
+      />
+
+      <Modal open={open} handleClose={handleClose}>
+        <ClientForm client={selectedClient} onClose={handleClose} />
       </Modal>
     </Box>
   )

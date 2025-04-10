@@ -1,6 +1,7 @@
 import { join } from 'path'
 
 const config = {
+  endpointProtection: process.env.DISABLE_ENDPOINT_PROTECTION !== '1',
   server: {
     port: 8000,
   },
