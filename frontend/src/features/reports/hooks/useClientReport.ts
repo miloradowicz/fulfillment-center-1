@@ -1,5 +1,5 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectClientReport, selectLoadingFetchReport } from '../../../store/slices/reportSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectClientReport, selectLoadingFetchReport } from '@/store/slices/reportSlice.ts'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
