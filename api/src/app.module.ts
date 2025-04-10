@@ -15,6 +15,7 @@ import { AuthModule } from './modules/auth.module'
 import { CounterpartiesModule } from './modules/counterparties.module'
 import { ServiceCategoriesModule } from './modules/service-category.module'
 import { ReportsModule } from './modules/reports.module'
+import { InvoicesModule } from './modules/invoices.module'
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ReportsModule } from './modules/reports.module'
     CounterpartiesModule,
     ServiceCategoriesModule,
     ReportsModule,
+    InvoicesModule,
   ],
   controllers: [],
   providers: [],

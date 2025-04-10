@@ -13,6 +13,7 @@ import { Order, OrderDocument } from '../schemas/order.schema'
 import { Counter, CounterDocument } from '../schemas/counter.schema'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
 import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-category.schema'
+import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 
 @Injectable()
 export class SeederService {
@@ -41,6 +42,8 @@ export class SeederService {
     private readonly counterpartyModel: Model<CounterpartyDocument>,
     @InjectModel(ServiceCategory.name)
     private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
+    @InjectModel(Invoice.name)
+    private readonly invoiceModel: Model<InvoiceDocument>,
   ) {}
 
   async seed() {
@@ -424,6 +427,47 @@ export class SeederService {
         type: 'поставка',
         associated_arrival: _arrival2._id,
         date_Done: '2025-03-28T08:27:17.078Z',
+      },
+    ])
+
+    const [_invoice1, _invoice2] = await this.invoiceModel.create([
+      {
+        invoiceNumber: 'INV-1',
+        associatedOrder: _order1._id,
+        client: _clients._id,
+        totalAmount: 306000,
+        status: 'в ожидании',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 3000,
+            service_amount: 2,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 3,
+          },
+        ],
+      },
+      {
+        invoiceNumber: 'INV-2',
+        associatedArrival: _arrival2._id,
+        client: _clients._id,
+        totalAmount: 66000,
+        status: 'оплачено',
+        services: [
+          {
+            service: _service1._id,
+            service_price: 2000,
+            service_amount: 3,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 2,
+          },
+        ],
       },
     ])
 
