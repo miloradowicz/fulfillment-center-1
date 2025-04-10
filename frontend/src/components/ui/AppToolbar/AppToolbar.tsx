@@ -50,9 +50,19 @@ const AppToolbar = () => {
             ) : (
               <NavLink to="/login">
                 <Button
-                  variant="outline"
-                  className="cursor-pointer border-white text-slate-800 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-200 transition-colors"
                   type="button"
+                  variant="outline"
+                  className="
+                  transition-colors
+                  cursor-pointer
+                  border-white
+                  text-slate-800
+                  hover:text-slate-800
+                  focus:text-slate-800
+                  hover:border-slate-300
+                  focus:border-slate-300
+                  hover:bg-slate-200
+                  focus:bg-slate-300"
                 >
                   Войти
                 </Button>
