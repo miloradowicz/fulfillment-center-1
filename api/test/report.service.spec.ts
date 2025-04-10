@@ -40,6 +40,38 @@ describe('ReportService', () => {
     { _id: 'client1', name: 'Client One' },
     { _id: 'client2', name: 'Client Two' },
   ]
+  const mockTasks = [
+    {
+      _id: 'task1',
+      taskNumber: 'T001',
+      date_Done: '2025-04-09T10:00:00Z',
+      user: { _id: 'user1', displayName: 'User One' },
+    },
+    {
+      _id: 'task2',
+      taskNumber: 'T002',
+      date_Done: '2025-04-09T12:00:00Z',
+      user: { _id: 'user1', displayName: 'User One' },
+    },
+    {
+      _id: 'task3',
+      taskNumber: 'T003',
+      date_Done: '2025-04-10T10:00:00Z',
+      user: { _id: 'user2', displayName: 'User Two' },
+    },
+    {
+      _id: 'task4',
+      taskNumber: 'T004',
+      date_Done: '2025-04-10T14:00:00Z',
+      user: { _id: 'user2', displayName: 'User Two' },
+    },
+    {
+      _id: 'task5',
+      taskNumber: 'T005',
+      date_Done: '2025-04-10T16:00:00Z',
+      user: { _id: 'user3', displayName: 'User Three' },
+    },
+  ]
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -62,8 +94,9 @@ describe('ReportService', () => {
         {
           provide: getModelToken('Task'),
           useValue: {
-            find: jest.fn(),
-            populate: jest.fn(),
+            find: jest.fn().mockImplementation(() => ({
+              populate: jest.fn().mockResolvedValue(mockTasks),
+            })),
           },
         },
       ],
@@ -86,8 +119,8 @@ describe('ReportService', () => {
     const result = await service.getClientReport(startDate, endDate)
 
     expect(result.clientOrderReport.length).toBe(2)
-    expect(result.clientOrderReport[0].orderCount).toBe(2) // Client One
-    expect(result.clientOrderReport[1].orderCount).toBe(1) // Client Two
+    expect(result.clientOrderReport[0].orderCount).toBe(2)
+    expect(result.clientOrderReport[1].orderCount).toBe(1)
     expect(result.clientOrderReport[0].client.name).toBe('Client One')
   })
 
@@ -104,7 +137,28 @@ describe('ReportService', () => {
     const result = await service.getClientReport(startDate, endDate)
 
     expect(result.clientOrderReport.length).toBe(2)
-    expect(result.clientOrderReport[0].orderCount).toBe(0) // Client One
-    expect(result.clientOrderReport[1].orderCount).toBe(0) // Client Two
+    expect(result.clientOrderReport[0].orderCount).toBe(0)
+    expect(result.clientOrderReport[1].orderCount).toBe(0)
   })
+  it('should return taskReport with correct userTaskReports and dailyTaskCounts', async () => {
+    const startDate = new Date('2025-04-09')
+    const endDate = new Date('2025-04-10')
+
+    const result = await service.getTaskReport(startDate, endDate)
+
+    expect(result.userTaskReports.length).toBe(3)
+    expect(result.userTaskReports[0].user.displayName).toBe('User One')
+    expect(result.userTaskReports[0].taskCount).toBe(2)
+
+    expect(result.userTaskReports[1].user.displayName).toBe('User Two')
+    expect(result.userTaskReports[1].taskCount).toBe(2)
+
+    expect(result.userTaskReports[2].user.displayName).toBe('User Three')
+    expect(result.userTaskReports[2].taskCount).toBe(1)
+
+    expect(result.dailyTaskCounts.length).toBe(2)
+    expect(result.dailyTaskCounts[0]).toEqual({ date: '2025-04-09', taskCount: 2 })
+    expect(result.dailyTaskCounts[1]).toEqual({ date: '2025-04-10', taskCount: 3 })
+  })
+
 })

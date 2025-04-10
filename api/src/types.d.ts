@@ -9,12 +9,36 @@ export type RequestWithUser = Request & { user: HydratedUser }
 export type JwtToken = { id: string }
 
 export interface UserTaskReport {
-  user: string
+  user: {
+    _id: string
+    displayName: string
+  }
   taskCount: number
   tasks: {
     _id: string
     taskNumber: string
   }[]
+}
+
+
+export interface TaskInterface {
+  _id: Types.ObjectId
+  isArchived: boolean
+  taskNumber: string
+  user: {
+    _id: Types.ObjectId
+    displayName: string
+  }
+  title: string
+  date_ToDO: Date | null
+  date_inProgress: Date | null
+  date_Done: Date | null
+  status: string
+  type: string
+  createdAt: Date
+  updatedAt: Date
+  logs: Log[]
+  __v: number
 }
 
 interface DailyTaskCount {

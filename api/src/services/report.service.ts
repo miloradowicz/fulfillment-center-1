@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Task, TaskDocument } from '../schemas/task.schema'
-import { clientOrderReport, DailyTaskCount, OrderWithClient, UserTaskReport } from '../types'
+import { clientOrderReport, DailyTaskCount, OrderWithClient, TaskInterface, UserTaskReport } from '../types'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { normalizeDates } from '../utils/normalazeDates'
 import { Client, ClientDocument } from '../schemas/client.schema'
@@ -34,13 +34,13 @@ export class ReportService {
           $lte: endDate.toISOString(),
         },
       })
-      .populate('user', 'displayName')
+      .populate('user', 'displayName') as unknown as TaskInterface[]
 
     const userTaskCount = tasks.reduce((acc, task) => {
-      const userId = task.user.toString()
+      const userId = task.user._id.toString()
 
       if (!acc[userId]) {
-        acc[userId] = { user: task.user, taskCount: 0, tasks: [] }
+        acc[userId] = { user:{ _id:task.user._id.toString(), displayName:task.user.displayName }, taskCount: 0, tasks: [] }
       }
       acc[userId].taskCount += 1
       acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber })
