@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { selectAllStocks, selectIsStocksLoading } from '../../../store/slices/stocksSlice.ts'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { selectAllStocks, selectIsStocksLoading } from '@/store/slices/stocksSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 
-import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { fetchStocks } from '@/store/thunks/stocksThunk.ts'
 
 export const useStockPage = () => {
   const dispatch = useAppDispatch()

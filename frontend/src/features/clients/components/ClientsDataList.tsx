@@ -2,13 +2,13 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, IconButton, useTheme, useMediaQuery, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import EditIcon from '@mui/icons-material/Edit'
-import { Client } from '../../../types'
+import { Client } from '@/types'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import { useClientActions } from '../hooks/useClientActions.ts'
 import ClientForm from './ClientForm.tsx'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
+import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 
 const ClientsDataList = () => {
   const {

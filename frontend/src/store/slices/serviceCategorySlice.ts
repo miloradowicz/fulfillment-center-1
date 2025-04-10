@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GlobalError, ServiceCategory, ValidationError } from '../../types'
+import { GlobalError, ServiceCategory, ValidationError } from '@/types'
 import { archiveServiceCategory, createServiceCategory, deleteServiceCategory, fetchServiceCategories, fetchServiceCategoryById, updateServiceCategory } from '../thunks/serviceCategoryThunk.ts'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 
 interface ServiceState {
   serviceCategory: ServiceCategory | null;

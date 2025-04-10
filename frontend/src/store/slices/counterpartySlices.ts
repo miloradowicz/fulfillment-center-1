@@ -9,8 +9,8 @@ import {
   archiveCounterparty,
   deleteCounterparty,
 } from '../thunks/counterpartyThunk'
-import { Counterparty, ValidationError } from '../../types'
-import { RootState } from '../../app/store'
+import { Counterparty, ValidationError } from '@/types'
+import { RootState } from '@/app/store'
 
 interface CounterpartyState {
   counterparties: Counterparty[] | null

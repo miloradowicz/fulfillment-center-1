@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { createCounterparty, fetchCounterparties, fetchCounterpartyById, updateCounterparty } from '../../../store/thunks/counterpartyThunk.ts'
-import { CounterpartyMutation } from '../../../types'
-import { phoneNumberRegex } from '../../../constants.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { createCounterparty, fetchCounterparties, fetchCounterpartyById, updateCounterparty } from '@/store/thunks/counterpartyThunk.ts'
+import { CounterpartyMutation } from '@/types'
+import { phoneNumberRegex } from '@/constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
 import { toast } from 'react-toastify'
-import { selectOneCounterparty, selectLoadingAdd, selectLoadingUpdate, selectCounterpartyCreateError, selectCounterpartyUpdateError, clearErrors, selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
+import { selectOneCounterparty, selectLoadingAdd, selectLoadingUpdate, selectCounterpartyCreateError, selectCounterpartyUpdateError, clearErrors, selectAllCounterparties } from '@/store/slices/counterpartySlices.ts'
 
 const requiredFields: (keyof CounterpartyMutation)[] = ['name']
 

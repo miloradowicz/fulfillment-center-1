@@ -1,10 +1,10 @@
 import useServiceForm from '../hooks/useServiceForm'
 import { Autocomplete as _Autocomplete, Box, Button, createFilterOptions, LinearProgress, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { isServiceCategory } from '../../../utils/helpers'
-import { ServiceCategory } from '../../../types'
+import { isServiceCategory } from '@/utils/helpers'
+import { ServiceCategory } from '@/types'
 
-const ServiceForm = ({ serviceId, onClose }: { serviceId: string, onClose: () => void }) => {
+const ServiceForm = ({ serviceId, onClose }: { serviceId?: string, onClose: () => void }) => {
   const {
     form,
     loading,

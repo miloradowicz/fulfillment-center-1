@@ -1,6 +1,6 @@
 import React from 'react'
 import { useArrivalsList } from '../hooks/useArrivalsList.ts'
-import { ArrivalWithClient } from '../../../types'
+import { ArrivalWithClient } from '@/types'
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
@@ -8,10 +8,10 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import ArrivalForm from './ArrivalForm.tsx'
 import StatusArrivalCell from './StatusArrivalCell.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 
 interface Props {
   onEdit: (data: ArrivalWithClient) => void;

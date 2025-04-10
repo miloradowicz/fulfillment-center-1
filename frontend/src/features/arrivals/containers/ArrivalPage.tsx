@@ -1,11 +1,11 @@
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import { Box, CircularProgress } from '@mui/material'
 import { useArrivalPage } from '../hooks/useArrivalPage.ts'
 import ArrivalsDataList from '../components/ArrivalsDataList.tsx'
 import ArrivalForm from '../components/ArrivalForm.tsx'
 import Grid from '@mui/material/Grid2'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/ui/CustomTitle/CustomTitle.tsx'
 
 const ArrivalPage = () => {
   const {

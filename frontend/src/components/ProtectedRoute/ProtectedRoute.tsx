@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { featureProtection } from '../../constants'
+import { featureProtection } from '@/constants.ts'
 
 interface Props extends PropsWithChildren {
   isAllowed: boolean;

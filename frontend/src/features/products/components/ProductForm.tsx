@@ -1,9 +1,9 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography, Autocomplete } from '@mui/material'
 import useProductForm from '../hooks/useProductForm.ts'
-import { ProductWithPopulate } from '../../../types'
+import { ProductWithPopulate } from '@/types'
 import React from 'react'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 
 interface Props {
   initialData?: ProductWithPopulate

@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import {
   GlobalError,
   Task,
   TaskMutation,
   TaskWithPopulate, ValidationError,
-} from '../../types'
+} from '@/types'
 import { isAxiosError } from 'axios'
 
 export const fetchTasks = createAsyncThunk<Task[]>(

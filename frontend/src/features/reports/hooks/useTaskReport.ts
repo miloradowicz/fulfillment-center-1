@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchReport, selectTaskReport } from '../../../store/slices/reportSlice.ts'
-import { selectLoadingFetchTask, selectPopulatedTasks } from '../../../store/slices/taskSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchReport, selectTaskReport } from '@/store/slices/reportSlice.ts'
+import { selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 

@@ -1,4 +1,4 @@
-import { ValidationError } from '../types'
+import { ValidationError } from '@/types'
 
 export const getFieldError = (fieldName: string, createError:ValidationError | null) => {
   try {

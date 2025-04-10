@@ -1,10 +1,10 @@
 import { Box, Card, CircularProgress, Divider, Typography } from '@mui/material'
 import useProductActions from '../hooks/useProductActions.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
-import EditButton from '../../../components/UI/Buttons/EditButton.tsx'
-import DeleteButton from '../../../components/UI/Buttons/DeleteButton.tsx'
-import BackButton from '../../../components/UI/Buttons/BackButton.tsx'
+import EditButton from '@/components/ui/Buttons/EditButton.tsx'
+import DeleteButton from '@/components/ui/Buttons/DeleteButton.tsx'
+import BackButton from '@/components/ui/Buttons/BackButton.tsx'
 
 const ProductDetails = () => {
   const {

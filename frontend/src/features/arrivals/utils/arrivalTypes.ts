@@ -5,8 +5,8 @@ import {
   ErrorsFields,
   ProductArrival,
   ServiceArrival,
-} from '../../../types'
-import { ItemType } from '../../../constants.ts'
+} from '@/types'
+import { ItemType } from '@/constants.ts'
 
 export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
 

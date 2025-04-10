@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { useAppDispatch } from '@/app/hooks.ts'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { fetchTaskReport } from '../../../store/thunks/reportThunk.ts'
+import { fetchTaskReport } from '@/store/thunks/reportThunk.ts'
 import { toast } from 'react-toastify'
 import useIMobile from '../utils/UseIMobile.ts'
 
