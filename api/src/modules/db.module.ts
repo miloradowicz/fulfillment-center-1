@@ -12,6 +12,7 @@ import { Stock, StockSchema } from '../schemas/stock.schema'
 import { Counter, CounterSchema } from '../schemas/counter.schema'
 import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema'
 import { ServiceCategory, ServiceCategorySchemaFactory } from '../schemas/service-category.schema'
+import { Invoice, InvoiceSchema } from '../schemas/invoice.schema'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ServiceCategory, ServiceCategorySchemaFactory } from '../schemas/servic
       { name: Stock.name, schema: StockSchema },
       { name: Counter.name, schema: CounterSchema },
       { name: Counterparty.name, schema: CounterpartySchema },
+      { name: Invoice.name, schema: InvoiceSchema },
     ]),
     MongooseModule.forFeatureAsync([
       {
