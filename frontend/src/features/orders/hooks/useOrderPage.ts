@@ -6,7 +6,11 @@ import {
   selectAllOrdersWithClient,
   selectLoadingFetchOrder,
 } from '../../../store/slices/orderSlice.ts'
-import { deleteOrder, fetchOrderByIdWithPopulate, fetchOrdersWithClient } from '../../../store/thunks/orderThunk.ts'
+import {
+  archiveOrder, fetchArchivedOrders,
+  fetchOrderByIdWithPopulate,
+  fetchOrdersWithClient,
+} from '../../../store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { OrderWithClient } from '../../../types'
 
@@ -21,13 +25,14 @@ const UseOrderPage = () => {
     dispatch(fetchOrdersWithClient())
   }, [dispatch])
 
-  const handleDelete = async (id: string) => {
+  const handleArchive = async (id: string) => {
     try {
-      await dispatch(deleteOrder(id))
+      await dispatch(archiveOrder(id))
       dispatch(fetchOrdersWithClient())
-      toast.success('Заказ успешно удалён!')
+      toast.success('Заказ успешно архивирован!')
+      dispatch(fetchArchivedOrders)
     } catch (e) {
-      toast.error('Ошибка при удалении заказа.')
+      toast.error('Ошибка при архивации заказа.')
       console.error(e)
     }
   }
@@ -45,9 +50,9 @@ const UseOrderPage = () => {
     setOpen(true)
   }
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmArchive = async () => {
     if (counterpartyToDelete) {
-      await dispatch(deleteOrder(counterpartyToDelete._id))
+      await dispatch(archiveOrder(counterpartyToDelete._id))
       dispatch(fetchOrdersWithClient())
       handleClose()
     }
@@ -59,10 +64,10 @@ const UseOrderPage = () => {
     handleOpen,
     loading,
     handleClose,
-    handleDelete,
+    handleArchive,
     handleOpenEdit,
     setCounterpartyToDelete,
-    handleConfirmDelete,
+    handleConfirmArchive,
   }
 }
 

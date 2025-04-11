@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { selectLoadingFetchOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
-import { deleteOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
+import { archiveOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { OrderWithProductsAndClients } from '../../../types'
@@ -13,7 +13,7 @@ export const useOrderDetails = () => {
   const order = useAppSelector(selectPopulateOrder)
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [open, setOpen] = useState(false)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openArchiveModal, setOpenArchiveModal] = useState(false)
   const [infoTab, setInfoTab] = useState(0)
   const navigate = useNavigate()
 
@@ -23,18 +23,18 @@ export const useOrderDetails = () => {
     }
   }, [dispatch, id])
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     try {
       if (order) {
-        await dispatch(deleteOrder(order._id))
+        await dispatch(archiveOrder(order._id))
         navigate('/orders')
-        toast.success('Заказ успешно удалён!')
+        toast.success('Заказ успешно архивирован!')
       }
     } catch (e) {
       console.error(e)
-      toast.error('Ошибка при удалении заказа')
+      toast.error('Ошибка при архивации заказа')
     }
-    setOpenDeleteModal(false)
+    setOpenArchiveModal(false)
   }
 
   const handleOpenEdit = () => {
@@ -58,13 +58,13 @@ export const useOrderDetails = () => {
     order,
     loading,
     open,
-    openDeleteModal,
-    handleDelete,
+    openArchiveModal,
+    handleArchive,
     handleOpenEdit,
     setOpen,
     navigateBack,
     getStepDescription,
-    setOpenDeleteModal,
+    setOpenArchiveModal,
     infoTab,
     setInfoTab,
   }

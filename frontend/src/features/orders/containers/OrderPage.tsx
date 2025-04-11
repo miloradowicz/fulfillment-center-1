@@ -8,7 +8,7 @@ import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
 import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
 
 const OrderPage = () => {
-  const { orders, open, handleOpen, handleClose, handleDelete, loading, handleOpenEdit } = useOrderPage()
+  const { orders, open, handleOpen, handleClose, handleArchive, loading, handleOpenEdit } = useOrderPage()
 
   return (
     <>
@@ -25,7 +25,7 @@ const OrderPage = () => {
             <CustomTitle text={'Заказы'}/>
             <CustomButton text={'Добавить заказ'} onClick={handleOpen} />
           </Box>
-          <OrdersList onEdit={handleOpenEdit} orders={orders || []} handleDelete={handleDelete} />
+          <OrdersList onEdit={handleOpenEdit} orders={orders || []} handleDelete={handleArchive} />
         </>
       )}
     </>

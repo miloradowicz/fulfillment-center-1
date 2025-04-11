@@ -35,13 +35,13 @@ const OrderDetails = () => {
     order,
     loading,
     open,
-    openDeleteModal,
+    openArchiveModal,
     handleOpenEdit,
-    handleDelete,
+    handleArchive,
     setOpen,
     navigateBack,
     getStepDescription,
-    setOpenDeleteModal,
+    setOpenArchiveModal,
     infoTab,
     setInfoTab,
   } = useOrderDetails()
@@ -166,17 +166,17 @@ const OrderDetails = () => {
           }}
         >
           <EditButton onClick={() => handleOpenEdit()} />
-          <ArchiveButton onClick={() => setOpenDeleteModal(true)} />
+          <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
 
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />
           </Modal>
           <ConfirmationModal
-            open={openDeleteModal}
+            open={openArchiveModal}
             entityName="этот заказ"
-            actionType="delete"
-            onConfirm={() => handleDelete()}
-            onCancel={() => setOpenDeleteModal(false)}
+            actionType="archive"
+            onConfirm={() => handleArchive()}
+            onCancel={() => setOpenArchiveModal(false)}
           />
         </Box>
       </Card>
