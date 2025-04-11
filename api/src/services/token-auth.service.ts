@@ -12,28 +12,25 @@ export class TokenAuthService {
 
   public async getUserForToken(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<RequestWithUser>()
-    const header = request.get('Authorization')
+    const token = request.cookies?.token as string | undefined
 
-    const bearerRegex = /^Bearer (?<token>.+)/
-
-    if (!header || !bearerRegex.test(header)) {
-      return true
+    if (!token) {
+      return null
     }
-
-    const jwtToken = bearerRegex.exec(header)!.groups!['token']
 
     try {
-      const token = jwt.verify(jwtToken, config.jwt.secret) as JwtToken
-      const user = await this.userModel.findById(token.id)
+      const decoded = jwt.verify(token, config.jwt.secret) as JwtToken
+      const user = await this.userModel.findById(decoded.id)
 
-      if (user && user.token === jwtToken) {
-        request.user = user
-        return true
+      if (!user || user.token !== token) {
+        throw new UnauthorizedException('Неверный токен')
       }
 
-      throw new UnauthorizedException('Недействительный токен')
+      request.user = user
+      return true
     } catch {
-      throw new UnauthorizedException('Недействительный токен')
+      throw new UnauthorizedException('Неверный токен')
     }
   }
+
 }
