@@ -24,10 +24,12 @@ export class OrdersService {
   }
 
   async getAllArchived() {
-    const orders = await this.orderModel.find({ isArchived: true }).populate('stock').exec()
+    const orders = await this.orderModel
+      .find({ isArchived: true })
+      .populate('client stock')
+      .exec()
     return orders.reverse()
   }
-
   async getAllWithClient() {
     const orders = await this.orderModel.find({ isArchived: false }).populate('client stock').exec()
     return orders.reverse()
@@ -138,6 +140,19 @@ export class OrdersService {
     if (order.isArchived) throw new ForbiddenException('Заказ уже в архиве')
 
     return { message: 'Заказ перемещен в архив' }
+  }
+
+  async unarchive(id: string) {
+    const order = await this.orderModel.findById(id)
+
+    if (!order) throw new NotFoundException('Заказ не найден')
+
+    if (!order.isArchived) throw new ForbiddenException('Заказ не находится в архиве')
+
+    order.isArchived = false
+    await order.save()
+
+    return { message: 'Заказ восстановлен из архива' }
   }
 
   async delete(id: string) {

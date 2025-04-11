@@ -52,7 +52,6 @@ export class OrdersController {
     return this.ordersService.create(orderDto, files)
   }
 
-
   @Put(':id')
   @UseInterceptors(FileUploadInterceptor())
   async updateOrder(@Param('id') id: string, @Body() orderDto: UpdateOrderDto, @UploadedFiles() files: Array<Express.Multer.File>,) {
@@ -62,6 +61,11 @@ export class OrdersController {
   @Patch(':id/archive')
   async archiveOrder(@Param('id') id: string) {
     return this.ordersService.archive(id)
+  }
+
+  @Patch(':id/unarchive')
+  async unarchiveOrder(@Param('id') id: string) {
+    return this.ordersService.unarchive(id)
   }
 
   @Delete(':id')

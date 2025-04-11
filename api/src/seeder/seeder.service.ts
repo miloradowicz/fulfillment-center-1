@@ -243,6 +243,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
         status: 'в сборке',
+        isArchived: false,
       },
       {
         orderNumber: 'ORD-2',
@@ -256,6 +257,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(),
         status: 'в пути',
+        isArchived: false,
       },
       {
         orderNumber: 'ORD-3',
@@ -269,6 +271,35 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'доставлен',
+        isArchived: false,
+      },
+      {
+        orderNumber: 'ORD-4',
+        client: _client_1._id,
+        stock: _stock1._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
+          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+        ],
+        price: 3900,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
+        status: 'в сборке',
+        isArchived: true,
+      },
+      {
+        orderNumber: 'ORD-5',
+        client: _client_1._id,
+        stock: _stock2._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
+          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+        ],
+        price: 2900,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
+        status: 'в пути',
+        isArchived: true,
       },
     ])
 
