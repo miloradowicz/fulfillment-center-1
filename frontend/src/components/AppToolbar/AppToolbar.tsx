@@ -2,10 +2,10 @@ import UserMenu from './UserMenu.tsx'
 import { selectUser } from '@/store/slices/authSlice.ts'
 import { useAppSelector } from '@/app/hooks.ts'
 import { featureProtection } from '@/constants.ts'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet.tsx'
+import { Button } from '@/components/ui/button.tsx'
 import { NavLink } from 'react-router-dom'
-import SidebarContent from '@/components/ui/SidebarContent/SidebarContent'
+import SidebarContent from '@/components/SidebarContent/SidebarContent.tsx'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -40,7 +40,7 @@ const AppToolbar = () => {
             )}
 
             <NavLink to="/" className="bg-white rounded-md">
-              <img src="/logo.png" alt="logo" className="h-[40px] object-cover rounded-[8px] cursor-pointer" />
+              <img src="/logo.png" alt="logo" className="h-[40px] object-cover cursor-pointer" />
             </NavLink>
           </div>
 

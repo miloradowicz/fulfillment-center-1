@@ -1,10 +1,10 @@
 import { Box, CircularProgress } from '@mui/material'
 import ProductsDataList from '../components/ProductsDataList.tsx'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import useProductActions from '../hooks/useProductActions.ts'
-import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
-import CustomTitle from '@/components/ui/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 
 const ProductPage = () => {
   const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)

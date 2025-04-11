@@ -15,9 +15,9 @@ import {
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
