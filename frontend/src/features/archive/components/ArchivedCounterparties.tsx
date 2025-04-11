@@ -73,7 +73,7 @@ const ArchivedCounterparties = () => {
       editable: false,
       filterable: false,
       renderCell: ({ row }) => (
-        <Box display="flex" alignItems="center">
+        <Box>
           <IconButton onClick={() => handleConfirmationOpen(row._id)}>
             <ClearIcon />
           </IconButton>
