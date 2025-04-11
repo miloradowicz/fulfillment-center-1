@@ -15,15 +15,17 @@ import {
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
-import Modal from '@/components/ui/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
+import TaskDetails from './TaskDetails.tsx'
+import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import Modal from '@/components/ui/Modal/Modal.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
+  const [openDetailModal, setOpenDetailModal] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
 
@@ -105,14 +107,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       <div
         {...listeners}
         style={{ padding: 16 }}
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-        }}
       >
         <CardContent>
-          <Typography variant="body1">
-            #<strong>{task.taskNumber}</strong>
+          <Typography variant="body1" onClick={() => setOpenDetailModal(true)}>
+            <strong>{task.taskNumber}</strong>
           </Typography>
           <Typography variant="body1" marginTop={1}>
             Исполнитель: <strong>{task.user.displayName}</strong>
@@ -186,6 +184,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       />
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
+      </Modal>
+      <Modal open={openDetailModal} width={'md'} handleClose={() => setOpenDetailModal(false)}>
+        <TaskDetails taskId={task._id}/>
       </Modal>
     </Card>
   )

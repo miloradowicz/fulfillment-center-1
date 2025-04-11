@@ -5,13 +5,14 @@ import React from 'react'
 export interface ModalProps {
   open: boolean
   handleClose: () => void
+  width?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   children: React.ReactNode
 }
 
-const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ open, handleClose, width='sm', children }) => {
   return (
     <Dialog
-      maxWidth="sm"
+      maxWidth={width}
       fullWidth
       className="text-[#32363F]"
       open={open}

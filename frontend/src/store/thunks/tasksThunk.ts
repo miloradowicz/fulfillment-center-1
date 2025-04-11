@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '@/utils/axiosAPI.ts'
+import axiosAPI from '../../utils/axiosAPI.ts'
 import {
   GlobalError,
   Task,
@@ -39,10 +39,10 @@ export const fetchTasksByUserIdWithPopulate = createAsyncThunk<TaskWithPopulate[
   },
 )
 
-export const fetchTaskById = createAsyncThunk<Task, string>(
+export const fetchTaskById = createAsyncThunk<TaskWithPopulate, string>(
   'tasks/fetchTaskById',
   async (taskId: string) => {
-    const response = await axiosAPI.get(`/tasks/?=${ taskId }`)
+    const response = await axiosAPI.get(`/tasks/${ taskId }`)
     return response.data
   },
 )
