@@ -109,21 +109,6 @@ export const deleteUser = createAsyncThunk<void, string, { rejectValue: GlobalEr
   },
 )
 
-export const getCurrentUser = createAsyncThunk<User>(
-  'users/getCurrentUser',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosAPI.get('/users/me')
-      return response.data
-    } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        return rejectWithValue(error.response.data as GlobalError)
-      }
-      throw error
-    }
-  },
-)
-
 export const logoutUser = createAsyncThunk<void, void, { rejectValue: GlobalError }>(
   'users/logoutUser',
   async (_, { rejectWithValue }) => {

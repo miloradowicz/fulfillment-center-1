@@ -5,22 +5,23 @@ import { store } from './app/store.ts'
 import { CssBaseline } from '@mui/material'
 import { ToastContainer } from 'react-toastify'
 import { BrowserRouter } from 'react-router-dom'
-import { addCsrf } from './utils/axiosAPI.ts'
+import { addCsrf, checkAuthentication } from './utils/axiosAPI.ts'
 import './index.css'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 
-addCsrf()
 dayjs.extend(localizedFormat)
 dayjs.locale('ru')
 
-createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
-    <CssBaseline />
-    <ToastContainer position={'top-center'} />
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </Provider>,
-)
+addCsrf()
+checkAuthentication(store)
+  .then(() => createRoot(document.getElementById('root')!).render(
+    <Provider store={store}>
+      <CssBaseline />
+      <ToastContainer position={'top-center'} />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>,
+  ))

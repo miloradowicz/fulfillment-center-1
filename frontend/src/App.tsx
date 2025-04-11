@@ -18,19 +18,13 @@ import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
-import { useAppDispatch, useAppSelector } from './app/hooks.ts'
+import { useAppSelector } from './app/hooks.ts'
 import { selectUser } from './store/slices/authSlice.ts'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
-import { useEffect } from 'react'
-import { getCurrentUser } from '@/store/thunks/userThunk.ts'
+
 
 const App = () => {
   const user = useAppSelector(selectUser)
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(getCurrentUser())
-  }, [dispatch])
 
   const theme = createTheme({
     typography: {

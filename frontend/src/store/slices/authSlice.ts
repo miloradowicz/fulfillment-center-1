@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '@/app/store'
-import { getCurrentUser, loginUser, logoutUser, registerUser } from '../thunks/userThunk'
+import { loginUser, logoutUser, registerUser } from '../thunks/userThunk'
 import { User, ValidationError, GlobalError } from '@/types'
 
 interface AuthState {
@@ -52,6 +52,9 @@ const authSlice = createSlice({
         state.loginError = null
       }
     },
+    setUser: (state, { payload }: PayloadAction<User>) => {
+      state.user = payload
+    },
     unsetUser: state => {
       state.user = null
     },
@@ -93,19 +96,13 @@ const authSlice = createSlice({
         state.loadingLogin = false
         state.error = error || null
       })
-
-      .addCase(getCurrentUser.fulfilled, (state, action) => {
-        state.user = action.payload
-      })
-      .addCase(getCurrentUser.rejected, state => {
-        state.user = null
-      })
   },
 })
 
 export const {
   clearCreateError,
   clearLoginError,
+  setUser,
   unsetUser,
 } = authSlice.actions
 

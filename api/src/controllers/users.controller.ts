@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Res, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { CreateUserDto } from '../dto/create-user.dto'
 import { UsersService } from '../services/user.service'
 import { UpdateUserDto } from '../dto/update-user.dto'
@@ -8,6 +8,7 @@ import { HydratedUser } from 'src/types'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
 import { Response } from 'express'
+import { Public } from 'src/decorators/public.decorator'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
@@ -21,6 +22,7 @@ export class UsersController {
     return await this.usersService.create(createUserDto)
   }
 
+  @Public()
   @Roles()
   @Post('sessions')
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
@@ -45,8 +47,12 @@ export class UsersController {
 
   @Get('me')
   getCurrentUser(@User() user: HydratedUser) {
-    const { token, ...userData } = user.toObject()
-    return userData
+    if (user) {
+      const { token, ...userData } = user.toObject()
+      return userData
+    } else {
+      throw new UnauthorizedException('Вход не выполнен.')
+    }
   }
 
   @Get()
