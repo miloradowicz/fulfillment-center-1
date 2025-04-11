@@ -21,7 +21,7 @@ const DataTableViewOptions = <T,>({ table }: Props<T>) => {
         <Button
           type="button"
           variant="outline"
-          className="max-w-sm h-8 lg:flex cursor-pointer"
+          className="max-w-sm lg:flex cursor-pointer"
         >
           <Settings2 />
           Настройки видимости

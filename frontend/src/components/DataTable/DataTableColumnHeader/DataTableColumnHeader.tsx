@@ -23,11 +23,11 @@ const DataTableColumnHeader = <TData, TValue>({ column, title, className }: Prop
           <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-accent">
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
-              <ArrowDown />
+              <ArrowDown size={18} />
             ) : column.getIsSorted() === 'asc' ? (
-              <ArrowUp />
+              <ArrowUp size={18} />
             ) : (
-              <ChevronsUpDown />
+              <ChevronsUpDown size={18} />
             )}
           </Button>
         </DropdownMenuTrigger>
