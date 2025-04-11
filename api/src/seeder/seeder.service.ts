@@ -471,7 +471,7 @@ export class SeederService {
       {
         invoiceNumber: 'INV-1',
         associatedOrder: _order1._id,
-        client: _clients._id,
+        client: _client1._id,
         totalAmount: 306000,
         status: 'в ожидании',
         services: [
@@ -490,7 +490,7 @@ export class SeederService {
       {
         invoiceNumber: 'INV-2',
         associatedArrival: _arrival2._id,
-        client: _clients._id,
+        client: _client1._id,
         totalAmount: 66000,
         status: 'оплачено',
         services: [
