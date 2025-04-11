@@ -1,23 +1,20 @@
 import { Box, CircularProgress, TextField, Stack, IconButton, InputAdornment } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { DndContext, rectIntersection } from '@dnd-kit/core'
-import { useAppDispatch } from '@/app/hooks.ts'
 import { useTaskBoard } from '../hooks/useTaskBoard.ts'
 import TaskLine from './TaskLine.tsx'
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import UserList from './UserList'
-import { useEffect, useState } from 'react'
 import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
 import Modal from '@/components/ui/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 import { onDragEnd } from '../hooks/onDragEnd.ts'
+import TaskDetails from '@/features/tasks/components/TaskDetails.tsx'
 
 const TaskBoard = () => {
-  const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(true)
-
   const {
+    id,
     todoItems,
     doneItems,
     inProgressItems,
@@ -26,6 +23,8 @@ const TaskBoard = () => {
     setInProgressItems,
     searchQuery,
     users,
+    loading,
+    openDetailsModal,
     selectFetchUser,
     clearAllFilters,
     clearSearch,
@@ -38,16 +37,16 @@ const TaskBoard = () => {
     handleOpen,
     open,
     handleClose,
+    handleCloseDetailsModal,
+    dispatch,
   } = useTaskBoard()
 
-  useEffect(() => {
-    if (selectFetchUser) {
-      setLoading(false)
-    }
-  }, [selectFetchUser])
   return (<>
     <Modal handleClose={handleClose} open={open}>
       <TaskForm onSuccess={handleClose} />
+    </Modal>
+    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} width={'md'}>
+      <TaskDetails taskId={id}/>
     </Modal>
     <DndContext
       sensors={sensors}

@@ -4,6 +4,8 @@ import { selectTask } from '@/store/slices/taskSlice.ts'
 import { fetchTaskById } from '@/store/thunks/tasksThunk.ts'
 import { Badge } from '@/components/ui/badge'
 import { getStatusStyles } from '@/features/tasks/utils/statusStyle.ts'
+import dayjs from 'dayjs'
+import { useNavigate } from 'react-router-dom'
 
 
 interface Props {
@@ -12,13 +14,15 @@ interface Props {
 
 const TaskDetails: React.FC<Props> = ({ taskId }) => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const task = useAppSelector(selectTask)
 
   useEffect(() => {
     if (taskId) {
       dispatch(fetchTaskById(taskId))
+      navigate(`/tasks/${ taskId }`, { replace: true })
     }
-  }, [dispatch, taskId])
+  }, [dispatch, taskId, navigate])
 
   console.log(task)
 
@@ -63,13 +67,11 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
           </div>
           <div>
             <p className="font-semibold">Дата</p>
-            <p>{task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Не указана'}</p>
+            <p>{dayjs(task.createdAt).format('D MMMM YYYY HH:mm')}</p>
           </div>
         </div>
       </div>
     </div>
-
-
   )
 }
 

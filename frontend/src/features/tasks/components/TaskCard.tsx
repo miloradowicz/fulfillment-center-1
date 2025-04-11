@@ -20,14 +20,35 @@ import TaskForm from './TaskForm.tsx'
 import TaskDetails from './TaskDetails.tsx'
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/ui/Modal/Modal.tsx'
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button.tsx'
+import { Link2 } from 'lucide-react'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDetailModal, setOpenDetailModal] = useState(false)
+  const [tooltipText, setTooltipText] = useState('Скопировать ссылку')
+  const [openTooltip, setOpenTooltip] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
+
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const url = `${ window.location.origin }/tasks/${ task._id }`
+    await navigator.clipboard.writeText(url)
+    setTooltipText('Скопировано')
+    setOpenTooltip(true)
+  }
+
+  const handleMouseOver = () => {
+    setTooltipText('Скопировать ссылку')
+  }
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
@@ -109,10 +130,35 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         style={{ padding: 16 }}
       >
         <CardContent>
-          <Typography variant="body1" onClick={() => setOpenDetailModal(true)}>
-            <strong>{task.taskNumber}</strong>
-          </Typography>
-          <Typography variant="body1" marginTop={1}>
+          <div className="flex flex-row items-center gap-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Typography variant="body1" onClick={() => setOpenDetailModal(true)}>
+                  <strong>{task.taskNumber}</strong>
+                </Typography>
+              </TooltipTrigger>
+              <TooltipContent>
+                Детальный просмотр
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip open={openTooltip} onOpenChange={setOpenTooltip}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-muted"
+                  onClick={handleCopyLink}
+                  onMouseOver={handleMouseOver}
+                >
+                  <Link2 className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {tooltipText}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Typography variant="body1" marginTop={1} onClick={handleCopyLink}>
             Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
           <Typography variant="body1">
