@@ -1,66 +1,64 @@
-import React, { useState } from 'react'
-import { Button, Menu, MenuItem } from '@mui/material'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import { User } from '@/types'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { logoutUser } from '@/store/thunks/userThunk.ts'
-import { unsetUser } from '@/store/slices/authSlice.ts'
-import { useAppDispatch } from '@/app/hooks.ts'
+
+import { logoutUser } from '@/store/thunks/userThunk'
+import { unsetUser } from '@/store/slices/authSlice'
+import { useAppDispatch } from '@/app/hooks'
 import { toast } from 'react-toastify'
+import React from 'react'
+import { Separator } from '@/components/ui/separator'
+import { Ellipsis, LogOut } from 'lucide-react'
 
 interface Props {
-  user: User;
+  user: User
 }
 
 const UserMenu: React.FC<Props> = ({ user }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const dispatch = useAppDispatch()
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
   const navigate = useNavigate()
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
   const handleLogout = async () => {
     await dispatch(logoutUser())
     dispatch(unsetUser())
-    setAnchorEl(null)
     toast.success('Вы вышли из системы')
     navigate('/login')
   }
 
   return (
-    <>
-      <Button onClick={handleClick} color="inherit">
-        Привет, {user.displayName}!
-      </Button>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        {user && user.role === 'admin' && (
-          <MenuItem
-            onClick={() => {
-              navigate('/admin')
-              setAnchorEl(null)
-            }}
-            component={NavLink}
-            to={'/admin'}
-          >
-            Admin
-          </MenuItem>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="secondary" className="h-11 w-11 p-0 rounded-full text-slate-800 bg-white hover:bg-slate-300 cursor-pointer  transition-colors">
+          <span className="text-xl font-bold uppercase">
+            {user.displayName?.[0]}
+          </span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <div className="px-3 py-1.5 text-md text-slate-700 font-bold text-center">
+          {user.displayName}
+        </div>
+        <Separator/>
+        {(user.role === 'admin' || user.role === 'super-admin') && (
+          <DropdownMenuItem className="text-md text-slate-800 mt-2 cursor-pointer" asChild>
+            <NavLink to="/admin">
+              <Ellipsis size={25}/>
+              Админ-панель
+            </NavLink>
+          </DropdownMenuItem>
         )}
-
-        <MenuItem
-          onClick={handleLogout}
-        >Выйти</MenuItem>
-      </Menu>
-    </>
+        <DropdownMenuItem onClick={handleLogout} className="text-md mt-2 my-1 text-slate-800 cursor-pointer">
+          <LogOut size={25}/>
+          Выйти
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
