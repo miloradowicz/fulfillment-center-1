@@ -20,6 +20,14 @@ export const fetchOrders = createAsyncThunk<Order[]>(
   },
 )
 
+export const fetchArchivedOrders = createAsyncThunk<OrderWithClient[]>(
+  'orders/fetchArchivedOrders',
+  async () => {
+    const response = await axiosAPI.get('/orders/archived/all?populate=true')
+    return response.data
+  },
+)
+
 export const fetchOrdersWithClient = createAsyncThunk<OrderWithClient[]>(
   'orders/fetchOrdersWithClient',
   async () => {
@@ -60,12 +68,26 @@ export const addOrder = createAsyncThunk<Order, OrderMutation & { files?: File[]
   }
 })
 
-
 export const archiveOrder = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
   'orders/archiveOrder',
   async (orderId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/orders/${ orderId }/archive`)
+      return { id: orderId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveOrder = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'orders/unarchiveOrder',
+  async (orderId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/orders/${ orderId }/unarchive`)
       return { id: orderId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
