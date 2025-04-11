@@ -10,7 +10,7 @@ import {
   UserStripped,
   ValidationError,
 } from '@/types'
-import { RootState } from '@/app/store.ts'
+
 
 export const registerUser = createAsyncThunk<
   User,
@@ -109,21 +109,11 @@ export const deleteUser = createAsyncThunk<void, string, { rejectValue: GlobalEr
   },
 )
 
-export const logoutUser = createAsyncThunk<void, void, { state: RootState; rejectValue: GlobalError }>(
+export const logoutUser = createAsyncThunk<void, void, { rejectValue: GlobalError }>(
   'users/logoutUser',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const token = getState().auth.user?.token
-
-      if (token) {
-        await axiosAPI.delete('/users/sessions', {
-          headers: {
-            Authorization: `Bearer ${ token }`,
-          },
-        })
-      } else {
-        await axiosAPI.delete('/users/sessions')
-      }
+      await axiosAPI.delete('/users/sessions')
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)

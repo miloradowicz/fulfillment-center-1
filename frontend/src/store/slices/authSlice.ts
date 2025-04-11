@@ -52,6 +52,9 @@ const authSlice = createSlice({
         state.loginError = null
       }
     },
+    setUser: (state, { payload }: PayloadAction<User>) => {
+      state.user = payload
+    },
     unsetUser: state => {
       state.user = null
     },
@@ -99,6 +102,7 @@ const authSlice = createSlice({
 export const {
   clearCreateError,
   clearLoginError,
+  setUser,
   unsetUser,
 } = authSlice.actions
 

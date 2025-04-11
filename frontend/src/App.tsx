@@ -22,6 +22,7 @@ import { useAppSelector } from './app/hooks.ts'
 import { selectUser } from './store/slices/authSlice.ts'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
 
+
 const App = () => {
   const user = useAppSelector(selectUser)
 
@@ -74,9 +75,10 @@ const App = () => {
                 <ProductDetails />
               </ProtectedRoute>
             } />
-            <Route path="/orders" element={                <ProtectedRoute isAllowed={!!user}>
-              <OrderPage />
-            </ProtectedRoute>
+            <Route path="/orders" element={
+              <ProtectedRoute isAllowed={!!user}>
+                <OrderPage />
+              </ProtectedRoute>
             } />
             <Route path="/orders/:id" element={
               <ProtectedRoute isAllowed={!!user}>

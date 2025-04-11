@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { CreateUserDto } from '../dto/create-user.dto'
 import { UsersService } from '../services/user.service'
 import { UpdateUserDto } from '../dto/update-user.dto'
@@ -7,6 +7,8 @@ import { User } from 'src/decorators/user.param-decorator'
 import { HydratedUser } from 'src/types'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
+import { Response } from 'express'
+import { Public } from 'src/decorators/public.decorator'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
@@ -20,15 +22,37 @@ export class UsersController {
     return await this.usersService.create(createUserDto)
   }
 
+  @Public()
   @Roles()
   @Post('sessions')
-  async login(@Body() loginDto: LoginDto) {
-    return await this.usersService.login(loginDto)
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const user = await this.usersService.login(loginDto)
+
+    res.cookie('token', user.token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
+
+    const { token, ...userData } = user.toObject()
+    return userData
   }
 
   @Delete('sessions')
-  async logout(@User() user: HydratedUser) {
+  async logout(@User() user: HydratedUser, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie('token')
     return await this.usersService.logout(String(user._id))
+  }
+
+  @Get('me')
+  getCurrentUser(@User() user: HydratedUser) {
+    if (user) {
+      const { token, ...userData } = user.toObject()
+      return userData
+    } else {
+      throw new UnauthorizedException('Вход не выполнен.')
+    }
   }
 
   @Get()
