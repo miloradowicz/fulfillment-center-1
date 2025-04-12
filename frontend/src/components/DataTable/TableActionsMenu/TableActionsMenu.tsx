@@ -43,9 +43,9 @@ const TableActionsMenu = <T extends { _id: string }>({
           <Button
             type="button"
             size="sm"
-            className="text-emerald-900 bg-emerald-100 hover:bg-emerald-300 cursor-pointer transition-colors">
+            className="text-slate-700 hover:bg-slate-100 bg-transparent cursor-pointer transition-colors shadow-sm">
             Редактировать
-            <Edit size={18} className="stroke-emerald-900" />
+            <Edit size={18} className="stroke-slate-700" />
           </Button>
         </DropdownMenuItem>
 
@@ -54,7 +54,7 @@ const TableActionsMenu = <T extends { _id: string }>({
             <Button
               type="button"
               size="sm"
-              className=" text-slate-800  bg-blue-200 hover:bg-blue-300 w-full transition-colors cursor-pointer">
+              className="text-slate-700 hover:bg-slate-100 bg-transparent cursor-pointer transition-colors shadow-sm w-full">
               <NavLink
                 to={`/${ detailsPathPrefix }/${ row._id }`}
                 className="inline-flex items-center content-center gap-0.5">
@@ -72,7 +72,7 @@ const TableActionsMenu = <T extends { _id: string }>({
             type="button"
             size="sm"
             onClick={() => handleConfirmationOpen(row._id)}
-            className="text-red-600 hover:bg-red-100 bg-red-50 w-full cursor-pointer transition-colors">
+            className="text-red-600 hover:bg-red-100 bg-transparent w-full cursor-pointer transition-colors shadow-sm">
             Удалить
             <Trash size={18} className="stroke-red-600" />
           </Button>
