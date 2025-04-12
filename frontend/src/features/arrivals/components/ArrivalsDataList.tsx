@@ -8,10 +8,10 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ArrivalForm from './ArrivalForm.tsx'
 import StatusArrivalCell from './StatusArrivalCell.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 interface Props {
   onEdit: (data: ArrivalWithClient) => void;

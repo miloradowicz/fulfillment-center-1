@@ -8,7 +8,7 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 import StatusOrderCell from './StatusOrderCell.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 interface Props {
   orders: OrderWithClient[] | []

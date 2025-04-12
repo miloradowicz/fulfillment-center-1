@@ -1,9 +1,9 @@
 import { Box } from '@mui/material'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import { useState } from 'react'
 import ServiceForm from '../components/ServiceForm.tsx'
-import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
-import CustomTitle from '@/components/ui/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 
 const ServicesPage = () => {
   const [open, setOpen] = useState(false)

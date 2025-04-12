@@ -6,9 +6,9 @@ import EditIcon from '@mui/icons-material/Edit'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from './ProductForm.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const ProductsDataList = () => {
   const {
