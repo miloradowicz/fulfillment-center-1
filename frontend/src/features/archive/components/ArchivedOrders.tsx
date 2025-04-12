@@ -4,12 +4,12 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useArchivedOrdersActions } from '../hooks/useArchivedOrdersActions'
 import StatusOrderCell from '../../orders/components/StatusOrderCell'
 import { NavLink } from 'react-router-dom'
 import CircularProgress from '@mui/material/CircularProgress'
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient } from '@/types'
 
 const ArchivedOrders = () => {
   const {

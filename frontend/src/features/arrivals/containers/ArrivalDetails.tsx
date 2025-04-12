@@ -5,7 +5,6 @@ import {
   CircularProgress,
   Container,
   Divider,
-  IconButton,
   Step,
   StepLabel,
   Stepper,
@@ -13,22 +12,22 @@ import {
   Tabs,
   Typography,
 } from '@mui/material'
-import { ArrowBack } from '@mui/icons-material'
 import dayjs from 'dayjs'
 import useArrivalDetails from '../hooks/useArrivalDetails'
-import Modal from '../../../components/UI/Modal/Modal'
+import Modal from '@/components/Modal/Modal'
 import ArrivalForm from '../components/ArrivalForm.tsx'
 import { Link } from 'react-router-dom'
-import { ArrivalStatus } from '../../../constants.ts'
-import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
-import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
+import { ArrivalStatus } from '@/constants.ts'
+import ProductsTable from '@/components/Tables/ProductsTable.tsx'
+import DefectsTable from '@/components/Tables/DefectsTable.tsx'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import LogsTable from '../../../components/Tables/LogsTable.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import LogsTable from '@/components/Tables/LogsTable.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
-import { getArrivalStatusColor } from '../../../utils/getOrderStatusColor.ts'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
+import { getArrivalStatusColor } from '@/utils/getOrderStatusColor.ts'
+import ArchiveButton from '../../../components/Buttons/ArchiveButton.tsx'
+import BackButton from '@/components/Buttons/BackButton.tsx'
+import EditButton from '@/components/Buttons/EditButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -38,7 +37,6 @@ const ArrivalDetails = () => {
     infoTab,
     productsTab,
     confirmArchiveModalOpen,
-    navigateBack,
     handleArchive,
     editModalOpen,
     setEditModalOpen,
@@ -84,14 +82,7 @@ const ArrivalDetails = () => {
 
       <Container maxWidth="md">
         <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
-            <IconButton >
-              <ArrowBack />
-            </IconButton>
-            <Typography variant="caption" className="!text-sm">
-              Поставки
-            </Typography>
-          </Box>
+          <BackButton/>
           <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
             <Box>
               <Chip label={arrival.arrival_status}
@@ -161,6 +152,7 @@ const ArrivalDetails = () => {
           </Tabs>
           <Box className="mt-4">
             {infoTab === 0 ? (
+              arrival.defects &&
               <DefectsTable defects={arrival.defects} />
             ) : infoTab === 1 ? (
               <LogsTable logs={arrival.logs || []} />

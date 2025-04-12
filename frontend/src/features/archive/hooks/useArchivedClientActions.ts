@@ -1,17 +1,17 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteClient, fetchArchivedClients, unarchiveClient } from '../../../store/thunks/clientThunk.ts'
+import { deleteClient, fetchArchivedClients, unarchiveClient } from '@/store/thunks/clientThunk.ts'
 import {
   clearClientError,
   selectAllArchivedClients,
   selectArchivedClient,
   selectClientError,
   selectLoadingArchivedClients,
-} from '../../../store/slices/clientSlice.ts'
+} from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
-import { Client } from '../../../types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
+import { Client } from '@/types'
 
 export const useArchivedClientActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()

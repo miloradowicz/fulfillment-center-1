@@ -1,9 +1,9 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteOrder, unarchiveOrder, fetchArchivedOrders } from '../../../store/thunks/orderThunk'
+import { deleteOrder, unarchiveOrder, fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
-import { selectAllArchivedOrders, selectLoadingFetchArchivedOrders } from '../../../store/slices/orderSlice'
-import { OrderWithClient } from '../../../types'
+import { selectAllArchivedOrders, selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
+import { OrderWithClient } from '@/types'
 
 export const useArchivedOrdersActions = () => {
   const dispatch = useAppDispatch()

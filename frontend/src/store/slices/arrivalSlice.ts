@@ -1,6 +1,6 @@
 import { Arrival, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addArrival,
   archiveArrival,
@@ -94,7 +94,7 @@ const arrivalSlice = createSlice({
         state.loadingFetch = false
       })
       .addCase(fetchArrivalById.pending, state => {
-        state.loadingFetchArchive = true
+        state.loadingFetch = true
         state.error = false
       })
       .addCase(fetchArrivalById.fulfilled, (state, { payload }) => {

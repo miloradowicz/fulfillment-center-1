@@ -1,18 +1,18 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import {
   deleteProduct,
   fetchArchivedProducts,
   unarchiveProduct,
-} from '../../../store/thunks/productThunk.ts'
+} from '@/store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
 import {
   clearErrorProduct, selectAllArchivedProducts, selectArchivedProduct, selectLoadingFetchArchivedProduct,
   selectProductError,
-} from '../../../store/slices/productSlice.ts'
+} from '@/store/slices/productSlice.ts'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ProductWithPopulate } from '../../../types'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
+import { ProductWithPopulate } from '@/types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 
 const useArchivedProductActions = () => {

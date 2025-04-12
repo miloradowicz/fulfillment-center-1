@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI'
+import axiosAPI from '@/utils/axiosAPI'
 import { isAxiosError } from 'axios'
 import {
   GlobalError,
@@ -9,7 +9,8 @@ import {
   UserRegistrationMutation,
   UserStripped,
   ValidationError,
-} from '../../types'
+} from '@/types'
+
 
 export const registerUser = createAsyncThunk<
   User,
@@ -107,3 +108,19 @@ export const deleteUser = createAsyncThunk<void, string, { rejectValue: GlobalEr
     }
   },
 )
+
+export const logoutUser = createAsyncThunk<void, void, { rejectValue: GlobalError }>(
+  'users/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosAPI.delete('/users/sessions')
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+

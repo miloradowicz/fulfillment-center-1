@@ -1,8 +1,8 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { Counterparty } from '../../../types'
+import { Counterparty } from '@/types'
 import { useCounterpartyForm } from '../hooks/useCounterpartyForm.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 
 const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterparty | null; onClose?: () => void }) => {
   const {

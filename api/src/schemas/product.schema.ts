@@ -16,7 +16,7 @@ export class Product {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
   })
-  client: string
+  client: mongoose.Types.ObjectId
 
   @Prop({ required: true })
   title: string
@@ -47,7 +47,7 @@ export class Product {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

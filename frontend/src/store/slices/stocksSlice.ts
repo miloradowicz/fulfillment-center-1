@@ -1,4 +1,4 @@
-import { GlobalError, Stock, ValidationError } from '../../types'
+import { GlobalError, Stock, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import {
   addStock,
@@ -9,7 +9,7 @@ import {
   fetchStocks,
   updateStock,
 } from '../thunks/stocksThunk.ts'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 
 interface StockState {
   stocks: Stock[] | null
@@ -158,5 +158,4 @@ const stocksSlice = createSlice({
 })
 
 export const { clearStockError } = stocksSlice.actions
-
 export const stockReducer = stocksSlice.reducer

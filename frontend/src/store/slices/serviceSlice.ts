@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GlobalError, PopulatedService, ValidationError } from '../../types'
+import { GlobalError, PopulatedService, ValidationError } from '@/types'
 import {
   fetchServices,
   fetchServiceById,
@@ -8,7 +8,7 @@ import {
   deleteService,
   archiveService,
 } from '../thunks/serviceThunk.ts'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 
 interface ServiceState {
   service: PopulatedService | null;

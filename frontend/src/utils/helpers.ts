@@ -1,4 +1,4 @@
-import { ServiceCategory, ValidationError } from '../types'
+import { ServiceCategory, ValidationError } from '@/types'
 
 export const isValidationError = (obj: unknown): obj is ValidationError =>
   typeof obj === 'object' && obj !== null &&

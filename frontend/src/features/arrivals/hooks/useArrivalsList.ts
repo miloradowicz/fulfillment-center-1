@@ -1,7 +1,7 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectPopulatedArrivals } from '../../../store/slices/arrivalSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectPopulatedArrivals } from '@/store/slices/arrivalSlice.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { archiveArrival, fetchPopulatedArrivals } from '../../../store/thunks/arrivalThunk.ts'
+import { archiveArrival, fetchPopulatedArrivals } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 
 export const useArrivalsList = () => {

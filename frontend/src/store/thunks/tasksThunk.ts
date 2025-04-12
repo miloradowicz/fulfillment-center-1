@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import {
   GlobalError,
   Task,
   TaskMutation,
   TaskWithPopulate, ValidationError,
-} from '../../types'
+} from '@/types'
 import { isAxiosError } from 'axios'
 
 export const fetchTasks = createAsyncThunk<Task[]>(
@@ -120,4 +120,16 @@ export const updateTask = createAsyncThunk<
   }
 })
 
-
+export const updateTaskStatus = createAsyncThunk<void, { taskId: string; data: TaskMutation }, { rejectValue: GlobalError }>(
+  'tasks/updateTaskStatus',
+  async ({ taskId, data }, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/tasks/${ taskId }/status`, data)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)

@@ -1,8 +1,8 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { toast } from 'react-toastify'
-import { clearLoginError, selectLoginError, selectLoadingLoginUser } from '../../../store/slices/userSlice.ts'
-import { loginUser } from '../../../store/thunks/userThunk.ts'
+import { clearLoginError, selectLoginError, selectLoadingLoginUser } from '@/store/slices/authSlice.ts'
+import { loginUser } from '@/store/thunks/userThunk.ts'
 import { useNavigate } from 'react-router-dom'
 
 class UnauthorizedException extends Error {

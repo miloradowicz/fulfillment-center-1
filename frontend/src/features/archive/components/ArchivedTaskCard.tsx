@@ -3,15 +3,15 @@ import { Box, Card, CardContent, IconButton, Menu, MenuItem, Typography } from '
 import React, { useState } from 'react'
 import ClearIcon from '@mui/icons-material/Clear'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { useAppDispatch } from '../../../app/hooks'
+import { useAppDispatch } from '@/app/hooks'
 import {
   deleteTask,
   fetchArchivedTasks,
   fetchTasksWithPopulate,
   unarchiveTask,
-} from '../../../store/thunks/tasksThunk'
+} from '@/store/thunks/tasksThunk'
 import { toast } from 'react-toastify'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
 import dayjs from 'dayjs'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'

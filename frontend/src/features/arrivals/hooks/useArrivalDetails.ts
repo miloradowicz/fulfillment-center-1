@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
   selectArrivalError,
   selectArrivalWithPopulate,
   selectLoadingFetchArrival,
-} from '../../../store/slices/arrivalSlice'
-import { archiveArrival, fetchArrivalByIdWithPopulate } from '../../../store/thunks/arrivalThunk'
+} from '@/store/slices/arrivalSlice.ts'
+import { archiveArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
-import { hasMessage } from '../../../utils/helpers'
+import { hasMessage } from '@/utils/helpers.ts'
 
 const useArrivalDetails = () => {
   const { arrivalId } = useParams()

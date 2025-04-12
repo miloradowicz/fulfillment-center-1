@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
-import { archiveOrder, fetchOrderByIdWithPopulate } from '../../../store/thunks/orderThunk.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
+import { archiveOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { OrderWithProductsAndClients } from '../../../types'
+import { OrderWithProductsAndClients } from '@/types'
 import dayjs from 'dayjs'
 
 export const useOrderDetails = () => {
@@ -41,10 +41,6 @@ export const useOrderDetails = () => {
     setOpen(true)
   }
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const getStepDescription = (index: number, order: OrderWithProductsAndClients) => {
     const descriptions = [
       'Товар собирается на складе',
@@ -62,7 +58,6 @@ export const useOrderDetails = () => {
     handleArchive,
     handleOpenEdit,
     setOpen,
-    navigateBack,
     getStepDescription,
     setOpenArchiveModal,
     infoTab,

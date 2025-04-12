@@ -1,4 +1,4 @@
-import { CounterpartyMutation } from '../../../types'
+import { CounterpartyMutation } from '@/types'
 
 export const initialState: CounterpartyMutation = {
   name: '',

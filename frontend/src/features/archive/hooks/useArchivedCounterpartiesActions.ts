@@ -1,21 +1,21 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { clearClientError } from '../../../store/slices/clientSlice.ts'
+import { clearClientError } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
-import { Counterparty } from '../../../types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
+import { Counterparty } from '@/types'
 import {
   selectAllArchivedCounterparties,
   selectCounterpartyError,
   selectLoadingFetchArchive,
   selectOneCounterparty,
-} from '../../../store/slices/counterpartySlices.ts'
+} from '@/store/slices/counterpartySlices.ts'
 import {
   deleteCounterparty,
   fetchAllArchivedCounterparties,
   unarchiveCounterparty,
-} from '../../../store/thunks/counterpartyThunk.ts'
+} from '@/store/thunks/counterpartyThunk.ts'
 
 export const useArchivedCounterpartiesActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()

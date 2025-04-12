@@ -1,49 +1,35 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
   ArrivalMutation,
-  ArrivalWithClient,
-  ArrivalWithPopulate,
   Defect,
-  ErrorsFields,
   Product,
-  ProductArrival,
-} from '../../../types'
-import { initialErrorState, initialItemState, initialState } from '../state/arrivalState'
+  ProductArrival, ServiceArrival,
+} from '@/types'
+import { initialErrorState, initialItemState, initialServiceState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
 import {
   addArrival,
   fetchArrivalByIdWithPopulate,
   fetchPopulatedArrivals,
   updateArrival,
-} from '../../../store/thunks/arrivalThunk.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
-import { selectCreateError, selectLoadingAddArrival } from '../../../store/slices/arrivalSlice.ts'
+} from '@/store/thunks/arrivalThunk.ts'
+import { selectAllClients } from '@/store/slices/clientSlice.ts'
+import { selectAllProducts } from '@/store/slices/productSlice.ts'
+import { selectCreateError, selectLoadingAddArrival } from '@/store/slices/arrivalSlice.ts'
 import dayjs from 'dayjs'
-import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
-import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
-import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
-import { selectAllCounterparties } from '../../../store/slices/counterpartySlices.ts'
-import { fetchAllCounterparties } from '../../../store/thunks/counterpartyThunk.ts'
-import { ErrorMessagesList } from '../../../messages.ts'
-import { ItemType } from '../../../constants.ts'
-
-export type ArrivalData = ArrivalWithClient | ArrivalWithPopulate
-
-type ErrorMessages = Pick<
-  ErrorsFields,
-  'client'
-  | 'product'
-  | 'arrival_date'
-  | 'amount'
-  | 'stock'
-  | 'defect_description'
-  | 'arrival_status'
-  | 'arrival_price'
->
+import { fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { selectAllStocks } from '@/store/slices/stocksSlice.ts'
+import { getAvailableItems } from '@/utils/getAvailableItems.ts'
+import { selectAllCounterparties } from '@/store/slices/counterpartySlices.ts'
+import { ErrorMessagesList } from '@/messages.ts'
+import { ItemType } from '@/constants.ts'
+import { fetchServices } from '@/store/thunks/serviceThunk.ts'
+import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
+import { selectAllServices } from '@/store/slices/serviceSlice.ts'
+import { fetchAllCounterparties } from '@/store/thunks/counterpartyThunk.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -54,6 +40,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const status = ['ожидается доставка', 'получена', 'отсортирована']
+  const services = useAppSelector(selectAllServices)
 
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
@@ -70,27 +57,38 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         received_amount: [],
         arrival_status: initialData.arrival_status,
         documents: [],
+        services: [],
       }
       : { ...initialState },
   )
 
-  const normalizeProductField = <T extends { product: string | { _id: string } }>(items?: T[]): T[] =>
+  const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
       ...item,
-      product: typeof item.product === 'string' ? item.product : item.product._id,
+      ...(item.product !== undefined && {
+        product: typeof item.product === 'string' ? item.product : item.product._id,
+      }),
+      ...(item.service !== undefined && {
+        service: typeof item.service === 'string' ? item.service : item.service._id,
+      }),
     })) || []
 
+
   const [productsForm, setProductsForm] = useState<ProductArrival[]>(
-    normalizeProductField((initialData?.products as ProductArrival[]) || []),
+    normalizeField((initialData?.products as ProductArrival[]) || []),
   )
   const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(
-    normalizeProductField((initialData?.received_amount as ProductArrival[]) || []),
+    normalizeField((initialData?.received_amount as ProductArrival[]) || []),
   )
   const [defectsForm, setDefectForm] = useState<Defect[]>(
-    normalizeProductField((initialData?.defects as Defect[]) || []),
+    normalizeField((initialData?.defects as Defect[]) || []),
+  )
+  const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
 
   const [newItem, setNewItem] = useState<ProductArrival | Defect>({ ...initialItemState })
+  const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
   const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
   const [availableItem, setAvailableItem] = useState<Product[]>([])
   const [files, setFiles] = useState<File[]>([])
@@ -98,11 +96,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
   const [defectsModalOpen, setDefectsModalOpen] = useState(false)
+  const [servicesModalOpen, setServicesModalOpen] = useState(false)
 
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
     dispatch(fetchAllCounterparties())
+    dispatch(fetchServices())
+
     if (form.client) {
       dispatch(fetchProductsByClientId(form.client))
     }
@@ -124,13 +125,21 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = (type: ItemType, initialState: ProductArrival | Defect) => {
-    setNewItem(initialState)
+  const openModal = <T extends ItemType>(
+    type: T,
+    initialState: ItemInitialStateMap[T],
+  ) => {
+    if (type === ItemType.SERVICES) {
+      setNewService(initialState as ServiceArrival)
+    } else {
+      setNewItem(initialState as ProductArrival | Defect)
+    }
 
-    const modalSetters = {
-      products: setProductsModalOpen,
-      received_amount: setReceivedModalOpen,
-      defects: setDefectsModalOpen,
+    const modalSetters: Record<ItemType, React.Dispatch<React.SetStateAction<boolean>>> = {
+      [ItemType.PRODUCTS]: setProductsModalOpen,
+      [ItemType.RECEIVED_AMOUNT]: setReceivedModalOpen,
+      [ItemType.DEFECTS]: setDefectsModalOpen,
+      [ItemType.SERVICES]: setServicesModalOpen,
     }
 
     Object.values(modalSetters).forEach(setter => setter(false))
@@ -145,8 +154,31 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       ...(type === ItemType.DEFECTS && { defect_description: (newItem as Defect).defect_description }),
     }
 
-    if (!baseItem.product || baseItem.amount <= 0 || (type === 'defects' && !(baseItem as Defect).defect_description)) {
+    const selectedService = services.find(s => s._id === newService.service)
+
+    const baseService = {
+      service: newService.service,
+      service_amount: Number(newService.service_amount),
+      service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+    }
+
+    if (
+      type !== ItemType.SERVICES &&
+      (
+        !baseItem.product ||
+        baseItem.amount <= 0 ||
+        (type === ItemType.DEFECTS && !(baseItem as Defect).defect_description)
+      )
+    ) {
       toast.warn('Заполните все обязательные поля.')
+      return
+    }
+
+    if (
+      type === ItemType.SERVICES &&
+      (!baseService.service || baseService.service_amount <= 0)
+    ) {
+      toast.warn('Заполните обязательные поля услуги.')
       return
     }
 
@@ -163,9 +195,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setDefectForm(prev => [...prev, baseItem as Defect])
       setDefectsModalOpen(false)
       break
+    case ItemType.SERVICES:
+      setServicesForm(prev => [...prev, baseService as ServiceArrival])
+      setServicesModalOpen(false)
+      break
     }
 
     setNewItem({ ...initialItemState })
+    setNewService({ ...initialServiceState })
   }
 
   const deleteItem = <T>(index: number, setter: React.Dispatch<React.SetStateAction<T[]>>) => {
@@ -181,6 +218,8 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       arrival_date: !value ? ErrorMessagesList.ArrivalDate : ErrorMessagesList.Default,
       stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
       arrival_price: Number(value) <= 0 ? ErrorMessagesList.ArrivalPrice : ErrorMessagesList.Default,
+      service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
+      service_amount: Number(value) <= 0 ? ErrorMessagesList.ServiceAmount : ErrorMessagesList.Default,
     }
 
     setErrors(prev => ({
@@ -189,6 +228,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }))
   }
 
+  const handleServiceChange = (serviceId: string) => {
+    const selectedService = services.find(s => s._id === serviceId)
+    setNewService(prev => ({
+      ...prev,
+      service: serviceId,
+      service_price: selectedService?.price || prev.service_price,
+    }))
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -206,7 +253,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
 
     setFiles(prevFiles => [...prevFiles, ...validFiles])
   }
-
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -227,6 +273,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         received_amount: receivedForm,
         defects: defectsForm,
         files: files || [],
+        services: servicesForm,
         shipping_agent: form.shipping_agent || null,
       }
 
@@ -281,6 +328,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     setReceivedModalOpen,
     defectsModalOpen,
     setDefectsModalOpen,
+    services,
+    newService,
+    setNewService,
+    servicesModalOpen,
+    setServicesModalOpen,
+    servicesForm,
+    setServicesForm,
     openModal,
     addItem,
     deleteItem,
@@ -294,5 +348,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     availableItem,
     files,
     handleFileChange,
+    handleServiceChange,
   }
 }

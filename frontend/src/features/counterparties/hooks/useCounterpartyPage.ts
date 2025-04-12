@@ -1,6 +1,6 @@
-import { useAppSelector } from '../../../app/hooks.ts'
+import { useAppSelector } from '@/app/hooks.ts'
 import { useState } from 'react'
-import { selectLoadingFetch } from '../../../store/slices/counterpartySlices.ts'
+import { selectLoadingFetch } from '@/store/slices/counterpartySlices.ts'
 
 export const useCounterpartyPage = () => {
   const [open, setOpen] = useState(false)

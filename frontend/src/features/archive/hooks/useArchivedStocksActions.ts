@@ -1,21 +1,21 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import {
   deleteStock,
   fetchArchivedStocks,
   unarchiveStock,
-} from '../../../store/thunks/stocksThunk.ts'
+} from '@/store/thunks/stocksThunk.ts'
 import {
   clearStockError,
   selectAllArchivedStocks,
   selectOneArchivedStock,
   selectStockError,
   selectLoadingFetchArchivedStocks,
-} from '../../../store/slices/stocksSlice.ts'
+} from '@/store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
-import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
-import { Stock } from '../../../types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
+import { Stock } from '@/types'
 
 const useArchivedStocksActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()

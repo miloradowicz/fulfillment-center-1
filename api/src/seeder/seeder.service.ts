@@ -13,6 +13,7 @@ import { Order, OrderDocument } from '../schemas/order.schema'
 import { Counter, CounterDocument } from '../schemas/counter.schema'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
 import { ServiceCategory, ServiceCategoryDocument } from '../schemas/service-category.schema'
+import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 
 @Injectable()
 export class SeederService {
@@ -41,7 +42,9 @@ export class SeederService {
     private readonly counterpartyModel: Model<CounterpartyDocument>,
     @InjectModel(ServiceCategory.name)
     private readonly serviceCategoryModel: Model<ServiceCategoryDocument>,
-  ) { }
+    @InjectModel(Invoice.name)
+    private readonly invoiceModel: Model<InvoiceDocument>,
+  ) {}
 
   async seed() {
     await this.connection.dropDatabase()
@@ -76,7 +79,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Артем Иванов',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -84,7 +87,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Игорь',
-        role: 'super-admin',
+        role: 'manager',
         token: randomUUID(),
       },
       {
@@ -92,7 +95,7 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Кристина',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
       {
@@ -100,48 +103,97 @@ export class SeederService {
         password: '1234567890',
         confirmPassword: '1234567890',
         displayName: 'Саша',
-        role: 'super-admin',
+        role: 'admin',
         token: randomUUID(),
       },
     ])
 
-    const [_client_1] = await this.clientModel.create(
+    const [_client1, _client2, _client3] = await this.clientModel.create({
+      name: 'CHAPSAN',
+      phone_number: '1 123-456-7890',
+      email: 'test@gmail.com',
+      inn: '123123',
+      address: 'Малдыбаева 7/1',
+      banking_data: '123123',
+      ogrn: '123123',
+      isArchived: false,
+    },
+    { name: 'ИП Петрова',
+      phone_number: '1 123-456-7899',
+      email: 'test1@gmail.com',
+      inn: '1231213',
+      address: 'Малдыбаева 8/1',
+      banking_data: '1231423',
+      ogrn: '1231423',
+      isArchived: false,
+    },
+    { name: 'ИП Сидорова',
+      phone_number: '1 123-056-7899',
+      email: 'test2@gmail.com',
+      inn: '12213',
+      address: 'Малдыбаева 9/1',
+      banking_data: '1230423',
+      ogrn: '1231623',
+      isArchived: false,
+    },
+    {
+      name: 'ОсOO CHAPSAN-GROUP',
+      phone_number: '1 123-456-7890',
+      email: 'test@gmail.com',
+      inn: '111',
+      address: 'Малдыбаева 7/2',
+      banking_data: '111',
+      ogrn: '111',
+      isArchived: true,
+    },
+    {
+      name: 'ИП Асанов',
+      phone_number: '1 123-456-7890',
+      email: 'test@gmail.com',
+      inn: '888',
+      address: 'Малдыбаева 7/3',
+      banking_data: '888',
+      ogrn: '888',
+      isArchived: true,
+    })
+
+    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
       {
-        name: 'CHAPSAN',
-        phone_number: '1 123-456-7890',
-        email: 'test@gmail.com',
-        inn: '123123',
-        address: 'Малдыбаева 7/1',
-        banking_data: '123123',
-        ogrn: '123123',
+        name: 'Работа с товаром',
         isArchived: false,
       },
       {
-        name: 'ОсOO CHAPSAN-GROUP',
-        phone_number: '1 123-456-7890',
-        email: 'test@gmail.com',
-        inn: '111',
-        address: 'Малдыбаева 7/2',
-        banking_data: '111',
-        ogrn: '111',
-        isArchived: true,
+        name: 'Дополнительные услуги',
+        isArchived: false,
+      },
+    ])
+
+    const [_service1, _service2, _service3, _service4] = await this.serviceModel.create([
+      {
+        name: 'Приемка, пересчет товара',
+        price: 50000,
+        serviceCategory: _serviceCat1._id,
       },
       {
-        name: 'ИП Асанов',
-        phone_number: '1 123-456-7890',
-        email: 'test@gmail.com',
-        inn: '888',
-        address: 'Малдыбаева 7/3',
-        banking_data: '888',
-        ogrn: '888',
-        isArchived: true,
+        name: 'Маркировка двойная',
+        price: 30000,
+        serviceCategory: _serviceCat1._id,
       },
-
-    )
-
-    const [_product1, _product2, _product3] = await this.productModel.create([
       {
-        client: _client_1._id,
+        name: 'Погрузка-Разгрузка на складе фулфилмента',
+        price: 70000,
+        serviceCategory: _serviceCat2._id,
+      },
+      {
+        name: 'Забор с другого адреса',
+        serviceCategory: _serviceCat2._id,
+        price: 100000,
+      },
+    ])
+
+    const [_product1, _product2, _product3, _product4] = await this.productModel.create([
+      {
+        client: _client1._id,
         title: 'Сарафан',
         barcode: '012345678901',
         article: '01234567',
@@ -152,7 +204,7 @@ export class SeederService {
         isArchived: false,
       },
       {
-        client: _client_1._id,
+        client: _client1._id,
         title: 'Джинсы',
         barcode: '987654321012',
         article: '987654',
@@ -163,7 +215,7 @@ export class SeederService {
         isArchived: false,
       },
       {
-        client: _client_1._id,
+        client: _client1._id,
         title: 'Футболка',
         barcode: '567890123456',
         article: '567890',
@@ -180,7 +232,7 @@ export class SeederService {
         isArchived: false,
       },
       {
-        client: _client_1._id,
+        client: _client1._id,
         title: 'Худи',
         barcode: '987654321012',
         article: '987654',
@@ -191,7 +243,7 @@ export class SeederService {
         isArchived: true,
       },
       {
-        client: _client_1._id,
+        client: _client1._id,
         title: 'Кепка',
         barcode: '987654321012',
         article: '987654',
@@ -201,13 +253,23 @@ export class SeederService {
         ],
         isArchived: true,
       },
+      {
+        client: _client2._id,
+        title: 'Платье',
+        barcode: '987644321012',
+        article: '987954',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+      },
     ])
 
     const [_stock1, _stock2] = await this.stockModel.create([
       {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product1._id, amount: 20 }],
+        products: [{ product: _product3._id, amount: 23 }],
         isArchived: false,
       },
       {
@@ -225,19 +287,18 @@ export class SeederService {
       {
         name: 'Склад Кант',
         address: 'Ул. Советская 101',
-        products: [],
+        products: [{ product: _product2._id, amount: 15 }],
         isArchived: true,
       },
     ])
 
-    const [_order1, _order2, _order3] = await this.orderModel.create([
+    const [_order1, _order2, _order3, _order4] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
-        client: _client_1._id,
+        client: _client1._id,
         stock: _stock1._id,
         products: [
-          { product: _product1._id, description: 'Заказ 1 - Сарафан', amount: 2 },
-          { product: _product2._id, description: 'Заказ 1 - Джинсы', amount: 1 },
+          { product: _product3._id, amount: 2 },
         ],
         price: 2500,
         sent_at: new Date().toISOString(),
@@ -247,11 +308,10 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-2',
-        client: _client_1._id,
+        client: _client1._id,
         stock: _stock2._id,
         products: [
-          { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 2 },
-          { product: _product3._id, description: 'Заказ 2 - Футболка', amount: 3 },
+          { product: _product2._id, description: 'Заказ 2 - Джинсы', amount: 15 },
         ],
         price: 4500,
         sent_at: new Date().toISOString(),
@@ -261,11 +321,10 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-3',
-        client: _client_1._id,
+        client: _client1._id,
         stock: _stock1._id,
         products: [
-          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
-          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+          { product: _product3._id, amount: 7 },
         ],
         price: 1900,
         sent_at: new Date().toISOString(),
@@ -275,7 +334,7 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-4',
-        client: _client_1._id,
+        client: _client1._id,
         stock: _stock1._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
@@ -289,7 +348,7 @@ export class SeederService {
       },
       {
         orderNumber: 'ORD-5',
-        client: _client_1._id,
+        client: _client1._id,
         stock: _stock2._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
@@ -301,14 +360,21 @@ export class SeederService {
         status: 'в пути',
         isArchived: true,
       },
+      {
+        orderNumber: 'ORD-6',
+        client: _client2._id,
+        stock: _stock1._id,
+        products: [
+          { product: _product3._id, amount: 5 },
+        ],
+        price: 2500,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
+        status: 'в сборке',
+      },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'order' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
-
+    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 3 } }, { upsert: true })
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
@@ -346,7 +412,7 @@ export class SeederService {
     const [_arrival1, _arrival2, _arrival3] = await this.arrivalModel.create([
       {
         arrivalNumber: 'ARL-1',
-        client: _client_1._id,
+        client: _client1._id,
         products: [{ product: _product1._id, description: '', amount: 20 }],
         arrival_price: 500,
         arrival_date: new Date().toISOString(),
@@ -355,16 +421,40 @@ export class SeederService {
         shipping_agent: _counterparty2._id,
         pickup_location: 'Ул. Пушкина, д. 67',
         isArchived: false,
+        services: [
+          {
+            service: _service1._id,
+            service_price: _service1.price,
+            service_amount: 2,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 4,
+          },
+        ],
       },
       {
         arrivalNumber: 'ARL-2',
-        client: _client_1._id,
-        products: [{ product: _product2._id, description: '', amount: 100 }],
+        client: _client1._id,
+        products: [{ product: _product2._id, description: '', amount: 30 }],
+        received_amount:[{ product: _product2._id, description: '', amount: 30 }],
         arrival_price: 2500,
         arrival_status: 'получена',
         arrival_date: new Date().toISOString(),
         sent_amount: '2 мешка',
         stock: _stock2._id,
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         logs: [
           { user: _User2, change: 'record #1', date: new Date().toISOString() },
           { user: _User1, change: 'record #2', date: new Date().toISOString() },
@@ -375,10 +465,11 @@ export class SeederService {
       },
       {
         arrivalNumber: 'ARL-3',
-        client: _client_1._id,
+        client: _client1._id,
         products: [{ product: _product3._id, description: '', amount: 30 }],
+        received_amount:[{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 1000,
-        arrival_status: 'отсортирована',
+        arrival_status: 'получена',
         arrival_date: new Date().toISOString(),
         sent_amount: '5 коробов',
         stock: _stock1._id,
@@ -388,7 +479,7 @@ export class SeederService {
       },
       {
         arrivalNumber: 'ARL-4',
-        client: _client_1._id,
+        client: _client1._id,
         products: [{ product: _product1._id, description: '', amount: 30 }],
         arrival_price: 100,
         arrival_status: 'отсортирована',
@@ -401,7 +492,7 @@ export class SeederService {
       },
       {
         arrivalNumber: 'ARL-5',
-        client: _client_1._id,
+        client: _client1._id,
         products: [{ product: _product2._id, description: '', amount: 30 }],
         arrival_price: 1200,
         arrival_status: 'отсортирована',
@@ -414,11 +505,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'arrival' },
-      { $set: { seq: 3 } },
-      { upsert: true }
-    )
+    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 3 } }, { upsert: true })
 
     await this.taskModel.create([
       {
@@ -548,44 +635,47 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate(
-      { name: 'task' },
-      { $set: { seq: 11 } },
-      { upsert: true }
-    )
-
-    const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
+    const [_invoice1, _invoice2] = await this.invoiceModel.create([
       {
-        name: 'Работа с товаром',
-        isArchived: false,
+        invoiceNumber: 'INV-1',
+        associatedOrder: _order1._id,
+        client: _client1._id,
+        totalAmount: 306000,
+        status: 'в ожидании',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 3000,
+            service_amount: 2,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 3,
+          },
+        ],
       },
       {
-        name: 'Дополнительные услуги',
-        isArchived: false,
-      }]
-    )
-
-    await this.serviceModel.create([
-      {
-        name: 'Приемка, пересчет товара',
-        price: 50000,
-        serviceCategory: _serviceCat1._id,
-      },
-      {
-        name: 'Маркировка двойная',
-        price: 30000,
-        serviceCategory: _serviceCat1._id,
-      },
-      {
-        name: 'Погрузка-Разгрузка на складе фулфилмента',
-        price: 70000,
-        serviceCategory: _serviceCat2._id,
-      },
-      {
-        name: 'Забор с другого адреса',
-        serviceCategory: _serviceCat2._id,
-        price: 100000,
+        invoiceNumber: 'INV-2',
+        associatedArrival: _arrival2._id,
+        client: _client1._id,
+        totalAmount: 66000,
+        status: 'оплачено',
+        services: [
+          {
+            service: _service1._id,
+            service_price: 2000,
+            service_amount: 3,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 2,
+          },
+        ],
       },
     ])
+
+    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 11 } }, { upsert: true })
   }
 }

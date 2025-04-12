@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { Client, ClientMutation, GlobalError, ValidationError } from '../../types'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import { Client, ClientMutation, GlobalError, ValidationError } from '@/types'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
 export const fetchClients = createAsyncThunk<Client[]>(

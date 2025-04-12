@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { TaskWithPopulate } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchTask, selectPopulatedTasks } from '../../../store/slices/taskSlice.ts'
-import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '../../../store/thunks/tasksThunk.ts'
-import { selectAllUsers, selectLoadingFetchUser } from '../../../store/slices/userSlice.ts'
-import { fetchUsers } from '../../../store/thunks/userThunk.ts'
+import { TaskWithPopulate } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
+import { selectAllUsers, selectUsersLoading } from '@/store/slices/userSlice.ts'
+import { fetchUsers } from '@/store/thunks/userThunk.ts'
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import dayjs from 'dayjs'
 
@@ -18,7 +18,7 @@ export const useTaskBoard = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null) // ID выбранного пользователя
   const inputRef = useRef<HTMLInputElement | null>(null)
   const users = useAppSelector(selectAllUsers)
-  const selectFetchUser = useAppSelector(selectLoadingFetchUser)
+  const selectFetchUser = useAppSelector(selectUsersLoading)
   const loading = useAppSelector(selectLoadingFetchTask)
   const [open, setOpen] = useState(false)
 

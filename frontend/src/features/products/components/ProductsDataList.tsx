@@ -1,14 +1,14 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, IconButton, Typography } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
-import { ProductWithPopulate } from '../../../types'
+import { ProductWithPopulate } from '@/types'
 import EditIcon from '@mui/icons-material/Edit'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { NavLink } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from './ProductForm.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const ProductsDataList = () => {
   const {
@@ -72,9 +72,7 @@ const ProductsDataList = () => {
           <IconButton onClick={() => handleConfirmationOpen(row._id)}>
             <ClearIcon />
           </IconButton>
-          <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
-            to={`/products/${ row._id }`}
-          >
+          <NavLink className="text-gray-500 hover:text-gray-700 ml-2" to={`/products/${ row._id }`}>
             Подробнее
           </NavLink>
         </>
@@ -117,7 +115,9 @@ const ProductsDataList = () => {
           checkboxSelection
           disableRowSelectionOnClick
         />
-      ) : <Typography className="text-center mt-5">Товаров нет</Typography>}
+      ) : (
+        <Typography className="text-center mt-5">Товары не найдены</Typography>
+      )}
     </Box>
   )
 }

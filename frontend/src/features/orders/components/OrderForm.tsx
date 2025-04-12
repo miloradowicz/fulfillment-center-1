@@ -10,14 +10,14 @@ import {
   Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
-import { ErrorMessagesList } from '../../../messages.ts'
-import { OrderStatus } from '../../../constants.ts'
+import { ErrorMessagesList } from '@/messages.ts'
+import { OrderStatus } from '@/constants.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import { getItemNameById } from '../../../utils/getItemNameById.ts'
+import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -38,13 +38,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     modalOpenDefects,
     isButtonDefectVisible,
     isButtonVisible,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
-    clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,
@@ -86,7 +85,6 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                     onChange={(_, newValue) => {
                       if (newValue) {
                         setForm(prevState => ({ ...prevState, client: newValue._id }))
-                        setCurrentClient(newValue._id)
                       }
                     }}
                     value={clients.find(option => option._id === form.client) || null}
@@ -109,12 +107,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
             <Grid>
               <Autocomplete
                 id="stock"
-                value={getItemNameById(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
+                value={getAutocompleteItemName(stocks, 'name', '_id').find(option => option.id === form.stock) || null}
                 onChange={(_, newValue) => setForm(prevState => ({ ...prevState, stock: newValue?.id || '' }))}
                 size="small"
                 fullWidth
                 disablePortal
-                options={getItemNameById(stocks, 'name', '_id')}
+                options={getAutocompleteItemName(stocks, 'name', '_id')}
                 getOptionKey={option => option.id}
                 sx={{ width: '100%' }}
                 renderInput={params => (
@@ -176,7 +174,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpen && clientProducts && (
+            {modalOpen && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить товар</Typography>
                 <Autocomplete
@@ -184,7 +182,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                   fullWidth
                   size={'small'}
                   disablePortal
-                  options={clientProducts}
+                  options={availableProducts}
                   getOptionKey={option => option._id}
                   onChange={(_, newValue) => {
                     if (newValue) {
@@ -298,7 +296,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                           setForm(prevState => ({ ...prevState, status: newValue || '' }))
                         }
                       }}
-                      value={OrderStatus.find(option => option === form.status)|| null}
+                      value={OrderStatus.find(option => option === form.status) || null}
                       getOptionLabel={option => option || ''}
                       isOptionEqualToValue={(option, value) => option === value}
                       renderInput={params => (
@@ -377,7 +375,7 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             </Grid>
 
-            {modalOpenDefects && clientProducts && (
+            {modalOpenDefects && availableProducts && (
               <Grid size={{ xs: 12 }}>
                 <Typography style={{ marginBottom: '10px' }}>Добавить дефекты товаров</Typography>
                 <Autocomplete
@@ -439,9 +437,9 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
               </Grid>
             )}
 
-            {initialData && ( <> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
+            {initialData && (<> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
               <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
-            {initialData && initialData.documents && initialData.documents.length>0 && (initialData.documents.map((document, index) => (
+            {initialData && initialData.documents && initialData.documents.length > 0 && (initialData.documents.map((document, index) => (
               <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
                 <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
             )))}

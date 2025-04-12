@@ -9,9 +9,9 @@ import {
 import ClearIcon from '@mui/icons-material/Clear'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'
 import { ruRU } from '@mui/x-data-grid/locales'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import useArchivedStocksActions from '../hooks/useArchivedStocksActions.ts'
-import { Stock } from '../../../types'
+import { Stock } from '@/types'
 
 const ArchivedStocks = () => {
   const {

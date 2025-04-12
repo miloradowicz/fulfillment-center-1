@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { GlobalError, Stock, StockMutation, StockPopulate, ValidationError } from '../../types'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import { GlobalError, Stock, StockMutation, StockPopulate, ValidationError } from '@/types'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
 export const fetchStocks = createAsyncThunk<Stock[], void>('stocks/fetchStocks', async () => {
@@ -28,7 +28,6 @@ export const addStock = createAsyncThunk<void, StockMutation, { rejectValue: Val
       await axiosAPI.post<StockMutation>('/stocks', stock)
     } catch (error) {
       if (isAxiosError(error) && error.response && error.response.status === 400) {
-        console.log(error)
         return rejectWithValue(error.response.data as ValidationError)
       }
       throw error

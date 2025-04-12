@@ -1,4 +1,4 @@
-import { ArrivalMutation, OrderMutation } from '../types'
+import { ArrivalMutation, OrderMutation } from '@/types'
 
 export const createArrivalAndOrderFormData = (data: ArrivalMutation | OrderMutation, files?: File[]) => {
   const formData = new FormData()

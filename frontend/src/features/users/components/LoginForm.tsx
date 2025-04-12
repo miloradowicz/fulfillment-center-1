@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid2'
 import { Box, Button, TextField, Typography, CircularProgress } from '@mui/material'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 import { useLoginForm } from '../hooks/useLoginForm.ts'
 
 const LoginForm = () => {

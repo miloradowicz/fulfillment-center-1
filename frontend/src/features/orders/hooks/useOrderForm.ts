@@ -6,36 +6,36 @@ import {
   Product,
   ProductForOrderForm,
   ProductOrder,
-} from '../../../types'
+} from '@/types'
 import {
   initialStateDefectForOrder,
   initialStateErrorForOrder,
   initialStateOrder,
   initialStateProductForOrder,
 } from './initialState.ts'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectCreateOrderError, selectLoadingAddOrder, selectPopulateOrder } from '../../../store/slices/orderSlice.ts'
-import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
-import { selectAllProducts } from '../../../store/slices/productSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectCreateOrderError, selectLoadingAddOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
+import { selectAllClients, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
+import { selectAllProducts } from '@/store/slices/productSlice.ts'
 import { validationRules } from './ValidationRulesForBlur.ts'
 import { toast } from 'react-toastify'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { fetchProductsByClientId } from '../../../store/thunks/productThunk.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
 import {
   addOrder,
   fetchOrderById,
   fetchOrderByIdWithPopulate,
   fetchOrdersWithClient,
   updateOrder,
-} from '../../../store/thunks/orderThunk.ts'
+} from '@/store/thunks/orderThunk.ts'
 import { deleteItem } from './deleteItem.ts'
 import { addArrayItemInForm } from './addArrayItemInForm.ts'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
-import { getAvailableItems } from '../../../utils/getAvailableItems.ts'
-import { ItemType } from '../../../constants.ts'
-import { selectAllStocks } from '../../../store/slices/stocksSlice.ts'
-import { fetchStocks } from '../../../store/thunks/stocksThunk.ts'
+import { ItemType } from '@/constants.ts'
+import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
+import { fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
@@ -54,7 +54,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         defects: [],
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
-        documents: initialData.documents? initialData.documents : [],
+        documents: initialData.documents ? initialData.documents : [],
       }
       : { ...initialStateOrder },
   )
@@ -64,7 +64,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [newFieldDefects, setNewFieldDefects] = useState<Defect>(initialStateDefectForOrder)
   const [modalOpenDefects, setModalOpenDefects] = useState(false)
   const [isButtonDefectVisible, setButtonDefectVisible] = useState(true)
-  const [currentClient, setCurrentClient] = useState<string>('')
   const [newField, setNewField] = useState<ProductOrder>(initialStateProductForOrder)
   const [modalOpen, setModalOpen] = useState(false)
   const dispatch = useAppDispatch()
@@ -77,14 +76,17 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [errors, setErrors] = useState<ErrorForOrder>(initialStateErrorForOrder)
   const params = useParams()
   const stocks = useAppSelector(selectAllStocks)
+  const stock = useAppSelector(selectOneStock)
 
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
 
   useEffect(() => {
-    if (productsForm.length > 0 && clientProducts) {
-      getAvailableItems(clientProducts, productsForm, availableDefects, setAvailableDefects, '_id')
+    if (availableProducts.length > 0) {
+      const availableDefects = availableProducts.filter(x => productsForm.some(y => x._id === y.product._id))
+      setAvailableDefects(availableDefects)
     }
-  }, [productsForm, clientProducts, availableDefects])
+  }, [availableProducts, productsForm])
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -97,8 +99,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpen(true)
       setButtonVisible(false)
@@ -111,8 +115,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   const handleButtonDefectClick = () => {
-    if (!currentClient) {
+    if (!form.client) {
       toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
     } else {
       setModalOpenDefects(true)
       setButtonDefectVisible(false)
@@ -148,14 +154,23 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
   useEffect(() => {
     if (form.client) {
-      clients?.map(client => {
-        if (form.client === client._id) {
-          setCurrentClient(client._id)
-        }
-      })
-      dispatch(fetchProductsByClientId(currentClient))
+      dispatch(fetchProductsByClientId(form.client))
     }
-  }, [clients, currentClient, dispatch, form.client])
+  }, [dispatch, form.client])
+
+  useEffect(() => {
+    if (form.stock) {
+      dispatch(fetchStockById(form.stock))
+    }
+  }, [dispatch, form.stock])
+
+  useEffect(() => {
+    if (clientProducts && stock?.products) {
+      const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
+      const availableProducts = clientProducts.filter(x => stockProducts.some(y => x._id === y.product._id))
+      setAvailableProducts(availableProducts)
+    }
+  }, [clientProducts, stock])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -225,6 +240,11 @@ export const useOrderForm = (onSuccess?: () => void) => {
         await dispatch(fetchOrdersWithClient())
       }
     } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
+      }
       console.error(e)
     }
   }
@@ -315,14 +335,13 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setButtonDefectVisible,
     isButtonVisible,
     setButtonVisible,
-    currentClient,
-    setCurrentClient,
     errors,
     setErrors,
     loading,
     createError,
     clients,
     clientProducts,
+    availableProducts,
     loadingFetchClient,
     handleBlur,
     handleBlurAutoComplete,

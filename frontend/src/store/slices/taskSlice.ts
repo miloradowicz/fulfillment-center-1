@@ -1,6 +1,6 @@
-import { Task, TaskWithPopulate, ValidationError } from '../../types'
+import { Task, TaskWithPopulate, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addTask, archiveTask,
   deleteTask, fetchArchivedTasks,
@@ -8,6 +8,7 @@ import {
   fetchTasks, fetchTasksByUserId, fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate, unarchiveTask,
   updateTask,
+  updateTaskStatus,
 } from '../thunks/tasksThunk.ts'
 
 interface TaskState {
@@ -166,6 +167,20 @@ const taskSlice = createSlice({
         state.loadingUpdate = false
         state.error = true
       })
+
+      .addCase(updateTaskStatus.pending, state => {
+        state.loadingUpdate = true
+        state.error = false
+      })
+      .addCase(updateTaskStatus.fulfilled, state => {
+        state.loadingUpdate = false
+        state.error = false
+      })
+      .addCase(updateTaskStatus.rejected, state => {
+        state.loadingUpdate = false
+        state.error = true
+      })
+
       .addCase(archiveTask.pending, state => {
         state.loadingArchive = true
         state.error = false

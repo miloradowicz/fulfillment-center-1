@@ -1,13 +1,12 @@
-
 import { FC } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { Box, Typography, Paper } from '@mui/material'
+import { Box, Paper, Typography } from '@mui/material'
 import { TaskLineProps } from '../hooks/TypesProps'
 import TaskCard from './TaskCard.tsx'
 import { getStatusStyles } from '../utils/statusStyle.ts'
 import TaskCardSceleton from './TaskCardSceleton.tsx'
-import { useAppSelector } from '../../../app/hooks.ts'
-import { selectLoadingFetchTask } from '../../../store/slices/taskSlice.ts'
+import { useAppSelector } from '@/app/hooks.ts'
+import { selectLoadingFetchTask } from '@/store/slices/taskSlice.ts'
 
 
 const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
@@ -27,24 +26,6 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
       minHeight="300px"
       height="100%"
     >
-      <Box style={{ display:'flex', alignItems:'center', justifyContent:'flex-start' }}>
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          gutterBottom
-          sx={{
-            ...statusStyles,
-            fontSize: '15px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            padding: '3px 10px',
-            borderRadius: '7px',
-            marginBottom: '12px',
-          }}
-        >
-          {title}
-        </Typography>
-      </Box>
       <Paper
         ref={setNodeRef}
         sx={{
@@ -58,6 +39,25 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
+        <Box style={{ display:'flex', alignItems:'center', justifyContent:'flex-start', marginBottom: '10px', gap: '10px' }}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            gutterBottom
+            sx={{
+              ...statusStyles,
+              fontSize: '15px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              padding: '3px 10px',
+              borderRadius: '7px',
+              margin: 0,
+            }}
+          >
+            {title}
+          </Typography>
+          <Typography variant="body1" className="!text-xl !text-[#44546F]">{items.length}</Typography>
+        </Box>
         {loadingFetchTask?<>
           <TaskCardSceleton /></>:<> {items.map((task, key) => (
           <TaskCard selectedUser={selectedUser} key={task._id} index={key} parent={title} task={task} />

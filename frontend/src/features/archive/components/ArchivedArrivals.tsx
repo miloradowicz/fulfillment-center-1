@@ -1,4 +1,3 @@
-import { ArrivalWithClient } from '../../../types'
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'
@@ -6,9 +5,10 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { useArchivedArrivalsActions } from '../hooks/useArchivedArrivalsActions.ts'
 import StatusArrivalCell from '../../arrivals/components/StatusArrivalCell.tsx'
+import { ArrivalWithClient } from '@/types'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const ArchivedArrivals = () => {
   const { arrivals, handleDeleteClick, handleConfirmDelete, handleUnarchiveClick, handleConfirmUnarchive, handleClose, deleteModalOpen, unarchiveModalOpen } = useArchivedArrivalsActions()

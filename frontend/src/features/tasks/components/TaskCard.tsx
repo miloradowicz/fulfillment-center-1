@@ -6,18 +6,18 @@ import { TaskCardProps } from '../hooks/TypesProps'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { useAppDispatch } from '../../../app/hooks.ts'
+import { useAppDispatch } from '@/app/hooks.ts'
 import {
   archiveTask,
   fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate,
-} from '../../../store/thunks/tasksThunk.ts'
+} from '@/store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {

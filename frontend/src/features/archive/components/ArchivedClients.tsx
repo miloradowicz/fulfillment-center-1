@@ -1,11 +1,11 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Box, CircularProgress, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
-import { Client } from '../../../types'
+import { Client } from '@/types'
 import { ruRU } from '@mui/x-data-grid/locales'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
 import { useArchivedClientActions } from '../hooks/useArchivedClientActions.ts'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const ArchivedClients = () => {
   const {

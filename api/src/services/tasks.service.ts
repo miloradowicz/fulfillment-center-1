@@ -5,6 +5,7 @@ import { Task, TaskDocument } from '../schemas/task.schema'
 import { CreateTaskDto } from '../dto/create-task.dto'
 import { UpdateTaskDto } from '../dto/update-task.dto'
 import { CounterService } from './counter.service'
+import { UpdateTaskStatusDto } from 'src/dto/update-taskstatus.dto'
 
 @Injectable()
 export class TasksService {
@@ -17,10 +18,13 @@ export class TasksService {
     const unarchived = this.taskModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.find({ user: userId })
-        .populate('user', 'email displayName role')
-        .populate('associated_order', 'orderNumber')
-        .populate('associated_arrival', 'arrivalNumber')).reverse()
+      return (
+        await unarchived
+          .find({ user: userId })
+          .populate('user', 'email displayName role')
+          .populate('associated_order', 'orderNumber')
+          .populate('associated_arrival', 'arrivalNumber')
+      ).reverse()
     }
 
     return (await unarchived.find({ user: userId })).reverse()
@@ -30,10 +34,13 @@ export class TasksService {
     const unarchived = this.taskModel.find({ isArchived: false })
 
     if (populate) {
-      return (await unarchived.find()
-        .populate('user', 'email displayName role')
-        .populate('associated_order', 'orderNumber')
-        .populate('associated_arrival', 'arrivalNumber')).reverse()
+      return (
+        await unarchived
+          .find()
+          .populate('user', 'email displayName role')
+          .populate('associated_order', 'orderNumber')
+          .populate('associated_arrival', 'arrivalNumber')
+      ).reverse()
     }
 
     return (await unarchived.find()).reverse()
@@ -77,7 +84,7 @@ export class TasksService {
       const newTask = await this.taskModel.create(taskDto)
 
       const sequenceNumber = await this.counterService.getNextSequence('task')
-      newTask.taskNumber  = `TSK-${ sequenceNumber }`
+      newTask.taskNumber = `TSK-${ sequenceNumber }`
 
       return newTask.save()
     } catch (error) {
@@ -90,6 +97,7 @@ export class TasksService {
       throw new BadRequestException('Произошла ошибка при создании задачи')
     }
   }
+
   async update(id: string, taskDto: UpdateTaskDto) {
     const task = await this.taskModel.findById(id)
     if (!task) throw new NotFoundException('Задача не найдена')
@@ -99,15 +107,22 @@ export class TasksService {
     if (taskDto.type === 'заказ') {
       task.set('associated_arrival', null)
       task.set('associated_order', taskDto.associated_order)
-    }
-    else if (taskDto.type === 'поставка') {
+    } else if (taskDto.type === 'поставка') {
       task.set('associated_order', null)
       task.set('associated_arrival', taskDto.associated_arrival)
-    }
-    else {
+    } else {
       task.set('associated_order', null)
       task.set('associated_arrival', null)
     }
+
+    return await task.save()
+  }
+
+  async updateStatus(id: string, taskDto: UpdateTaskStatusDto) {
+    const task = await this.taskModel.findById(id)
+    if (!task) throw new NotFoundException('Задача не найдена')
+
+    task.set(taskDto)
 
     return await task.save()
   }

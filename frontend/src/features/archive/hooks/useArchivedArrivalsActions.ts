@@ -1,7 +1,7 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllArchivedArrivals } from '../../../store/slices/arrivalSlice.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectAllArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteArrival, fetchArchivedArrivals, unarchiveArrival } from '../../../store/thunks/arrivalThunk.ts'
+import { deleteArrival, fetchArchivedArrivals, unarchiveArrival } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 
 export const useArchivedArrivalsActions = () => {

@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { ProductsService } from '../services/products.service'
 import { UpdateProductDto } from '../dto/update-product.dto'
+import { Roles } from 'src/decorators/roles.decorator'
+import { RolesGuard } from 'src/guards/roles.guard'
 
+@UseGuards(RolesGuard)
+@Roles('stock-worker', 'manager', 'admin', 'super-admin')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Roles('super-admin', 'admin', 'manager')
   @Post()
   async createProduct(@Body() productDto: CreateProductDto) {
     return await this.productsService.create(productDto)
@@ -21,10 +26,9 @@ export class ProductsController {
     }
   }
 
+  @Roles('super-admin')
   @Get('archived/all')
-  async getAllArchivedProducts(
-    @Query('populate') populate?: string
-  ) {
+  async getAllArchivedProducts(@Query('populate') populate?: string) {
     return await this.productsService.getAllArchived(populate === '1')
   }
 
@@ -33,29 +37,31 @@ export class ProductsController {
     return await this.productsService.getById(id, populate === '1')
   }
 
+  @Roles('super-admin')
   @Get('archived/:id')
-  async getArchivedProduct(
-    @Param('id') id: string,
-    @Query('populate') populate?: string
-  ) {
+  async getArchivedProduct(@Param('id') id: string, @Query('populate') populate?: string) {
     return await this.productsService.getArchivedById(id, populate === '1')
   }
 
+  @Roles('super-admin', 'admin')
   @Patch(':id/archive')
   async archiveProduct(@Param('id') id: string) {
     return await this.productsService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
   async unarchiveProduct(@Param('id') id: string) {
     return this.productsService.unarchive(id)
   }
 
+  @Roles('super-admin')
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     return await this.productsService.delete(id)
   }
 
+  @Roles('super-admin', 'admin', 'manager')
   @Put(':id')
   async updateProduct(@Param('id') id: string, @Body() productDto: UpdateProductDto) {
     return await this.productsService.update(id, productDto)

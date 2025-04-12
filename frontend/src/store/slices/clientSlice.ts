@@ -1,6 +1,6 @@
-import { Client, GlobalError, ValidationError } from '../../types'
+import { Client, GlobalError, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addClient,
   archiveClient,

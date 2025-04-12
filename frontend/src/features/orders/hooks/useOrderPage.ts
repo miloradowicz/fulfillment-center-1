@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
   clearErrorOrder,
   clearPopulateOrder,
   selectAllOrdersWithClient,
   selectLoadingFetchOrder,
-} from '../../../store/slices/orderSlice.ts'
+} from '@/store/slices/orderSlice.ts'
 import {
   archiveOrder, fetchArchivedOrders,
   fetchOrderByIdWithPopulate,
   fetchOrdersWithClient,
-} from '../../../store/thunks/orderThunk.ts'
+} from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { OrderWithClient } from '../../../types'
 

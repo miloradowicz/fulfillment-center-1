@@ -1,11 +1,11 @@
 import { Autocomplete, Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { getItemNameById } from '../../../utils/getItemNameById.ts'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
 import Grid from '@mui/material/Grid2'
 import { taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
 import React from 'react'
-import { TaskWithPopulate } from '../../../types'
+import { TaskWithPopulate } from '@/types'
 
 interface Props {
   onSuccess?: () => void
@@ -38,12 +38,12 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
         <Grid>
           <Autocomplete
             id="user"
-            value={getItemNameById(users, 'displayName', '_id').find(option => option.id === form.user) || null}
+            value={getAutocompleteItemName(users, 'displayName', '_id').find(option => option.id === form.user) || null}
             onChange={(_, newValue) => setForm(prevState => ({ ...prevState, user: newValue?.id || '' }))}
             size="small"
             fullWidth
             disablePortal
-            options={getItemNameById(users, 'displayName', '_id')}
+            options={getAutocompleteItemName(users, 'displayName', '_id')}
             getOptionKey={option => option.id}
             renderInput={params => (
               <TextField
@@ -108,12 +108,12 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
           {form.type === 'заказ' && (
             <Autocomplete
               id="order"
-              value={getItemNameById(orders, 'orderNumber', '_id').find(option => option.id === form.associated_order) || null}
+              value={getAutocompleteItemName(orders, 'orderNumber', '_id').find(option => option.id === form.associated_order) || null}
               onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_order: newValue?.id || '' }))}
               size="small"
               fullWidth
               disablePortal
-              options={getItemNameById(orders, 'orderNumber', '_id')}
+              options={getAutocompleteItemName(orders, 'orderNumber', '_id')}
               getOptionKey={option => option.id}
               renderInput={params => (
                 <TextField
@@ -131,12 +131,12 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
           {form.type === 'поставка' && (
             <Autocomplete
               id="arrival"
-              value={getItemNameById(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associated_arrival) || null}
+              value={getAutocompleteItemName(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associated_arrival) || null}
               onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_arrival: newValue?.id || '' }))}
               size="small"
               fullWidth
               disablePortal
-              options={getItemNameById(arrivals, 'arrivalNumber', '_id')}
+              options={getAutocompleteItemName(arrivals, 'arrivalNumber', '_id')}
               getOptionKey={option => option.id}
               renderInput={params => (
                 <TextField

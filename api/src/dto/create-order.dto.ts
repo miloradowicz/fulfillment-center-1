@@ -16,7 +16,7 @@ import mongoose from 'mongoose'
 class ProductDto {
   @IsNotEmpty({ message: 'Поле товар не должно быть пустым.' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  product: string
+  product: mongoose.Types.ObjectId
 
   @IsOptional()
   description: string
@@ -42,7 +42,7 @@ class LogDto {
 class DefectDto {
   @IsNotEmpty({ message: 'Поле товар не должно быть пустым.' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  product: string
+  product: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле описание дефекта не должно быть пустым.' })
   defect_description: string
@@ -55,7 +55,7 @@ class DefectDto {
 
 export class CreateOrderDto {
   @IsNotEmpty({ message: 'Поле клиент обязательно для заполнения' })
-  client: string
+  client: mongoose.Types.ObjectId
 
   @IsArray({ message: 'Заполните список товаров.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ArrayNotEmpty({ message: 'Список товаров не может быть пустым' })
@@ -74,7 +74,7 @@ export class CreateOrderDto {
   sent_at: Date
 
   @IsNotEmpty({ message: 'Поле склад обязательно для заполнения.' })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @IsOptional()
   delivered_at?: string

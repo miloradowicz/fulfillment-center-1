@@ -1,10 +1,10 @@
 import React from 'react'
-import { Stock } from '../../../types'
+import { Stock } from '@/types'
 import { useStockForm } from '../hooks/useStockForm.ts'
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { getFieldError } from '../../../utils/getFieldError.ts'
-import { inputChangeHandler } from '../../../utils/inputChangeHandler.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 
 interface Props {
   initialData?: Stock | undefined

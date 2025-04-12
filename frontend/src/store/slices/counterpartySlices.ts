@@ -7,8 +7,8 @@ import {
   archiveCounterparty,
   deleteCounterparty, fetchAllArchivedCounterparties, unarchiveCounterparty,
 } from '../thunks/counterpartyThunk'
-import { Counterparty, GlobalError, ValidationError } from '../../types'
-import { RootState } from '../../app/store'
+import { Counterparty, GlobalError, ValidationError } from '@/types'
+import { RootState } from '@/app/store'
 
 interface CounterpartyState {
   counterparties: Counterparty[] | null
@@ -83,7 +83,7 @@ const counterpartiesSlice = createSlice({
 
       .addCase(fetchAllArchivedCounterparties.pending, state => {
         state.loadingFetchArchive = true
-        state.error = null // Сброс ошибки при запуске запроса
+        state.error = null
       })
       .addCase(fetchAllArchivedCounterparties.fulfilled, (state, action) => {
         state.loadingFetchArchive = false

@@ -8,4 +8,7 @@ class Expressions {
   }
 }
 
-export const Regex = new Expressions
+export const Regex = new Expressions()
+
+export const RolesList = ['stock-worker', 'manager', 'admin', 'super-admin'] as const
+export type RolesType = (typeof RolesList)[number]

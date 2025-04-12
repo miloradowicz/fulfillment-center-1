@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid2'
 import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { Client } from '../../../types'
+import { Client } from '@/types'
 import { useClientForm } from '../hooks/useClientForm.ts'
 
 const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () => void }) => {

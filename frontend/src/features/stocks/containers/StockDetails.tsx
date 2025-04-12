@@ -1,24 +1,23 @@
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
 import Grid from '@mui/material/Grid2'
-import { ArrowBack } from '@mui/icons-material'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import EditButton from '@/components/Buttons/EditButton.tsx'
+import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const StockDetails = () => {
   const {
     stock,
     isLoading,
     archiveModalOpen,
-    showDeleteModal,
-    hideDeleteModal,
+    showArchiveModal,
+    hideArchiveModal,
     handleArchive,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
     stockColumns,
@@ -46,20 +45,12 @@ const StockDetails = () => {
         entityName="этот склад"
         actionType="archive"
         onConfirm={handleArchive}
-        onCancel={hideDeleteModal}
+        onCancel={hideArchiveModal}
       />
 
-      <div className="flex items-center gap-3">
-        <IconButton onClick={() => navigateBack()}>
-          <ArrowBack />
-        </IconButton>
-        <Typography variant="h5" fontWeight={700} className="whitespace-normal break-words">
-          Назад
-        </Typography>
-      </div>
-
       <div className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8 mb-8">
-        <Box className="text-center mb-8 p-4 bg-gray-100 rounded-lg shadow-md">
+        <BackButton />
+        <Box className="text-center mt-4 mb-8 p-4 bg-gray-100 rounded-lg shadow-md">
           <Typography
             sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937' }}
             className="whitespace-normal break-words"
@@ -98,7 +89,7 @@ const StockDetails = () => {
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
           <EditButton onClick={() => setEditModalOpen(true)} />
-          <ArchiveButton onClick={showDeleteModal}/>
+          <ArchiveButton onClick={showArchiveModal}/>
         </Box>
       </div>
     </>

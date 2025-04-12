@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid2'
 import { Box, Button, MenuItem, TextField, Typography, CircularProgress } from '@mui/material'
-import SelectField from '../../../components/SelectField/SelectField.tsx'
-import { roles } from '../../../constants.ts'
+import SelectField from '@/components/SelectField/SelectField.tsx'
+import { roles } from '@/constants.ts'
 import { useRegistrationForm } from '../hooks/useRegistrationForm.ts'
 
 const RegistrationForm = () => {

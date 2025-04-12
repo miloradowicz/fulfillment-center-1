@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useEffect, useState } from 'react'
-import { archiveStock, fetchArchivedStocks, fetchStockById, fetchStocks } from '../../../store/thunks/stocksThunk.ts'
-import { selectIsStocksLoading, selectOneStock } from '../../../store/slices/stocksSlice.ts'
+import { archiveStock, fetchArchivedStocks, fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { selectIsStocksLoading, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
-import { hasMessage } from '../../../utils/helpers.ts'
+import { hasMessage } from '@/utils/helpers.ts'
 
 export const useStockDetails = () => {
   const { stockId } = useParams()
@@ -30,10 +30,6 @@ export const useStockDetails = () => {
     }
   }, [dispatch, stockId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleArchive = async () => {
     if (stockId) {
       try {
@@ -51,14 +47,14 @@ export const useStockDetails = () => {
         }
       }
     }
-    hideDeleteModal()
+    hideArchiveModal()
   }
 
-  const showDeleteModal = () => {
+  const showArchiveModal = () => {
     setArchiveModalOpen(true)
   }
 
-  const hideDeleteModal = () => {
+  const hideArchiveModal = () => {
     setArchiveModalOpen(false)
   }
 
@@ -68,10 +64,9 @@ export const useStockDetails = () => {
     isLoading,
     stockColumns,
     archiveModalOpen,
-    showDeleteModal,
-    hideDeleteModal,
+    showArchiveModal,
+    hideArchiveModal,
     handleArchive,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
   }

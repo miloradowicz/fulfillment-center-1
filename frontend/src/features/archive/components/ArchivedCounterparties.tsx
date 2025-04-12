@@ -8,9 +8,9 @@ import {
 } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'
-import { Counterparty } from '../../../types'
+import { Counterparty } from '@/types'
 import { ruRU } from '@mui/x-data-grid/locales'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useArchivedCounterpartiesActions } from '../hooks/useArchivedCounterpartiesActions.ts'
 
 const ArchivedCounterparties = () => {

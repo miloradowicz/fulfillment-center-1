@@ -5,7 +5,6 @@ import {
   CircularProgress,
   Container,
   Divider,
-  IconButton,
   Step,
   StepLabel,
   Stepper,
@@ -15,20 +14,20 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
-import DefectsTable from '../../../components/Tables/DefectsTable.tsx'
-import { ArrowBack } from '@mui/icons-material'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import DefectsTable from '@/components/Tables/DefectsTable.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import { Link } from 'react-router-dom'
-import ProductsTable from '../../../components/Tables/ProductsTable.tsx'
-import { OrderStatus } from '../../../constants.ts'
-import LogsTable from '../../../components/Tables/LogsTable.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
-import { getOrderStatusColor } from '../../../utils/getOrderStatusColor.ts'
+import ProductsTable from '@/components/Tables/ProductsTable.tsx'
+import { OrderStatus } from '@/constants.ts'
+import LogsTable from '@/components/Tables/LogsTable.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { getOrderStatusColor } from '@/utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
-import EditButton from '../../../components/UI/EditButton/EditButton.tsx'
-import ArchiveButton from '../../../components/UI/ArchiveButton/ArchiveButton.tsx'
+import EditButton from '@/components/Buttons/EditButton.tsx'
+import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
 
 const OrderDetails = () => {
   const {
@@ -39,7 +38,6 @@ const OrderDetails = () => {
     handleOpenEdit,
     handleArchive,
     setOpen,
-    navigateBack,
     getStepDescription,
     setOpenArchiveModal,
     infoTab,
@@ -64,14 +62,7 @@ const OrderDetails = () => {
   return (
     <Container maxWidth="md">
       <Card className="mx-auto bg-white shadow-lg rounded-lg p-6 pb-10">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigateBack()}>
-          <IconButton >
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="caption" className="!text-sm">
-            Заказы
-          </Typography>
-        </Box>
+        <BackButton/>
         <Box className="flex flex-wrap gap-5 items-start mt-3 mb-10">
           <Box>
             <Chip label={order.status}

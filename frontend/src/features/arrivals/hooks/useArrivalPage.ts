@@ -1,7 +1,7 @@
-import { useAppSelector } from '../../../app/hooks.ts'
+import { useAppSelector } from '@/app/hooks.ts'
 import { useState } from 'react'
-import { clearErrorArrival, selectLoadingFetchArrival } from '../../../store/slices/arrivalSlice.ts'
-import { ArrivalWithClient } from '../../../types'
+import { clearErrorArrival, selectLoadingFetchArrival } from '@/store/slices/arrivalSlice.ts'
+import { ArrivalWithClient } from '@/types'
 import { useDispatch } from 'react-redux'
 
 export const useArrivalPage = () => {

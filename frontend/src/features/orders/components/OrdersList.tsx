@@ -1,4 +1,4 @@
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient } from '@/types'
 import React, { useState } from 'react'
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -8,7 +8,7 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 import StatusOrderCell from './StatusOrderCell.tsx'
-import ConfirmationModal from '../../../components/UI/Modal/ConfirmationModal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 interface Props {
   orders: OrderWithClient[] | []

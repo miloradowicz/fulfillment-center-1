@@ -2,10 +2,10 @@ import { useStockPage } from '../hooks/useStockPage.ts'
 import StockCard from '../components/StockCard.tsx'
 import Grid from '@mui/material/Grid2'
 import { Box, CircularProgress } from '@mui/material'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 
 const StockPage = () => {
   const { open, handleOpen, isLoading, handleClose, stocks } = useStockPage()

@@ -1,4 +1,4 @@
-import { GlobalError, Product, ProductWithPopulate, ValidationError } from '../../types'
+import { GlobalError, Product, ProductWithPopulate, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import {
   addProduct,
@@ -10,7 +10,7 @@ import {
   archiveProduct,
   fetchArchivedProducts, unarchiveProduct,
 } from '../thunks/productThunk.ts'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 
 interface ProductState {
   product: Product | null

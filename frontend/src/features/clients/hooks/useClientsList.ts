@@ -1,7 +1,7 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect } from 'react'
-import { deleteClient, fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
+import { deleteClient, fetchClients } from '@/store/thunks/clientThunk.ts'
+import { selectAllClients, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 

@@ -1,10 +1,10 @@
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import { Box, CircularProgress } from '@mui/material'
 import { useCounterpartyPage } from '../hooks/useCounterpartyPage.ts'
 import CounterpartiesDataList from '../components/CounterpartiesDataList.tsx'
 import CounterpartyForm from '../components/CounterpartyForm.tsx'
-import CustomButton from '../../../components/UI/CustomButton/CustomButton.tsx'
-import CustomTitle from '../../../components/UI/CustomTitle/CustomTitle.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 
 const CounterpartiesPage = () => {
   const { open, handleOpen, handleClose, isLoading } = useCounterpartyPage()

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react'
-import { TaskWithPopulate } from '../../../types'
-import { AppDispatch } from '../../../app/store'
-import { updateTask } from '../../../store/thunks/tasksThunk.ts'
+import { TaskWithPopulate } from '@/types'
+import { AppDispatch } from '@/app/store.ts'
+import { updateTaskStatus } from '@/store/thunks/tasksThunk.ts'
 import { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core'
 import dayjs from 'dayjs'
 import { toast } from 'react-toastify'
@@ -167,7 +167,7 @@ export const onDragEnd = async ({
         updatedData.date_inProgress = null
       }
 
-      await dispatch(updateTask({
+      await dispatch(updateTaskStatus({
         taskId: _id,
         data: updatedData,
       }))
