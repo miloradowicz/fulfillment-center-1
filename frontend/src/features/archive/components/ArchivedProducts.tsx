@@ -3,7 +3,6 @@ import {
   Box,
   CircularProgress,
   IconButton,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -26,7 +25,7 @@ const ArchivedProducts = () => {
     handleUnarchiveConfirmationOpen,
     handleUnarchiveConfirmationClose,
     handleUnarchiveConfirm,
-  } = useArchivedProductActions(true)
+  } = useArchivedProductActions()
 
   const theme = useTheme()
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
@@ -100,10 +99,10 @@ const ArchivedProducts = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
           <CircularProgress />
         </Box>
-      ) : products && products.length > 0 ? (
+      ) : (
         <DataGrid
           getRowId={row => row._id}
-          rows={products}
+          rows={products || []}
           columns={columns}
           localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
@@ -130,8 +129,6 @@ const ArchivedProducts = () => {
             },
           }}
         />
-      ) : (
-        <Typography className="text-center mt-5">Продуктов нет</Typography>
       )}
 
       <ConfirmationModal

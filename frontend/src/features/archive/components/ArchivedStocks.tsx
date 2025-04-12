@@ -3,7 +3,6 @@ import {
   Box,
   CircularProgress,
   IconButton,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -75,10 +74,10 @@ const ArchivedStocks = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
           <CircularProgress />
         </Box>
-      ) : stocks && stocks.length > 0 ? (
+      ) : (
         <DataGrid
           getRowId={row => row._id}
-          rows={stocks}
+          rows={stocks || []}
           columns={columns}
           localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
@@ -105,8 +104,6 @@ const ArchivedStocks = () => {
             },
           }}
         />
-      ) : (
-        <Typography className="text-center mt-5">Склады отсутствуют</Typography>
       )}
 
       <ConfirmationModal

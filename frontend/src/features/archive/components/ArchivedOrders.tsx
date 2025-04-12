@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import UnarchiveIcon from '@mui/icons-material/Unarchive'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -36,7 +36,21 @@ const ArchivedOrders = () => {
       renderCell: ({ row }) => (
         <NavLink
           to={`/orders/${ row._id }`}
-          className="py-2 px-3 bg-blue-50 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-100 transition-colors duration-150 border border-blue-200 hover:border-blue-300 whitespace-nowrap"
+          className="
+            py-2 px-3
+            bg-blue-50
+            text-blue-700
+            rounded-md
+            text-sm
+            font-medium
+            hover:bg-blue-100
+            transition-colors
+            duration-150
+            border
+            border-blue-200
+            hover:border-blue-300
+            whitespace-nowrap
+          "
           style={{
             lineHeight: '1.25rem',
             maxWidth: '120px',
@@ -112,7 +126,7 @@ const ArchivedOrders = () => {
     },
   ]
 
-  if (isLoading && !orders) {
+  if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
         <CircularProgress />
@@ -122,24 +136,27 @@ const ArchivedOrders = () => {
 
   return (
     <Box className="max-w-[1000px] mx-auto w-full">
-      {orders && orders.length > 0 ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={orders}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10 },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
-      ) : (
-        <Typography className="text-center mt-5">Заказы не найдены.</Typography>
-      )}
+      <DataGrid
+        getRowId={row => row._id}
+        rows={orders || []}
+        columns={columns}
+        localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 10 },
+          },
+        }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection
+        disableRowSelectionOnClick
+        sx={{
+          '& .MuiDataGrid-cell': {
+            display: 'flex',
+            alignItems: 'center',
+            padding: '8px 16px',
+          },
+        }}
+      />
 
       <ConfirmationModal
         open={deleteModalOpen}

@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, CircularProgress, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, CircularProgress, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import { Client } from '../../../types'
 import { ruRU } from '@mui/x-data-grid/locales'
@@ -106,10 +106,10 @@ const ArchivedClients = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
           <CircularProgress />
         </Box>
-      ) : clients && clients.length > 0 ? (
+      ) : (
         <DataGrid
           getRowId={row => row._id}
-          rows={clients}
+          rows={clients || []}
           columns={columns}
           localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
@@ -136,8 +136,6 @@ const ArchivedClients = () => {
             },
           }}
         />
-      ) : (
-        <Typography className="text-center mt-5">Клиентов нет</Typography>
       )}
 
       <ConfirmationModal

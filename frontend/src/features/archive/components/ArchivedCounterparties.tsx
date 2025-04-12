@@ -3,7 +3,6 @@ import {
   Box,
   CircularProgress,
   IconButton,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -91,10 +90,10 @@ const ArchivedCounterparties = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
           <CircularProgress />
         </Box>
-      ) : counterparties && counterparties.length > 0 ? (
+      ) : (
         <DataGrid
           getRowId={row => row._id}
-          rows={counterparties}
+          rows={counterparties || []}
           columns={columns}
           localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
           initialState={{
@@ -107,9 +106,14 @@ const ArchivedCounterparties = () => {
           pageSizeOptions={[5, 10, 20]}
           checkboxSelection
           disableRowSelectionOnClick
+          sx={{
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px 16px',
+            },
+          }}
         />
-      ) : (
-        <Typography className="text-center mt-5">Контрагентов нет</Typography>
       )}
 
       <ConfirmationModal

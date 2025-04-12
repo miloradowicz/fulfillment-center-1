@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteProduct, fetchArchivedProducts, unarchiveProduct } from '../../../store/thunks/productThunk.ts'
+import {
+  deleteProduct,
+  fetchArchivedProducts,
+  unarchiveProduct,
+} from '../../../store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
 import {
   clearErrorProduct, selectAllArchivedProducts, selectArchivedProduct, selectLoadingFetchArchivedProduct,
@@ -11,7 +15,7 @@ import { ProductWithPopulate } from '../../../types'
 import { hasMessage, isGlobalError } from '../../../utils/helpers.ts'
 
 
-const useArchivedProductActions = (fetchOnDelete: boolean) => {
+const useArchivedProductActions = () => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -60,11 +64,7 @@ const useArchivedProductActions = (fetchOnDelete: boolean) => {
   const deleteOneProduct = async (id: string) => {
     try {
       await dispatch(deleteProduct(id)).unwrap()
-      if (fetchOnDelete) {
-        fetchArchivedProducts()
-      } else {
-        navigate('/products')
-      }
+      await dispatch(fetchArchivedProducts())
       toast.success('Товар успешно удалён!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
