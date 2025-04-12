@@ -68,11 +68,19 @@ export class OrdersService {
     if (order.status === 'в пути' || order.status === 'доставлен') {
       await this.stockManipulationService.decreaseProductStock(order.stock, order.products)
     }
+
+    if (order.status === 'доставлен') {
+      await this.stockManipulationService.increaseDefectStock(order.stock, order.defects)
+    }
   }
 
   async undoStocking(order: OrderDocument) {
     if (order.status === 'в пути' || order.status === 'доставлен') {
       await this.stockManipulationService.increaseProductStock(order.stock, order.products)
+    }
+
+    if (order.status === 'доставлен') {
+      await this.stockManipulationService.decreaseDefectStock(order.stock, order.defects)
     }
   }
 
@@ -106,7 +114,7 @@ export class OrdersService {
       const newOrder = new this.orderModel({
         ...orderDto,
         documents,
-        orderNumber: `ORD-${ sequenceNumber }`,
+        orderNumber: `ORD-${sequenceNumber}`,
       })
 
       this.stockManipulationService.init()
@@ -153,7 +161,7 @@ export class OrdersService {
     const newStock = updatedOrder.stock
     await this.doStocking(updatedOrder)
 
-    if (!this.stockManipulationService.testStock(newStock)){
+    if (!this.stockManipulationService.testStock(newStock)) {
       throw new BadRequestException('На данном складе нет необходимого количества товара')
     }
 

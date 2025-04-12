@@ -19,7 +19,7 @@ export class ArrivalsService {
     private readonly counterService: CounterService,
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
-  ) {}
+  ) { }
 
   async getAllByClient(clientId: string, populate: boolean) {
     const unarchived = this.arrivalModel.find({ isArchived: false })
@@ -98,6 +98,7 @@ export class ArrivalsService {
 
     if (arrival.arrival_status === 'отсортирована' && arrival.defects?.length) {
       await this.stockManipulationService.decreaseProductStock(arrival.stock, arrival.defects)
+      await this.stockManipulationService.increaseDefectStock(arrival.stock, arrival.defects)
     }
   }
 
@@ -111,6 +112,7 @@ export class ArrivalsService {
 
     if (arrival.arrival_status === 'отсортирована' && arrival.defects.length) {
       await this.stockManipulationService.increaseProductStock(arrival.stock, arrival.defects)
+      await this.stockManipulationService.decreaseDefectStock(arrival.stock, arrival.defects)
     }
   }
 
@@ -146,7 +148,7 @@ export class ArrivalsService {
     const newArrival = await this.arrivalModel.create({
       ...arrivalDto,
       documents,
-      arrivalNumber: `ARL-${ sequenceNumber }`,
+      arrivalNumber: `ARL-${sequenceNumber}`,
     })
 
     if (

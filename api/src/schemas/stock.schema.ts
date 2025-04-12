@@ -34,6 +34,20 @@ export class Stock {
   @Prop({
     type: [
       {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        amount: { type: Number, required: true },
+      },
+    ],
+    default: [],
+  })
+  defects: {
+    product: mongoose.Types.ObjectId
+    amount: number
+  }[]
+
+  @Prop({
+    type: [
+      {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         change: { type: String, required: true },
         date: { type: Date, required: true, default: Date.now },
