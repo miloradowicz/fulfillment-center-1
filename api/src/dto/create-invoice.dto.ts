@@ -50,7 +50,7 @@ export class CreateInvoiceDto {
   @IsPositive({ message: 'Сумма должна быть больше 0.' })
   totalAmount: number
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Укажите статус оплаты.' })
   @IsEnum(['в ожидании', 'оплачено', 'частично оплачено'], {
     message: 'Статус должен быть одним из: "в ожидании", "оплачено", "частично оплачено"',
   })

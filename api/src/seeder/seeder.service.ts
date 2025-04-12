@@ -149,21 +149,25 @@ export class SeederService {
       {
         name: 'Приемка, пересчет товара',
         price: 50000,
+        type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
       },
       {
         name: 'Маркировка двойная',
         price: 30000,
+        type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
       },
       {
         name: 'Погрузка-Разгрузка на складе фулфилмента',
         price: 70000,
+        type: 'внешняя',
         serviceCategory: _serviceCat2._id,
       },
       {
         name: 'Забор с другого адреса',
         serviceCategory: _serviceCat2._id,
+        type: 'внешняя',
         price: 100000,
       },
     ])

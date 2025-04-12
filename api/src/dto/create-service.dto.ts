@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPositive,
@@ -33,6 +34,12 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString({ message: 'Поле описание должно быть текстом.' })
   description: string
+
+  @IsNotEmpty({ message: 'Поле тип услуги обязательно для заполнения.' })
+  @IsEnum(['внутренняя', 'внешняя'], {
+    message: 'Тип услуги должен быть "внутренняя" или "внешняя".',
+  })
+  type: 'внутренняя' | 'внешняя'
 
   @IsOptional()
   @ValidateNested({ each: true })
