@@ -39,6 +39,14 @@ export class Service {
   description: string
 
   @Prop({
+    type: String,
+    enum: ['внутренняя', 'внешняя'],
+    required: true,
+    default: 'internal',
+  })
+  type: 'внутренняя' | 'внешняя'
+
+  @Prop({
     type: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
