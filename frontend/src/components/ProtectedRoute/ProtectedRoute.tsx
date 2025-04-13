@@ -15,7 +15,7 @@ const ProtectedRoute: FC<Props> = ({ isAllowed, children }) => {
     }
   })
 
-  return featureProtection && !isAllowed ? null : children
+  return children
 }
 
 export default ProtectedRoute
