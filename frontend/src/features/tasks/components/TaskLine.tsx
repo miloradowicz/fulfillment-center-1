@@ -19,7 +19,7 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
   const isMobile = useIMobile()
 
   return (
-    <div  className="flex flex-col p-4 min-h-[300px] space-y-4">
+    <div className="flex flex-col p-4 min-h-[300px] space-y-4">
       <div
         ref={setNodeRef}
         className="bg-[#f7f7f7] rounded-xl py-4 flex flex-col shadow-md"
@@ -34,9 +34,10 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
           </h6>
           <p className="text-xl text-[#44546F]">{items.length}</p>
         </div>
-        <div className="overflow-y-auto px-2" style={{
+        <div className="overflow-y-auto overflow-x-hidden px-2" style={{
           maxHeight: isMobile ? '53vh' : '69vh',
           WebkitOverflowScrolling: 'touch',
+          position: 'relative',
         }}>
           {loadingFetchTask ? (
             <TaskCardSceleton />

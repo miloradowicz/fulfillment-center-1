@@ -19,6 +19,7 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
 import Modal from '@/components/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
+import { setDraggingTask } from '@/store/slices/taskSlice.ts'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -29,6 +30,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  const handleDragStart = () => {
+    const taskWithDateAsString = {
+      ...task,
+      updatedAt: task.updatedAt.toString(),
+    }
+
+    dispatch(setDraggingTask(taskWithDateAsString))
+  }
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
     data: {
@@ -38,6 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     },
     disabled: isMobile,
   })
+
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -80,8 +91,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     touchAction: 'none',
   }
 
-
-
   return (
     <Card
       id={task._id}
@@ -107,6 +116,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     >
       <div
         {...listeners}
+        onMouseDown={handleDragStart}
         style={{ padding: 16 }}
         onClick={e => {
           e.stopPropagation()

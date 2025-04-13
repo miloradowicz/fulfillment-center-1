@@ -1,4 +1,4 @@
-import { DndContext, rectIntersection } from '@dnd-kit/core'
+import { DndContext, DragOverlay, rectIntersection } from '@dnd-kit/core'
 import { onDragEnd } from '../hooks/onDragEnd.ts'
 import { useTaskBoard } from '../hooks/useTaskBoard.ts'
 import TaskLine from './TaskLine.tsx'
@@ -9,8 +9,10 @@ import Loader from '@/components/Loader/Loader.tsx'
 import { X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
+import TaskCard from './TaskCard.tsx'
 
 const TaskBoard = () => {
+
   const {
     todoItems,
     doneItems,
@@ -20,6 +22,7 @@ const TaskBoard = () => {
     setInProgressItems,
     searchQuery,
     users,
+    draggingTask,
     selectFetchUser,
     clearAllFilters,
     clearSearch,
@@ -110,6 +113,11 @@ const TaskBoard = () => {
           </div>
         </div>
       )}
+      {draggingTask ? (
+        <DragOverlay>
+          <TaskCard task={draggingTask}  selectedUser={selectedUser} />
+        </DragOverlay>
+      ) : null}
     </DndContext>
   </>
   )

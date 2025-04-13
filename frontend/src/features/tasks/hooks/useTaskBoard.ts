@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TaskWithPopulate } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
+import { selectDraggingTask, selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
 import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
 import { selectAllUsers, selectUsersLoading } from '@/store/slices/userSlice.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
@@ -11,6 +11,7 @@ import dayjs from 'dayjs'
 export const useTaskBoard = () => {
   const dispatch = useAppDispatch()
 
+  const draggingTask = useAppSelector(selectDraggingTask)
   const tasks = useAppSelector(selectPopulatedTasks)
   const users = useAppSelector(selectAllUsers)
   const selectFetchUser = useAppSelector(selectUsersLoading)
@@ -135,6 +136,7 @@ export const useTaskBoard = () => {
     setDoneItems,
     setTodoItems,
     setInProgressItems,
+    draggingTask,
     open,
     loading,
     searchQuery,
