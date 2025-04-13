@@ -3,8 +3,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '../UI/dropdown-menu.tsx'
-import { Button } from '../UI/button.tsx'
+} from '../ui/dropdown-menu.tsx'
+import { Button } from '../ui/button.tsx'
 import { User } from '@/types'
 import { NavLink, useNavigate } from 'react-router-dom'
 
@@ -13,7 +13,7 @@ import { unsetUser } from '@/store/slices/authSlice.ts'
 import { useAppDispatch } from '@/app/hooks.ts'
 import { toast } from 'react-toastify'
 import React from 'react'
-import { Separator } from '../UI/separator.tsx'
+import { Separator } from '../ui/separator.tsx'
 import { Ellipsis, LogOut } from 'lucide-react'
 
 interface Props {

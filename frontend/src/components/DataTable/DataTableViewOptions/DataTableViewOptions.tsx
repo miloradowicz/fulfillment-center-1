@@ -1,13 +1,13 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Table } from '@tanstack/react-table'
 
-import { Button } from '../../UI/button.tsx'
+import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel, DropdownMenuSeparator,
-} from '../../UI/dropdown-menu.tsx'
+} from '../../ui/dropdown-menu.tsx'
 import { Settings2 } from 'lucide-react'
 
 interface Props<T> {

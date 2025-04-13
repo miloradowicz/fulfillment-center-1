@@ -6,7 +6,6 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { useArchivedArrivalsActions } from '../hooks/useArchivedArrivalsActions.ts'
-import StatusArrivalCell from '../../arrivals/components/StatusArrivalCell.tsx'
 import { ArrivalWithClient } from '@/types'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
@@ -74,7 +73,7 @@ const ArchivedArrivals = () => {
       minWidth: isMediumScreen ? 160 : 140,
       align: 'left',
       headerAlign: 'left',
-      renderCell: params => <StatusArrivalCell row={params.row} />,
+      valueGetter: (_value, row) => row.arrival_status,
     },
     {
       field: 'Actions',

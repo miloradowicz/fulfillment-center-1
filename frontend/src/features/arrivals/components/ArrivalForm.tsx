@@ -21,7 +21,7 @@ import { getArrayItemNameById } from '@/utils/getArrayItemName.ts'
 import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
 import { ItemType } from '@/constants.ts'
 import { ArrivalData } from '../utils/arrivalTypes.ts'
-import { Button } from '@/components/UI/button.tsx'
+import { Button } from '@/components/ui/button.tsx'
 import { Loader2 } from 'lucide-react'
 
 interface Props {

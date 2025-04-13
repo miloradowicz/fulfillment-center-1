@@ -2,8 +2,8 @@ import { Column } from '@tanstack/react-table'
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '@/lib/utils.ts'
-import { Button } from '../../UI/button.tsx'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../UI/dropdown-menu.tsx'
+import { Button } from '../../ui/button.tsx'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown-menu.tsx'
 import React from 'react'
 
 interface Props<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {

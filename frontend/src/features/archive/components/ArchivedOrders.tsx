@@ -6,7 +6,6 @@ import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useArchivedOrdersActions } from '../hooks/useArchivedOrdersActions'
-import StatusOrderCell from '../../orders/components/StatusOrderCell'
 import { NavLink } from 'react-router-dom'
 import CircularProgress from '@mui/material/CircularProgress'
 import { OrderWithClient } from '@/types'
@@ -96,7 +95,7 @@ const ArchivedOrders = () => {
       field: 'status',
       headerName: 'Статус',
       width: 145,
-      renderCell: params => <StatusOrderCell row={params.row} />,
+      valueGetter: (_, row) => row.status || 'Неизвестно',
     },
     {
       field: 'products',
