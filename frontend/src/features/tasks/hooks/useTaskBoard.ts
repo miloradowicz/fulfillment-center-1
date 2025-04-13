@@ -7,20 +7,26 @@ import { selectAllUsers, selectUsersLoading } from '@/store/slices/userSlice.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import dayjs from 'dayjs'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export const useTaskBoard = () => {
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
   const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
   const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
   const dispatch = useAppDispatch()
+  const { id } = useParams()
+  const navigate = useNavigate()
   const tasks = useAppSelector(selectPopulatedTasks)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUser, setSelectedUser] = useState<string | null>(null) // ID выбранного пользователя
   const inputRef = useRef<HTMLInputElement | null>(null)
   const users = useAppSelector(selectAllUsers)
   const selectFetchUser = useAppSelector(selectUsersLoading)
-  const loading = useAppSelector(selectLoadingFetchTask)
+  const loadingTasks = useAppSelector(selectLoadingFetchTask)
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [openDetailsModal, setOpenDetailsModal] = useState(false)
+
 
   const fetchAllTasks = useCallback(async () => {
     setTodoItems([])
@@ -49,12 +55,26 @@ export const useTaskBoard = () => {
   )
 
   useEffect(() => {
-    if(selectFetchUser || loading){
+    if(selectFetchUser || loadingTasks){
       setDoneItems([])
       setInProgressItems([])
       setTodoItems([])
     }
-  }, [dispatch, fetchAllTasks, loading, selectFetchUser])
+  }, [dispatch, fetchAllTasks, loadingTasks, selectFetchUser])
+
+  useEffect(() => {
+    if (id) {
+      setOpenDetailsModal(true)
+    } else {
+      setOpenDetailsModal(false)
+    }
+  }, [id])
+
+  const handleCloseDetailsModal = () => {
+    void fetchAllTasks()
+    setOpenDetailsModal(false)
+    navigate('/tasks', { replace: true })
+  }
 
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
@@ -96,6 +116,12 @@ export const useTaskBoard = () => {
     void fetchAllUsers()
   }, [dispatch, fetchAllUsers])
 
+  useEffect(() => {
+    if (selectFetchUser) {
+      setLoading(false)
+    }
+  }, [selectFetchUser])
+
   const clearAllFilters = async () => {
     setSearchQuery('')
     setSelectedUser(null)
@@ -119,6 +145,7 @@ export const useTaskBoard = () => {
     }
   }
   return {
+    id,
     todoItems,
     doneItems,
     inProgressItems,
@@ -126,8 +153,10 @@ export const useTaskBoard = () => {
     setTodoItems,
     setInProgressItems,
     open,
+    openDetailsModal,
     searchQuery,
     users,
+    loading,
     clearAllFilters,
     clearSearch,
     filterTasks,
@@ -139,5 +168,7 @@ export const useTaskBoard = () => {
     selectFetchUser,
     handleOpen,
     handleClose,
+    handleCloseDetailsModal,
+    dispatch,
   }
 }

@@ -12,10 +12,11 @@ import {
 } from '../thunks/tasksThunk.ts'
 
 interface TaskState {
-  task: Task | null
+  task: TaskWithPopulate | null
   tasksPopulate: TaskWithPopulate[] | null
   tasks: Task[] | null
   loadingFetch: boolean
+  loadingFetchTaskById: boolean
   loadingAdd: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
@@ -29,6 +30,7 @@ const initialState: TaskState= {
   tasksPopulate: null,
   tasks: null,
   loadingFetch: false,
+  loadingFetchTaskById: false,
   loadingAdd: false,
   loadingDelete: false,
   loadingUpdate: false,
@@ -100,15 +102,15 @@ const taskSlice = createSlice({
       })
 
       .addCase(fetchTaskById.pending, state => {
-        state.loadingFetch = true
+        state.loadingFetchTaskById = true
         state.error = false
       })
       .addCase(fetchTaskById.fulfilled, (state, { payload: task }) => {
-        state.loadingFetch = false
+        state.loadingFetchTaskById = false
         state.task = task
       })
       .addCase(fetchTaskById.rejected, state => {
-        state.loadingFetch = false
+        state.loadingFetchTaskById = false
       })
 
       .addCase(addTask.pending, state => {
