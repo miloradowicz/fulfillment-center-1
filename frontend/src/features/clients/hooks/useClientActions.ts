@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteClient, fetchClientById, fetchClients } from '@/store/thunks/clientThunk.ts'
+import { archiveClient, fetchClientById, fetchClients } from '@/store/thunks/clientThunk.ts'
 import { clearClientError, selectAllClients, selectClient, selectClientError, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,7 +11,7 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const [clientToDeleteId, setClientToDeleteId] = useState<string | null>(null)
+  const [clientToArchiveId, setClientToArchiveId] = useState<string | null>(null)
   const clients = useAppSelector(selectAllClients)
   const { id } = useParams()
   const client = useAppSelector(selectClient)
@@ -46,20 +46,20 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     }
   }, [id, fetchClient])
 
-  const deleteOneClient = async (id: string) => {
+  const archiveOneClient = async (id: string) => {
     try {
-      await dispatch(deleteClient(id)).unwrap()
+      await dispatch(archiveClient(id)).unwrap()
       if (fetchOnDelete) {
         await fetchAllClients()
       } else {
         navigate('/clients')
       }
-      toast.success('Клиент успешно удалён!')
+      toast.success('Клиент успешно архивирован!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
       } else {
-        toast.error('Не удалось удалить клиента')
+        toast.error('Не удалось архивировать клиента')
       }
       console.error(e)
     }
@@ -78,17 +78,17 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   }
 
   const handleConfirmationOpen = (id: string) => {
-    setClientToDeleteId(id)
+    setClientToArchiveId(id)
     setConfirmationOpen(true)
   }
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false)
-    setClientToDeleteId(null)
+    setClientToArchiveId(null)
   }
 
-  const handleConfirmationDelete = () => {
-    if (clientToDeleteId) deleteOneClient(clientToDeleteId)
+  const handleConfirmationArchive = () => {
+    if (clientToArchiveId) archiveOneClient(clientToArchiveId)
     handleConfirmationClose()
   }
 
@@ -102,11 +102,11 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     loading,
     id,
     navigate,
-    deleteOneClient,
+    archiveOneClient,
     handleOpen,
     handleClose,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
+    handleConfirmationArchive,
   }
 }

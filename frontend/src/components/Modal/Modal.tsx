@@ -11,7 +11,7 @@ export interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
   return (
     <Dialog
-      maxWidth="sm"
+      maxWidth={'sm'}
       fullWidth
       className="text-[#32363F]"
       open={open}

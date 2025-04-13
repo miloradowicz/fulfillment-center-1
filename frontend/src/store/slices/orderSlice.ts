@@ -1,4 +1,5 @@
 import {
+  Client,
   GlobalError,
   Order,
   OrderWithClient,
@@ -11,22 +12,26 @@ import { RootState } from '@/app/store.ts'
 import {
   addOrder,
   archiveOrder,
-  deleteOrder,
+  deleteOrder, fetchArchivedOrders,
   fetchOrderById, fetchOrderByIdWithPopulate,
   fetchOrders,
-  fetchOrdersWithClient,
+  fetchOrdersWithClient, unarchiveOrder,
   updateOrder,
 } from '../thunks/orderThunk.ts'
 
 interface OrderState {
   order: OrderWithProducts | null
+  archivedOrder: Client[] | null;
   orders: Order[] | null
+  archivedOrders: OrderWithClient[] | null
   populateOrder: OrderWithProductsAndClients | null
   ordersWithClient: OrderWithClient[] | null
   loadingFetch : boolean
+  loadingFetchArchive : boolean
   loadingFetchPopulate: boolean
   loadingAdd: boolean
   loadingArchive: boolean
+  loadingUnarchive: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
   error: GlobalError | null
@@ -35,13 +40,17 @@ interface OrderState {
 
 const initialState: OrderState = {
   order: null,
+  archivedOrder: null,
   orders: null,
+  archivedOrders: null,
   populateOrder: null,
   ordersWithClient: null,
   loadingFetch: false,
+  loadingFetchArchive: false,
   loadingFetchPopulate:false,
   loadingAdd: false,
   loadingArchive: false,
+  loadingUnarchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -50,9 +59,11 @@ const initialState: OrderState = {
 
 export const selectOrder = (state: RootState) => state.orders.order
 export const selectAllOrders = (state: RootState) => state.orders.orders
+export const selectAllArchivedOrders = (state: RootState) => state.orders.archivedOrders
 export const selectPopulateOrder = (state: RootState) => state.orders.populateOrder
 export const selectAllOrdersWithClient = (state: RootState) => state.orders.ordersWithClient
 export const selectLoadingFetchOrder = (state: RootState) => state.orders.loadingFetch
+export const selectLoadingFetchArchivedOrders = (state: RootState) => state.orders.loadingFetchArchive
 export const selectLoadingFetchOrderPopulate = (state: RootState) => state.orders.loadingFetchPopulate
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
 export const selectLoadingArchiveOrder = (state: RootState) => state.orders.loadingArchive
@@ -71,7 +82,9 @@ const orderSlice = createSlice({
     clearErrorOrder: state => {
       state.createAndUpdateError = null
     },
-
+    clearArchivedOrders: state => {
+      state.archivedOrders = null
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchOrders.pending, state => {
@@ -83,6 +96,19 @@ const orderSlice = createSlice({
     })
     builder.addCase(fetchOrders.rejected, state => {
       state.loadingFetch = false
+    })
+    builder.addCase(fetchArchivedOrders.pending, state => {
+      state.loadingFetchArchive = true
+      state.error = null
+    })
+    builder.addCase(fetchArchivedOrders.fulfilled, (state, action) => {
+      state.loadingFetchArchive = false
+      state.archivedOrders = action.payload
+      state.error = null
+    })
+    builder.addCase(fetchArchivedOrders.rejected, (state, action) => {
+      state.loadingFetchArchive = false
+      state.error = action.payload as GlobalError
     })
     builder.addCase(fetchOrdersWithClient.pending, state => {
       state.loadingFetch = true
@@ -136,6 +162,22 @@ const orderSlice = createSlice({
     })
     builder.addCase(archiveOrder.rejected, (state, { payload: error }) => {
       state.loadingArchive = false
+      state.error = error || null
+    })
+    builder.addCase(unarchiveOrder.pending, state => {
+      state.loadingUnarchive = true
+      state.error = null
+    })
+    builder.addCase(unarchiveOrder.fulfilled, (state, action) => {
+      state.loadingUnarchive = false
+      state.error = null
+
+      if (state.archivedOrders) {
+        state.archivedOrders = state.archivedOrders.filter(order => order._id !== action.payload.id)
+      }
+    })
+    builder.addCase(unarchiveOrder.rejected, (state, { payload: error }) => {
+      state.loadingUnarchive = false
       state.error = error || null
     })
     builder.addCase(deleteOrder.pending, state => {

@@ -7,6 +7,7 @@ import { selectAllUsers, selectUsersLoading } from '@/store/slices/userSlice.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import dayjs from 'dayjs'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export const useTaskBoard = () => {
   const dispatch = useAppDispatch()
@@ -20,10 +21,14 @@ export const useTaskBoard = () => {
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
   const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
   const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
+
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+  const [openDetailsModal, setOpenDetailsModal] = useState(false)
 
   const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -67,6 +72,20 @@ export const useTaskBoard = () => {
     }
   }, [dispatch, fetchAllTasks, loadingTasks, selectFetchUser])
 
+  useEffect(() => {
+    if (id) {
+      setOpenDetailsModal(true)
+    } else {
+      setOpenDetailsModal(false)
+    }
+  }, [id])
+
+  const handleCloseDetailsModal = () => {
+    void fetchAllTasks()
+    setOpenDetailsModal(false)
+    navigate('/tasks', { replace: true })
+  }
+
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
       return tasks?.filter(task => task.status === status)
@@ -107,6 +126,12 @@ export const useTaskBoard = () => {
     void fetchAllUsers()
   }, [dispatch, fetchAllUsers])
 
+  useEffect(() => {
+    if (selectFetchUser) {
+      setLoading(false)
+    }
+  }, [selectFetchUser])
+
   const clearAllFilters = async () => {
     setSearchQuery('')
     setSelectedUser(null)
@@ -130,6 +155,7 @@ export const useTaskBoard = () => {
     }
   }
   return {
+    id,
     todoItems,
     doneItems,
     inProgressItems,
@@ -139,6 +165,7 @@ export const useTaskBoard = () => {
     draggingTask,
     open,
     loading,
+    openDetailsModal,
     searchQuery,
     users,
     clearAllFilters,
@@ -153,5 +180,6 @@ export const useTaskBoard = () => {
     handleOpen,
     handleClose,
     dispatch,
+    handleCloseDetailsModal,
   }
 }

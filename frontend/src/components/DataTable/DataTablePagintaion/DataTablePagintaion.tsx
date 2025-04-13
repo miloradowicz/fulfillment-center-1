@@ -1,7 +1,7 @@
 import { Table } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { Button } from '@/components/ui/button.tsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx'
+import { Button } from '../../ui/button.tsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select.tsx'
 
 interface Props<T> {
   table: Table<T>

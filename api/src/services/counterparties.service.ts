@@ -78,6 +78,19 @@ export class CounterpartiesService {
     return { message: 'Контрагент перемещен в архив' }
   }
 
+  async unarchive(id: string) {
+    const counterparty = await this.counterpartyModel.findById(id)
+
+    if (!counterparty) throw new NotFoundException('Контрагент не найден')
+
+    if (!counterparty.isArchived) throw new ForbiddenException('Контрагент не находится в архиве')
+
+    counterparty.isArchived = false
+    await counterparty.save()
+
+    return { message: 'Контрагент восстановлен из архива' }
+  }
+
   async delete(id: string) {
     const counterparty = await this.counterpartyModel.findByIdAndDelete(id).exec()
     if (!counterparty) throw new NotFoundException('Контрагент не найден')

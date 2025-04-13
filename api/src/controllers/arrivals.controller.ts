@@ -75,6 +75,12 @@ export class ArrivalsController {
     return await this.arrivalsService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveArrival(@Param('id') id: string) {
+    return this.arrivalsService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteArrival(@Param('id') id: string) {

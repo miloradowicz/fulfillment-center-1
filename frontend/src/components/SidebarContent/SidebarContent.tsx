@@ -1,5 +1,16 @@
 import { NavLink } from 'react-router-dom'
-import { BookUser, ClipboardList, FileText, Handshake, ListTodo, Package, Truck, Users, Warehouse } from 'lucide-react'
+import {
+  ArchiveRestore,
+  BookUser,
+  ClipboardList,
+  FileText,
+  Handshake,
+  ListTodo,
+  Package,
+  Truck,
+  Users,
+  Warehouse,
+} from 'lucide-react'
 import React from 'react'
 
 const links = [
@@ -12,6 +23,7 @@ const links = [
   { to: '/services', label: 'Услуги', icon: <Handshake size={25} /> },
   { to: '/stocks', label: 'Склады', icon: <Warehouse size={25} /> },
   { to: '/counterparties', label: 'Контрагенты', icon: <BookUser size={25} /> },
+  { to: '/archives', label: 'Архив', icon: <ArchiveRestore size={25} /> },
 ]
 
 interface Props {

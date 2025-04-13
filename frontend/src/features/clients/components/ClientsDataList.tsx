@@ -19,7 +19,7 @@ const ClientsDataList = () => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
+    handleConfirmationArchive,
   } = useClientActions(true)
 
   const columns: ColumnDef<Client>[] = [
@@ -89,8 +89,8 @@ const ClientsDataList = () => {
       <ConfirmationModal
         open={confirmationOpen}
         entityName="этого клиента"
-        actionType="delete"
-        onConfirm={handleConfirmationDelete}
+        actionType="archive"
+        onConfirm={handleConfirmationArchive}
         onCancel={handleConfirmationClose}
       />
 

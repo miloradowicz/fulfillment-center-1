@@ -19,6 +19,14 @@ export const fetchClientById = createAsyncThunk<Client, string>(
   },
 )
 
+export const fetchArchivedClients = createAsyncThunk<Client[]>(
+  'clients/fetchArchivedClients',
+  async () => {
+    const response = await axiosAPI.get('/clients/archived/all')
+    return response.data
+  },
+)
+
 export const addClient = createAsyncThunk<void, ClientMutation, { rejectValue: ValidationError | GlobalError }>(
   'clients/addClient',
   async (data: ClientMutation, { rejectWithValue }) => {
@@ -40,6 +48,21 @@ export const archiveClient = createAsyncThunk<{ id: string }, string, { rejectVa
   async (clientId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/clients/${ clientId }/archive`)
+      return { id: clientId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveClient = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'clients/unarchiveClient',
+  async (clientId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/clients/${ clientId }/unarchive`)
       return { id: clientId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {

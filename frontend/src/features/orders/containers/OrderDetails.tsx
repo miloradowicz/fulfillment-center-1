@@ -26,20 +26,20 @@ import { getOrderStatusColor } from '@/utils/getOrderStatusColor.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { basename } from 'path-browserify'
 import EditButton from '@/components/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
 
 const OrderDetails = () => {
   const {
     order,
     loading,
     open,
-    openDeleteModal,
+    openArchiveModal,
     handleOpenEdit,
-    handleDelete,
+    handleArchive,
     setOpen,
     getStepDescription,
-    setOpenDeleteModal,
+    setOpenArchiveModal,
     infoTab,
     setInfoTab,
   } = useOrderDetails()
@@ -157,17 +157,17 @@ const OrderDetails = () => {
           }}
         >
           <EditButton onClick={() => handleOpenEdit()} />
-          <DeleteButton  onClick={() => setOpenDeleteModal(true)} />
+          <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
 
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />
           </Modal>
           <ConfirmationModal
-            open={openDeleteModal}
+            open={openArchiveModal}
             entityName="этот заказ"
-            actionType="delete"
-            onConfirm={() => handleDelete()}
-            onCancel={() => setOpenDeleteModal(false)}
+            actionType="archive"
+            onConfirm={() => handleArchive()}
+            onCancel={() => setOpenArchiveModal(false)}
           />
         </Box>
       </Card>

@@ -3,6 +3,7 @@ import { onDragEnd } from '../hooks/onDragEnd.ts'
 import { useTaskBoard } from '../hooks/useTaskBoard.ts'
 import TaskLine from './TaskLine.tsx'
 import TaskForm from './TaskForm.tsx'
+import TaskDetails from '@/features/tasks/components/TaskDetails.tsx'
 import UserList from './UserList'
 import Modal from '@/components/Modal/Modal.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
@@ -14,6 +15,7 @@ import TaskCard from './TaskCard.tsx'
 const TaskBoard = () => {
 
   const {
+    id,
     todoItems,
     doneItems,
     inProgressItems,
@@ -22,6 +24,8 @@ const TaskBoard = () => {
     setInProgressItems,
     searchQuery,
     users,
+    loading,
+    openDetailsModal,
     draggingTask,
     selectFetchUser,
     clearAllFilters,
@@ -34,14 +38,17 @@ const TaskBoard = () => {
     sensors,
     handleOpen,
     open,
-    loading,
     handleClose,
     dispatch,
+    handleCloseDetailsModal,
   } = useTaskBoard()
 
   return (<>
     <Modal handleClose={handleClose} open={open}>
       <TaskForm onSuccess={handleClose} />
+    </Modal>
+    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} >
+      <TaskDetails taskId={id}/>
     </Modal>
     <DndContext
       sensors={sensors}

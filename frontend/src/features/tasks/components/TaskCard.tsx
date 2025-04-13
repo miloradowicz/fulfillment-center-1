@@ -15,8 +15,16 @@ import {
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
-import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { NavLink } from 'react-router-dom'
+import TaskDetails from './TaskDetails.tsx'
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button.tsx'
+import { Link2 } from 'lucide-react'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 import { setDraggingTask } from '@/store/slices/taskSlice.ts'
@@ -25,6 +33,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
+  const [openDetailModal, setOpenDetailModal] = useState(false)
+  const [tooltipText, setTooltipText] = useState('Скопировать ссылку')
+  const [openTooltip, setOpenTooltip] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
   const theme = useTheme()
@@ -37,6 +48,18 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     }
 
     dispatch(setDraggingTask(taskWithDateAsString))
+  }
+
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const url = `${ window.location.origin }/tasks/${ task._id }`
+    await navigator.clipboard.writeText(url)
+    setTooltipText('Скопировано')
+    setOpenTooltip(true)
+  }
+
+  const handleMouseOver = () => {
+    setTooltipText('Скопировать ссылку')
   }
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -124,10 +147,35 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         }}
       >
         <CardContent>
-          <Typography variant="body1">
-            #<strong>{task.taskNumber}</strong>
-          </Typography>
-          <Typography variant="body1" marginTop={1}>
+          <div className="flex flex-row items-center gap-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Typography variant="body1" onClick={() => setOpenDetailModal(true)}>
+                  <strong>{task.taskNumber}</strong>
+                </Typography>
+              </TooltipTrigger>
+              <TooltipContent>
+                Детальный просмотр
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip open={openTooltip} onOpenChange={setOpenTooltip}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-muted"
+                  onClick={handleCopyLink}
+                  onMouseOver={handleMouseOver}
+                >
+                  <Link2 className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {tooltipText}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Typography variant="body1" marginTop={1} onClick={handleCopyLink}>
             Исполнитель: <strong>{task.user.displayName}</strong>
           </Typography>
           <Typography variant="body1">
@@ -199,6 +247,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       />
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
+      </Modal>
+      <Modal open={openDetailModal} handleClose={() => setOpenDetailModal(false)}>
+        <TaskDetails taskId={task._id}/>
       </Modal>
     </Card>
   )

@@ -8,6 +8,14 @@ export const fetchStocks = createAsyncThunk<Stock[], void>('stocks/fetchStocks',
   return response.data
 })
 
+export const fetchArchivedStocks = createAsyncThunk<Stock[]>(
+  'stocks/fetchArchivedCStocks',
+  async () => {
+    const response = await axiosAPI.get('/stocks/archived/all')
+    return response.data
+  },
+)
+
 export const fetchStockById = createAsyncThunk<StockPopulate, string>('stocks/fetchStockById', async stockId => {
   const response = await axiosAPI.get<StockPopulate>(`/stocks/${ stockId }`)
   return response.data
@@ -32,6 +40,21 @@ export const archiveStock = createAsyncThunk<{ id: string }, string, { rejectVal
   async (stockId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/stocks/${ stockId }/archive`)
+      return { id: stockId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveStock = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'stocks/unarchiveStock',
+  async (stockId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/stocks/${ stockId }/unarchive`)
       return { id: stockId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
