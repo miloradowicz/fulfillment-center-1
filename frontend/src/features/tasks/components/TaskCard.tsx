@@ -231,7 +231,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
       </Modal>
-      <Modal open={openDetailModal} width={'md'} handleClose={() => setOpenDetailModal(false)}>
+      <Modal open={openDetailModal} handleClose={() => setOpenDetailModal(false)}>
         <TaskDetails taskId={task._id}/>
       </Modal>
     </Card>
