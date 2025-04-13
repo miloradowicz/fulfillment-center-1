@@ -26,6 +26,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
   const [openEditModal, setOpenEditModal] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
@@ -34,6 +36,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       index,
       parent,
     },
+    disabled: isMobile,
   })
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -74,10 +77,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     transform: transform ? CSS.Translate.toString(transform) : 'none',
     zIndex: isDragging ? 9999 : 'auto',
     opacity: isDragging ? 0.9 : 1,
+    touchAction: 'none',
   }
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
 
   return (
     <Card
@@ -94,7 +97,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         willChange: 'transform',
         zIndex: style.zIndex,
         opacity: style.opacity,
-        touchAction: 'none',
+        touchAction: 'auto',
         userSelect: 'none',
       }}
       {...attributes}

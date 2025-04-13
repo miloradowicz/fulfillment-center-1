@@ -6,6 +6,7 @@ import { getStatusStyles } from '../utils/statusStyle.ts'
 import TaskCardSceleton from './TaskCardSceleton.tsx'
 import { useAppSelector } from '@/app/hooks.ts'
 import { selectLoadingFetchTask } from '@/store/slices/taskSlice.ts'
+import useIMobile from '@/features/reports/utils/UseIMobile.ts'
 
 const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
   const loadingFetchTask = useAppSelector(selectLoadingFetchTask)
@@ -14,6 +15,8 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
   })
 
   const statusStyles = getStatusStyles(title)
+
+  const isMobile = useIMobile()
 
   return (
     <div  className="flex flex-col p-4 min-h-[300px] space-y-4">
@@ -31,7 +34,10 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
           </h6>
           <p className="text-xl text-[#44546F]">{items.length}</p>
         </div>
-        <div className="overflow-y-auto max-h-[72vh] px-2">
+        <div className="overflow-y-auto px-2" style={{
+          maxHeight: isMobile ? '53vh' : '69vh',
+          WebkitOverflowScrolling: 'touch',
+        }}>
           {loadingFetchTask ? (
             <TaskCardSceleton />
           ) : (

@@ -69,7 +69,7 @@ const TaskBoard = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box display="flex" flexDirection="column" p={2} paddingBottom={'150px'} justifyContent={'space-between'} overflow={'hidden'}  minWidth={'950px'} >
+        <Box display="flex" flexDirection="column" p={2}  justifyContent={'space-between'} overflow={'hidden'}  minWidth={'950px'} >
           <Stack direction="row" spacing={1} sx={{ display:'flex', width:'100%', marginLeft: '20px', marginBottom: '0', marginTop: '10px', alignItems: 'center' }}>
             <Box sx={{ position: 'relative', display: 'inline-block', maxWidth: 300, minWidth: 230 }}>
               <TextField
