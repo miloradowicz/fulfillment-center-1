@@ -7,8 +7,8 @@ import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import UserList from './UserList'
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button.tsx'
-import Modal from '@/components/ui/Modal/Modal.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 import { onDragEnd } from '../hooks/onDragEnd.ts'
 
@@ -103,8 +103,8 @@ const TaskBoard = () => {
               setSelectedUser={setSelectedUser}
             />:null }
             <Stack sx={{ display:'flex', flexDirection:'row', paddingRight:'20px', justifyContent:'flex-start',flexGrow:'1', maxWidth:'700px', marginBottom: '0', alignItems: 'center' }}>
-              <Box className={'mx-3'}><Button variant="outline" onClick={clearAllFilters}>Сбросить фильтры</Button></Box>
-              <Box marginLeft={'auto'} ><Button variant="outline" onClick={handleOpen}>Добавить задачу</Button></Box>
+              <Box className={'mx-3'}><CustomButton text={'Сбросить фильтры'} onClick={clearAllFilters}/></Box>
+              <Box marginLeft={'auto'} ><CustomButton text={'Добавить задачу'} onClick={handleOpen}/></Box>
             </Stack>
           </div>
 

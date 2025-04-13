@@ -6,8 +6,8 @@ import { Counterparty } from '@/types'
 import { ruRU } from '@mui/x-data-grid/locales'
 import { useCounterpartiesList } from '../hooks/useCounterpartiesList.ts'
 import CounterpartyForm from './CounterpartyForm.tsx'
-import Modal from '../../../components/ui/Modal/Modal.tsx'
-import ConfirmationModal from '../../../components/ui/Modal/ConfirmationModal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useState } from 'react'
 
 const CounterpartiesDataList = () => {

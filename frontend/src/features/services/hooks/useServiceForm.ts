@@ -25,6 +25,7 @@ const initialState: Form = {
   price: '',
   description: '',
   serviceCategory: null,
+  type: 'внутренняя',
 }
 
 interface Errors {

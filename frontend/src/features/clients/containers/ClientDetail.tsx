@@ -8,12 +8,12 @@ import {
 } from '@mui/icons-material'
 import ClientInfoItem from '../components/ClientInfoItem.tsx'
 import ClientForm from '../components/ClientForm.tsx'
-import Modal from '@/components/ui/Modal/Modal.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useClientActions } from '../hooks/useClientActions.ts'
-import EditButton from '@/components/ui/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/ui/Buttons/DeleteButton.tsx'
-import BackButton from '@/components/ui/Buttons/BackButton.tsx'
+import EditButton from '@/components/Buttons/EditButton.tsx'
+import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
+import BackButton from '@/components/Buttons/BackButton.tsx'
 
 const ClientDetail = () => {
   const {

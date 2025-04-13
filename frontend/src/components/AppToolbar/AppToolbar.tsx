@@ -2,14 +2,14 @@ import UserMenu from './UserMenu.tsx'
 import { selectUser } from '@/store/slices/authSlice.ts'
 import { useAppSelector } from '@/app/hooks.ts'
 import { featureProtection } from '@/constants.ts'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet.tsx'
+import { Button } from '@/components/ui/button.tsx'
 import { NavLink } from 'react-router-dom'
-import SidebarContent from '@/components/ui/SidebarContent/SidebarContent'
+import SidebarContent from '@/components/SidebarContent/SidebarContent.tsx'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { DialogTitle } from '@radix-ui/react-dialog'
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
 
 const AppToolbar = () => {
   const user = useAppSelector(selectUser)
@@ -33,6 +33,7 @@ const AppToolbar = () => {
                 <SheetContent side="left" className="w-[250px] p-0 [&>button.absolute]:hidden">
                   <VisuallyHidden>
                     <DialogTitle>Навигация по сайту</DialogTitle>
+                    <DialogDescription>Сайдбар с навигацией по страницам приложения</DialogDescription>
                   </VisuallyHidden>
                   <SidebarContent onLinkClick={() => setIsOpen(false)} />
                 </SheetContent>
@@ -40,7 +41,7 @@ const AppToolbar = () => {
             )}
 
             <NavLink to="/" className="bg-white rounded-md">
-              <img src="/logo.png" alt="logo" className="h-[40px] object-cover rounded-[8px] cursor-pointer" />
+              <img src="/logo.png" alt="logo" className="h-[40px] object-cover cursor-pointer" />
             </NavLink>
           </div>
 

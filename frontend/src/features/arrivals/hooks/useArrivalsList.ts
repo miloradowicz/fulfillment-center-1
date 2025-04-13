@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectPopulatedArrivals } from '@/store/slices/arrivalSlice.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { deleteArrival, fetchPopulatedArrivals } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 
@@ -11,13 +11,11 @@ export const useArrivalsList = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedArrivalId, setSelectedArrivalId] = useState<string | null>(null)
 
-  const fetchAllArrivals = useCallback(async () => {
-    await dispatch(fetchPopulatedArrivals())
-  }, [dispatch])
+
 
   useEffect(() => {
-    void fetchAllArrivals()
-  }, [dispatch, fetchAllArrivals])
+    dispatch(fetchPopulatedArrivals())
+  }, [dispatch])
 
   const handleClose = () => {
     setIsOpen(false)
@@ -33,7 +31,7 @@ export const useArrivalsList = () => {
     try {
       if (selectedArrivalId) {
         await dispatch(deleteArrival(selectedArrivalId))
-        await fetchAllArrivals()
+        await dispatch(fetchPopulatedArrivals())
         toast.success('Поставка успешно удалена.')
       }
     } catch (e) {
