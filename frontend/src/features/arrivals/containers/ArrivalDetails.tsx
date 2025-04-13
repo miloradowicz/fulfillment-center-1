@@ -25,9 +25,9 @@ import LogsTable from '@/components/Tables/LogsTable.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { basename } from 'path-browserify'
 import { getArrivalStatusColor } from '@/utils/getOrderStatusColor.ts'
-import EditButton from '@/components/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
+import ArchiveButton from '../../../components/Buttons/ArchiveButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
+import EditButton from '@/components/Buttons/EditButton.tsx'
 
 
 const ArrivalDetails = () => {
@@ -36,11 +36,11 @@ const ArrivalDetails = () => {
     loading,
     infoTab,
     productsTab,
-    confirmDeleteModalOpen,
-    handleDelete,
+    confirmArchiveModalOpen,
+    handleArchive,
     editModalOpen,
     setEditModalOpen,
-    setConfirmDeleteModalOpen,
+    setConfirmArchiveModalOpen,
     setInfoTab,
     setProductsTabs,
     getStepDescription,
@@ -73,11 +73,11 @@ const ArrivalDetails = () => {
       </Modal>
 
       <ConfirmationModal
-        open={confirmDeleteModalOpen}
+        open={confirmArchiveModalOpen}
         entityName="эту поставку"
-        actionType="delete"
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmDeleteModalOpen(false)}
+        actionType="archive"
+        onConfirm={handleArchive}
+        onCancel={() => setConfirmArchiveModalOpen(false)}
       />
 
       <Container maxWidth="md">
@@ -185,7 +185,7 @@ const ArrivalDetails = () => {
             }}
           >
             <EditButton onClick={() => setEditModalOpen(true)} />
-            <DeleteButton onClick={() => setConfirmDeleteModalOpen(true)} />
+            <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
           </Box>
         </Card>
       </Container>

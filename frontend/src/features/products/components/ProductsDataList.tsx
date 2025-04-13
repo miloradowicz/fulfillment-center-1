@@ -17,7 +17,7 @@ const ProductsDataList = () => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
+    handleConfirmationArchive,
     handleClose,
     handleOpen,
     fetchAllProducts,
@@ -95,8 +95,8 @@ const ProductsDataList = () => {
       <ConfirmationModal
         open={confirmationOpen}
         entityName="этот товар"
-        actionType={'delete'}
-        onConfirm={handleConfirmationDelete}
+        actionType={'archive'}
+        onConfirm={handleConfirmationArchive}
         onCancel={handleConfirmationClose}
       />
     </div>

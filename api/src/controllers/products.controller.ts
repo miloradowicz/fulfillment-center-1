@@ -49,6 +49,12 @@ export class ProductsController {
     return await this.productsService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveProduct(@Param('id') id: string) {
+    return this.productsService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {

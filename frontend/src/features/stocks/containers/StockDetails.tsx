@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
@@ -6,17 +6,18 @@ import Grid from '@mui/material/Grid2'
 import { DataGrid } from '@mui/x-data-grid'
 import { ruRU } from '@mui/x-data-grid/locales'
 import EditButton from '@/components/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const StockDetails = () => {
   const {
     stock,
     isLoading,
-    deleteModalOpen,
-    showDeleteModal,
-    hideDeleteModal,
-    handleDelete,
+    archiveModalOpen,
+    showArchiveModal,
+    hideArchiveModal,
+    handleArchive,
     editModalOpen,
     setEditModalOpen,
     stockColumns,
@@ -39,26 +40,13 @@ const StockDetails = () => {
         />
       </Modal>
 
-      <Modal open={deleteModalOpen} handleClose={hideDeleteModal}>
-        <Grid container direction="column">
-          <Grid mb={4}>
-            <Typography variant="h6" gutterBottom>
-              Вы действительно хотите удалить склад?
-            </Typography>
-          </Grid>
-
-          <Grid>
-            <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Удалить
-              </Button>
-              <Button variant="outlined" onClick={hideDeleteModal}>
-                Отмена
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Modal>
+      <ConfirmationModal
+        open={archiveModalOpen}
+        entityName="этот склад"
+        actionType="archive"
+        onConfirm={handleArchive}
+        onCancel={hideArchiveModal}
+      />
 
       <div className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8 mb-8">
         <BackButton />
@@ -101,7 +89,7 @@ const StockDetails = () => {
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
           <EditButton onClick={() => setEditModalOpen(true)} />
-          <DeleteButton onClick={showDeleteModal}/>
+          <ArchiveButton onClick={showArchiveModal}/>
         </Box>
       </div>
     </>

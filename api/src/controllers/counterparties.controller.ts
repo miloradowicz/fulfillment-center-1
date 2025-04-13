@@ -51,6 +51,12 @@ export class CounterpartiesController {
     return this.counterpartiesService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveClient(@Param('id') id: string) {
+    return this.counterpartiesService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteCounterparty(@Param('id') id: string) {

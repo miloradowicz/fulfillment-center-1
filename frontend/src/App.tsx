@@ -22,6 +22,7 @@ import { useAppSelector } from './app/hooks.ts'
 import { selectUser } from './store/slices/authSlice.ts'
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 
 const App = () => {
   const user = useAppSelector(selectUser)
@@ -130,6 +131,11 @@ const App = () => {
               <Route path="/stocks/:stockId" element={
                 <ProtectedRoute isAllowed={!!user}>
                   <StockDetails />
+                </ProtectedRoute>
+              } />
+              <Route path="/archives" element={
+                <ProtectedRoute isAllowed={!!user}>
+                  <ArchivePage />
                 </ProtectedRoute>
               } />
               <Route

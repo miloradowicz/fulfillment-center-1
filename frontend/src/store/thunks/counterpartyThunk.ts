@@ -3,35 +3,54 @@ import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 import { Counterparty, CounterpartyMutation, GlobalError, ValidationError } from '@/types'
 
-export const fetchCounterparties = createAsyncThunk<Counterparty[]>(
+export const fetchAllCounterparties = createAsyncThunk<Counterparty[], void, { rejectValue: GlobalError }>(
   'counterparties/fetchAll',
-  async () => {
-    const response = await axiosAPI.get('/counterparties')
-    return response.data
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosAPI.get('/counterparties')
+      return response.data
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
   },
 )
 
-export const fetchAllCounterparties = createAsyncThunk<Counterparty[]>(
-  'counterparties/fetchAllWithArchived',
-  async () => {
-    const response = await axiosAPI.get('/counterparties/all')
-    return response.data
+export const fetchAllArchivedCounterparties = createAsyncThunk<Counterparty[], void, { rejectValue: GlobalError }>(
+  'counterparty/fetchArchivedCounterparties',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosAPI.get('/counterparties/archived/all')
+      return response.data
+    } catch (e) {
+      if (isAxiosError(e)) {
+        return rejectWithValue({
+          message: e.response?.data?.message || e.message || 'Ошибка сети',
+        })
+      }
+      return rejectWithValue({ message: 'Неизвестная ошибка' })
+    }
   },
 )
 
-export const fetchCounterpartyById = createAsyncThunk<Counterparty, string>(
+export const fetchCounterpartyById = createAsyncThunk<
+  Counterparty,
+  string,
+  { rejectValue: GlobalError }
+>(
   'counterparties/fetchById',
-  async (id: string) => {
-    const response = await axiosAPI.get(`/counterparties/${ id }`)
-    return response.data
-  },
-)
-
-export const fetchCounterpartyByIdWithArchived = createAsyncThunk<Counterparty, string>(
-  'counterparties/fetchByIdWithArchived',
-  async (id: string) => {
-    const response = await axiosAPI.get(`/counterparties/all/${ id }`)
-    return response.data
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosAPI.get(`/counterparties/${ id }`)
+      return response.data
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
   },
 )
 
@@ -71,6 +90,21 @@ export const archiveCounterparty = createAsyncThunk<{ id: string }, string, { re
     try {
       await axiosAPI.patch(`/counterparties/${ id }/archive`)
       return { id }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveCounterparty = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'counterparties/unarchiveCounterparty',
+  async (counterpartyId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/counterparties/${ counterpartyId }/unarchive`)
+      return { id: counterpartyId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)

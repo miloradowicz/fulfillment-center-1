@@ -12,8 +12,8 @@ import Modal from '@/components/Modal/Modal.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useClientActions } from '../hooks/useClientActions.ts'
 import EditButton from '@/components/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '../../../components/Buttons/ArchiveButton.tsx'
 
 const ClientDetail = () => {
   const {
@@ -26,7 +26,7 @@ const ClientDetail = () => {
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
+    handleConfirmationArchive,
   } = useClientActions(false)
 
   return (
@@ -120,22 +120,22 @@ const ClientDetail = () => {
                   gap: 2,
                   justifyContent: 'flex-end',
                 }}>
-                  <EditButton onClick={() => handleOpen()}/>
-                  <DeleteButton onClick={() => handleConfirmationOpen(client._id)}/>
+                  <EditButton onClick={() => handleOpen()} />
+                  <ArchiveButton onClick={() => handleConfirmationOpen(client._id)} />
                 </Box>
               </>
             )}
           </Card>
 
           <Modal open={open} handleClose={handleClose}>
-            <ClientForm client={client} onClose={handleClose}/>
+            <ClientForm client={client} onClose={handleClose} />
           </Modal>
 
           <ConfirmationModal
             open={confirmationOpen}
             entityName="этого клиента"
-            actionType={'delete'}
-            onConfirm={handleConfirmationDelete}
+            actionType={'archive'}
+            onConfirm={handleConfirmationArchive}
             onCancel={handleConfirmationClose}
           />
         </Box>

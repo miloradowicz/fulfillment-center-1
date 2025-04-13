@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const { arrivals, handleDeleteClick, handleConfirmDelete, handleClose, isOpen, deleteModalOpen } = useArrivalsList()
+  const { arrivals, handleArchiveClick, handleConfirmArchive, handleClose, isOpen, archiveModalOpen } = useArrivalsList()
 
   const columns: ColumnDef<ArrivalWithClient>[] = [
     {
@@ -82,7 +82,7 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
           <TableActionsMenu<ArrivalWithClient>
             row={tableArrival}
             handleOpen={() => onEdit(tableArrival)}
-            handleConfirmationOpen={() => handleDeleteClick(tableArrival._id)}
+            handleConfirmationOpen={() => handleArchiveClick(tableArrival._id)}
             showDetailsLink={true}
             detailsPathPrefix="arrivals"
           />
@@ -96,10 +96,10 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       <DataTable columns={columns} data={arrivals ?? []} />
 
       <ConfirmationModal
-        open={deleteModalOpen}
+        open={archiveModalOpen}
         entityName="эту поставку"
-        actionType="delete"
-        onConfirm={handleConfirmDelete}
+        actionType="archive"
+        onConfirm={handleConfirmArchive}
         onCancel={handleClose}
       />
 

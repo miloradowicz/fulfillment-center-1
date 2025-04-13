@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { createCounterparty, fetchCounterparties, fetchCounterpartyById, updateCounterparty } from '@/store/thunks/counterpartyThunk.ts'
+import { createCounterparty, fetchAllCounterparties, fetchCounterpartyById, updateCounterparty } from '@/store/thunks/counterpartyThunk.ts'
 import { CounterpartyMutation } from '@/types'
 import { phoneNumberRegex } from '@/constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
@@ -146,11 +146,11 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
 
       if (counterpartyId) {
         await dispatch(updateCounterparty({ id: counterpartyId, data: submissionData })).unwrap()
-        await dispatch(fetchCounterparties())
+        await dispatch(fetchAllCounterparties())
         toast.success('Контрагент успешно обновлен!')
       } else {
         await dispatch(createCounterparty(submissionData)).unwrap()
-        await dispatch(fetchCounterparties())
+        await dispatch(fetchAllCounterparties())
         toast.success('Контрагент успешно создан!')
       }
 

@@ -10,11 +10,11 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.tsx'
-import { Input } from '@/components/ui/input.tsx'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table.tsx'
+import { Input } from '../../components/ui/input.tsx'
 
 import { useState } from 'react'
-import { Separator } from '@/components/ui/separator.tsx'
+import { Separator } from '../../components/ui/separator.tsx'
 import DataTableViewOptions from '@/components/DataTable/DataTableViewOptions/DataTableViewOptions.tsx'
 import DataTablePagination from '@/components/DataTable/DataTablePagintaion/DataTablePagintaion.tsx'
 

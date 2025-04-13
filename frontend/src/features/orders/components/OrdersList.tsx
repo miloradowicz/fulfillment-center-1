@@ -124,7 +124,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       <ConfirmationModal
         open={openModal}
         entityName="этот заказ"
-        actionType="delete"
+        actionType="archive"
         onConfirm={handleModalConfirm}
         onCancel={handleModalCancel}
       />

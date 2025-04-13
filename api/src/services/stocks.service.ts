@@ -63,6 +63,19 @@ export class StocksService {
     return { message: 'Склад перемещен в архив.' }
   }
 
+  async unarchive(id: string) {
+    const stock = await this.stockModel.findById(id)
+
+    if (!stock) throw new NotFoundException('Склад не найден')
+
+    if (!stock.isArchived) throw new ForbiddenException('Склад не находится в архиве')
+
+    stock.isArchived = false
+    await stock.save()
+
+    return { message: 'Склад восстановлен из архива' }
+  }
+
   async delete(id: string) {
     const stock = await this.stockModel.findByIdAndDelete(id)
     if (!stock) throw new NotFoundException('Склад не найден.')

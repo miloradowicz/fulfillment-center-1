@@ -16,7 +16,7 @@ const CounterpartiesDataList = () => {
     confirmationModalOpen,
     handleOpenConfirmationModal,
     handleCloseConfirmationModal,
-    confirmDelete,
+    confirmArchive,
   } = useCounterpartiesList()
 
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -91,8 +91,8 @@ const CounterpartiesDataList = () => {
       <ConfirmationModal
         open={confirmationModalOpen}
         entityName="этого контрагента"
-        actionType="delete"
-        onConfirm={confirmDelete}
+        actionType="archive"
+        onConfirm={confirmArchive}
         onCancel={handleCloseConfirmationModal}
       />
     </div>

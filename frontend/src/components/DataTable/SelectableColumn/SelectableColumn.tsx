@@ -1,4 +1,4 @@
-import { Checkbox } from '@/components/ui/checkbox.tsx'
+import { Checkbox } from '../../ui/checkbox.tsx'
 import type { Row, Table } from '@tanstack/react-table'
 
 const SelectableColumn = <TData,>(input: Table<TData> | Row<TData>, type: 'header' | 'cell') => {

@@ -16,6 +16,14 @@ export const fetchTasks = createAsyncThunk<Task[]>(
   },
 )
 
+export const fetchArchivedTasks = createAsyncThunk<TaskWithPopulate[]>(
+  'tasks/fetchArchivedTasks',
+  async () => {
+    const response = await axiosAPI.get('/tasks/archived/all?populate=1')
+    return response.data
+  },
+)
+
 export const fetchTasksWithPopulate = createAsyncThunk<TaskWithPopulate[]>(
   'tasks/fetchTasksWithPopulate',
   async () => {
@@ -78,6 +86,21 @@ export const archiveTask = createAsyncThunk<{ id: string }, string>(
   async taskId => {
     const response = await axiosAPI.patch(`/tasks/${ taskId }/archive`)
     return response.data
+  },
+)
+
+export const unarchiveTask = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'tasks/unarchiveTask',
+  async (taskId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/tasks/${ taskId }/unarchive`)
+      return { id: taskId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
   },
 )
 

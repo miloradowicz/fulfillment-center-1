@@ -1,5 +1,5 @@
 import { ChevronRight, Edit, MoreHorizontal, Trash } from 'lucide-react'
-import { Button } from '@/components/ui/button.tsx'
+import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu.tsx'
+} from '../../ui/dropdown-menu.tsx'
 import { NavLink } from 'react-router-dom'
 
 interface Props<T> {
