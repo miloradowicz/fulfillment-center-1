@@ -9,18 +9,22 @@ import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import dayjs from 'dayjs'
 
 export const useTaskBoard = () => {
+  const dispatch = useAppDispatch()
+
+  const tasks = useAppSelector(selectPopulatedTasks)
+  const users = useAppSelector(selectAllUsers)
+  const selectFetchUser = useAppSelector(selectUsersLoading)
+  const loadingTasks = useAppSelector(selectLoadingFetchTask)
+
   const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
   const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
   const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
-  const dispatch = useAppDispatch()
-  const tasks = useAppSelector(selectPopulatedTasks)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string | null>(null) // ID выбранного пользователя
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const users = useAppSelector(selectAllUsers)
-  const selectFetchUser = useAppSelector(selectUsersLoading)
-  const loading = useAppSelector(selectLoadingFetchTask)
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const fetchAllTasks = useCallback(async () => {
     setTodoItems([])
@@ -32,6 +36,12 @@ export const useTaskBoard = () => {
   useEffect(() => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
+
+  useEffect(() => {
+    if (selectFetchUser) {
+      setLoading(false)
+    }
+  }, [selectFetchUser])
 
   const handleOpen = () => setOpen(true)
 
@@ -49,12 +59,12 @@ export const useTaskBoard = () => {
   )
 
   useEffect(() => {
-    if(selectFetchUser || loading){
+    if(selectFetchUser || loadingTasks){
       setDoneItems([])
       setInProgressItems([])
       setTodoItems([])
     }
-  }, [dispatch, fetchAllTasks, loading, selectFetchUser])
+  }, [dispatch, fetchAllTasks, loadingTasks, selectFetchUser])
 
   const filterTasksByStatus = useCallback((status: string) => {
     if(tasks){
@@ -126,6 +136,7 @@ export const useTaskBoard = () => {
     setTodoItems,
     setInProgressItems,
     open,
+    loading,
     searchQuery,
     users,
     clearAllFilters,
@@ -139,5 +150,6 @@ export const useTaskBoard = () => {
     selectFetchUser,
     handleOpen,
     handleClose,
+    dispatch,
   }
 }
