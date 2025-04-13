@@ -6,11 +6,11 @@ import TaskLine from './TaskLine.tsx'
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import UserList from './UserList'
-import CustomButton from '@/components/ui/CustomButton/CustomButton.tsx'
-import Modal from '@/components/ui/Modal/Modal.tsx'
 import TaskForm from './TaskForm.tsx'
 import { onDragEnd } from '../hooks/onDragEnd.ts'
 import TaskDetails from '@/features/tasks/components/TaskDetails.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 
 const TaskBoard = () => {
   const {
@@ -45,7 +45,7 @@ const TaskBoard = () => {
     <Modal handleClose={handleClose} open={open}>
       <TaskForm onSuccess={handleClose} />
     </Modal>
-    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} width={'md'}>
+    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} >
       <TaskDetails taskId={id}/>
     </Modal>
     <DndContext

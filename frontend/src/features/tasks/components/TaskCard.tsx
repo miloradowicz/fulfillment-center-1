@@ -18,8 +18,6 @@ import StatusCell from './StatusCell.tsx'
 import { NavLink } from 'react-router-dom'
 import TaskForm from './TaskForm.tsx'
 import TaskDetails from './TaskDetails.tsx'
-import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal.tsx'
-import Modal from '@/components/ui/Modal/Modal.tsx'
 import {
   Tooltip,
   TooltipTrigger,
@@ -27,6 +25,8 @@ import {
 } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button.tsx'
 import { Link2 } from 'lucide-react'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)

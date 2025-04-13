@@ -297,6 +297,7 @@ export interface Service {
   serviceCategory: string
   price: number
   description: string
+  type: string
   logs?: Log[]
 }
 

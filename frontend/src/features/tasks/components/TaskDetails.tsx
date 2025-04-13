@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 
 interface Props {
-  taskId: string
+  taskId?: string
 }
 
 const TaskDetails: React.FC<Props> = ({ taskId }) => {

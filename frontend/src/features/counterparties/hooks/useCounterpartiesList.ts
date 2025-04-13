@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteCounterparty, fetchCounterparties } from '@/store/thunks/counterpartyThunk.ts'
-import { selectAllCounterparties, selectLoadingFetch } from '@/store/slices/counterpartySlices.ts'
+import { selectAllCounterparties } from '@/store/slices/counterpartySlices.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { Counterparty } from '@/types'
@@ -9,7 +9,6 @@ import { Counterparty } from '@/types'
 export const useCounterpartiesList = () => {
   const dispatch = useAppDispatch()
   const counterparties = useAppSelector(selectAllCounterparties)
-  const isLoading = useAppSelector(selectLoadingFetch)
   const navigate = useNavigate()
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
@@ -62,7 +61,6 @@ export const useCounterpartiesList = () => {
   return {
     counterparties,
     deleteOneCounterparty,
-    isLoading,
     confirmationModalOpen,
     counterpartyToDelete,
     handleOpenConfirmationModal,

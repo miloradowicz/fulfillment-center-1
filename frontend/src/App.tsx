@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import ClientForm from './features/clients/components/ClientForm.tsx'
 import { createTheme, ThemeProvider, Typography } from '@mui/material'
-import Layout from './Layout/Layout.tsx'
+import Layout from '@/layout/Layout.tsx'
 import LoginPage from './features/users/containers/LoginPage.tsx'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ProductPage from './features/products/containers/ProductPage.tsx'
@@ -20,7 +20,7 @@ import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 import { useAppSelector } from './app/hooks.ts'
 import { selectUser } from './store/slices/authSlice.ts'
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
+import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 const App = () => {
