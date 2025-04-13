@@ -36,6 +36,7 @@ export class Invoice {
   @Prop({
     type: String,
     enum: ['в ожидании', 'оплачено', 'частично оплачено'],
+    required: true,
     default: 'в ожидании',
   })
   status: 'в ожидании' | 'оплачено' | 'частично оплачено'

@@ -1,5 +1,14 @@
 import useServiceForm from '../hooks/useServiceForm'
-import { Autocomplete as _Autocomplete, Box, Button, createFilterOptions, LinearProgress, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete as _Autocomplete,
+  Box,
+  Button,
+  createFilterOptions,
+  LinearProgress,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { isServiceCategory } from '@/utils/helpers'
 import { ServiceCategory } from '@/types'
@@ -60,6 +69,22 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string, onClose: () =
           <Box height={6}>
             {(addCategoryLoading || fetchCategoryLoading) && <LinearProgress />}
           </Box>
+        </Grid>
+        <Grid>
+          <TextField
+            select
+            fullWidth
+            label="Тип услуги"
+            name="type"
+            value={form.type}
+            onChange={handleInputChange}
+            size="small"
+            error={!!errors.type}
+            helperText={errors.type}
+          >
+            <MenuItem value="внутренняя">Внутренняя услуга</MenuItem>
+            <MenuItem value="внешняя">Внешняя услуга</MenuItem>
+          </TextField>
         </Grid>
         <Grid>
           <TextField

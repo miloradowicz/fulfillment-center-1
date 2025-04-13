@@ -9,7 +9,7 @@ import SidebarContent from '@/components/SidebarContent/SidebarContent.tsx'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { DialogTitle } from '@radix-ui/react-dialog'
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
 
 const AppToolbar = () => {
   const user = useAppSelector(selectUser)
@@ -33,6 +33,7 @@ const AppToolbar = () => {
                 <SheetContent side="left" className="w-[250px] p-0 [&>button.absolute]:hidden">
                   <VisuallyHidden>
                     <DialogTitle>Навигация по сайту</DialogTitle>
+                    <DialogDescription>Сайдбар с навигацией по страницам приложения</DialogDescription>
                   </VisuallyHidden>
                   <SidebarContent onLinkClick={() => setIsOpen(false)} />
                 </SheetContent>

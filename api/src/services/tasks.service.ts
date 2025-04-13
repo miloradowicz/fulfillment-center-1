@@ -61,7 +61,10 @@ export class TasksService {
   }
 
   async getById(id: string) {
-    const task = await this.taskModel.findById(id).populate('user', 'email displayName role').exec()
+    const task = await this.taskModel.findById(id)
+      .populate('user', 'email displayName role')
+      .populate('associated_order', 'orderNumber')
+      .populate('associated_arrival', 'arrivalNumber')
 
     if (!task) throw new NotFoundException('Задача не найдена')
 
