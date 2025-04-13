@@ -1,4 +1,4 @@
-import { Arrival, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '../../types'
+import { Arrival, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '@/app/store.ts'
 import {

@@ -1,5 +1,5 @@
 import { Task, TaskWithPopulate, ValidationError } from '@/types'
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '@/app/store.ts'
 import {
   addTask, archiveTask,
@@ -12,6 +12,7 @@ import {
 } from '../thunks/tasksThunk.ts'
 
 interface TaskState {
+  draggingTask: TaskWithPopulate | null
   task: TaskWithPopulate | null
   tasksPopulate: TaskWithPopulate[] | null
   tasks: Task[] | null
@@ -29,6 +30,7 @@ interface TaskState {
 
 const initialState: TaskState = {
   task: null,
+  draggingTask: null,
   tasksPopulate: null,
   tasks: null,
   archivedTasks: null,
@@ -45,6 +47,7 @@ const initialState: TaskState = {
 
 
 export const selectTask= (state: RootState) => state.tasks.task
+export const selectDraggingTask= (state: RootState) => state.tasks.draggingTask
 export const selectAllTasks = (state: RootState) => state.tasks.tasks
 export const selectAllArchivedTasks = (state: RootState) => state.tasks.archivedTasks
 export const selectPopulatedTasks = (state: RootState) => state.tasks.tasksPopulate
@@ -60,7 +63,11 @@ export const selectCreateError = (state: RootState) => state.tasks.createError
 const taskSlice = createSlice({
   name: 'tasks',
   initialState,
-  reducers: {},
+  reducers: {
+    setDraggingTask(state, action: PayloadAction<TaskWithPopulate>) {
+      state.draggingTask = action.payload
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchTasks.pending, state => {
@@ -214,3 +221,4 @@ const taskSlice = createSlice({
 })
 
 export const taskReducer = taskSlice.reducer
+export const { setDraggingTask } = taskSlice.actions

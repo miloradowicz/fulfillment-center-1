@@ -275,8 +275,8 @@ export interface TaskWithPopulate {
     _id: string | null,
     arrivalNumber: string
   }
-  createdAt: Date,
-  updatedAt: Date,
+  createdAt: string,
+  updatedAt: string,
   date_inProgress:string | null,
   date_Done:string | null,
   date_ToDO:string | null,

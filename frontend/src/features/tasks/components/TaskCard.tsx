@@ -16,7 +16,6 @@ import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import StatusCell from './StatusCell.tsx'
 import { NavLink } from 'react-router-dom'
-import TaskForm from './TaskForm.tsx'
 import TaskDetails from './TaskDetails.tsx'
 import {
   Tooltip,
@@ -27,6 +26,8 @@ import { Button } from '@/components/ui/button.tsx'
 import { Link2 } from 'lucide-react'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
+import TaskForm from './TaskForm.tsx'
+import { setDraggingTask } from '@/store/slices/taskSlice.ts'
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -37,6 +38,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
   const [openTooltip, setOpenTooltip] = useState(false)
   const open = Boolean(anchorEl)
   const dispatch = useAppDispatch()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const handleDragStart = () => {
+    const taskWithDateAsString = {
+      ...task,
+      updatedAt: task.updatedAt.toString(),
+    }
+
+    dispatch(setDraggingTask(taskWithDateAsString))
+  }
 
   const handleCopyLink = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -57,7 +69,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       index,
       parent,
     },
+    disabled: isMobile,
   })
+
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -97,10 +111,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     transform: transform ? CSS.Translate.toString(transform) : 'none',
     zIndex: isDragging ? 9999 : 'auto',
     opacity: isDragging ? 0.9 : 1,
+    touchAction: 'none',
   }
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   return (
     <Card
@@ -117,7 +129,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
         willChange: 'transform',
         zIndex: style.zIndex,
         opacity: style.opacity,
-        touchAction: 'none',
+        touchAction: 'auto',
         userSelect: 'none',
       }}
       {...attributes}
@@ -127,7 +139,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     >
       <div
         {...listeners}
+        onMouseDown={handleDragStart}
         style={{ padding: 16 }}
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
       >
         <CardContent>
           <div className="flex flex-row items-center gap-4">

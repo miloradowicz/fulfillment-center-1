@@ -12,7 +12,7 @@ import {
   fetchOrdersWithClient,
 } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient } from '@/types'
 
 const UseOrderPage = () => {
   const dispatch = useAppDispatch()

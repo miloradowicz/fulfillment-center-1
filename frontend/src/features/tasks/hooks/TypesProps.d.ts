@@ -8,8 +8,8 @@ export interface TaskLineProps {
 
 export interface TaskCardProps {
   task: TaskWithPopulate
-  index: number
-  parent: string
+  index?: number
+  parent?: string
   selectedUser: string | null
 }
 

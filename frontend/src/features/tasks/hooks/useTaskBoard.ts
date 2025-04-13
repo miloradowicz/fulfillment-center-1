@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TaskWithPopulate } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
+import { selectDraggingTask, selectLoadingFetchTask, selectPopulatedTasks } from '@/store/slices/taskSlice.ts'
 import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
 import { selectAllUsers, selectUsersLoading } from '@/store/slices/userSlice.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
@@ -10,23 +10,27 @@ import dayjs from 'dayjs'
 import { useNavigate, useParams } from 'react-router-dom'
 
 export const useTaskBoard = () => {
-  const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
-  const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
-  const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
   const dispatch = useAppDispatch()
-  const { id } = useParams()
-  const navigate = useNavigate()
+
+  const draggingTask = useAppSelector(selectDraggingTask)
   const tasks = useAppSelector(selectPopulatedTasks)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string | null>(null) // ID выбранного пользователя
-  const inputRef = useRef<HTMLInputElement | null>(null)
   const users = useAppSelector(selectAllUsers)
   const selectFetchUser = useAppSelector(selectUsersLoading)
   const loadingTasks = useAppSelector(selectLoadingFetchTask)
-  const [open, setOpen] = useState(false)
+
+  const [todoItems, setTodoItems] = useState<TaskWithPopulate[]>([])
+  const [doneItems, setDoneItems] = useState<TaskWithPopulate[]>([])
+  const [inProgressItems, setInProgressItems] = useState<TaskWithPopulate[]>([])
+
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [open, setOpen] = useState(false)
   const [openDetailsModal, setOpenDetailsModal] = useState(false)
 
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const fetchAllTasks = useCallback(async () => {
     setTodoItems([])
@@ -38,6 +42,12 @@ export const useTaskBoard = () => {
   useEffect(() => {
     void fetchAllTasks()
   }, [dispatch, fetchAllTasks])
+
+  useEffect(() => {
+    if (selectFetchUser) {
+      setLoading(false)
+    }
+  }, [selectFetchUser])
 
   const handleOpen = () => setOpen(true)
 
@@ -152,11 +162,12 @@ export const useTaskBoard = () => {
     setDoneItems,
     setTodoItems,
     setInProgressItems,
+    draggingTask,
     open,
+    loading,
     openDetailsModal,
     searchQuery,
     users,
-    loading,
     clearAllFilters,
     clearSearch,
     filterTasks,
@@ -168,7 +179,7 @@ export const useTaskBoard = () => {
     selectFetchUser,
     handleOpen,
     handleClose,
-    handleCloseDetailsModal,
     dispatch,
+    handleCloseDetailsModal,
   }
 }
