@@ -35,7 +35,7 @@ const TaskLine: FC<TaskLineProps> = ({ title, items, selectedUser }) => {
           <p className="text-xl text-[#44546F]">{items.length}</p>
         </div>
         <div className="overflow-y-auto overflow-x-hidden px-2" style={{
-          maxHeight: isMobile ? '53vh' : '69vh',
+          maxHeight: isMobile ? '60vh' : '69vh',
           WebkitOverflowScrolling: 'touch',
           position: 'relative',
         }}>
