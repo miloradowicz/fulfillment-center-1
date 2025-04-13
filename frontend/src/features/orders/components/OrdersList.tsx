@@ -1,14 +1,14 @@
 import { OrderWithClient } from '@/types'
 import React, { useState } from 'react'
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { NavLink } from 'react-router-dom'
-import EditIcon from '@mui/icons-material/Edit'
-import ClearIcon from '@mui/icons-material/Clear'
-import { ruRU } from '@mui/x-data-grid/locales'
 import dayjs from 'dayjs'
 import StatusOrderCell from './StatusOrderCell.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
 
 interface Props {
   orders: OrderWithClient[] | []
@@ -17,136 +17,91 @@ interface Props {
 }
 
 const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
   const [openModal, setOpenModal] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<OrderWithClient | null>(null)
 
-  const columns: GridColDef<OrderWithClient>[] = [
+  const columns: ColumnDef<OrderWithClient>[] = [
     {
-      field: 'orderNumber',
-      headerName: 'Номер заказа',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      renderCell: ({ row }) => (
-        <NavLink
-          to={`/orders/${ row._id }`}
-          className="
-            py-2 px-3
-            bg-blue-50
-            text-blue-700
-            rounded-md
-            text-sm
-            font-medium
-            hover:bg-blue-100
-            transition-colors
-            duration-150
-            border
-            border-blue-200
-            hover:border-blue-300
-            whitespace-nowrap
-          "
-          style={{
-            lineHeight: '1.25rem',
-            maxWidth: '120px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {row.orderNumber}
-        </NavLink>
-      ),
-      valueGetter: (_value: string, row: OrderWithClient) => row.orderNumber,
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'client',
-      headerName: 'Клиент',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: OrderWithClient) => row.client.name,
+      accessorKey: 'orderNumber',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Номер заказа" />,
+      cell: ({ row }) => {
+        const tableOrder = row.original
+
+        return (
+          <NavLink
+            to={`/orders/${ tableOrder._id }`}
+            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 hover:text-blue-800 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
+          >
+            {tableOrder.orderNumber}
+          </NavLink>
+        )
+      },
+      enableHiding: false,
     },
     {
-      field: 'stock',
-      headerName: 'Склад',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => row.stock?.name ?? 'Неизвестный склад',
+      accessorKey: 'client.name',
+      header: 'Клиент',
+      cell: ({ row }) => row.original.client?.name ?? 'Неизвестный клиент',
     },
     {
-      field: 'sent_at',
-      headerName: 'Отправлен',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => new Date(row.sent_at),
-      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
+      accessorKey: 'stock.name',
+      header: 'Склад',
+      cell: ({ row }) => row.original.stock?.name ?? 'Неизвестный склад',
     },
     {
-      field: 'delivered_at',
-      headerName: 'Доставлен',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => row.delivered_at && new Date(row.delivered_at),
-      valueFormatter: (value: Date | null) => (value ? dayjs(value).format('DD.MM.YYYY') : 'Не доставлен'),
+      accessorKey: 'sent_at',
+      header: 'Отправлен',
+      cell: ({ row }) => dayjs(row.original.sent_at).format('DD.MM.YYYY'),
     },
     {
-      field: 'price',
-      headerName: 'Стоимость',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 120,
-      align: 'left',
-      headerAlign: 'left',
+      accessorKey: 'delivered_at',
+      header: 'Доставлен',
+      cell: ({ row }) =>
+        row.original.delivered_at ? dayjs(row.original.delivered_at).format('DD.MM.YYYY') : 'Не доставлен',
     },
     {
-      field: 'status',
-      headerName: 'Статус',
-      width: 145,
-      align: 'left',
-      headerAlign: 'left',
-      renderCell: params => <StatusOrderCell row={params.row} />,
+      accessorKey: 'price',
+      header: 'Стоимость',
+      cell: ({ row }) => row.original.price,
     },
     {
-      field: 'products',
-      headerName: 'Товаров',
-      flex: 0.1,
-      minWidth: isMediumScreen ? 120 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value: string, row: OrderWithClient) => row.products.length,
+      accessorKey: 'status',
+      header: 'Статус',
+      cell: ({ row }) => <StatusOrderCell row={row.original} />,
     },
     {
-      field: 'actions',
-      headerName: '',
-      flex: 0.2,
-      minWidth: isMediumScreen ? 220 : 160,
-      align: 'left',
-      headerAlign: 'left',
-      renderCell: ({ row }) => (
-        <>
-          <IconButton onClick={() => onEdit(row)}>
-            <EditIcon fontSize="inherit" />
-          </IconButton>
-          <IconButton onClick={() => {
-            setOrderToDelete(row)
-            setOpenModal(true)
-          }}>
-            <ClearIcon fontSize="inherit" />
-          </IconButton>
-        </>
-      ),
+      accessorKey: 'products',
+      header: 'Товаров',
+      cell: ({ row }) => row.original.products.length,
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableOrder = row.original
+
+        return (
+          <TableActionsMenu<OrderWithClient>
+            row={tableOrder}
+            handleOpen={() => onEdit(tableOrder)}
+            handleConfirmationOpen={() => {
+              setOrderToDelete(tableOrder)
+              setOpenModal(true)
+            }}
+            showDetailsLink={true}
+            detailsPathPrefix="orders"
+          />
+        )
+      },
     },
   ]
 
@@ -163,27 +118,8 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
   }
 
   return (
-    <Box className="max-w-[1000px] mx-auto w-full">
-      {orders ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={orders}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
-      ) : (
-        <Typography className="text-center mt-5">Заказы не найдены.</Typography>
-      )}
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={orders ?? []} />
 
       <ConfirmationModal
         open={openModal}
@@ -192,7 +128,7 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
         onConfirm={handleModalConfirm}
         onCancel={handleModalCancel}
       />
-    </Box>
+    </div>
   )
 }
 
