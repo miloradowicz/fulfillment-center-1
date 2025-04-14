@@ -49,25 +49,27 @@ const ClientReportTable: React.FC<PropsClientTable> = ({ clientOrderReport }) =>
             <TableBody>
               {clientOrderReport.map(report => (
                 <TableRow key={report.client._id}>
-                  <TableCell width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
+                  <TableCell width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} component="th" scope="row">
-                    {report.client.name}
+                    {report.client.name}{report.client.isArchived && (
+                      <div style={{ color: '#999' }}>(в архиве)</div>
+                    )}
                   </TableCell>
-                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
+                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} align="center">
                     {report.orderCount === 0 ? (
                       <div className={'h-[38px] flex items-center justify-center'}>-</div>
                     ) : (
                       <GenericDropdown
                         items={report.orders}
-                        getLabel={order => order.orderNumber}
+                        getLabel={order => `${ order.orderNumber }${ order.isArchived ? ' (в архиве)' : '' }`}
                         getLink={order => `/orders/${ order._id }`}
                         getStatus={order => order.status}
                         statusFilterOptions={['в сборке', 'в пути', 'доставлен']}
                       />
                     )}
                   </TableCell>
-                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 2, xl: 2 },
+                  <TableCell  width={'auto'} sx={{ padding: { xs: 1, sm: 1, md: 1, xl: 1 },
                     fontSize: { xs: '0.875rem', md: '1rem' } }} align="center">
                     {report.orderCount}
                   </TableCell>

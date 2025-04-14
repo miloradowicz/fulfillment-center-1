@@ -59,7 +59,7 @@ const TaskReportTable: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
                     fontSize: { xs: '0.875rem', md: '1rem' } }} align="center">
                     <GenericDropdown
                       items={report.tasks}
-                      getLabel={task => task.taskNumber}
+                      getLabel={task => `${ task.taskNumber }${ task.isArchived ? ' (в архиве)' : '' }`}
                       getLink={task => `/tasks/${ task._id }`}
                       buttonText="Задачи"
                     />

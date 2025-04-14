@@ -9,6 +9,7 @@ import useIMobile from '../utils/UseIMobile.ts'
 
 type CommonDropdownItem = {
   _id: string
+  isArchived?: boolean
 }
 
 type GenericDropdownProps<T extends CommonDropdownItem> = {
@@ -127,15 +128,19 @@ const GenericDropdown = <T extends CommonDropdownItem>({
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            <NavLink
-              to={getLink(item)}
-              style={{
-                textDecoration: 'underline',
-                color: '#1A73E8',
-              }}
-            >
-              {getLabel(item)}
-            </NavLink>
+            {item.isArchived ? (
+              <span style={{ color: '#333' }}>{getLabel(item)}</span>
+            ) : (
+              <NavLink
+                to={getLink(item)}
+                style={{
+                  textDecoration: 'underline',
+                  color: '#1A73E8',
+                }}
+              >
+                {getLabel(item)}
+              </NavLink>
+            )}
           </div>
         ))}
       </Menu>
