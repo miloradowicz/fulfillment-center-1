@@ -7,7 +7,7 @@ import SelectableColumn from '@/components/DataTable/SelectableColumn/Selectable
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader'
 import { PropsClientTable } from '../../utils/TypesProps.ts'
 import { ClientOrderReport } from '@/types'
-import Dropdown from '@/features/reports/components/Drop.tsx'
+import Dropdown from '@/features/reports/components/DropDown.tsx'
 
 const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport }) => {
   const [searchParams] = useSearchParams()
@@ -72,14 +72,11 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport })
   ]
 
   return (
-    <div className="w-full max-w-[1000px] mx-auto px-2 sm:px-4 space-y-4">
-      <h6 className="text-center text-base sm:text-xl mx-auto break-words w-[80%]">
+    <div className="max-w-full overflow-x-auto">
+      <h6 className="text-center text-base sm:text-xl mx-auto mb-2 break-words w-[80%]">
         Количество заказов каждого клиента за период с {startDate} по {endDate}
       </h6>
-
-      <div className="overflow-x-auto">
-        <DataTable columns={columns} data={clientOrderReport ?? []} />
-      </div>
+      <DataTable columns={columns} data={clientOrderReport ?? []} />
     </div>
   )
 }

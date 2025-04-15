@@ -6,15 +6,15 @@ import { toast } from 'react-toastify'
 import useIMobile from '../utils/UseIMobile.ts'
 
 export const useRangePicker = () => {
-  const [startDate, setStartDate] = useState<Date | null>(null)
-  const [endDate, setEndDate] = useState<Date | null>(null)
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [tab, setTab] = useState<string|null>('')
   const dispatch = useAppDispatch()
   const location = useLocation()
 
   useEffect(() => {
-    setStartDate(null)
-    setEndDate(null)
+    setStartDate(undefined)
+    setEndDate(undefined)
   }, [tab])
 
   useEffect(() => {
@@ -84,11 +84,10 @@ export const useRangePicker = () => {
     }
   }
 
-  const handleChange = (dates: [Date | null, Date | null] | null) => {
-    if (dates) {
-      const [start, end] = dates
-      setStartDate(start)
-      setEndDate(end)
+  const handleChange = (range: { startDate?: Date; endDate?: Date }) => {
+    if (range.startDate && range.endDate) {
+      setStartDate(range.startDate)
+      setEndDate(range.endDate)
     }
   }
 

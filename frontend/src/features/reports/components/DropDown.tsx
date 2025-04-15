@@ -47,7 +47,7 @@ const Dropdown = <T extends CommonDropdownItem>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-[#3679a1] hover:bg-[#2f6586] text-white rounded-md text-sm md:text-base">
+        <Button variant={'secondary'} className="text-sm md:text-base">
           {isMobile ? buttonText : `${ buttonText }`}
           <ChevronDown className="ml-1 h-4 w-4" />
         </Button>

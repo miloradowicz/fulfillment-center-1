@@ -4,51 +4,35 @@ import ClientReportDataList from '@/features/reports/clientReport/components/Cli
 import Loader from '@/components/Loader/Loader.tsx'
 
 const ClientReport = () => {
-
-  const { clientReport,
-    endDate,
-    startDate,
-    loadingReport,
-  } = useClientReport()
+  const { clientReport, endDate, startDate, loadingReport } = useClientReport()
 
   return (
-    <div className="flex flex-wrap justify-around mb-3">
-      <div className="flex flex-wrap justify-around items-start gap-2 mb-3">
-        <div className="flex justify-center max-w-[700px] w-full sm:w-full">
-          <DateRangePicker />
-        </div>
+    <div className="w-full flex flex-col xl:flex-row xl:items-start xl:justify-between items-center gap-4 px-2">
+      <div className="w-full lg:w-[40%]">
+        <DateRangePicker />
       </div>
 
-      {loadingReport ? (
-        <div className="mt-5 mb-2 mx-auto">
-          <Loader />
-        </div>
-      ) : (
-        clientReport && (
-          <>
-            {!startDate || !endDate ? (
-              <h6 className="text-center text-base sm:text-xl">
-                Период не выбран
-              </h6>
-            ) : (
-              <>
-                {clientReport?.clientOrderReport.every(item => item.orderCount === 0) ? (
-                  <h6 className="text-center text-base sm:text-xl">
-                    В выбранном периоде нет заказов
-                  </h6>
-                ) : (
-                  <div className="flex flex-wrap justify-around mt-2">
-                    <div className="flex-grow w-full sm:w-[600px] lg:w-[620px] mx-4 sm:mx-0">
-                      <ClientReportDataList clientOrderReport={clientReport.clientOrderReport} />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )
-      )}
+      <div className="w-full sm:w-[85%] xl:w-full xl:flex-1 relative min-h-[200px] overflow-x-auto">
+        {loadingReport ? (
+          <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
+            <Loader />
+          </div>
+        ) : clientReport ? (
+          !startDate || !endDate ? (
+            <h6 className="text-center text-base sm:text-xl mt-5">
+              Период не выбран
+            </h6>
+          ) : clientReport.clientOrderReport.every(item => item.orderCount === 0) ? (
+            <h6 className="text-center text-base mt-5 sm:text-xl">
+              В выбранном периоде нет заказов
+            </h6>
+          ) : (
+            <ClientReportDataList clientOrderReport={clientReport.clientOrderReport} />
+          )
+        ) : null}
+      </div>
     </div>
-  )}
+  )
+}
 
 export default ClientReport

@@ -20,7 +20,7 @@ const ButtonDateRangePicker = ({
       onClick={onClick}
       variant={variant}
       size={size}
-      className={`w-full sm:w-44 text-center px-2 sm:px-4 py-2 bg-[#3679a1] hover:bg-[#2f6586] text-sm shadow-sm transition-all duration-300 hover:shadow-md active:scale-95 active:shadow-lg ${ className }`}
+      className={`w-full sm:w-44 text-center px-2 sm:px-4 py-2 bg-primary/80 text-sm shadow-sm transition-all duration-300 hover:shadow-md active:scale-95 active:shadow-lg ${ className }`}
     >
       {text}
     </Button>

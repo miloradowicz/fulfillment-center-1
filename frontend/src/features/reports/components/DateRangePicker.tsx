@@ -1,7 +1,7 @@
-import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useRangePicker } from '../hooks/useRangePicker.ts'
 import ButtonDateRangePicker from '@/features/reports/components/DateRangeButton.tsx'
+import { ShadcnRangePicker } from '@/features/reports/components/inlineRandgePicker.tsx'
 
 const DateRangePicker = () => {
 
@@ -13,10 +13,9 @@ const DateRangePicker = () => {
     startDate,
     endDate } = useRangePicker()
 
-
   return (
     <div
-      className="w-full my-5 p-1"
+      className="w-full mt-5 mb-2 p-1"
       style={{
         height: 'auto',
       }}
@@ -60,16 +59,10 @@ const DateRangePicker = () => {
           </div>
         </div>
         <div style={{ margin: 'auto 0' }}>
-          <DatePicker
-            selected={startDate}
-            onChange={handleChange}
+          <ShadcnRangePicker
             startDate={startDate}
             endDate={endDate}
-            selectsRange
-            inline
-            calendarStartDay={1}
-            dateFormat="dd/MM/yyyy"
-            showMonthYearDropdown={true}
+            onChange={handleChange}
             minDate={minDate}
             maxDate={maxDate}
           />
