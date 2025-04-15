@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, HydratedDocument, Model } from 'mongoose'
+import { Task } from './task.schema'
 
 export type ArrivalDocument = Arrival & Document
 
@@ -135,10 +136,77 @@ export class Arrival {
     default: [],
   })
   services: {
-    service: mongoose.Schema.Types.ObjectId
+    service: mongoose.Types.ObjectId
     service_amount: number
     service_price: number
   }[]
 }
 
-export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
+const ArrivalSchema = SchemaFactory.createForClass(Arrival)
+
+export const ArrivalSchemaFactory = (
+  taskModel: Model<Task>,
+) => {
+  const cascadeArchive = async (arrival: HydratedDocument<Arrival>) => {
+    const tasks = await taskModel.find({ associated_arrival: arrival._id })
+
+    await Promise.all([
+      ...tasks.map(x => x.updateOne({ isArchived: true })),
+    ])
+  }
+
+  const cascadeDelete = async (arrival: HydratedDocument<Arrival>) => {
+    const tasks = await taskModel.find({ associated_arrival: arrival._id })
+
+    await Promise.all([
+      ...tasks.map(x => x.deleteOne()),
+    ])
+  }
+
+  ArrivalSchema.pre('findOneAndUpdate', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(arrival)
+    }
+  })
+
+  ArrivalSchema.pre('updateOne', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(arrival)
+    }
+  })
+
+  ArrivalSchema.pre('save', async function () {
+    if (this.isModified('isArchived') && this.isArchived) {
+      await cascadeArchive(this)
+    }
+  })
+
+  ArrivalSchema.pre('findOneAndDelete', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    await cascadeDelete(arrival)
+  })
+
+  ArrivalSchema.pre('deleteOne', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    await cascadeDelete(arrival)
+  })
+
+  return ArrivalSchema
+}
