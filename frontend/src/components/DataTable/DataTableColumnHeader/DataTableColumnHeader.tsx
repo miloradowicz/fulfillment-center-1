@@ -20,7 +20,7 @@ const DataTableColumnHeader = <TData, TValue>({ column, title, className }: Prop
     <div className={cn('flex items-center space-x-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="-ml-0.5 h-8 data-[state=open]:bg-accent">
+          <Button variant="ghost" size="sm" className="-ml-0.5 h-8 data-[state=open]:bg-accent cursor-pointer hover:shadow-sm">
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
               <ArrowDown size={18} />
@@ -32,12 +32,12 @@ const DataTableColumnHeader = <TData, TValue>({ column, title, className }: Prop
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp className="h-3.5 w-3.5 text-muted-foreground/70" />
+          <DropdownMenuItem onClick={() => column.toggleSorting(false)} className="cursor-pointer">
+            <ArrowUp className="h-3.5 w-3.5" />
             Сортировать по возрастанию
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70" />
+          <DropdownMenuItem onClick={() => column.toggleSorting(true)} className="cursor-pointer">
+            <ArrowDown className="h-3.5 w-3.5" />
             Сортировать по убыванию
           </DropdownMenuItem>
         </DropdownMenuContent>

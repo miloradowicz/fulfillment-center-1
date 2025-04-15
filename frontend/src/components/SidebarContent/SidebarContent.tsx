@@ -40,7 +40,7 @@ const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
           onClick={onLinkClick}
           className={({ isActive }) =>
             `w-full flex items-center gap-2 p-2 rounded-md transition-colors
-             ${ isActive ? 'bg-slate-200 text-slate-900' : 'text-slate-800 hover:bg-slate-800 hover:text-white' }`
+             ${ isActive ? 'bg-ring/50 text-primary' : 'text-primary hover:bg-primary hover:text-card' }`
           }
         >
           {icon}

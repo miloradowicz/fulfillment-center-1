@@ -48,7 +48,7 @@ export class DefectDto {
 }
 export class ServiceDto {
   @IsNotEmpty({ message: 'Заполните название услуги.' })
-  service: mongoose.Schema.Types.ObjectId
+  service: mongoose.Types.ObjectId
 
   @IsOptional()
   @IsPositive({ message: 'Количество оказанной услуги должно быть больше 0.' })

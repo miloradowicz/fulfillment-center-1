@@ -5,6 +5,7 @@ import ProductForm from '../components/ProductForm.tsx'
 import useProductActions from '../hooks/useProductActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { Package } from 'lucide-react'
 
 const ProductPage = () => {
   const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)
@@ -23,7 +24,7 @@ const ProductPage = () => {
         />
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Товары'}/>
+        <CustomTitle text={'Товары'} icon={<Package size={25} />}/>
         <CustomButton text={'Добавить товар'} onClick={handleOpen}/>
       </Box>
       <Box><ProductsDataList/></Box>

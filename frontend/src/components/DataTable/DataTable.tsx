@@ -53,7 +53,7 @@ const DataTable = <TData, TValue>({ columns, data }: Props<TData, TValue>) => {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
         <Input
           placeholder="Искать в таблице..."
           value={globalFilter}
@@ -63,14 +63,14 @@ const DataTable = <TData, TValue>({ columns, data }: Props<TData, TValue>) => {
         <DataTableViewOptions table={table} />
       </div>
 
-      <div className="rounded-md border">
-        <Table className="text-slate-800">
+      <div className="rounded-md border mb-6">
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => {
                   return (
-                    <TableHead className="text-slate-800 font-bold p-3" key={header.id}>
+                    <TableHead className="font-bold p-3" key={header.id}>
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )

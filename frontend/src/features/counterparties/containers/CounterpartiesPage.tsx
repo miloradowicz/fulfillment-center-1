@@ -5,6 +5,7 @@ import CounterpartiesDataList from '../components/CounterpartiesDataList.tsx'
 import CounterpartyForm from '../components/CounterpartyForm.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { BookUser } from 'lucide-react'
 
 const CounterpartiesPage = () => {
   const { open, handleOpen, handleClose, isLoading } = useCounterpartyPage()
@@ -21,7 +22,7 @@ const CounterpartiesPage = () => {
         <CounterpartyForm onClose={handleClose} />
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Контрагенты'}/>
+        <CustomTitle text={'Контрагенты'} icon={<BookUser size={25} />}/>
         <CustomButton text={'Добавить контрагента'} onClick={handleOpen}/>
       </Box>
       <Box className="my-8">

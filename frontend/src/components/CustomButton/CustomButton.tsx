@@ -1,34 +1,23 @@
 import React from 'react'
-import { Button, useMediaQuery, useTheme } from '@mui/material'
+import { Button } from '../ui/button'
 
 interface CustomButtonProps {
-  text: string;
-  onClick: () => void;
+  text: string
+  onClick: () => void
 }
 
-const CustomButton:React.FC<CustomButtonProps> = ({ text, onClick }) => {
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+const CustomButton: React.FC<CustomButtonProps> = ({ text, onClick }) => {
+  const customButtonStyle = [
+    'cursor-pointer',
+    'inline-flex',
+    'gap-2',
+    'items-center',
+    'font-medium',
+    'font-semibold',
+  ].join(' ')
 
   return (
-    <Button
-      sx={{
-        color: '#32363F',
-        marginLeft: 'auto',
-        border: '1px solid #32363F',
-        transition: 'all 0.3s ease-in-out',
-        padding:  '5px 8px',
-        fontSize: isSmallScreen ? '11px' : '13px',
-        whiteSpace: 'nowrap',
-        '&:hover': {
-          color: '#ffffff',
-          backgroundColor: '#32363F',
-          border: '1px solid #ffffff',
-        },
-      }}
-      variant="outlined"
-      onClick={onClick}
-    >
+    <Button type="button" className={customButtonStyle} onClick={onClick}>
       {text}
     </Button>
   )
