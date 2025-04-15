@@ -1,11 +1,11 @@
 import Grid from '@mui/material/Grid2'
 import { CircularProgress, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import TaskReportTable from './TaskReportTable.tsx'
 import TaskCountAreaChart from './TaskCountChart.tsx'
 import DateRangePicker from '../../components/DateRangePicker.tsx'
 import TaskSummary from './TaskStateForReport.tsx'
 import { useTaskReport } from '../../hooks/useTaskReport.ts'
+import TaskReportDataList from '@/features/reports/taskPeport/components/TaskReportDataList.tsx'
 
 const TaskReport = () => {
 
@@ -94,7 +94,7 @@ const TaskReport = () => {
                   minWidth: '100%',
                 },
               }}>
-                <TaskReportTable userTaskReports={report.userTaskReports} />
+                <TaskReportDataList userTaskReports={report.userTaskReports} />
               </Box>
             </Box>
           )}</> }
