@@ -1,18 +1,17 @@
 import React from 'react'
-import { Typography, useMediaQuery, useTheme } from '@mui/material'
 
 interface CustomTitleProps {
   text: string;
+  icon: React.ReactNode;
 }
 
-const CustomTitle: React.FC<CustomTitleProps> = ({ text }) => {
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+const CustomTitle: React.FC<CustomTitleProps> = ({ text, icon }) => {
 
   return (
-    <Typography variant={isSmallScreen ? 'h6' : 'h5'} className="flex-grow">
+    <h2 className="text-md sm:text-2xl font-semibold flex-grow text-primary flex items-center gap-2">
+      {icon}
       {text}
-    </Typography>
+    </h2>
   )
 }
 
