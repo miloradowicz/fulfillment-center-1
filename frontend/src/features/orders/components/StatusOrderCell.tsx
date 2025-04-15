@@ -19,7 +19,7 @@ const StatusOrderCell: React.FC<Props> = ({ row }) => {
       'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-900 transition-colors rounded-lg font-bold',
     'доставлен':
       'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-900 transition-colors rounded-lg font-bold',
-    'default': 'bg-slate-100 text-slate-700 border font-bold',
+    default: 'bg-primary/10 text-primary/80 border font-bold hover:bg-primary/20 hover:text-primary',
   }
 
   const handleStatusChange = async (row: OrderWithClient, newStatus: string) => {

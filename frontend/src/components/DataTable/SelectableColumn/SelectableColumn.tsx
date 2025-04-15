@@ -5,14 +5,6 @@ const SelectableColumn = <TData,>(input: Table<TData> | Row<TData>, type: 'heade
   if (type === 'header' && 'getIsAllPageRowsSelected' in input) {
     return (
       <Checkbox
-        className="
-            text-white
-            border-slate-300
-            group-hover:border-slate-400
-            data-[state=checked]:bg-slate-800
-            data-[state=checked]:border-slate-800
-            cursor-pointer
-          "
         checked={input.getIsAllPageRowsSelected() || (input.getIsSomePageRowsSelected() && 'indeterminate')}
         onCheckedChange={value => input.toggleAllPageRowsSelected(!!value)}
         aria-label="Выбрать все"
@@ -23,14 +15,6 @@ const SelectableColumn = <TData,>(input: Table<TData> | Row<TData>, type: 'heade
   if (type === 'cell' && 'getIsSelected' in input) {
     return (
       <Checkbox
-        className="
-            text-white
-            border-slate-300
-            group-hover:border-slate-400
-            data-[state=checked]:bg-slate-800
-            data-[state=checked]:border-slate-800
-            cursor-pointer
-          "
         checked={input.getIsSelected()}
         onCheckedChange={value => input.toggleSelected(!!value)}
         aria-label="Выбрать эту строку"
