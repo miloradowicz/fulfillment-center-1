@@ -6,16 +6,10 @@ import ArrivalForm from '../components/ArrivalForm.tsx'
 import Grid from '@mui/material/Grid2'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { Truck } from 'lucide-react'
 
 const ArrivalPage = () => {
-  const {
-    open,
-    handleOpen,
-    handleClose,
-    isLoading,
-    arrivalToEdit,
-    handleOpenEdit,
-  } = useArrivalPage()
+  const { open, handleOpen, handleClose, isLoading, arrivalToEdit, handleOpenEdit } = useArrivalPage()
 
   return (
     <>
@@ -30,8 +24,8 @@ const ArrivalPage = () => {
       </Modal>
 
       <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Поставки'}/>
-        <CustomButton text={'Добавить поставку'} onClick={handleOpen}/>
+        <CustomTitle text={'Поставки'} icon={<Truck size={25} />} />
+        <CustomButton text={'Добавить поставку'} onClick={handleOpen} />
       </Box>
       <Box className="my-8">
         <ArrivalsDataList onEdit={handleOpenEdit} />

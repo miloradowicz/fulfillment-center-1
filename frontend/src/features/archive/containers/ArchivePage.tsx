@@ -24,6 +24,7 @@ import ArchivedTasksPage from '../components/ArchivedTasksPage.tsx'
 import ArchivedOrders from '../components/ArchivedOrders.tsx'
 import { selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { ArchiveRestore } from 'lucide-react'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -60,7 +61,7 @@ const ArchivePage = () =>  {
   return (
     <Box sx={{ width: '100%' }}>
       <Box style={{ textAlign: 'center', margin: '10px 0 15px' }}>
-        <CustomTitle text={'Архив'} />
+        <CustomTitle text={'Архив'} icon={<ArchiveRestore size={25} />} />
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
