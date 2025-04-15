@@ -14,6 +14,7 @@ import { TabProps } from '../utils/TabProps.ts'
 import { useNavigate, useLocation } from 'react-router-dom'
 import TaskReport from '../taskPeport/components/TaskReport.tsx'
 import ClientReport from '../clientReport/components/ClientReport.tsx'
+import { FileText } from 'lucide-react'
 
 export default function ReportTabs() {
   const [value, setValue] = React.useState(0)
@@ -49,7 +50,7 @@ export default function ReportTabs() {
   return (
     <Box sx={{ width: '100%' }}>
       <Box style={{ textAlign: 'center', margin: '10px 0 15px' }}>
-        <CustomTitle text={'Отчеты'} />
+        <CustomTitle text={'Отчеты'} icon={<FileText size={25} />}/>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
