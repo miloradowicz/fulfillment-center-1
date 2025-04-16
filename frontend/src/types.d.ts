@@ -361,6 +361,7 @@ export interface UserTaskReport {
   tasks: {
     _id: string
     taskNumber: string
+    isArchived: boolean
   }[],
   taskCount: number;
 }
@@ -380,11 +381,13 @@ export interface ClientOrderReport {
   client: {
     _id: string;
     name: string;
+    isArchived: boolean
   };
   orders: {
     _id: string
     orderNumber: string
     status:string
+    isArchived: boolean
   }[],
   orderCount: number;
 }
