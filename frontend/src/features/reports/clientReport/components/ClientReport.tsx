@@ -1,72 +1,38 @@
-import Grid from '@mui/material/Grid2'
-import { CircularProgress, Typography } from '@mui/material'
-import Box from '@mui/material/Box'
 import DateRangePicker from '../../components/DateRangePicker.tsx'
 import { useClientReport } from '../../hooks/useClientReport.ts'
-import ClientReportTable from './ClientReportTable.tsx'
+import ClientReportDataList from '@/features/reports/clientReport/components/ClientReportDataList.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
 
 const ClientReport = () => {
-
-  const { clientReport,
-    endDate,
-    startDate,
-    loadingReport,
-  } = useClientReport()
+  const { clientReport, endDate, startDate, loadingReport } = useClientReport()
 
   return (
-    <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="start"  flexWrap={'wrap'} mb={3}>
-      <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="center" gap={2} flexWrap={'wrap'} mb={3}>
-        <Box sx={{
-          flex: 1,
-          display:'flex',
-          justifyContent:'center',
-          minWidth: '500px',
-          maxWidth: '700px',
-          width: '100%',
-          '@media (max-width: 900px)': {
-            width: '100%',
-            minWidth: '100%',
-          },
-        }}>
-          <DateRangePicker />
-        </Box>
-      </Box>
-      {loadingReport ? (
-        <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Grid>
-      ) : (
-        clientReport && (
-          <>{!startDate || !endDate? <Typography variant={'h6'} textAlign={'center'} mt={3} sx={{ fontSize: { xs: '14px', sm: '16px' } }}>Период не выбран</Typography>:  <> {(!clientReport ) ? (
-            <Typography variant={'h6'} textAlign={'center'} mt={3} mb={5} sx={{ fontSize: { xs: '14px', sm: '16px' },
-            }}>В выбранном периоде нет заказов</Typography>
+    <div className="w-full flex flex-col xl:flex-row xl:items-start xl:justify-between items-center gap-4 px-2">
+      <div className="w-full lg:w-[40%]">
+        <DateRangePicker />
+      </div>
+
+      <div className="w-full sm:w-[85%] xl:w-full xl:flex-1 relative min-h-[200px] overflow-x-auto">
+        {loadingReport ? (
+          <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
+            <Loader />
+          </div>
+        ) : clientReport ? (
+          !startDate || !endDate ? (
+            <h6 className="text-center text-base sm:text-xl mt-5">
+              Период не выбран
+            </h6>
+          ) : clientReport.clientOrderReport.every(item => item.orderCount === 0) ? (
+            <h6 className="text-center text-base mt-5 sm:text-xl">
+              В выбранном периоде нет заказов
+            </h6>
           ) : (
-            <Box
-              display="flex"
-              alignItems="flex-start"
-              justifyContent="space-around"
-              flexWrap="wrap"
-              mt={2}
-            >
-              <Box flexGrow={1}  sx={{
-                flex: 1,
-                marginLeft: '40px',
-                minWidth: '540px',
-                maxWidth: '600px',
-                width: '100%',
-                '@media (max-width: 900px)': {
-                  marginLeft:'0',
-                  width: '100%',
-                  minWidth: '100%',
-                },
-              }}>
-                <ClientReportTable clientOrderReport={clientReport.clientOrderReport} />
-              </Box>
-            </Box>
-          )}</> }
-          </>
-        )
-      )}
-    </Box>)}
+            <ClientReportDataList clientOrderReport={clientReport.clientOrderReport} />
+          )
+        ) : null}
+      </div>
+    </div>
+  )
+}
 
 export default ClientReport

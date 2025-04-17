@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { getModelToken, MongooseModule } from '@nestjs/mongoose'
 import config from '../config'
-import { Arrival, ArrivalSchema } from '../schemas/arrival.schema'
+import { Arrival, ArrivalSchemaFactory } from '../schemas/arrival.schema'
 import { Client, ClientSchemaFactory } from '../schemas/client.schema'
 import { Product, ProductSchema } from '../schemas/product.schema'
-import { Order, OrderSchema } from 'src/schemas/order.schema'
+import { Order, OrderSchemaFactory } from 'src/schemas/order.schema'
 import { User, UserSchemaFactory } from '../schemas/user.schema'
 import { Task, TaskSchema } from '../schemas/task.schema'
 import { Service, ServiceSchema } from '../schemas/service.schema'
@@ -18,9 +18,7 @@ import { Invoice, InvoiceSchema } from '../schemas/invoice.schema'
   imports: [
     MongooseModule.forRoot(new URL(config.mongo.db, config.mongo.host).href),
     MongooseModule.forFeature([
-      { name: Arrival.name, schema: ArrivalSchema },
       { name: Product.name, schema: ProductSchema },
-      { name: Order.name, schema: OrderSchema },
       { name: Task.name, schema: TaskSchema },
       { name: Service.name, schema: ServiceSchema },
       { name: Stock.name, schema: StockSchema },
@@ -34,6 +32,18 @@ import { Invoice, InvoiceSchema } from '../schemas/invoice.schema'
         useFactory: ClientSchemaFactory,
         imports: [DbModule],
         inject: [getModelToken(Arrival.name), getModelToken(Order.name), getModelToken(Product.name)],
+      },
+      {
+        name: Arrival.name,
+        useFactory: ArrivalSchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Task.name)],
+      },
+      {
+        name: Order.name,
+        useFactory: OrderSchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Task.name)],
       },
       {
         name: User.name,

@@ -12,7 +12,7 @@ import mongoose from 'mongoose'
 class LogDto {
   @IsNotEmpty({ message: 'Поле пользователь не должно быть пустым.' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  user: mongoose.Schema.Types.ObjectId
+  user: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле описание изменения не должно быть пустым.' })
   change: string
@@ -24,7 +24,7 @@ class LogDto {
 export class CreateTaskDto {
   @IsNotEmpty({ message: 'Поле исполнитель обязательно для заполнения' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  user: mongoose.Schema.Types.ObjectId
+  user: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле заголовок задачи обязательно для заполнения' }) title: string
 
@@ -54,11 +54,11 @@ export class CreateTaskDto {
 
   @IsOptional()
   @IsMongoId({ message: 'Некорректный формат ID' })
-  associated_order?: mongoose.Schema.Types.ObjectId | null
+  associated_order?: mongoose.Types.ObjectId | null
 
   @IsOptional()
   @IsMongoId({ message: 'Некорректный формат ID' })
-  associated_arrival?: mongoose.Schema.Types.ObjectId | null
+  associated_arrival?: mongoose.Types.ObjectId | null
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })

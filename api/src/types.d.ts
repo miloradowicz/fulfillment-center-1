@@ -17,6 +17,7 @@ export interface UserTaskReport {
   tasks: {
     _id: string
     taskNumber: string
+    isArchived:boolean
   }[]
 }
 
@@ -47,17 +48,19 @@ interface DailyTaskCount {
 }
 
 export interface clientOrderReport {
-  client: {_id:string,name:string},
+  client: {_id:string,name:string,isArchived:boolean},
   orderCount: number
   orders: {
     _id: string
     orderNumber: string
     status:string
+    isArchived:boolean
   }[]
 }
 
 export interface Order {
   _id: string
+  isArchived: boolean
   client: string
   products: ProductOrder[]
   price: number

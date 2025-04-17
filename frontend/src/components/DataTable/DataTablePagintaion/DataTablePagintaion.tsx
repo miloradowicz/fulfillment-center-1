@@ -41,7 +41,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
         <div className="flex items-center justify-center gap-1">
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
@@ -50,7 +50,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -59,7 +59,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -68,7 +68,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
