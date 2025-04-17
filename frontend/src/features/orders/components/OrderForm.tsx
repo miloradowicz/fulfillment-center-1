@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 import { getFieldError } from '@/utils/getFieldError.ts'
 import { useOrderForm } from '../hooks/useOrderForm.ts'
@@ -18,6 +19,9 @@ import { ErrorMessagesList } from '@/messages.ts'
 import { OrderStatus } from '@/constants.ts'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
+import { Link } from 'react-router-dom'
+import { basename } from 'path-browserify'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 interface Props {
   onSuccess?: () => void
@@ -61,6 +65,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     files,
     handleFileChange,
     stocks,
+    handleRemoveFile,
+    handleRemoveExistingFile,
+    existingFiles,
+    handleModalCancel,
+    handleModalConfirm,
+    openModal,
   } = useOrderForm(onSuccess)
 
   return (
@@ -436,31 +446,63 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 </Button>
               </Grid>
             )}
+            {existingFiles.length > 0 && (
+              existingFiles.map((document, index:number) => (
+                <React.Fragment key={index}>
+                  <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Link
+                      key={index}
+                      to={`http://localhost:8000/uploads/documents/${ basename(document.document) }`}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center text-center gap-1 hover:text-blue-500"
+                    >
+                      <InsertDriveFileIcon fontSize="large" color="primary" />
+                      <Typography variant="caption" className="!text-sm !truncate !w-40">{basename(document.document)}</Typography>
+                    </Link>
+                    <IconButton size="small" onClick={() => handleRemoveExistingFile(index)}>
+                      <DeleteForeverIcon fontSize="large" />
+                    </IconButton>
+                  </Grid>
+                  <Divider sx={{ width: '100%', marginBottom: '10px' }} />
+                </React.Fragment>
+              ))
+            )}
+            {files.length > 0 && (
+              <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                {files.map((file, index) => (
+                  <Grid
+                    key={index}
+                    sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                  >
+                    <Typography variant="body2">{file.name}</Typography>
+                    <IconButton style={{ marginLeft:'auto' }} size="small" onClick={() => handleRemoveFile(index)}>
+                      <DeleteForeverIcon fontSize="large" />
+                    </IconButton>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
 
-            {initialData && (<> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
-              <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
-            {initialData && initialData.documents && initialData.documents.length > 0 && (initialData.documents.map((document, index) => (
-              <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
-                <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
-            )))}
-
-            <Grid className="flex gap-2 content-between items-center">
+            <Grid style={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Загрузить документ</Typography>
               <Grid sx={{ display: 'flex', alignItems: 'center' }}>
                 <IconButton component="label">
                   <InsertDriveFileIcon fontSize="large" color="primary" />
-                  <input type="file" accept=".pdf, .doc, .docx, .xlsx" multiple hidden onChange={handleFileChange} />
+                  <input
+                    type="file"
+                    accept=".pdf, .doc, .docx, .xlsx"
+                    multiple
+                    hidden
+                    onChange={handleFileChange}
+                  />
                 </IconButton>
-                {files.length > 0 && (
-                  <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-
-                    {files.map((file, index) => (
-                      <Typography key={index} variant="body2">{file.name}</Typography>
-                    ))}
-                  </Grid>
-                )}
               </Grid>
             </Grid>
+
+
+
             <Grid>
               <Button type="submit" disabled={loading}>
                 {loading ? (
@@ -475,6 +517,13 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
           </Grid>
         </form>
       )}
+      <ConfirmationModal
+        open={openModal}
+        entityName="этот документ"
+        actionType="delete"
+        onConfirm={handleModalConfirm}
+        onCancel={handleModalCancel}
+      />
     </>
   )
 }

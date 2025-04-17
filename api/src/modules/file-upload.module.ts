@@ -4,9 +4,12 @@ import { diskStorage } from 'multer'
 import { FilesService } from '../services/files.service'
 import * as path from 'path'
 import * as fs from 'fs'
+import { FilesController } from '../controllers/files.controller'
+import { DbModule } from './db.module'
 
 @Module({
   imports: [
+    DbModule,
     MulterModule.register({
       storage: diskStorage({
         destination: (_req, _file, cb) => {
@@ -37,6 +40,7 @@ import * as fs from 'fs'
       },
     }),
   ],
+  controllers: [FilesController],
   providers: [FilesService],
   exports: [FilesService],
 })
