@@ -37,7 +37,7 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
         <div className="flex-8 p-4 space-y-4">
           <div className="flex justify-between items-center border-b-1 sm:text-[18px] text-sm pb-2 font-bold">
             <span>{task.taskNumber}</span>
-            <Badge style={getStatusStyles(task.status)} className="text-sm font-medium">
+            <Badge className={`text-sm font-medium ${ getStatusStyles(task.status) }`}>
               {task.status}
             </Badge>
           </div>

@@ -1,34 +1,28 @@
-import { StatusColor } from '@/types'
 import { useAppDispatch } from '@/app/hooks.ts'
-import React, { useState } from 'react'
-import { Box, Chip, Menu, MenuItem } from '@mui/material'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import React from 'react'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { SquareArrowOutDownRight } from 'lucide-react'
 import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate, updateTask } from '@/store/thunks/tasksThunk.ts'
 import { PropsStatus } from '../hooks/TypesProps'
 
-
 const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
   const dispatch = useAppDispatch()
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const statusColors: Record<string, StatusColor> = {
-    'к выполнению': 'warning',
-    'в работе': 'success',
-    'готово': 'info',
+  const statusColors: Record<string, string> = {
+    'к выполнению': 'bg-yellow-300',
+    'в работе': 'bg-blue-300',
+    'готово': 'bg-green-300',
   }
 
   const status = task.status || 'к выполнению'
-  const capitalizeFirstLetter = (text: string) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-
   const statusOptions = ['к выполнению', 'в работе', 'готово']
-  const open = Boolean(anchorEl)
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
 
   const handleClose = async (newStatus?: string) => {
-    setAnchorEl(null)
     if (newStatus && newStatus !== task.status) {
       const currentDate = new Date().toISOString()
 
@@ -59,36 +53,29 @@ const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
       } else {
         await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
       }
-
     }
   }
 
-  const chip = (
-    <Chip
-      label={capitalizeFirstLetter(status)}
-      color={statusColors[status] ?? 'default'}
-      onClick={handleClick}
-      icon={<ArrowDropDownIcon style={{ marginRight: '5px' }} />}
-      sx={{
-        flexDirection: 'row-reverse',
-        justifyContent: 'space-between',
-        width: '100%',
-        cursor: 'pointer',
-      }}
-    />
-  )
-
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100%" width="100%">
-      {chip}
-      <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
-        {statusOptions.map(option => (
-          <MenuItem key={option} onClick={() => handleClose(option)}>
-            {option}
-          </MenuItem>
-        ))}
-      </Menu>
-    </Box>
+    <div className="flex justify-center items-center h-[100%] w-[100%]">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div
+            className={`flex relative px-3 py-1.5 rounded-b-[12px] w-full cursor-pointer text-gray-700 text-sm ${ statusColors[status] }`}
+          >
+            <p className="uppercase font-bold text-center flex-1">{task.status}</p>
+            <SquareArrowOutDownRight className="absolute right-4 top-2 w-4 h-4" />
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {statusOptions.map(option => (
+            <DropdownMenuItem key={option} onClick={() => handleClose(option)}>
+              {option}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
