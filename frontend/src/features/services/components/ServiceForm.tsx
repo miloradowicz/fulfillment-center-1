@@ -51,26 +51,33 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
             getOptionLabel={option =>
               isServiceCategory(option) ? option.name : option
             }
-            renderOption={(props, option) => (
-              <li {...props} style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <span>
-                  {isServiceCategory(option) ? option.name : `Добавить "${ option }"`}
-                </span>
-                {isServiceCategory(option) && (
-                  <IconButton
-                    size="small"
-                    edge="end"
-                    onClick={e => {
-                      e.stopPropagation()
-                      handleDeleteCategory(option._id)
-                    }}
-                    aria-label="delete"
-                  >
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </li>
-            )}
+            renderOption={(props, option) => {
+              const { key, ...rest } = props
+              return (
+                <li
+                  key={key}
+                  {...rest}
+                  style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
+                >
+                  <span>
+                    {isServiceCategory(option) ? option.name : `Добавить "${ option }"`}
+                  </span>
+                  {isServiceCategory(option) && (
+                    <IconButton
+                      size="small"
+                      edge="end"
+                      onClick={e => {
+                        e.stopPropagation()
+                        handleDeleteCategory(option._id)
+                      }}
+                      aria-label="delete"
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </li>
+              )
+            }}
             renderInput={params => (
               <TextField
                 {...params}
