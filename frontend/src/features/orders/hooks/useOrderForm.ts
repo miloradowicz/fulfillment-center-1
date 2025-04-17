@@ -37,6 +37,8 @@ import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
+import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
+
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
@@ -81,38 +83,17 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
   const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
-  const [existingFiles, setExistingFiles] = useState(initialData?.documents || [])
-  const [openModal, setOpenModal] = useState(false)
-  const [fileIndexToRemove, setFileIndexToRemove] = useState<number | null>(null)
-
-  const handleRemoveExistingFile = (indexToRemove: number) => {
-    setFileIndexToRemove(indexToRemove)
-    setOpenModal(true)
+  const handleRemoveFile = (indexToRemove:number) => {
+    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
   }
 
-  const handleModalConfirm = async () => {
-    if (fileIndexToRemove === null) return
-
-    const fileToDelete = existingFiles[fileIndexToRemove]
-    const fileName = fileToDelete.document.split('/').pop()
-    if (!fileName) return
-
-    try {
-      await dispatch(deleteFile(fileName))
-      toast.success(`Вы удалили ${ fileName } из заказа`)
-      setExistingFiles(prev => prev.filter((_, index) => index !== fileIndexToRemove))
-    } catch (err) {
-      console.error('Ошибка при удалении файла', err)
-    } finally {
-      setOpenModal(false)
-      setFileIndexToRemove(null)
-    }
-  }
-  const handleModalCancel = () => {
-    setOpenModal(false)
-    setFileIndexToRemove(null)
-  }
-
+  const {
+    existingFiles,
+    openDeleteModal,
+    handleRemoveExistingFile,
+    handleModalConfirm,
+    handleModalCancel,
+  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
   useEffect(() => {
     if (availableProducts.length > 0) {
@@ -140,9 +121,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
       setModalOpen(true)
       setButtonVisible(false)
     }
-  }
-  const handleRemoveFile = (indexToRemove:number) => {
-    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
   }
 
   const handleCloseDefectModal = () => {
@@ -227,7 +205,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
         const updatedForm = {
           ...form,
           delivered_at: updated_delivered_at,
-          documents: [...existingFiles], // ссылки на старые файлы
+          documents: [...existingFiles],
           files,
           products: transformToOrder(productsForm, item => ({
             product: item.product._id,
@@ -252,7 +230,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
         }
 
         await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm } })).unwrap()
-        console.log(updatedForm)
         if (params.id) {
           onSuccess?.()
           await dispatch(fetchOrderById(params.id))
@@ -401,6 +378,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
     existingFiles,
     handleModalCancel,
     handleModalConfirm,
-    openModal,
+    openDeleteModal,
   }
 }
