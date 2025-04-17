@@ -60,7 +60,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
       } else {
         navigate('/services')
       }
-      toast.success('Услуга успешно архивирован!')
+      toast.success('Услуга успешно архивирована!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
