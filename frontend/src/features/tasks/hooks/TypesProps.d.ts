@@ -4,6 +4,7 @@ export interface TaskLineProps {
   title: string;
   items: TaskWithPopulate[];
   selectedUser: string | null
+  activeColumnId: string | null
 }
 
 export interface TaskCardProps {

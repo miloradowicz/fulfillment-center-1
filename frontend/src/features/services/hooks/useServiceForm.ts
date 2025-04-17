@@ -1,15 +1,15 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { ServiceCategory, ServiceMutation, ValidationError } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
-import { createService, fetchServiceById, fetchServices } from '@/store/thunks/serviceThunk'
+import { createService, fetchServiceById, fetchServices, updateService } from '@/store/thunks/serviceThunk'
 import { selectAllServices, selectLoadingAddService, selectService, selectServiceCreationAndModificationError } from '@/store/slices/serviceSlice'
 import { selectAllServiceCateogories, selectLoadingAddServiceCategory, selectLoadingFetchServiceCategory, selectServiceCategoryCreationAndModificationError } from '@/store/slices/serviceCategorySlice'
-import { createServiceCategory, fetchServiceCategories } from '@/store/thunks/serviceCategoryThunk'
+import { createServiceCategory, deleteServiceCategory, fetchServiceCategories } from '@/store/thunks/serviceCategoryThunk'
 import { toast } from 'react-toastify'
 import { clearCreationAndModificationError as clearServiceCreateError } from '@/store/slices/serviceSlice'
 import { clearCreationAndModificationError as clearServiceCategoryCreateError } from '@/store/slices/serviceCategorySlice'
 import { isAxiosError } from 'axios'
-import { isGlobalError, isValidationError } from '@/utils/helpers'
+import { isGlobalError, isServiceCategory, isValidationError } from '@/utils/helpers'
 import { positiveDecimalNumber } from '@/constants'
 
 
@@ -55,24 +55,33 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
+    dispatch(fetchServiceCategories())
     if (serviceId) {
       dispatch(fetchServiceById(serviceId))
     }
   }, [dispatch, serviceId])
 
   useEffect(() => {
-    if (serviceId && service) {
-      const category = serviceCategories.find(x => x._id === service._id)
-      setForm({ ...service, price: service.price.toString(), serviceCategory: category ?? null })
-    }
-  }, [serviceId, service, serviceCategories])
-
-  useEffect(() => {
     dispatch(clearServiceCreateError())
     dispatch(clearServiceCategoryCreateError())
     dispatch(fetchServices())
-    dispatch(fetchServiceCategories())
   }, [dispatch])
+
+  useEffect(() => {
+    if (serviceId && service) {
+      const category = serviceCategories.find(x => x._id === service.serviceCategory._id)
+
+      if (category) {
+        setForm({
+          name: service.name,
+          price: service.price.toString(),
+          description: service.description || '',
+          type: service.type,
+          serviceCategory: category,
+        })
+      }
+    }
+  }, [serviceId, service, serviceCategories])
 
   useEffect(() => {
     if (isValidationError(createServiceError)) {
@@ -95,23 +104,62 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
 
   const handleAutocompleteChange = async (_: unknown, newValue: ServiceCategory | string | null) => {
     setErrors(prevErrors => ({ ...prevErrors, serviceCategory: '' }))
-    if (typeof newValue === 'string') {
+
+    if (newValue === null) {
+      setForm(prevState => ({ ...prevState, serviceCategory: null }))
+      return
+    }
+
+    if (isServiceCategory(newValue)) {
+      setForm(prevState => ({ ...prevState, serviceCategory: newValue }))
+      return
+    }
+
+    if (newValue.trim() !== '') {
       try {
+        const existingCategory = serviceCategories.find(
+          cat => cat.name.toLowerCase() === newValue.toLowerCase(),
+        )
+
+        if (existingCategory) {
+          setForm(prevState => ({
+            ...prevState,
+            serviceCategory: existingCategory,
+          }))
+          return
+        }
+
         const category = await dispatch(createServiceCategory({ name: newValue })).unwrap()
         await dispatch(fetchServiceCategories())
+
         setForm(prevState => ({
           ...prevState,
-          serviceCategory: category as ServiceCategory,
+          serviceCategory: category,
         }))
       } catch (e) {
-        setForm(prevState => ({
-          ...prevState,
-          serviceCategory: null,
+        setErrors(prev => ({
+          ...prev,
+          serviceCategory: 'Не удалось создать категорию',
         }))
         console.error(e)
       }
     } else {
-      setForm(prevState => ({ ...prevState, serviceCategory: newValue }))
+      setForm(prevState => ({ ...prevState, serviceCategory: null }))
+    }
+  }
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      await dispatch(deleteServiceCategory(categoryId)).unwrap()
+      await dispatch(fetchServiceCategories())
+
+      if (form.serviceCategory?._id === categoryId) {
+        setForm(prev => ({ ...prev, serviceCategory: null }))
+      }
+      toast.success('Категория успешно удалена')
+    } catch (error) {
+      toast.error('Не удалось удалить категорию')
+      console.error(error)
     }
   }
 
@@ -124,7 +172,6 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     }
     return ''
   }
-
 
   const validateFields = () => {
     const newErrors: Errors = {}
@@ -162,22 +209,44 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
 
     if (checkServiceNameExistence(form.name)) return
 
-    const serviceData: ServiceMutation = { ...form, price: Number.parseFloat(form.price), serviceCategory: form.serviceCategory?._id ?? '' }
+    if (!form.serviceCategory) {
+      setErrors(prev => ({
+        ...prev,
+        serviceCategory: 'Выберите категорию услуги',
+      }))
+      return
+    }
+
+    const serviceData: ServiceMutation = {
+      name: form.name,
+      price: Number.parseFloat(form.price),
+      description: form.description,
+      type: form.type,
+      serviceCategory: form.serviceCategory._id,
+    }
 
     try {
-      await dispatch(createService(serviceData)).unwrap()
-      toast.success('Услуга успешно создана!')
-
-      setForm(initialState)
+      if (serviceId) {
+        await dispatch(updateService({ id: serviceId, data: serviceData })).unwrap()
+        await dispatch(fetchServices())
+        toast.success('Услуга успешно обновлена!')
+      } else {
+        await dispatch(createService(serviceData)).unwrap()
+        await dispatch(fetchServices())
+        toast.success('Услуга успешно создана!')
+        setForm(initialState)
+      }
     } catch (e) {
       if (isAxiosError(e) && e.response?.data) {
         if (isGlobalError(e.response.data)) {
-          return void toast.error(e.response.data.message)
+          toast.error(e.response.data.message)
         } else {
-          return void toast.error('Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
+          toast.error(serviceId
+            ? 'Ошибка при обновлении услуги. Проверьте данные и попробуйте снова.'
+            : 'Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
         }
       } else {
-        return void console.error('Ошибка сервера:', e)
+        console.error('Ошибка сервера:', e)
       }
     }
 
@@ -189,11 +258,11 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     loading,
     services,
     serviceCategories,
-    open,
     addCategoryLoading,
     fetchCategoryLoading,
     handleInputChange,
     handleAutocompleteChange,
+    handleDeleteCategory,
     onSubmit,
     errors,
     createServiceError,

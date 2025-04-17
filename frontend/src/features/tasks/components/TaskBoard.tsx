@@ -11,9 +11,10 @@ import { X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
 import TaskCard from './TaskCard.tsx'
+import { useState } from 'react'
 
 const TaskBoard = () => {
-
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
   const {
     id,
     todoItems,
@@ -53,7 +54,8 @@ const TaskBoard = () => {
     <DndContext
       sensors={sensors}
       collisionDetection={rectIntersection}
-      onDragEnd={e =>
+      onDragEnd={e => {
+        setTimeout(() => setActiveColumnId(null), 50)
         onDragEnd({
           e,
           todoItems: filterTasks(todoItems),
@@ -63,7 +65,14 @@ const TaskBoard = () => {
           inProgressItems: filterTasks(inProgressItems),
           setInProgressItems,
           dispatch,
-        })}
+        })
+      }}
+      onDragCancel={() => setTimeout(() => setActiveColumnId(null), 50)}
+      onDragOver={({ over }) => {
+        if (over?.id) {
+          setActiveColumnId(over.id.toString())
+        }
+      }}
     >
       {selectFetchUser || loading ? (
         <Loader/>
@@ -109,13 +118,13 @@ const TaskBoard = () => {
 
           <div className="flex gap-4 mt-4">
             <div className="w-1/3">
-              <TaskLine selectedUser={selectedUser} title="к выполнению" items={filterTasks(todoItems)} />
+              <TaskLine selectedUser={selectedUser} title="к выполнению" items={filterTasks(todoItems)} activeColumnId={activeColumnId}/>
             </div>
             <div className="w-1/3">
-              <TaskLine selectedUser={selectedUser} title="в работе" items={filterTasks(inProgressItems)} />
+              <TaskLine selectedUser={selectedUser} title="в работе" items={filterTasks(inProgressItems)} activeColumnId={activeColumnId}/>
             </div>
             <div className="w-1/3">
-              <TaskLine selectedUser={selectedUser} title="готово" items={filterTasks(doneItems)} />
+              <TaskLine selectedUser={selectedUser} title="готово" items={filterTasks(doneItems)} activeColumnId={activeColumnId}/>
             </div>
           </div>
         </div>
