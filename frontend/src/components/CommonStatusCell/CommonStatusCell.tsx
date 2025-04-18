@@ -79,6 +79,7 @@ const CommonStatusCell = <T, K extends keyof T>({
         <DropdownMenuContent>
           {statusOptions.map(option => (
             <DropdownMenuItem
+              className="cursor-pointer"
               key={option}
               onClick={() => handleChangeStatus(option)}
               disabled={loading}

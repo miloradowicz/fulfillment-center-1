@@ -25,7 +25,7 @@ const AppToolbar = () => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="transition-colors cursor-pointer"
+                  className="transition-colors"
                 >
                   <Menu className="w-7 h-7" />
                 </Button>
@@ -41,7 +41,7 @@ const AppToolbar = () => {
           )}
 
           <NavLink to="/" className="bg-card rounded-md">
-            <img src="/logo.png" alt="logo" className="h-[40px] object-cover cursor-pointer" />
+            <img src="/logo.png" alt="logo" className="h-[40px] object-cover" />
           </NavLink>
         </div>
 
@@ -50,7 +50,7 @@ const AppToolbar = () => {
             <UserMenu user={user} />
           ) : (
             <NavLink to="/login">
-              <Button type="button" variant="secondary" className="cursor-pointer transition-colors font-bold">
+              <Button type="button" variant="secondary" className="transition-colors font-bold">
                 Войти
               </Button>
             </NavLink>
