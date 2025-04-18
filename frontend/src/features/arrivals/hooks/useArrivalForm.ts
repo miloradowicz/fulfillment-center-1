@@ -26,6 +26,8 @@ import { fetchServices } from '@/store/thunks/serviceThunk.ts'
 import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
 import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 import { useLocation } from 'react-router-dom'
+import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
+import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -58,6 +60,17 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       }
       : { ...initialState },
   )
+
+  const handleRemoveFile = (indexToRemove:number) => {
+    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
+  }
+  const {
+    existingFiles,
+    handleRemoveExistingFile,
+    handleModalConfirm,
+    handleModalCancel,
+    openDeleteModal,
+  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
   const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
@@ -259,13 +272,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
-        files: files || [],
+        documents: [...existingFiles],
+        files,
         services: servicesForm,
         shipping_agent: form.shipping_agent || null,
       }
 
       if (initialData) {
-        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm, files } })).unwrap()
+        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm } })).unwrap()
         onSuccess?.()
 
         if (location.pathname === `/arrivals/${ initialData._id }`) {
@@ -341,6 +355,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     availableItem,
     files,
     handleFileChange,
-    handleServiceChange,
+    handleServiceChange,handleModalConfirm,
+    handleModalCancel,
+    handleRemoveExistingFile,
+    openDeleteModal,
+    existingFiles,
+    handleRemoveFile,
   }
 }

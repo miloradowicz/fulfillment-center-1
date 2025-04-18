@@ -3,8 +3,7 @@ import {
   Autocomplete,
   Button,
   CircularProgress,
-  Divider,
-  FormControl, IconButton,
+  FormControl,
   InputLabel,
   TextField,
   Typography,
@@ -16,8 +15,9 @@ import { useOrderForm } from '../hooks/useOrderForm.ts'
 import React from 'react'
 import { ErrorMessagesList } from '@/messages.ts'
 import { OrderStatus } from '@/constants.ts'
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import FileAttachments from '@/components/FileAttachment/FileAttachment.tsx'
 
 interface Props {
   onSuccess?: () => void
@@ -61,6 +61,12 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
     files,
     handleFileChange,
     stocks,
+    handleRemoveFile,
+    handleRemoveExistingFile,
+    existingFiles,
+    handleModalCancel,
+    handleModalConfirm,
+    openDeleteModal,
   } = useOrderForm(onSuccess)
 
   return (
@@ -436,31 +442,13 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
                 </Button>
               </Grid>
             )}
-
-            {initialData && (<> <Divider sx={{ width: '100%', marginBottom: '10px' }} />
-              <Typography style={{ marginBottom: '10px' }}>Документы</Typography></>)}
-            {initialData && initialData.documents && initialData.documents.length > 0 && (initialData.documents.map((document, index) => (
-              <><Typography style={{ textAlign: 'left' }} key={index} variant="body2">{document.document.split('/').pop()}</Typography>
-                <Divider sx={{ width: '100%', marginBottom: '10px' }} /></>
-            )))}
-
-            <Grid className="flex gap-2 content-between items-center">
-              <Typography>Загрузить документ</Typography>
-              <Grid sx={{ display: 'flex', alignItems: 'center' }}>
-                <IconButton component="label">
-                  <InsertDriveFileIcon fontSize="large" color="primary" />
-                  <input type="file" accept=".pdf, .doc, .docx, .xlsx" multiple hidden onChange={handleFileChange} />
-                </IconButton>
-                {files.length > 0 && (
-                  <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-
-                    {files.map((file, index) => (
-                      <Typography key={index} variant="body2">{file.name}</Typography>
-                    ))}
-                  </Grid>
-                )}
-              </Grid>
-            </Grid>
+            <FileAttachments
+              existingFiles={existingFiles}
+              onRemoveExistingFile={handleRemoveExistingFile}
+              files={files}
+              onRemoveFile={handleRemoveFile}
+              onFileChange={handleFileChange}
+            />
             <Grid>
               <Button type="submit" disabled={loading}>
                 {loading ? (
@@ -475,6 +463,13 @@ const OrderForm: React.FC<Props> = ({ onSuccess }) => {
           </Grid>
         </form>
       )}
+      <ConfirmationModal
+        open={openDeleteModal}
+        entityName="этот документ"
+        actionType="delete"
+        onConfirm={handleModalConfirm}
+        onCancel={handleModalCancel}
+      />
     </>
   )
 }
