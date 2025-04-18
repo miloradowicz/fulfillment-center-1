@@ -46,15 +46,23 @@ export class CreateInvoiceDto {
   @Type(() => InvoiceServiceDto)
   services: InvoiceServiceDto[]
 
-  @IsNotEmpty({ message: 'Укажите итоговую сумму.' })
+  @IsOptional()
   @IsPositive({ message: 'Сумма должна быть больше 0.' })
   totalAmount: number
 
-  @IsNotEmpty({ message: 'Укажите статус оплаты.' })
+  @IsOptional()
+  @IsPositive({ message: 'Сумма должна быть больше 0.' })
+  paid_amount: number
+
+  @IsOptional()
+  @IsPositive({ message: 'Скидка должна быть больше 0.' })
+  discount: number
+
+  @IsOptional()
   @IsEnum(['в ожидании', 'оплачено', 'частично оплачено'], {
     message: 'Статус должен быть одним из: "в ожидании", "оплачено", "частично оплачено"',
   })
-  status?: 'в ожидании' | 'оплачено' | 'частично оплачено'
+  status: 'в ожидании' | 'оплачено' | 'частично оплачено'
 
   @IsOptional()
   associatedArrival?: mongoose.Types.ObjectId
