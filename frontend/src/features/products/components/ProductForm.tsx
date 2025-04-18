@@ -57,7 +57,6 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
       <InputWithError
         name="title"
-        id="title"
         placeholder="Название"
         value={form.title}
         onChange={inputChangeHandler}
@@ -66,7 +65,6 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
       <InputWithError
         name="barcode"
-        id="barcode"
         placeholder="Баркод"
         value={form.barcode}
         onChange={inputChangeHandler}
