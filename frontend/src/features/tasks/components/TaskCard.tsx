@@ -1,66 +1,48 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Card, CardContent, IconButton, Menu, MenuItem, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { CSS } from '@dnd-kit/utilities'
-import React, { useState } from 'react'
-import { TaskCardProps } from '../hooks/TypesProps'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import { useAppDispatch } from '@/app/hooks.ts'
+import { Pencil, Trash2, MoreHorizontal, Link2, Truck, ClipboardList, ListTodo } from 'lucide-react'
 import {
-  archiveTask,
-  fetchTasksByUserIdWithPopulate,
-  fetchTasksWithPopulate,
-} from '@/store/thunks/tasksThunk.ts'
-import { toast } from 'react-toastify'
-import dayjs from 'dayjs'
-import StatusCell from './StatusCell.tsx'
-import { NavLink } from 'react-router-dom'
-import TaskDetails from './TaskDetails.tsx'
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { CSS } from '@dnd-kit/utilities'
+import React, { memo } from 'react'
+import { TaskCardProps } from '../hooks/TypesProps'
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip'
+import { NavLink } from 'react-router-dom'
+import StatusCell from './StatusCell.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Link2 } from 'lucide-react'
+import TaskDetails from './TaskDetails.tsx'
+import TaskForm from './TaskForm.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
-import TaskForm from './TaskForm.tsx'
-import { setDraggingTask } from '@/store/slices/taskSlice.ts'
+import useBreakpoint from '@/hooks/useBreakpoint.ts'
+import UseTaskCard from '@/features/tasks/hooks/useTaskCard.ts'
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [openDetailModal, setOpenDetailModal] = useState(false)
-  const [tooltipText, setTooltipText] = useState('Скопировать ссылку')
-  const [openTooltip, setOpenTooltip] = useState(false)
-  const open = Boolean(anchorEl)
-  const dispatch = useAppDispatch()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
-  const handleDragStart = () => {
-    const taskWithDateAsString = {
-      ...task,
-      updatedAt: task.updatedAt.toString(),
-    }
-
-    dispatch(setDraggingTask(taskWithDateAsString))
-  }
-
-  const handleCopyLink = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const url = `${ window.location.origin }/tasks/${ task._id }`
-    await navigator.clipboard.writeText(url)
-    setTooltipText('Скопировано')
-    setOpenTooltip(true)
-  }
-
-  const handleMouseOver = () => {
-    setTooltipText('Скопировать ссылку')
-  }
+const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, parent }) => {
+  const { isMobile } = useBreakpoint()
+  const {
+    openDeleteModal,
+    openEditModal,
+    openDetailModal,
+    tooltipText,
+    openTooltip,
+    setOpenDetailModal,
+    setOpenEditModal,
+    setOpenDeleteModal,
+    setOpenTooltip,
+    handleDragStart,
+    handleCopyLink,
+    handleMouseOver,
+    handleEdit,
+    handleDelete,
+    handleCancelDelete,
+  } = UseTaskCard(task, selectedUser)
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task._id,
@@ -72,41 +54,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     disabled: isMobile,
   })
 
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
-
-  const handleEdit = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    setOpenEditModal(true)
-    handleMenuClose()
-  }
-
-  const handleDelete = async () => {
-    try {
-      await dispatch(archiveTask(task._id))
-      if (!selectedUser) {
-        await dispatch(fetchTasksWithPopulate())
-      } else {
-        await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
-      }
-      toast.success('Задача перемещена в архив.')
-    } catch (e) {
-      console.error(e)
-    }
-    setOpenDeleteModal(false)
-  }
-
-  const handleCancelDelete = () => {
-    setOpenDeleteModal(false)
-  }
-
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
     zIndex: isDragging ? 9999 : 'auto',
@@ -114,23 +61,34 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
     touchAction: 'none',
   }
 
+  const getTaskIcon = (type: string, className = '') => {
+    switch (type) {
+    case 'поставка':
+      return <Truck className={className} />
+    case 'заказ':
+      return <ClipboardList className={className} />
+    default:
+      return <ListTodo className={className} />
+    }
+  }
+
   return (
-    <Card
+    <div
       id={task._id}
       ref={setNodeRef}
-      sx={{
-        borderRadius: '12px',
-        border: 'none',
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        marginBottom: 2,
+      className="rounded-[12px]
+      shadow-[0_4px_10px_rgba(0,0,0,0.1)]
+      bg-white
+      mb-2
+      relative
+      cursor-grab
+      touch-auto
+      select-none
+      "
+      style={{
         transform: style.transform,
-        position: 'relative',
-        cursor:  'grab',
-        willChange: 'transform',
         zIndex: style.zIndex,
         opacity: style.opacity,
-        touchAction: 'auto',
-        userSelect: 'none',
       }}
       {...attributes}
       onClick={e => {
@@ -140,19 +98,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       <div
         {...listeners}
         onMouseDown={handleDragStart}
-        style={{ padding: 16 }}
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-        }}
       >
-        <CardContent>
-          <div className="flex flex-row items-center gap-4">
+        <div className="bg-white p-4 rounded-xl">
+          <div className="flex flex-row items-center gap-4" onClick={() => setOpenDetailModal(true)}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Typography variant="body1" onClick={() => setOpenDetailModal(true)}>
-                  <strong>{task.taskNumber}</strong>
-                </Typography>
+                <div className="flex items-center gap-2 rounded-md cursor-pointer transition-colors group hover:text-blue-600">
+                  {getTaskIcon(task.type, 'h-5 w-5 text-gray-700 transition-colors group-hover:text-blue-600')}
+                  <h5>
+                    <strong>{task.taskNumber}</strong>
+                  </h5>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 Детальный просмотр
@@ -163,7 +119,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-muted"
+                  className="cursor-pointer hover:text-blue-600 hover:bg-transparent"
                   onClick={handleCopyLink}
                   onMouseOver={handleMouseOver}
                 >
@@ -174,70 +130,50 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
                 {tooltipText}
               </TooltipContent>
             </Tooltip>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-auto"
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Pencil className="mr-2 h-4 w-4 text-blue-500" />
+                  Редактировать
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={e => {
+                    e.stopPropagation()
+                    setOpenDeleteModal(true)
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                  Переместить в архив
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <Typography variant="body1" marginTop={1} onClick={handleCopyLink}>
-            Исполнитель: <strong>{task.user.displayName}</strong>
-          </Typography>
-          <Typography variant="body1">
-            Тип: {task.type}
-          </Typography>
-          <Typography variant="body1">{task.title} </Typography>
-          {task.associated_arrival && (
-            <NavLink to={`/arrivals/${ task.associated_arrival._id }`}  style={{
-              textDecoration: 'underline',
-              color: '#1A73E8',
-            }}>
-              {`Поставка ${ task.associated_arrival.arrivalNumber }`}
-            </NavLink>
-          )}
-          {task.associated_order && (
-            <NavLink to={`/orders/${ task.associated_order._id }`} style={{
-              textDecoration: 'underline',
-              color: '#1A73E8',
-            }}>
-              {`Заказ ${ task.associated_order.orderNumber }`}
-            </NavLink>
-          )}
-          {task.description && (
-            <Typography variant="body2" color="textSecondary">
-              {task.description}
-            </Typography>
-          )}
-
-          {task.createdAt && (
-            <Typography variant="body2" color="textSecondary" marginTop={'5px'}>
-              Создано: {dayjs(task.createdAt).format('DD.MM.YYYY HH:mm')}
-            </Typography>
-          )}
-          {task.updatedAt && (
-            <Typography variant="body2" color="textSecondary">
-              Обновлено: {dayjs(task.updatedAt).format('DD.MM.YYYY HH:mm')}
-            </Typography>
-          )}
-        </CardContent>
+          <div className="flex flex-col gap-2">
+            <p>{task.title}</p>
+            {task.associated_arrival && (
+              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+                {`Поставка ${ task.associated_arrival.arrivalNumber }`}
+              </NavLink>
+            )}
+            {task.associated_order && (
+              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+                {`Заказ ${ task.associated_order.orderNumber }`}
+              </NavLink>
+            )}
+            <p className="text-[14px]">Исполнитель: <span className="font-bold">{task.user.displayName}</span></p>
+          </div>
+        </div>
         {isMobile && <StatusCell task={task} selectedUser={selectedUser} />}
       </div>
-
-      <IconButton
-        style={{ position: 'absolute', top: 0, right: 0, zIndex: 1000 }}
-        onClick={handleMenuOpen}
-      >
-        <MoreHorizIcon />
-      </IconButton>
-      <Menu style={{ marginLeft: '10px' }} anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-        <MenuItem onClick={handleEdit}>
-          <EditIcon style={{ marginRight: 8 }} /> Редактировать
-        </MenuItem>
-        <MenuItem
-          onClick={e => {
-            e.stopPropagation()
-            setOpenDeleteModal(true)
-            handleMenuClose()
-          }}
-        >
-          <DeleteIcon style={{ marginRight: 8 }} /> Переместить в архив
-        </MenuItem>
-      </Menu>
       <ConfirmationModal
         open={openDeleteModal}
         entityName="эту задачу"
@@ -251,8 +187,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, parent, selectedUser }
       <Modal open={openDetailModal} handleClose={() => setOpenDetailModal(false)}>
         <TaskDetails taskId={task._id}/>
       </Modal>
-    </Card>
+    </div>
   )
-}
+})
 
 export default TaskCard

@@ -378,7 +378,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 3 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 6 } }, { upsert: true })
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
@@ -509,7 +509,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 3 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 5 } }, { upsert: true })
 
     await this.taskModel.create([
       {
@@ -690,6 +690,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 11 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 13 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 2 } }, { upsert: true })
   }
 }

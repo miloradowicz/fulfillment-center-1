@@ -7,10 +7,11 @@ import { AuthModule } from './auth.module'
 import { CounterService } from '../services/counter.service'
 import { FilesModule } from './file-upload.module'
 import { StockManipulationService } from 'src/services/stock-manipulation.service'
+import { FilesService } from '../services/files.service'
 
 @Module({
   imports: [DbModule, AuthModule, ValidatorsModule, FilesModule],
   controllers: [ArrivalsController],
-  providers: [ArrivalsService, CounterService, StockManipulationService],
+  providers: [ArrivalsService, CounterService, StockManipulationService, FilesService],
 })
 export class ArrivalsModule { }

@@ -21,6 +21,7 @@ interface ServiceState {
   loadingUpdate: boolean;
   error: GlobalError | null;
   creationAndModificationError: ValidationError | GlobalError | null;
+  deletionError: GlobalError | null;
 }
 
 const initialState: ServiceState = {
@@ -34,6 +35,7 @@ const initialState: ServiceState = {
   loadingUpdate: false,
   error: null,
   creationAndModificationError: null,
+  deletionError: null,
 }
 
 export const selectService = (state: RootState) => state.services.service
@@ -52,6 +54,11 @@ const serviceSlice = createSlice({
   reducers: {
     clearCreationAndModificationError: state => {
       state.creationAndModificationError = null
+    },
+    clearServiceError: state => {
+      state.creationAndModificationError = null
+      state.deletionError = null
+      state.error = null
     },
   },
   extraReducers: builder => {
@@ -130,4 +137,4 @@ const serviceSlice = createSlice({
 })
 
 export const serviceReducer = serviceSlice.reducer
-export const { clearCreationAndModificationError } = serviceSlice.actions
+export const { clearCreationAndModificationError, clearServiceError } = serviceSlice.actions

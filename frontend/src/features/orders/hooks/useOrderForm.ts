@@ -36,6 +36,9 @@ import { ItemType } from '@/constants.ts'
 import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
+import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
+import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
+
 
 type ErrorForOrder = Pick<ErrorsFields, 'client' | 'product' | 'price' | 'sent_at' | 'amount' | 'defect_description' | 'status' | 'stock'>
 
@@ -80,6 +83,17 @@ export const useOrderForm = (onSuccess?: () => void) => {
 
   const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [availableDefects, setAvailableDefects] = useState<Product[]>([])
+  const handleRemoveFile = (indexToRemove:number) => {
+    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
+  }
+
+  const {
+    existingFiles,
+    openDeleteModal,
+    handleRemoveExistingFile,
+    handleModalConfirm,
+    handleModalCancel,
+  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
   useEffect(() => {
     if (availableProducts.length > 0) {
@@ -191,7 +205,8 @@ export const useOrderForm = (onSuccess?: () => void) => {
         const updatedForm = {
           ...form,
           delivered_at: updated_delivered_at,
-          files: files || [],
+          documents: [...existingFiles],
+          files,
           products: transformToOrder(productsForm, item => ({
             product: item.product._id,
             description: item.description,
@@ -214,8 +229,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           return
         }
 
-        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm, files } })).unwrap()
-
+        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm } })).unwrap()
         if (params.id) {
           onSuccess?.()
           await dispatch(fetchOrderById(params.id))
@@ -231,7 +245,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
           toast.error('Добавьте товары')
           return
         }
-        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at, files })).unwrap()
+        await dispatch(addOrder({ ...form, delivered_at: updated_delivered_at, files, documents: existingFiles })).unwrap()
         onSuccess?.()
         toast.success('Заказ успешно создан!')
         setForm({ ...initialStateOrder })
@@ -359,5 +373,11 @@ export const useOrderForm = (onSuccess?: () => void) => {
     files,
     handleFileChange,
     stocks,
+    handleRemoveFile,
+    handleRemoveExistingFile,
+    existingFiles,
+    handleModalCancel,
+    handleModalConfirm,
+    openDeleteModal,
   }
 }
