@@ -1,7 +1,14 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { selectClient, selectLoadingAddClient, selectAllClients, selectClientCreationAndModificationError, clearCreationAndModificationError } from '@/store/slices/clientSlice.ts'
+import {
+  selectClient,
+  selectLoadingAddClient,
+  selectAllClients,
+  selectClientCreationAndModificationError,
+  clearCreationAndModificationError,
+  selectLoadingUpdateClient,
+} from '@/store/slices/clientSlice.ts'
 import { addClient, fetchClientById, fetchClients, updateClient } from '@/store/thunks/clientThunk.ts'
 import { emailRegex, initialClientState, phoneNumberRegex } from '@/constants.ts'
 import { ClientMutation } from '@/types'
@@ -14,7 +21,8 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
   const [errors, setErrors] = useState<Partial<ClientMutation>>({})
 
   const dispatch = useAppDispatch()
-  const loading = useAppSelector(selectLoadingAddClient)
+  const loadingAdd = useAppSelector(selectLoadingAddClient)
+  const loadingUpdate = useAppSelector(selectLoadingUpdateClient)
   const creationAndModificationError = useAppSelector(selectClientCreationAndModificationError)
   const client = useAppSelector(selectClient)
   const clients = useAppSelector(selectAllClients) || []
@@ -125,5 +133,5 @@ export const useClientForm = (clientId?: string, onClose?: () => void) => {
     return messages.length ? messages.join(', ') : undefined
   }
 
-  return { form, errors, loading, inputChangeHandler, onSubmit, getFieldError }
+  return { form, errors, loadingAdd, loadingUpdate, inputChangeHandler, onSubmit, getFieldError }
 }
