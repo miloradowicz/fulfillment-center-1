@@ -1,6 +1,5 @@
-import { Dialog, DialogContent, IconButton } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
 import React from 'react'
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 export interface ModalProps {
   open: boolean
@@ -10,39 +9,29 @@ export interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
   return (
-    <Dialog
-      maxWidth={'sm'}
-      fullWidth
-      className="text-[#32363F]"
-      open={open}
-      onClose={handleClose}
-      disableEnforceFocus
-    >
-      <IconButton
-        style={{ marginLeft: 'auto' }}
-        onClick={handleClose}
-        aria-label="Закрыть модальное окно"
-      >
-        <CloseIcon />
-      </IconButton>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && handleClose()}>
       <DialogContent
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '10px',
-          '& form': {
-            width: '100%',
-            maxWidth: '70%',
-            '@media (max-width:500px)': {
-              maxWidth: '100%',
-            },
-          },
-          '& .MuiTextField-root': {
-            width: '100%',
-          },
-        }}
+        className="sm:max-w-[500px] text-primary p-6 max-h-[90vh] overflow-y-auto"
       >
-        {children}
+        <DialogTitle/>
+        <DialogClose asChild>
+          <button
+            className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100"
+            aria-label="Закрыть модальное окно"
+            onClick={handleClose}
+          >
+          </button>
+        </DialogClose>
+
+        <DialogDescription className="sr-only">
+          Форма создания или редактирования товара.
+        </DialogDescription>
+
+        <div className="flex justify-center w-full mb-2">
+          <div className="w-full sm:max-w-full">
+            {children}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )
