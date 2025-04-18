@@ -60,9 +60,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       }
       : { ...initialState },
   )
-  // const [existingFiles, setExistingFiles] = useState(initialData?.documents || [])
-  // const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  // const [fileIndexToRemove, setFileIndexToRemove] = useState<number | null>(null)
 
   const handleRemoveFile = (indexToRemove:number) => {
     setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
@@ -75,33 +72,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     openDeleteModal,
   } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
-  // const handleRemoveExistingFile = (indexToRemove: number) => {
-  //   setFileIndexToRemove(indexToRemove)
-  //   setOpenDeleteModal(true)
-  // }
-  //
-  // const handleModalConfirm = async () => {
-  //   if (fileIndexToRemove === null) return
-  //
-  //   const fileToDelete = existingFiles[fileIndexToRemove]
-  //   const fileName = fileToDelete.document.split('/').pop()
-  //   if (!fileName) return
-  //
-  //   try {
-  //     await dispatch(deleteFile(fileName))
-  //     toast.success(`Вы удалили ${ fileName }`)
-  //     setExistingFiles(prev => prev.filter((_, index) => index !== fileIndexToRemove))
-  //   } catch (err) {
-  //     console.error('Ошибка при удалении файла', err)
-  //   } finally {
-  //     setOpenDeleteModal(false)
-  //     setFileIndexToRemove(null)
-  //   }
-  // }
-  // const handleModalCancel = () => {
-  //   setOpenDeleteModal(false)
-  //   setFileIndexToRemove(null)
-  // }
   const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
       ...item,
