@@ -30,7 +30,7 @@ const UseOrderPage = () => {
       await dispatch(archiveOrder(id))
       dispatch(fetchOrdersWithClient())
       toast.success('Заказ успешно архивирован!')
-      dispatch(fetchArchivedOrders)
+      dispatch(fetchArchivedOrders())
     } catch (e) {
       toast.error('Ошибка при архивации заказа.')
       console.error(e)
