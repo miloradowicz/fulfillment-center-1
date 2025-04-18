@@ -1,9 +1,12 @@
-import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, TextField, Typography, Autocomplete } from '@mui/material'
 import useProductForm from '../hooks/useProductForm.ts'
 import { ProductWithPopulate } from '@/types'
 import React from 'react'
 import { getFieldError } from '@/utils/getFieldError.ts'
+import { Loader2, Plus } from 'lucide-react'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import ClientCombobox from '@/components/ClientCombobox/ClientCombobox.tsx'
 
 interface Props {
   initialData?: ProductWithPopulate
@@ -34,127 +37,94 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   } = useProductForm(initialData, onSuccess)
 
   return (
-    <form onSubmit={onSubmit} >
-      <Typography variant="h5" sx={{ mb: 1 }}>
-        { initialData? 'Редактировать данные товара' : 'Добавить новый товар'}
-      </Typography>
-      <Grid container direction="column" spacing={2}>
-        <Grid>
-          <Autocomplete
-            options={clients || []}
-            getOptionLabel={option => option.name}
-            value={clients?.find(client => client._id === selectedClient) || null}
-            onChange={(_event, newValue) => {
-              const clientId = newValue ? newValue._id : ''
-              setSelectedClient(clientId)
-              setErrors(prevErrors => ({ ...prevErrors, client: '' }))
-              setForm(prevState => ({ ...prevState, client: clientId }))
-            }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Клиент"
-                fullWidth
-                size="small"
-                error={Boolean(errors.client || getFieldError('client',createError))}
-                helperText={errors.client || getFieldError('client',createError)}
-              />
-            )}
-          />
-        </Grid>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {initialData ? 'Редактировать данные товара' : 'Добавить новый товар'}
+      </h3>
 
-        <Grid>
-          <TextField
-            name="title"
-            label="Название"
-            value={form.title}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.title || getFieldError('title',createError))}
-            helperText={errors.title || getFieldError('title',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            name="barcode"
-            label="Баркод"
-            value={form.barcode}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.barcode || getFieldError('barcode',createError))}
-            helperText={errors.barcode || getFieldError('barcode',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            name="article"
-            label="Артикул"
-            value={form.article}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.article || getFieldError('article',createError))}
-            helperText={errors.article || getFieldError('article',createError)}
-          />
-        </Grid>
+      <div className="space-y-1">
+        <ClientCombobox
+          clients={clients ?? []}
+          selectedClientId={selectedClient}
+          onSelectClient={id => {
+            setSelectedClient(id)
+            setForm(prev => ({ ...prev, client: id }))
+            setErrors(prev => ({ ...prev, client: '' }))
+          }}
+          error={errors.client || getFieldError('client', createError)}
+        />
+      </div>
 
-        <Typography variant="h6">Дополнительные параметры</Typography>
-        {dynamicFields.map((field, i) => (
-          <Grid key={i} sx={{ mb: 2 }}>
-            <TextField
-              name={field.label}
-              label={field.label}
-              fullWidth
-              size="small"
-              value={field.value || ''}
-              onChange={e => onChangeDynamicFieldValue(i, e)}
-            />
-          </Grid>
-        ))}
+      <InputWithError
+        name="title"
+        id="title"
+        placeholder="Название"
+        value={form.title}
+        onChange={inputChangeHandler}
+        error={errors.title || getFieldError('title', createError)}
+      />
 
-        {showNewFieldInputs && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid>
-              <TextField
-                label="Ключ"
-                value={newField.key}
-                onChange={e => setNewField({ ...newField, key: e.target.value })}
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid>
-              <TextField
-                label="Название"
-                value={newField.label}
-                onChange={e => setNewField({ ...newField, label: e.target.value })}
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid>
-              <Button variant="contained" onClick={addDynamicField}>
-                Добавить
-              </Button>
-              <Button variant="outlined" color="error" onClick={() => setShowNewFieldInputs(false)} sx={{ ml: 1 }}>
-                Отмена
-              </Button>
-            </Grid>
-          </Grid>
-        )}
+      <InputWithError
+        name="barcode"
+        id="barcode"
+        placeholder="Баркод"
+        value={form.barcode}
+        onChange={inputChangeHandler}
+        error={errors.barcode || getFieldError('barcode', createError)}
+      />
 
-        <Button type="button" onClick={() => setShowNewFieldInputs(true)}>
-          + Добавить параметр
+      <InputWithError
+        name="article"
+        placeholder="Артикул"
+        value={form.article}
+        onChange={inputChangeHandler}
+        error={errors.article || getFieldError('article', createError)}
+      />
+
+      <h6 className="font-bold text-sm sm:text-md">Дополнительные параметры</h6>
+      {dynamicFields.map((field, i) => (
+        <Input
+          key={field.key || i}
+          placeholder={field.label}
+          value={field.value || ''}
+          onChange={e => onChangeDynamicFieldValue(i, e)}
+        />
+      ))}
+
+      {showNewFieldInputs && (
+        <div className="flex-col space-y-4">
+          <Input
+            placeholder="Ключ"
+            value={newField.key}
+            onChange={e => setNewField({ ...newField, key: e.target.value })}
+          />
+          <Input
+            placeholder="Название"
+            value={newField.label}
+            onChange={e => setNewField({ ...newField, label: e.target.value })}
+          />
+
+          <div className="flex gap-3 justify-start">
+            <Button type="button" onClick={addDynamicField}>
+              Добавить
+            </Button>
+            <Button type="button" variant="outline" onClick={() => setShowNewFieldInputs(false)}>
+              Отмена
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!showNewFieldInputs && (
+        <Button type="button" variant="outline" onClick={() => setShowNewFieldInputs(true)}>
+          <Plus className=" h-4 w-4" /> Добавить параметр
         </Button>
+      )}
 
-        <Grid>
-          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate} sx={{ mb: 2 }}>
-            {loadingAdd || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
-          </Button>
-        </Grid>
-      </Grid>
+      <Button type="submit" className="w-full mt-3" disabled={loadingAdd || loadingUpdate}>
+        {initialData ? 'Обновить товар' : 'Создать товар'}
+        {loadingAdd || loadingUpdate ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+      </Button>
     </form>
   )
 }

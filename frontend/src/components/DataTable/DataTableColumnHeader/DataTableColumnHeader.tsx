@@ -20,7 +20,7 @@ const DataTableColumnHeader = <TData, TValue>({ column, title, className }: Prop
     <div className={cn('flex items-center space-x-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="-ml-0.5 h-8 data-[state=open]:bg-accent cursor-pointer hover:shadow-sm">
+          <Button variant="ghost" size="sm" className="-ml-0.5 h-8 data-[state=open]:bg-accent hover:shadow-sm">
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
               <ArrowDown size={18} />

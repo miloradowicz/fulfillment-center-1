@@ -28,7 +28,7 @@ const TableActionsMenu = <T extends { _id: string }>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" className="cursor-pointer hover:shadow-sm">
+        <Button type="button" variant="ghost" className="hover:shadow-sm">
           <span className="sr-only">Открыть меню</span>
           <MoreHorizontal size={25} />
         </Button>
@@ -44,7 +44,7 @@ const TableActionsMenu = <T extends { _id: string }>({
             type="button"
             variant="ghost"
             size="sm"
-            className="text-primary bg-transparent cursor-pointer transition-colors shadow-sm"
+            className="text-primary bg-transparent transition-colors shadow-sm"
           >
             Редактировать
             <Edit size={18} className="stroke-primary" />
@@ -57,7 +57,7 @@ const TableActionsMenu = <T extends { _id: string }>({
               type="button"
               variant="ghost"
               size="sm"
-              className="text-primary bg-transparent cursor-pointer transition-colors shadow-sm w-full"
+              className="text-primary bg-transparent transition-colors shadow-sm w-full"
             >
               <NavLink
                 to={`/${ detailsPathPrefix }/${ row._id }`}
@@ -77,7 +77,7 @@ const TableActionsMenu = <T extends { _id: string }>({
             type="button"
             size="sm"
             onClick={() => handleConfirmationOpen(row._id)}
-            className="text-destructive hover:bg-destructive/10 bg-transparent w-full cursor-pointer transition-colors shadow-sm"
+            className="text-destructive hover:bg-destructive/10 bg-transparent w-full transition-colors shadow-sm"
           >
             Удалить
             <Trash size={18} className="stroke-destructive" />

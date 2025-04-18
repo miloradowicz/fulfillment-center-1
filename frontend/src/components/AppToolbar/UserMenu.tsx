@@ -29,7 +29,7 @@ const UserMenu: React.FC<Props> = ({ user }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className="h-11 w-11 p-0 rounded-full cursor-pointer transition-colors">
+        <Button variant="secondary" className="h-11 w-11 p-0 rounded-full transition-colors">
           <span className="text-xl font-bold uppercase">{user.displayName?.[0]}</span>
         </Button>
       </DropdownMenuTrigger>
