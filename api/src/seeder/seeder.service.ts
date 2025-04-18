@@ -691,5 +691,6 @@ export class SeederService {
     ])
 
     await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 13 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 2 } }, { upsert: true })
   }
 }
