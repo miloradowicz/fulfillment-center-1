@@ -62,6 +62,7 @@ export const useStockForm = (initialData?: Stock, onSuccess?: () => void) => {
 
       setForm({ ...initialState })
       setErrors({ ...initialErrorState })
+      onSuccess?.()
     } catch (e) {
       console.error(e)
     }
