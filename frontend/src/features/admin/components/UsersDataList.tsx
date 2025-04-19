@@ -1,7 +1,5 @@
 import { UserWithPopulate } from '@/types'
 import useUserActions from '../hooks/useUserActions'
-import Modal from '@/components/Modal/Modal'
-import RegistrationForm from '../../users/components/RegistrationForm.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal'
 import { ColumnDef } from '@tanstack/react-table'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn'
@@ -13,14 +11,11 @@ import { Badge } from '@/components/ui/badge'
 const UsersDataList = () => {
   const {
     users,
-    open,
     confirmationOpen,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
-    handleClose,
     handleOpen,
-    fetchAllUsers,
   } = useUserActions(true)
 
   const columns: ColumnDef<UserWithPopulate>[] = [
@@ -36,6 +31,9 @@ const UsersDataList = () => {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Отображаемое имя" />
       ),
+      meta: {
+        title: 'Отображаемое имя',
+      },
       cell: ({ row }) => (
         <div className="font-medium">{row.original.displayName}</div>
       ),
@@ -45,6 +43,9 @@ const UsersDataList = () => {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Email" />
       ),
+      meta: {
+        title: 'Email',
+      },
       cell: ({ row }) => <div>{row.original.email}</div>,
     },
     {
@@ -52,6 +53,9 @@ const UsersDataList = () => {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Роль" />
       ),
+      meta: {
+        title: 'Роль',
+      },
       cell: ({ row }) => {
         const role = row.original.role
         const variant = role === 'super-admin' ? 'destructive' :
@@ -93,15 +97,6 @@ const UsersDataList = () => {
   return (
     <div className="max-w-[1000px] mx-auto w-full">
       <DataTable columns={columns} data={users ?? []} />
-
-      <Modal handleClose={handleClose} open={open}>
-        <RegistrationForm
-          onSuccess={() => {
-            void fetchAllUsers()
-            handleClose()
-          }}
-        />
-      </Modal>
 
       <ConfirmationModal
         open={confirmationOpen}
