@@ -23,9 +23,8 @@ interface StockState {
   loadingDelete: boolean
   loadingArchive: boolean
   error: GlobalError | null
-  creationAndModificationError: ValidationError | GlobalError | null;
-  createError: ValidationError | null
-  deletionError: GlobalError | null;
+  createAndUpdateError: ValidationError | null
+  deletionError: GlobalError | null
 }
 
 const initialState: StockState = {
@@ -40,8 +39,7 @@ const initialState: StockState = {
   loadingDelete: false,
   loadingArchive: false,
   error: null,
-  creationAndModificationError: null,
-  createError: null,
+  createAndUpdateError: null,
   deletionError: null,
 }
 
@@ -53,22 +51,18 @@ export const selectIsStocksLoading = (state: RootState) => state.stocks.loadingF
 export const selectLoadingFetchArchivedStocks = (state: RootState) => state.stocks.loadingFetchArchive
 export const selectIsStockArchiving = (state: RootState) => state.stocks.loadingArchive
 export const selectIsStockCreating = (state: RootState) => state.stocks.loadingCreate
-export const selectStockCreateError = (state: RootState) => state.stocks.createError
+export const selectStockCreateError = (state: RootState) => state.stocks.createAndUpdateError
 export const selectStockError = (state: RootState) => state.stocks.error
 
 const stocksSlice = createSlice({
   name: 'stocks',
   initialState,
   reducers: {
-    clearCreationAndModificationError: state => {
-      state.creationAndModificationError = null
-    },
     clearStockError: state => {
-      state.creationAndModificationError = null
-      state.deletionError = null
-      state.error = null
+      state.createAndUpdateError = null
     },
-  },  extraReducers: builder => {
+  },
+  extraReducers: builder => {
     builder
       .addCase(fetchStocks.pending, state => {
         state.loadingFetch = true
@@ -109,14 +103,14 @@ const stocksSlice = createSlice({
 
       .addCase(addStock.pending, state => {
         state.loadingCreate = true
-        state.createError = null
+        state.createAndUpdateError = null
       })
       .addCase(addStock.fulfilled, state => {
         state.loadingCreate = false
       })
       .addCase(addStock.rejected, (state, { payload: error }) => {
         state.loadingCreate = false
-        state.createError = error || null
+        state.createAndUpdateError = error || null
       })
 
       .addCase(archiveStock.pending, state => {
@@ -145,14 +139,14 @@ const stocksSlice = createSlice({
 
       .addCase(updateStock.pending, state => {
         state.loadingUpdate = true
-        state.error = null
+        state.createAndUpdateError = null
       })
       .addCase(updateStock.fulfilled, state => {
         state.loadingUpdate = false
       })
-      .addCase(updateStock.rejected, (state, { payload: returnedError, error: thrownError }) => {
+      .addCase(updateStock.rejected, (state, { payload: error }) => {
         state.loadingUpdate = false
-        state.creationAndModificationError = returnedError ?? (thrownError.message ? (thrownError as GlobalError) : { message: 'Неизвестная ошибка' })
+        state.createAndUpdateError = error || null
       })
   },
 })
