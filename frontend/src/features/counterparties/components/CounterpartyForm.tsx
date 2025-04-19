@@ -49,7 +49,7 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
 
       <Button type="submit" disabled={loading} className="w-full mt-3">
         {counterparty ? 'Сохранить' : 'Создать'}
-        {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
+        {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )
