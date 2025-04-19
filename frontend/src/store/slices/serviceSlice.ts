@@ -41,6 +41,7 @@ const initialState: ServiceState = {
 export const selectService = (state: RootState) => state.services.service
 export const selectAllServices = (state: RootState) => state.services.services
 export const selectLoadingFetchService = (state: RootState) => state.services.loadingFetch
+export const selectLoadingFetchOneService = (state: RootState) => state.services.loadingFetchOne
 export const selectLoadingAddService = (state: RootState) => state.services.loadingAdd
 export const selectLoadingArchiveService = (state: RootState) => state.services.loadingArchive
 export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete

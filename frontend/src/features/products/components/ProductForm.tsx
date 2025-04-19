@@ -120,7 +120,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
       )}
 
       <Button type="submit" className="w-full mt-3" disabled={loadingAdd || loadingUpdate}>
-        {initialData ? 'Обновить товар' : 'Создать товар'}
+        {initialData ? 'Сохранить' : 'Создать'}
         {loadingAdd || loadingUpdate ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>

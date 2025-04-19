@@ -82,13 +82,13 @@ export const deleteStock = createAsyncThunk<void, string, { rejectValue: GlobalE
 export const updateStock = createAsyncThunk<
   void,
   { stockId: string; stock: StockMutation },
-  { rejectValue: GlobalError }
+  { rejectValue: ValidationError }
 >('stocks/updateStock', async ({ stockId, stock }, { rejectWithValue }) => {
   try {
     await axiosAPI.put(`/stocks/${ stockId }`, stock)
   } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+    if (isAxiosError(e) && e.response?.status === 400) {
+      return rejectWithValue(e.response.data as ValidationError)
     }
     throw e
   }

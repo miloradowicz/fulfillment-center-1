@@ -157,12 +157,12 @@ const ArrivalDetails = () => {
             ) : infoTab === 1 ? (
               <LogsTable logs={arrival.logs || []} />
             ) : (
-              <Box  className="flex gap-3 items-center">
+              <Box  className="flex gap-3 flex-wrap items-center">
                 {arrival?.documents?.length ? (
                   arrival.documents.map((doc, index) => (
                     <Link
                       key={index}
-                      to={doc.document}
+                      to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"

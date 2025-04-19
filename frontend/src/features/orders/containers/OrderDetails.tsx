@@ -129,7 +129,7 @@ const OrderDetails = () => {
           ) : infoTab === 1 ? (
             <LogsTable logs={order.logs || []} />
           ) : (
-            <Box  className="flex gap-3 items-center">
+            <Box  className="flex gap-3 flex-wrap items-center">
               {order?.documents?.length ? (
                 order.documents.map((doc, index) => (
                   <Link
