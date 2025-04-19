@@ -5,7 +5,7 @@ import RegistrationForm from '../../users/components/RegistrationForm.tsx'
 import useUserActions from '../hooks/useUserActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
-import { Users } from 'lucide-react'
+import { ContactRound } from 'lucide-react'
 
 const UserPage = () => {
   const {
@@ -33,8 +33,8 @@ const UserPage = () => {
         />
       </Modal>
 
-      <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Сотрудники'} icon={<Users size={25} />} />
+      <Box className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-end">
+        <CustomTitle text={'Сотрудники'} icon={<ContactRound size={25} />} />
         <CustomButton text={'Добавить сотрудника'} onClick={handleOpen} />
       </Box>
 
