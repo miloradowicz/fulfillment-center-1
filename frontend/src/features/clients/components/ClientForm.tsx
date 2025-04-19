@@ -69,7 +69,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
 
       <Button type="submit" disabled={loadingAdd || loadingUpdate} className="w-full mt-3">
         {client ? 'Сохранить' : 'Создать'}
-        {loadingAdd || loadingUpdate && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
+        {loadingAdd || loadingUpdate ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )
