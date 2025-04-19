@@ -1,5 +1,5 @@
+import { Transform, Type } from 'class-transformer'
 import { IsArray, IsNotEmpty, IsOptional, IsPositive, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
 import mongoose from 'mongoose'
 
 class ProductDto {
@@ -23,9 +23,11 @@ class LogDto {
 }
 
 export class CreateStockDto {
+  @Transform(({ value }: { value: unknown }) => typeof value === 'string' ? value.trim() : value)
   @IsNotEmpty({ message: 'Заполните название склада.' })
   name: string
 
+  @Transform(({ value }: { value: unknown }) => typeof value === 'string' ? value.trim() : value)
   @IsNotEmpty({ message: 'Заполните адрес склада.' })
   address: string
 
