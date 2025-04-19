@@ -26,7 +26,7 @@ const AdminPage = () => {
       </div>
       <Tabs value={currentTab} onValueChange={handleTabChange}>
         <div className="flex justify-center">
-          <TabsList className="mb-8 flex flex-wrap justify-center gap-2 sm:gap-4 sm:mb-10">
+          <TabsList className="mb-10 flex flex-wrap justify-center gap-3 sm:gap-4 sm:mb-10">
             {tabs.map(tab => (
               <TabsTrigger
                 key={tab.value}
