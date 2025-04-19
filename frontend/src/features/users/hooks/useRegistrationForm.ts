@@ -21,7 +21,7 @@ const initialState: UserRegistrationMutation | (Omit<UserRegistrationMutation, '
   role: '',
 }
 
-export const useRegistrationForm = () => {
+export const useRegistrationForm = (onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -65,6 +65,7 @@ export const useRegistrationForm = () => {
         setFrontendError({})
         navigate('/clients')
         toast.success('Пользователь успешно создан!')
+        onSuccess?.()
       } catch {
         toast.error('При создании пользователя произошла ошибка.')
       }

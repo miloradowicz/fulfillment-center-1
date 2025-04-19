@@ -3,8 +3,14 @@ import { Box, Button, MenuItem, TextField, Typography, CircularProgress } from '
 import SelectField from '@/components/SelectField/SelectField.tsx'
 import { roles } from '@/constants.ts'
 import { useRegistrationForm } from '../hooks/useRegistrationForm.ts'
+import React from 'react'
 
-const RegistrationForm = () => {
+interface RegistrationFormProps {
+  onSuccess: () => void
+}
+
+
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
   const {
     sending,
     backendError,
@@ -16,7 +22,7 @@ const RegistrationForm = () => {
     validateFields,
     getFieldError,
     isFormValid,
-  } = useRegistrationForm()
+  } = useRegistrationForm(onSuccess)
 
   return (
     <Box
