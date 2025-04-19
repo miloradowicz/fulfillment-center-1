@@ -107,6 +107,11 @@ const App = () => {
                   <ServicesPage />
                 </ProtectedRoute>
               } />
+              <Route path="/services/:id" element={
+                <ProtectedRoute isAllowed={!!user}>
+                  <ServicesPage />
+                </ProtectedRoute>
+              } />
               <Route path="/add-new-client" element={
                 <ProtectedRoute isAllowed={!!user}>
                   <ClientForm />

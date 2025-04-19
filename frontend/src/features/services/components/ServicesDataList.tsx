@@ -8,6 +8,7 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import ServiceForm from '@/features/services/components/ServiceForm.tsx'
 import { useServiceActions } from '@/features/services/hooks/useServicesActions.ts'
+import ServiceDetails from '@/features/services/components/ServiceDetails.tsx'
 
 const ServicesDataList = () => {
   const {
@@ -20,6 +21,8 @@ const ServicesDataList = () => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
+    openDetailsModal,
+    handleCloseDetailsModal,
   } = useServiceActions(true)
 
   const columns: ColumnDef<PopulatedService>[] = [
@@ -86,7 +89,7 @@ const ServicesDataList = () => {
 
   return (
     <div className="max-w-[1000px] w-full mx-auto space-y-4">
-      <DataTable columns={columns} data={services ?? [] as PopulatedService[]} />
+      <DataTable columns={columns} data={[...(services ?? [])].reverse()} />
 
       <ConfirmationModal
         open={confirmationOpen}
@@ -95,6 +98,10 @@ const ServicesDataList = () => {
         onConfirm={handleConfirmationArchive}
         onCancel={handleConfirmationClose}
       />
+
+      <Modal open={openDetailsModal} handleClose={handleCloseDetailsModal}>
+        <ServiceDetails />
+      </Modal>
 
       <Modal open={open} handleClose={handleClose}>
         <ServiceForm serviceId={selectedService?._id} onClose={handleClose} />
