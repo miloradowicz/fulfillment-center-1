@@ -13,8 +13,6 @@ import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import TaskBoard from './features/tasks/components/TaskBoard.tsx'
 import ProductDetails from './features/products/containers/ProductDetails.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
-import ServicesPage from './features/services/containers/ServicesPage.tsx'
-import RegistrationPage from './features/users/containers/RegistrationPage.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
@@ -23,6 +21,7 @@ import { selectUser } from './store/slices/authSlice.ts'
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
+import AdminPage from '@/features/admin/containers/AdminPage.tsx'
 
 const App = () => {
   const user = useAppSelector(selectUser)
@@ -102,16 +101,6 @@ const App = () => {
                   <TaskBoard />
                 </ProtectedRoute>
               } />
-              <Route path="/services" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ServicesPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/services/:id" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ServicesPage />
-                </ProtectedRoute>
-              } />
               <Route path="/add-new-client" element={
                 <ProtectedRoute isAllowed={!!user}>
                   <ClientForm />
@@ -123,11 +112,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <RegistrationPage />
-                </ProtectedRoute>
-              } />
               <Route path="/stocks" element={
                 <ProtectedRoute isAllowed={!!user}>
                   <StockPage />
@@ -141,6 +125,11 @@ const App = () => {
               <Route path="/archives" element={
                 <ProtectedRoute isAllowed={!!user}>
                   <ArchivePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute isAllowed={!!user}>
+                  <AdminPage />
                 </ProtectedRoute>
               } />
               <Route

@@ -20,7 +20,7 @@ const ServicesPage = () => {
       )}
 
       <Modal handleClose={handleClose} open={open}><ServiceForm onClose={handleClose}/></Modal>
-      <Box  display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
+      <Box  display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-end">
         <CustomTitle text={'Услуги'} icon={<Handshake size={25} />}/>
         <CustomButton text={'Добавить услугу'} onClick={handleOpen}/>
       </Box>

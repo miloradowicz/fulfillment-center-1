@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '@/app/store'
 import { fetchUsers, fetchUserById, updateUser, deleteUser, archiveUser } from '../thunks/userThunk'
 import { UserStripped, GlobalError, User } from '@/types'
@@ -25,7 +25,14 @@ export const selectUsersError = (state: RootState) => state.users.error
 const userSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedUser: (state, action: PayloadAction<User>) => {
+      state.selectedUser = action.payload
+    },
+    clearSelectedUser: state => {
+      state.selectedUser = null
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchUsers.pending, state => {
       state.loading = true
@@ -84,4 +91,5 @@ const userSlice = createSlice({
   },
 })
 
+export const { setSelectedUser, clearSelectedUser } = userSlice.actions
 export const userReducer = userSlice.reducer

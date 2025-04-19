@@ -196,6 +196,10 @@ export type UserMutation = Omit<User, '_id' | 'token'> & {
   password: string
 }
 
+export type UserWithPopulate = Omit<User, 'token'> & {
+  password?: string;
+}
+
 export interface LoginMutation {
   email: string
   password: string

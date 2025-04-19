@@ -14,6 +14,10 @@ interface Props<T> {
   table: Table<T>
 }
 
+interface ColumnMetaWithTitle {
+  title?: string
+}
+
 const DataTableViewOptions = <T,>({ table }: Props<T>) => {
   return (
     <DropdownMenu>
@@ -42,9 +46,10 @@ const DataTableViewOptions = <T,>({ table }: Props<T>) => {
               checked={column.getIsVisible()}
               onCheckedChange={value => column.toggleVisibility(value)}
             >
-              {typeof column.columnDef.header === 'string'
-                ? column.columnDef.header
-                : column.id}
+              {(column.columnDef.meta as ColumnMetaWithTitle)?.title
+                ?? (typeof column.columnDef.header === 'string'
+                  ? column.columnDef.header
+                  : column.id)}
             </DropdownMenuCheckboxItem>
           ))}
       </DropdownMenuContent>
