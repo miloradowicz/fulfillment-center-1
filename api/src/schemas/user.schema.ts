@@ -55,7 +55,7 @@ export class User {
   role: RolesType
 
   @Prop({
-    required: true,
+    required: false,
   })
   token: string
 }

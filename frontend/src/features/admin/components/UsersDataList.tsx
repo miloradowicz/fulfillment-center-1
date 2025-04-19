@@ -64,7 +64,7 @@ const UsersDataList = () => {
           <Badge variant={variant}>
             {role === 'super-admin' && 'Супер-админ'}
             {role === 'admin' && 'Администратор'}
-            {role === 'manager' && 'Мэнеджер'}
+            {role === 'manager' && 'Менеджер'}
             {role === 'stock-worker' && 'Работник склада'}
           </Badge>
         )
