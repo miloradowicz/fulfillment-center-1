@@ -43,7 +43,7 @@ const StockForm: React.FC<Props> = ({ initialData, onSuccess }) => {
       />
 
       <Button type="submit" disabled={isLoading} className="w-full mt-3">
-        {initialData ? 'Обновить данные склада' : 'Создать склад'}
+        {initialData ? 'Сохранить' : 'Создать'}
         {isLoading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
       </Button>
     </form>
