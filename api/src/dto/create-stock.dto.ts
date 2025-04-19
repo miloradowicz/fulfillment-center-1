@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 class ProductDto {
   @IsNotEmpty({ message: 'Заполните поле товара.' })
-  product: mongoose.Schema.Types.ObjectId
+  product: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните количество товара.' })
   @IsPositive({ message: 'Количество товара должно быть больше 0.' })
@@ -13,7 +13,7 @@ class ProductDto {
 
 class LogDto {
   @IsNotEmpty({ message: 'Заполните поле пользователя.' })
-  user: mongoose.Schema.Types.ObjectId
+  user: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Заполните описание изменения.' })
   change: string
