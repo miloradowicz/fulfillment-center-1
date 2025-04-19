@@ -1,8 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Check, ChevronDown } from 'lucide-react'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
+import { ScrollArea } from '../ui/scroll-area'
+import { Button } from '@/components/ui/button.tsx'
 
 interface Client {
   _id: string
@@ -22,7 +24,6 @@ const ClientCombobox: React.FC<Props> = ({
   onSelectClient,
   error,
 }) => {
-  const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
 
   const selectedClientName = clients.find(c => c._id === selectedClientId)?.name
@@ -31,9 +32,9 @@ const ClientCombobox: React.FC<Props> = ({
     <div className="space-y-1">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button
-            ref={triggerRef}
+          <Button
             type="button"
+            variant="ghost"
             role="combobox"
             className={cn(
               'w-full flex justify-between items-center px-2 py-2 border rounded-md text-sm cursor-pointer text-muted-foreground',
@@ -44,29 +45,37 @@ const ClientCombobox: React.FC<Props> = ({
           >
             {selectedClientName || 'Выберите клиента...'}
             <ChevronDown className="ml-2 h-4 w-4" />
-          </button>
+          </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
-          <Command>
-            <CommandInput placeholder="Поиск клиента..." />
+        <PopoverContent
+          className="p-0 w-[var(--radix-popover-trigger-width)]"
+        >
+          <Command shouldFilter={true}>
+            <CommandInput placeholder="Поиск клиента…" />
             <CommandEmpty>Клиент не найден</CommandEmpty>
-            <CommandGroup>
-              {clients.map(client => (
-                <CommandItem
-                  key={client._id}
-                  value={client.name}
-                  onSelect={() => {
-                    onSelectClient(client._id)
-                    setOpen(false)
-                  }}
-                >
-                  {client.name}
-                  <Check
-                    className={cn('ml-auto h-4 w-4', selectedClientId === client._id ? 'opacity-100' : 'opacity-0')}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <ScrollArea>
+              <CommandGroup className="p-1">
+                {clients.map(client => (
+                  <CommandItem
+                    key={client._id}
+                    value={client.name}
+                    onSelect={() => {
+                      onSelectClient(client._id)
+                      setOpen(false)
+                    }}
+                    className="rounded-md"
+                  >
+                    {client.name}
+                    <Check
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        selectedClientId === client._id ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
           </Command>
         </PopoverContent>
       </Popover>
