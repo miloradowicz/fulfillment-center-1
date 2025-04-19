@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useNavigate } from 'react-router-dom'
-import { selectService } from '@/store/slices/serviceSlice.ts'
+import { selectLoadingFetchOneService, selectService } from '@/store/slices/serviceSlice.ts'
 import { fetchServiceById } from '@/store/thunks/serviceThunk.ts'
 import { Badge } from '@/components/ui/badge.tsx'
+import { Box, CircularProgress } from '@mui/material'
 
 interface Props {
   serviceId?: string
@@ -13,6 +14,7 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const service = useAppSelector(selectService)
+  const loading = useAppSelector(selectLoadingFetchOneService)
 
   useEffect(() => {
     if (serviceId) {
@@ -20,6 +22,14 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
       navigate(`/services/${ serviceId }`, { replace: true })
     }
   }, [dispatch, serviceId, navigate])
+
+  if (loading) {
+    return (
+      <Box className="flex justify-center mt-4">
+        <CircularProgress />
+      </Box>
+    )
+  }
 
   if (!service) {
     return (
