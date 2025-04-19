@@ -15,48 +15,46 @@ import {
 
 export const useServiceActions = (fetchOnDelete: boolean) => {
   const dispatch = useAppDispatch()
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [serviceToArchiveId, setServiceToArchiveId] = useState<string | null>(null)
-  const services = useAppSelector(selectAllServices)
-  const { id } = useParams()
-  const service = useAppSelector(selectService)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
+  const services = useAppSelector(selectAllServices)
+  const service = useAppSelector(selectService)
   const error = useAppSelector(selectServiceError)
   const loading = useAppSelector(selectLoadingFetchService)
-  const navigate = useNavigate()
+
+  const [openDetailsModal, setOpenDetailsModal] = useState(false)
+
+  useEffect(() => {
+    if (id) {
+      setOpenDetailsModal(true)
+      dispatch(fetchServiceById(id))
+    } else {
+      setOpenDetailsModal(false)
+    }
+  }, [id, dispatch])
+
+  useEffect(() => {
+    dispatch(fetchServices())
+  }, [dispatch])
+
+  const handleCloseDetailsModal = useCallback(() => {
+    setOpenDetailsModal(false)
+    navigate('/services', { replace: true })
+  }, [navigate])
 
   const clearErrors = useCallback(() => {
     dispatch(clearServiceError())
   }, [dispatch])
 
-  const fetchAllServices = useCallback(async () => {
-    await dispatch(fetchServices())
-  }, [dispatch])
-
-  const fetchService = useCallback(async (id: string) => {
-    await dispatch(fetchServiceById(id))
-  }, [dispatch])
-
-  useEffect(() => {
-    void clearErrors()
-  }, [clearErrors])
-
-  useEffect(() => {
-    void fetchAllServices()
-  }, [fetchAllServices])
-
-  useEffect(() => {
-    if (id) {
-      void fetchService(id)
-    }
-  }, [id, fetchService])
-
   const archiveOneService = async (id: string) => {
     try {
       await dispatch(archiveService(id)).unwrap()
       if (fetchOnDelete) {
-        await fetchAllServices()
+        await dispatch(fetchServices())
       } else {
         navigate('/services')
       }
@@ -104,6 +102,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
     selectedService,
     open,
     confirmationOpen,
+    openDetailsModal,
     error,
     loading,
     id,
@@ -111,6 +110,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
     archiveOneService,
     handleOpen,
     handleClose,
+    handleCloseDetailsModal,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
