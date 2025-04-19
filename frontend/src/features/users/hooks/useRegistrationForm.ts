@@ -7,7 +7,6 @@ import { passwordStrengthOptions, emailRegex, roles } from '@/constants.ts'
 import { selectCreateError, selectLoadingRegisterUser, clearCreateError } from '@/store/slices/authSlice.ts'
 import { registerUser } from '@/store/thunks/userThunk.ts'
 import { UserRegistrationMutation } from '@/types'
-import { useNavigate } from 'react-router-dom'
 
 type FormType = UserRegistrationMutation | (Omit<UserRegistrationMutation, 'role'> & { role: '' })
 
@@ -21,9 +20,8 @@ const initialState: UserRegistrationMutation | (Omit<UserRegistrationMutation, '
   role: '',
 }
 
-export const useRegistrationForm = () => {
+export const useRegistrationForm = (onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const sending = useAppSelector(selectLoadingRegisterUser)
   const backendError = useAppSelector(selectCreateError)
@@ -63,8 +61,8 @@ export const useRegistrationForm = () => {
         setConfirmPassword('')
         dispatch(clearCreateError())
         setFrontendError({})
-        navigate('/clients')
         toast.success('Пользователь успешно создан!')
+        onSuccess?.()
       } catch {
         toast.error('При создании пользователя произошла ошибка.')
       }
