@@ -25,6 +25,8 @@ import ArchivedOrders from '../components/ArchivedOrders.tsx'
 import { selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { ArchiveRestore } from 'lucide-react'
+import ArchivedUsers from '@/features/archive/components/ArchivedUsers.tsx'
+import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -37,6 +39,7 @@ const ArchivePage = () =>  {
   const loadingCounterparties = useAppSelector(selectLoadingFetchArchive)
   const loadingTasks = useAppSelector(selectLoadingFetchArchivedTasks)
   const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
+  const loadingUsers = useAppSelector(selectUsersLoading)
 
   const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
 
@@ -64,14 +67,45 @@ const ArchivePage = () =>  {
         <CustomTitle text={'Архив'} icon={<ArchiveRestore size={25} />} />
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered={true}>
-          <Tab label="Клиенты" sx={{ fontSize:'1rem' }} {...TabProps(0)} />
-          <Tab label="Товары" sx={{ fontSize:'1rem' }} {...TabProps(1)} />
-          <Tab label="Поставки" sx={{ fontSize:'1rem' }}  {...TabProps(2)} />
-          <Tab label="Заказы" sx={{ fontSize:'1rem' }} {...TabProps(3)} />
-          <Tab label="Задачи" sx={{ fontSize:'1rem' }} {...TabProps(4)} />
-          <Tab label="Склады" sx={{ fontSize:'1rem' }} {...TabProps(5)} />
-          <Tab label="Контрагенты" sx={{ fontSize:'1rem' }} {...TabProps(6)} />
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+          scrollButtons="auto"
+          sx={{
+            '.MuiTabs-flexContainer': {
+              display: 'flex',
+              flexWrap: 'nowrap',
+              scrollBehavior: 'smooth',
+              '@media (max-width: 870px)': {
+                overflowX: 'auto',
+                justifyContent: 'flex-start',
+              },
+              '@media (min-width: 871px)': {
+                justifyContent: 'center',
+              },
+            },
+            '.MuiTab-root': {
+              fontSize: '1rem',
+              padding: '4px 16px',
+              width: 'auto',
+            },
+            '@media (max-width: 630px)': {
+              '.MuiTab-root': {
+                fontSize: '0.8rem',
+                padding: '2px 4px',
+              },
+            },
+          }}
+        >
+          <Tab label="Клиенты" {...TabProps(0)} />
+          <Tab label="Товары" {...TabProps(1)} />
+          <Tab label="Поставки" {...TabProps(2)} />
+          <Tab label="Заказы" {...TabProps(3)} />
+          <Tab label="Задачи" {...TabProps(4)} />
+          <Tab label="Склады" {...TabProps(5)} />
+          <Tab label="Контрагенты" {...TabProps(6)} />
+          <Tab label="Пользователи" {...TabProps(7)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -151,7 +185,17 @@ const ArchivePage = () =>  {
           </>
         )}
       </CustomTabPanel>
-
+      <CustomTabPanel value={value} index={7}>
+        {loadingUsers ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedUsers/>
+          </>
+        )}
+      </CustomTabPanel>
     </Box>
   )
 }
