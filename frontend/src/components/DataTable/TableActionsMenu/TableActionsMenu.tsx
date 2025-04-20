@@ -1,5 +1,5 @@
 import { ChevronRight, Edit, MoreHorizontal, Trash } from 'lucide-react'
-import { Button } from '@/components/ui/button.tsx'
+import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu.tsx'
+} from '../../ui/dropdown-menu.tsx'
 import { NavLink } from 'react-router-dom'
 
 interface Props<T> {
@@ -17,18 +17,18 @@ interface Props<T> {
   showDetailsLink?: boolean
   detailsPathPrefix?: string
 }
+
 const TableActionsMenu = <T extends { _id: string }>({
   row,
   handleOpen,
   handleConfirmationOpen,
   showDetailsLink = true,
   detailsPathPrefix,
-
 }: Props<T>) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" className="cursor-pointer" >
+        <Button type="button" variant="ghost" className="hover:shadow-sm">
           <span className="sr-only">Открыть меню</span>
           <MoreHorizontal size={25} />
         </Button>
@@ -42,10 +42,12 @@ const TableActionsMenu = <T extends { _id: string }>({
         <DropdownMenuItem className="!bg-transparent px-1.5" onClick={() => handleOpen(row)}>
           <Button
             type="button"
+            variant="ghost"
             size="sm"
-            className="text-emerald-900 bg-emerald-100 hover:bg-emerald-300 cursor-pointer transition-colors">
+            className="text-primary bg-transparent transition-colors shadow-sm"
+          >
             Редактировать
-            <Edit size={18} className="stroke-emerald-900" />
+            <Edit size={18} className="stroke-primary" />
           </Button>
         </DropdownMenuItem>
 
@@ -53,13 +55,16 @@ const TableActionsMenu = <T extends { _id: string }>({
           <DropdownMenuItem className="!bg-transparent px-1.5">
             <Button
               type="button"
+              variant="ghost"
               size="sm"
-              className=" text-slate-800  bg-blue-200 hover:bg-blue-300 w-full transition-colors cursor-pointer">
+              className="text-primary bg-transparent transition-colors shadow-sm w-full"
+            >
               <NavLink
                 to={`/${ detailsPathPrefix }/${ row._id }`}
-                className="inline-flex items-center content-center gap-0.5">
+                className="inline-flex items-center content-center gap-0.5"
+              >
                 Подробнее
-                <ChevronRight size={20} className="stroke-slate-800" />
+                <ChevronRight size={20} className="stroke-primary" />
               </NavLink>
             </Button>
           </DropdownMenuItem>
@@ -72,9 +77,10 @@ const TableActionsMenu = <T extends { _id: string }>({
             type="button"
             size="sm"
             onClick={() => handleConfirmationOpen(row._id)}
-            className="text-red-600 hover:bg-red-100 bg-red-50 w-full cursor-pointer transition-colors">
+            className="text-destructive hover:bg-destructive/10 bg-transparent w-full transition-colors shadow-sm"
+          >
             Удалить
-            <Trash size={18} className="stroke-red-600" />
+            <Trash size={18} className="stroke-destructive" />
           </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>

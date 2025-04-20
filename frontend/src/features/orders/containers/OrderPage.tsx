@@ -6,9 +6,10 @@ import Grid from '@mui/material/Grid2'
 import useOrderPage from '../hooks/useOrderPage.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { ClipboardList } from 'lucide-react'
 
 const OrderPage = () => {
-  const { orders, open, handleOpen, handleClose, handleDelete, loading, handleOpenEdit } = useOrderPage()
+  const { orders, open, handleOpen, handleClose, handleArchive, loading, handleOpenEdit } = useOrderPage()
 
   return (
     <>
@@ -22,10 +23,10 @@ const OrderPage = () => {
             <OrderForm onSuccess={handleClose} />
           </Modal>
           <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-            <CustomTitle text={'Заказы'}/>
+            <CustomTitle text={'Заказы'} icon={<ClipboardList size={25} />}/>
             <CustomButton text={'Добавить заказ'} onClick={handleOpen} />
           </Box>
-          <OrdersList onEdit={handleOpenEdit} orders={orders || []} handleDelete={handleDelete} />
+          <OrdersList onEdit={handleOpenEdit} orders={orders || []} handleDelete={handleArchive} />
         </>
       )}
     </>

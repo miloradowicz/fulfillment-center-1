@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, HydratedDocument, Model } from 'mongoose'
+import { Task } from './task.schema'
 
 export type OrderDocument = Order & Document
 
@@ -103,4 +104,71 @@ export class Order {
 }
 
 
-export const OrderSchema = SchemaFactory.createForClass(Order)
+const OrderSchema = SchemaFactory.createForClass(Order)
+
+export const OrderSchemaFactory = (
+  taskModel: Model<Task>,
+) => {
+  const cascadeArchive = async (order: HydratedDocument<Order>) => {
+    const tasks = await taskModel.find({ associated_order: order._id })
+
+    await Promise.all([
+      ...tasks.map(x => x.updateOne({ isArchived: true })),
+    ])
+  }
+
+  const cascadeDelete = async (order: HydratedDocument<Order>) => {
+    const tasks = await taskModel.find({ associated_order: order._id })
+
+    await Promise.all([
+      ...tasks.map(x => x.deleteOne()),
+    ])
+  }
+
+  OrderSchema.pre('findOneAndUpdate', async function () {
+    const order = await this.model.findOne<HydratedDocument<Order>>(this.getQuery())
+
+    if (!order) return
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(order)
+    }
+  })
+
+  OrderSchema.pre('updateOne', async function () {
+    const order = await this.model.findOne<HydratedDocument<Order>>(this.getQuery())
+
+    if (!order) return
+
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(order)
+    }
+  })
+
+  OrderSchema.pre('save', async function () {
+    if (this.isModified('isArchived') && this.isArchived) {
+      await cascadeArchive(this)
+    }
+  })
+
+  OrderSchema.pre('findOneAndDelete', async function () {
+    const order = await this.model.findOne<HydratedDocument<Order>>(this.getQuery())
+
+    if (!order) return
+
+    await cascadeDelete(order)
+  })
+
+  OrderSchema.pre('deleteOne', async function () {
+    const order = await this.model.findOne<HydratedDocument<Order>>(this.getQuery())
+
+    if (!order) return
+
+    await cascadeDelete(order)
+  })
+
+  return OrderSchema
+}

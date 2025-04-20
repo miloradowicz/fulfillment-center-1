@@ -6,6 +6,7 @@ import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { Warehouse } from 'lucide-react'
 
 const StockPage = () => {
   const { open, handleOpen, isLoading, handleClose, stocks } = useStockPage()
@@ -23,7 +24,7 @@ const StockPage = () => {
       </Modal>
 
       <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Склады'}/>
+        <CustomTitle text={'Склады'} icon={<Warehouse size={25} />}/>
         <CustomButton text={'Добавить склад'} onClick={handleOpen}/>
       </Box>
 

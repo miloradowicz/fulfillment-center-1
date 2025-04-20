@@ -1,14 +1,14 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectPopulatedArrivals } from '@/store/slices/arrivalSlice.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteArrival, fetchPopulatedArrivals } from '@/store/thunks/arrivalThunk.ts'
+import { archiveArrival, fetchPopulatedArrivals } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 
 export const useArrivalsList = () => {
   const dispatch = useAppDispatch()
   const arrivals = useAppSelector(selectPopulatedArrivals)
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [archiveModalOpen, setArchiveModalOpen] = useState(false)
   const [selectedArrivalId, setSelectedArrivalId] = useState<string | null>(null)
 
   const fetchAllArrivals = useCallback(async () => {
@@ -21,23 +21,23 @@ export const useArrivalsList = () => {
 
   const handleClose = () => {
     setIsOpen(false)
-    setDeleteModalOpen(false)
+    setArchiveModalOpen(false)
   }
 
-  const handleDeleteClick = (arrivalId: string) => {
+  const handleArchiveClick = (arrivalId: string) => {
     setSelectedArrivalId(arrivalId)
-    setDeleteModalOpen(true)
+    setArchiveModalOpen(true)
   }
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmArchive = async () => {
     try {
       if (selectedArrivalId) {
-        await dispatch(deleteArrival(selectedArrivalId))
+        await dispatch(archiveArrival(selectedArrivalId))
         await fetchAllArrivals()
-        toast.success('Поставка успешно удалена.')
+        toast.success('Поставка успешно архивирована.')
       }
     } catch (e) {
-      toast.error('Ошибка при удалении поставки.')
+      toast.error('Ошибка при архивировании поставки.')
       console.error(e)
     } finally {
       handleClose()
@@ -46,10 +46,10 @@ export const useArrivalsList = () => {
 
   return {
     arrivals,
-    handleDeleteClick,
-    handleConfirmDelete,
+    handleArchiveClick,
+    handleConfirmArchive,
     isOpen,
-    deleteModalOpen,
+    archiveModalOpen,
     handleClose,
   }
 }

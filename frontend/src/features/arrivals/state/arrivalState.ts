@@ -39,3 +39,5 @@ export const initialErrorState = {
   defect_description: '',
   arrival_status: '',
 }
+
+export type FormType = 'arrival' | 'product'

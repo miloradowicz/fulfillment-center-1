@@ -62,6 +62,12 @@ export class TasksController {
     return this.tasksService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveTask(@Param('id') id: string) {
+    return this.tasksService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteTask(@Param('id') id: string) {

@@ -1,17 +1,29 @@
 import { NavLink } from 'react-router-dom'
-import { BookUser, ClipboardList, FileText, Handshake, ListTodo, Package, Truck, Users, Warehouse } from 'lucide-react'
+import {
+  ArchiveRestore,
+  BookUser,
+  ClipboardList,
+  FileText,
+  ListTodo,
+  Package,
+  Truck,
+  Users,
+  Warehouse,
+  Settings,
+} from 'lucide-react'
 import React from 'react'
 
 const links = [
+  { to: '/admin', label: 'Админ-панель', icon: <Settings size={25} /> },
   { to: '/clients', label: 'Клиенты', icon: <Users size={25} /> },
   { to: '/products', label: 'Товары', icon: <Package size={25} /> },
   { to: '/arrivals', label: 'Поставки', icon: <Truck size={25} /> },
   { to: '/orders', label: 'Заказы', icon: <ClipboardList size={25} /> },
   { to: '/tasks', label: 'Задачи', icon: <ListTodo size={25} /> },
   { to: '/reports', label: 'Отчеты', icon: <FileText size={25} /> },
-  { to: '/services', label: 'Услуги', icon: <Handshake size={25} /> },
   { to: '/stocks', label: 'Склады', icon: <Warehouse size={25} /> },
   { to: '/counterparties', label: 'Контрагенты', icon: <BookUser size={25} /> },
+  { to: '/archives', label: 'Архив', icon: <ArchiveRestore size={25} /> },
 ]
 
 interface Props {
@@ -28,7 +40,7 @@ const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
           onClick={onLinkClick}
           className={({ isActive }) =>
             `w-full flex items-center gap-2 p-2 rounded-md transition-colors
-             ${ isActive ? 'bg-slate-200 text-slate-900' : 'text-slate-800 hover:bg-slate-800 hover:text-white' }`
+             ${ isActive ? 'bg-ring/50 text-primary' : 'text-primary hover:bg-primary hover:text-card' }`
           }
         >
           {icon}

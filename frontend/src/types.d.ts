@@ -196,6 +196,10 @@ export type UserMutation = Omit<User, '_id' | 'token'> & {
   password: string
 }
 
+export type UserWithPopulate = Omit<User, 'token'> & {
+  password?: string;
+}
+
 export interface LoginMutation {
   email: string
   password: string
@@ -275,8 +279,8 @@ export interface TaskWithPopulate {
     _id: string | null,
     arrivalNumber: string
   }
-  createdAt: Date,
-  updatedAt: Date,
+  createdAt: string,
+  updatedAt: string,
   date_inProgress:string | null,
   date_Done:string | null,
   date_ToDO:string | null,
@@ -310,7 +314,7 @@ export type ServiceMutation = Omit<Service, '_id' | 'logs'>
 
 export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
-export type PopulatedService = Omit<Service, 'serviceCategory'> & {
+export interface PopulatedService extends Omit<Service, 'serviceCategory'> {
   serviceCategory: ServiceCategory
 }
 
@@ -351,8 +355,6 @@ export interface Counterparty {
 
 export type CounterpartyMutation = Omit<Counterparty, '_id'>
 
-export type StatusColor = 'warning' | 'success' | 'info' | 'default'
-
 export interface UserTaskReport {
   user: {
     _id: string;
@@ -361,6 +363,7 @@ export interface UserTaskReport {
   tasks: {
     _id: string
     taskNumber: string
+    isArchived: boolean
   }[],
   taskCount: number;
 }
@@ -380,11 +383,13 @@ export interface ClientOrderReport {
   client: {
     _id: string;
     name: string;
+    isArchived: boolean
   };
   orders: {
     _id: string
     orderNumber: string
     status:string
+    isArchived: boolean
   }[],
   orderCount: number;
 }

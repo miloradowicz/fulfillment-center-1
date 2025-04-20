@@ -25,7 +25,7 @@ export class CreateServiceDto {
   name: string
 
   @IsNotEmpty({ message: 'Поле категория услуги обязательно для заполнения.' })
-  serviceCategory: mongoose.Schema.Types.ObjectId
+  serviceCategory: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле цена обязательно для заполнения.' })
   @IsPositive({ message: 'Поле цена должно быть положительным числом.' })

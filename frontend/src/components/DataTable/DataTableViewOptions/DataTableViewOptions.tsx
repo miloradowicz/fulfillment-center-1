@@ -1,17 +1,21 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Table } from '@tanstack/react-table'
 
-import { Button } from '@/components/ui/button.tsx'
+import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel, DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu.tsx'
+} from '../../ui/dropdown-menu.tsx'
 import { Settings2 } from 'lucide-react'
 
 interface Props<T> {
   table: Table<T>
+}
+
+interface ColumnMetaWithTitle {
+  title?: string
 }
 
 const DataTableViewOptions = <T,>({ table }: Props<T>) => {
@@ -21,7 +25,7 @@ const DataTableViewOptions = <T,>({ table }: Props<T>) => {
         <Button
           type="button"
           variant="outline"
-          className="max-w-sm lg:flex cursor-pointer"
+          className="max-w-sm lg:flex"
         >
           <Settings2 />
           Настройки видимости
@@ -38,13 +42,14 @@ const DataTableViewOptions = <T,>({ table }: Props<T>) => {
           .map(column => (
             <DropdownMenuCheckboxItem
               key={column.id}
-              className="capitalize"
+              className="capitalize cursor-pointer"
               checked={column.getIsVisible()}
               onCheckedChange={value => column.toggleVisibility(value)}
             >
-              {typeof column.columnDef.header === 'string'
-                ? column.columnDef.header
-                : column.id}
+              {(column.columnDef.meta as ColumnMetaWithTitle)?.title
+                ?? (typeof column.columnDef.header === 'string'
+                  ? column.columnDef.header
+                  : column.id)}
             </DropdownMenuCheckboxItem>
           ))}
       </DropdownMenuContent>

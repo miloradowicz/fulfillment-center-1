@@ -45,10 +45,15 @@ export class StocksController {
     return await this.stocksService.update(id, stockDto)
   }
 
-  @Roles('super-admin', 'admin')
   @Patch(':id/archive')
   async archiveStock(@Param('id') id: string) {
     return await this.stocksService.archive(id)
+  }
+
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveStock(@Param('id') id: string) {
+    return this.stocksService.unarchive(id)
   }
 
   @Roles('super-admin')

@@ -43,7 +43,7 @@ export class ReportService {
         acc[userId] = { user:{ _id:task.user._id.toString(), displayName:task.user.displayName }, taskCount: 0, tasks: [] }
       }
       acc[userId].taskCount += 1
-      acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber })
+      acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber, isArchived:task.isArchived })
 
       return acc
     }, {} as Record<string, UserTaskReport>)
@@ -87,14 +87,13 @@ export class ReportService {
           $lte: endDate.toISOString(),
         },
       })
-      .populate('client', 'name') as unknown as OrderWithClient[]
-
+      .populate('client', 'name isArchived') as unknown as OrderWithClient[]
     const clientOrderCount = orders.reduce((acc, order): Record<string, clientOrderReport> => {
       const clientId = String(order.client._id)
 
       if (!acc[clientId]) {
         acc[clientId] = {
-          client: { _id: clientId, name: order.client.name },
+          client: { _id: clientId, name: order.client.name, isArchived: order.isArchived },
           orderCount: 0,
           orders: [],
         }
@@ -105,6 +104,7 @@ export class ReportService {
         _id: String(order._id),
         orderNumber: order.orderNumber ?? '',
         status: order.status,
+        isArchived: order.isArchived,
       })
 
       return acc
@@ -116,7 +116,7 @@ export class ReportService {
       const clientId = String(client._id)
       if (!clientOrderCount[clientId]) {
         clientOrderCount[clientId] = {
-          client: { _id: clientId, name: client.name },
+          client: { _id: clientId, name: client.name, isArchived: client.isArchived },
           orderCount: 0,
           orders: [],
         }

@@ -77,6 +77,12 @@ export class OrdersController {
     return this.ordersService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveOrder(@Param('id') id: string) {
+    return this.ordersService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteOrder(@Param('id') id: string) {

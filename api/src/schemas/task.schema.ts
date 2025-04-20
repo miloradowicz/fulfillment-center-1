@@ -22,7 +22,7 @@ export class Task {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
-  user: string
+  user: mongoose.Types.ObjectId
 
   @Prop({ required: true })
   title: string
@@ -57,14 +57,14 @@ export class Task {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
   })
-  associated_order: mongoose.Schema.Types.ObjectId
+  associated_order: mongoose.Types.ObjectId
 
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Arrival',
   })
-  associated_arrival: mongoose.Schema.Types.ObjectId
+  associated_arrival: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -77,7 +77,7 @@ export class Task {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

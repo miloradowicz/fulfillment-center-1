@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { deleteCounterparty, fetchCounterparties } from '@/store/thunks/counterpartyThunk.ts'
+import { archiveCounterparty, fetchAllCounterparties } from '@/store/thunks/counterpartyThunk.ts'
 import { selectAllCounterparties, selectLoadingFetch } from '@/store/slices/counterpartySlices.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
@@ -15,23 +15,24 @@ export const useCounterpartiesList = () => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [counterpartyToDelete, setCounterpartyToDelete] = useState<Counterparty | null>(null)
 
-  const fetchAllCounterparties = useCallback(async () => {
-    await dispatch(fetchCounterparties())
+  const fetchCounterparties = useCallback(async () => {
+    await dispatch(fetchAllCounterparties())
   }, [dispatch])
 
   useEffect(() => {
-    void fetchAllCounterparties()
-  }, [dispatch, fetchAllCounterparties])
+    void fetchCounterparties()
+  }, [dispatch, fetchCounterparties])
 
-  const deleteOneCounterparty = async (id: string) => {
+  const archiveOneCounterparty = async (id: string) => {
     try {
-      await dispatch(deleteCounterparty(id)).unwrap()
+      await dispatch(archiveCounterparty(id)).unwrap()
+      await dispatch(fetchCounterparties)
       navigate('/counterparties')
       void fetchAllCounterparties()
-      toast.success('Контрагент успешно удалён!')
+      toast.success('Контрагент успешно архивирован!')
     } catch (e) {
       console.error(e)
-      let errorMessage = 'Не удалось удалить контрагента'
+      let errorMessage = 'Не удалось архивировать контрагента'
 
       if (e instanceof Error) {
         errorMessage = e.message
@@ -52,21 +53,21 @@ export const useCounterpartiesList = () => {
     setCounterpartyToDelete(null)
   }
 
-  const confirmDelete = () => {
+  const confirmArchive = () => {
     if (counterpartyToDelete) {
-      deleteOneCounterparty(counterpartyToDelete._id)
+      archiveOneCounterparty(counterpartyToDelete._id)
       handleCloseConfirmationModal()
     }
   }
 
   return {
     counterparties,
-    deleteOneCounterparty,
+    archiveOneCounterparty,
     isLoading,
     confirmationModalOpen,
     counterpartyToDelete,
     handleOpenConfirmationModal,
     handleCloseConfirmationModal,
-    confirmDelete,
+    confirmArchive,
   }
 }

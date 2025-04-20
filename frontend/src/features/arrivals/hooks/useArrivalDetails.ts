@@ -6,7 +6,7 @@ import {
   selectArrivalWithPopulate,
   selectLoadingFetchArrival,
 } from '@/store/slices/arrivalSlice.ts'
-import { deleteArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
+import { archiveArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 import { hasMessage } from '@/utils/helpers.ts'
 
@@ -18,8 +18,8 @@ const useArrivalDetails = () => {
   const arrival = useAppSelector(selectArrivalWithPopulate)
   const loading = useAppSelector(selectLoadingFetchArrival)
   const error = useAppSelector(selectArrivalError)
-  const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false)
-  const [isDeleted, setIsDeleted] = useState(false)
+  const [confirmArchiveModalOpen, setConfirmArchiveModalOpen] = useState(false)
+  const [isArchived, setIsArchived] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
   const [productsTab, setProductsTabs] = useState(0)
   const [infoTab, setInfoTab] = useState(0)
@@ -30,16 +30,20 @@ const useArrivalDetails = () => {
     }
   }, [dispatch, arrivalId])
 
-  const handleDelete = async () => {
+  const navigateBack = () => {
+    navigate(-1)
+  }
+
+  const handleArchive = async () => {
     if (arrivalId) {
       try {
-        await dispatch(deleteArrival(arrivalId)).unwrap()
-        toast.success('Поставка успешно удалена!')
-        setIsDeleted(true)
+        await dispatch(archiveArrival(arrivalId)).unwrap()
+        toast.success('Поставка успешно архивирована!')
+        setIsArchived(true)
         navigate('/arrivals')
       } catch (e) {
         if (hasMessage(e)) {
-          toast.error(e.message || 'Ошибка удаления')
+          toast.error(e.message || 'Ошибка архивирования')
         } else {
           console.error(e)
           toast.error('Неизвестная ошибка')
@@ -47,7 +51,7 @@ const useArrivalDetails = () => {
       }
     }
 
-    setConfirmDeleteModalOpen(false)
+    setConfirmArchiveModalOpen(false)
   }
 
   const getStepDescription = (index: number) => {
@@ -66,13 +70,14 @@ const useArrivalDetails = () => {
     error,
     productsTab,
     infoTab,
-    confirmDeleteModalOpen,
-    isDeleted,
-    handleDelete,
+    confirmArchiveModalOpen,
+    isArchived,
+    handleArchive,
+    navigateBack,
     editModalOpen,
     setEditModalOpen,
     setProductsTabs,
-    setConfirmDeleteModalOpen,
+    setConfirmArchiveModalOpen,
     setInfoTab,
     getStepDescription,
   }

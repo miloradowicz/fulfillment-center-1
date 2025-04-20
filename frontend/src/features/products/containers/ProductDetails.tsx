@@ -1,22 +1,28 @@
-import { Box, Card, CircularProgress, Divider, Typography } from '@mui/material'
+import { Box, Card, CircularProgress, Divider, Typography, IconButton } from '@mui/material'
+import { ArrowBack } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 import useProductActions from '../hooks/useProductActions.ts'
 import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import EditButton from '@/components/Buttons/EditButton.tsx'
-import DeleteButton from '@/components/Buttons/DeleteButton.tsx'
-import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 
 const ProductDetails = () => {
+  const navigate = useNavigate()
   const {
     id,
     product,
     error,
     loading,
-    deleteOneProduct,
     open,
     handleClose,
     handleOpen,
     fetchProduct,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationArchive,
   } = useProductActions(false)
 
   return (
@@ -31,10 +37,27 @@ const ProductDetails = () => {
         />
       </Modal>
 
-      <Box className="max-w-2xl mx-auto p-3">
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этот товар"
+        actionType="archive"
+        onConfirm={handleConfirmationArchive}
+        onCancel={handleConfirmationClose}
+      />
+
+      <Box className="max-w-2xl mx-auto p-4 sm:p-8">
+        <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} onClick={() => navigate('/products')}>
+          <IconButton>
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="h5" fontWeight={700}>
+            Товары
+          </Typography>
+        </Box>
+
         {error ? (
           <Box textAlign="center" mt={4}>
-            <Typography color="error" variant="body1" textAlign="center">
+            <Typography color="error" variant="body1">
               Ошибка загрузки данных товара
             </Typography>
           </Box>
@@ -46,13 +69,9 @@ const ProductDetails = () => {
               boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.2)',
             }}
           >
-            <BackButton />
-
             {!product ? (
               <Box textAlign="center" mt={4}>
-                <Typography variant="body1" textAlign="center">
-                  Товар не найден
-                </Typography>
+                <Typography variant="body1">Товар не найден</Typography>
               </Box>
             ) : (
               <>
@@ -95,7 +114,7 @@ const ProductDetails = () => {
 
                 <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                   <EditButton onClick={() => handleOpen()} />
-                  <DeleteButton onClick={() => deleteOneProduct(product._id)} />
+                  <ArchiveButton onClick={() => handleConfirmationOpen(product._id)} />
                 </Box>
               </>
             )}

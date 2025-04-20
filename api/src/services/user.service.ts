@@ -16,7 +16,6 @@ export class UsersService {
       throw new HttpException(`Пользователь с эл. почтой ${ userDto.email } уже зарегистрирован`, HttpStatus.CONFLICT)
     }
     const user = new this.userModel(userDto)
-    user.generateToken()
     return user.save()
   }
 
@@ -51,11 +50,13 @@ export class UsersService {
   }
 
   async getAll() {
-    return this.userModel.find({ isArchived: false }).select('-token')
+    const users = await this.userModel.find({ isArchived: false }).select('-token')
+    return users.reverse()
   }
 
   async getArchivedUsers() {
-    return this.userModel.find({ isArchived: true }).select('-token')
+    const users = await this.userModel.find({ isArchived: true }).select('-token')
+    return users.reverse()
   }
 
   async getById(id: string) {
@@ -97,6 +98,19 @@ export class UsersService {
     if (user.isArchived) throw new ForbiddenException('Пользователь уже в архиве')
 
     return { message: 'Пользователь перемещен в архив' }
+  }
+
+  async unarchive(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (!user.isArchived) throw new ForbiddenException('Пользователь не находится в архиве')
+
+    user.isArchived = false
+    await user.save()
+
+    return { message: 'Пользователь восстановлен из архива' }
   }
 
   async delete(id: string) {

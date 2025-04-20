@@ -86,7 +86,7 @@ export const onDragEnd = async ({
   const newItem: TaskWithPopulate = {
     taskNumber,
     createdAt,
-    updatedAt: currentTime,
+    updatedAt: currentTime.toISOString(),
     _id,
     title,
     description,

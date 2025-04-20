@@ -8,6 +8,14 @@ export const fetchStocks = createAsyncThunk<Stock[], void>('stocks/fetchStocks',
   return response.data
 })
 
+export const fetchArchivedStocks = createAsyncThunk<Stock[]>(
+  'stocks/fetchArchivedCStocks',
+  async () => {
+    const response = await axiosAPI.get('/stocks/archived/all')
+    return response.data
+  },
+)
+
 export const fetchStockById = createAsyncThunk<StockPopulate, string>('stocks/fetchStockById', async stockId => {
   const response = await axiosAPI.get<StockPopulate>(`/stocks/${ stockId }`)
   return response.data
@@ -42,6 +50,21 @@ export const archiveStock = createAsyncThunk<{ id: string }, string, { rejectVal
   },
 )
 
+export const unarchiveStock = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'stocks/unarchiveStock',
+  async (stockId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/stocks/${ stockId }/unarchive`)
+      return { id: stockId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteStock = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'stocks/deleteStock',
   async (stockId: string, { rejectWithValue }) => {
@@ -59,13 +82,13 @@ export const deleteStock = createAsyncThunk<void, string, { rejectValue: GlobalE
 export const updateStock = createAsyncThunk<
   void,
   { stockId: string; stock: StockMutation },
-  { rejectValue: GlobalError }
+  { rejectValue: ValidationError }
 >('stocks/updateStock', async ({ stockId, stock }, { rejectWithValue }) => {
   try {
     await axiosAPI.put(`/stocks/${ stockId }`, stock)
   } catch (e) {
-    if (isAxiosError(e) && e.response) {
-      return rejectWithValue(e.response.data as GlobalError)
+    if (isAxiosError(e) && e.response?.status === 400) {
+      return rejectWithValue(e.response.data as ValidationError)
     }
     throw e
   }

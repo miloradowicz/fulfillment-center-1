@@ -8,18 +8,23 @@ import {
   fetchProducts,
   updateProduct, fetchProductsWithPopulate, fetchProductByIdWithPopulate,
   archiveProduct,
+  fetchArchivedProducts, unarchiveProduct,
 } from '../thunks/productThunk.ts'
 import { RootState } from '@/app/store.ts'
 
 interface ProductState {
   product: Product | null
+  archivedProduct: Product | null
   productWithPopulate: ProductWithPopulate | null
   productsWithPopulate: ProductWithPopulate[] | null
   products: Product[] | null
+  archivedProducts: ProductWithPopulate[] | null
   loadingFetch: boolean
+  loadingFetchArchive: boolean
   loadingFetchOneClient: boolean
   loadingAdd: boolean
   loadingArchive: boolean
+  loadingUnarchive: boolean
   loadingDelete: boolean
   loadingUpdate: boolean
   error: GlobalError | null
@@ -29,13 +34,17 @@ interface ProductState {
 
 const initialState: ProductState = {
   product: null,
+  archivedProduct: null,
   productWithPopulate: null,
   productsWithPopulate: null,
   products: null,
+  archivedProducts: null,
   loadingFetch: false,
+  loadingFetchArchive: false,
   loadingFetchOneClient: false,
   loadingAdd: false,
   loadingArchive: false,
+  loadingUnarchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
@@ -44,10 +53,13 @@ const initialState: ProductState = {
 }
 
 export const selectProduct = (state: RootState) => state.products.product
+export const selectArchivedProduct = (state: RootState) => state.products.archivedProduct
 export const selectAllProducts = (state: RootState) => state.products.products
+export const selectAllArchivedProducts = (state: RootState) => state.products.archivedProducts
 export const selectProductWithPopulate = (state: RootState) => state.products.productWithPopulate
 export const selectProductsWithPopulate = (state: RootState) => state.products.productsWithPopulate
 export const selectLoadingFetchProduct = (state: RootState) => state.products.loadingFetch
+export const selectLoadingFetchArchivedProduct = (state: RootState) => state.products.loadingFetch
 export const selectLoadingAddProduct = (state: RootState) => state.products.loadingAdd
 export const selectLoadingArchiveProduct = (state: RootState) => state.products.loadingArchive
 export const selectLoadingDeleteProduct = (state: RootState) => state.products.loadingDelete
@@ -76,6 +88,16 @@ const productSlice = createSlice({
     })
     builder.addCase(fetchProducts.rejected, state => {
       state.loadingFetch = false
+    })
+    builder.addCase(fetchArchivedProducts.pending, state => {
+      state.loadingFetchArchive = true
+    })
+    builder.addCase(fetchArchivedProducts.fulfilled, (state, action) => {
+      state.loadingFetchArchive = false
+      state.archivedProducts = action.payload
+    })
+    builder.addCase(fetchArchivedProducts.rejected, state => {
+      state.loadingFetchArchive = false
     })
     builder.addCase(fetchProductsWithPopulate.pending, state => {
       state.loadingFetch = true
@@ -138,6 +160,22 @@ const productSlice = createSlice({
     })
     builder.addCase(archiveProduct.rejected, (state, { payload: error }) => {
       state.loadingArchive = false
+      state.error = error || null
+    })
+    builder.addCase(unarchiveProduct.pending, state => {
+      state.loadingUnarchive = true
+      state.error = null
+    })
+    builder.addCase(unarchiveProduct.fulfilled, (state, action) => {
+      state.loadingUnarchive = false
+      state.error = null
+
+      if (state.archivedProducts) {
+        state.archivedProducts = state.archivedProducts.filter(product => product._id !== action.payload.id)
+      }
+    })
+    builder.addCase(unarchiveProduct.rejected, (state, { payload: error }) => {
+      state.loadingUnarchive = false
       state.error = error || null
     })
     builder.addCase(deleteProduct.pending, state => {

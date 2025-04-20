@@ -1,7 +1,7 @@
 import { Table } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { Button } from '@/components/ui/button.tsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx'
+import { Button } from '../../ui/button.tsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select.tsx'
 
 interface Props<T> {
   table: Table<T>
@@ -41,7 +41,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
         <div className="flex items-center justify-center gap-1">
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
@@ -50,7 +50,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -59,7 +59,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -68,7 +68,7 @@ const DataTablePagination = <T,>({ table }: Props<T>) => {
           </Button>
           <Button
             variant="outline"
-            className="p-0 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="p-0 hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >

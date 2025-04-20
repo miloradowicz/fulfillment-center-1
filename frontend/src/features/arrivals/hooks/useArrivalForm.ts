@@ -1,11 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import {
-  ArrivalMutation,
-  Defect,
-  Product,
-  ProductArrival, ServiceArrival,
-} from '@/types'
+import { ArrivalMutation, Defect, Product, ProductArrival, ServiceArrival } from '@/types'
 import { initialErrorState, initialItemState, initialServiceState, initialState } from '../state/arrivalState'
 import { toast } from 'react-toastify'
 import { fetchClients } from '@/store/thunks/clientThunk.ts'
@@ -24,12 +19,15 @@ import { fetchStocks } from '@/store/thunks/stocksThunk.ts'
 import { selectAllStocks } from '@/store/slices/stocksSlice.ts'
 import { getAvailableItems } from '@/utils/getAvailableItems.ts'
 import { selectAllCounterparties } from '@/store/slices/counterpartySlices.ts'
-import { fetchCounterparties } from '@/store/thunks/counterpartyThunk.ts'
+import { fetchAllCounterparties } from '@/store/thunks/counterpartyThunk.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { ItemType } from '@/constants.ts'
 import { fetchServices } from '@/store/thunks/serviceThunk.ts'
 import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
 import { selectAllServices } from '@/store/slices/serviceSlice.ts'
+import { useLocation } from 'react-router-dom'
+import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
+import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -41,6 +39,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const status = ['ожидается доставка', 'получена', 'отсортирована']
   const services = useAppSelector(selectAllServices)
+  const location = useLocation()
 
   const [form, setForm] = useState<ArrivalMutation>(
     initialData
@@ -62,6 +61,17 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       : { ...initialState },
   )
 
+  const handleRemoveFile = (indexToRemove:number) => {
+    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
+  }
+  const {
+    existingFiles,
+    handleRemoveExistingFile,
+    handleModalConfirm,
+    handleModalCancel,
+    openDeleteModal,
+  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
+
   const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
       ...item,
@@ -73,16 +83,13 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       }),
     })) || []
 
-
   const [productsForm, setProductsForm] = useState<ProductArrival[]>(
     normalizeField((initialData?.products as ProductArrival[]) || []),
   )
   const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(
     normalizeField((initialData?.received_amount as ProductArrival[]) || []),
   )
-  const [defectsForm, setDefectForm] = useState<Defect[]>(
-    normalizeField((initialData?.defects as Defect[]) || []),
-  )
+  const [defectsForm, setDefectForm] = useState<Defect[]>(normalizeField((initialData?.defects as Defect[]) || []))
   const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
     normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
@@ -101,7 +108,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchStocks())
-    dispatch(fetchCounterparties())
+    dispatch(fetchAllCounterparties())
     dispatch(fetchServices())
 
     if (form.client) {
@@ -125,10 +132,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = <T extends ItemType>(
-    type: T,
-    initialState: ItemInitialStateMap[T],
-  ) => {
+  const openModal = <T extends ItemType>(type: T, initialState: ItemInitialStateMap[T]) => {
     if (type === ItemType.SERVICES) {
       setNewService(initialState as ServiceArrival)
     } else {
@@ -164,20 +168,15 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
 
     if (
       type !== ItemType.SERVICES &&
-      (
-        !baseItem.product ||
+      (!baseItem.product ||
         baseItem.amount <= 0 ||
-        (type === ItemType.DEFECTS && !(baseItem as Defect).defect_description)
-      )
+        (type === ItemType.DEFECTS && !(baseItem as Defect).defect_description))
     ) {
       toast.warn('Заполните все обязательные поля.')
       return
     }
 
-    if (
-      type === ItemType.SERVICES &&
-      (!baseService.service || baseService.service_amount <= 0)
-    ) {
+    if (type === ItemType.SERVICES && (!baseService.service || baseService.service_amount <= 0)) {
       toast.warn('Заполните обязательные поля услуги.')
       return
     }
@@ -253,6 +252,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
 
     setFiles(prevFiles => [...prevFiles, ...validFiles])
   }
+
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -272,16 +272,24 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         products: productsForm,
         received_amount: receivedForm,
         defects: defectsForm,
-        files: files || [],
+        documents: [...existingFiles],
+        files,
         services: servicesForm,
         shipping_agent: form.shipping_agent || null,
       }
 
       if (initialData) {
-        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm, files } })).unwrap()
+        await dispatch(updateArrival({ arrivalId: initialData._id, data: { ...updatedForm } })).unwrap()
         onSuccess?.()
-        await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
+
+        if (location.pathname === `/arrivals/${ initialData._id }`) {
+          await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
+        } else {
+          await dispatch(fetchPopulatedArrivals())
+        }
+
         toast.success('Поставка успешно обновлена!')
+
       } else {
         await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
@@ -294,7 +302,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setDefectForm([])
 
       if (onSuccess) onSuccess()
-
     } catch (error) {
       console.error(error)
 
@@ -348,6 +355,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     availableItem,
     files,
     handleFileChange,
-    handleServiceChange,
+    handleServiceChange,handleModalConfirm,
+    handleModalCancel,
+    handleRemoveExistingFile,
+    openDeleteModal,
+    existingFiles,
+    handleRemoveFile,
   }
 }

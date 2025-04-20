@@ -57,6 +57,7 @@ export class SeederService {
         displayName: 'Мария',
         role: 'stock-worker',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'test1@gmail.com',
@@ -65,6 +66,7 @@ export class SeederService {
         displayName: 'Оля Макарова',
         role: 'stock-worker',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe.com',
@@ -73,6 +75,7 @@ export class SeederService {
         displayName: 'Admin',
         role: 'super-admin',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe1.com',
@@ -81,6 +84,7 @@ export class SeederService {
         displayName: 'Артем Иванов',
         role: 'manager',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe12.com',
@@ -89,6 +93,7 @@ export class SeederService {
         displayName: 'Игорь',
         role: 'manager',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john1234@doe.com',
@@ -97,6 +102,7 @@ export class SeederService {
         displayName: 'Кристина',
         role: 'admin',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john123а4@doe.com',
@@ -105,6 +111,25 @@ export class SeederService {
         displayName: 'Саша',
         role: 'admin',
         token: randomUUID(),
+        isArchived: false,
+      },
+      {
+        email: 'abc@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Маша',
+        role: 'admin',
+        token: randomUUID(),
+        isArchived: true,
+      },
+      {
+        email: 'xyz@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Даша',
+        role: 'stock-worker',
+        token: randomUUID(),
+        isArchived: true,
       },
     ])
 
@@ -116,6 +141,7 @@ export class SeederService {
       address: 'Малдыбаева 7/1',
       banking_data: '123123',
       ogrn: '123123',
+      isArchived: false,
     },
     { name: 'ИП Петрова',
       phone_number: '1 123-456-7899',
@@ -124,6 +150,7 @@ export class SeederService {
       address: 'Малдыбаева 8/1',
       banking_data: '1231423',
       ogrn: '1231423',
+      isArchived: false,
     },
     { name: 'ИП Сидорова',
       phone_number: '1 123-056-7899',
@@ -132,6 +159,27 @@ export class SeederService {
       address: 'Малдыбаева 9/1',
       banking_data: '1230423',
       ogrn: '1231623',
+      isArchived: false,
+    },
+    {
+      name: 'ОсOO CHAPSAN-GROUP',
+      phone_number: '1 123-456-7890',
+      email: 'test@gmail.com',
+      inn: '111',
+      address: 'Малдыбаева 7/2',
+      banking_data: '111',
+      ogrn: '111',
+      isArchived: true,
+    },
+    {
+      name: 'ИП Асанов',
+      phone_number: '1 123-456-7890',
+      email: 'test@gmail.com',
+      inn: '888',
+      address: 'Малдыбаева 7/3',
+      banking_data: '888',
+      ogrn: '888',
+      isArchived: true,
     })
 
     const [_serviceCat1, _serviceCat2] = await this.serviceCategoryModel.create([
@@ -151,24 +199,28 @@ export class SeederService {
         price: 50000,
         type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
+        description: 'Полная проверка поступившего товара на соответствие накладной: пересчет, сверка позиций, фиксация расхождений и подготовка отчета.',
       },
       {
         name: 'Маркировка двойная',
         price: 30000,
         type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
+        description: 'Нанесение двух комплектов маркировок (штрихкодов или стикеров) на каждую единицу товара по требованиям партнера или системы учета.',
       },
       {
         name: 'Погрузка-Разгрузка на складе фулфилмента',
         price: 70000,
         type: 'внешняя',
         serviceCategory: _serviceCat2._id,
+        description: 'Физическая разгрузка поступающего товара и размещение его на складе, а также погрузка товара при его отгрузке или перемещении.',
       },
       {
         name: 'Забор с другого адреса',
         serviceCategory: _serviceCat2._id,
         type: 'внешняя',
         price: 100000,
+        description: 'Организация и выполнение транспортировки товара от указанного клиента адреса до склада, включая координацию времени и логистики.',
       },
     ])
 
@@ -182,6 +234,7 @@ export class SeederService {
           { label: 'Размер', key: 'size', value: '42' },
           { label: 'Цвет', key: 'color', value: 'Красный' },
         ],
+        isArchived: false,
       },
       {
         client: _client1._id,
@@ -192,6 +245,7 @@ export class SeederService {
           { label: 'Размер', key: 'size', value: '48' },
           { label: 'Цвет', key: 'color', value: 'Синий' },
         ],
+        isArchived: false,
       },
       {
         client: _client1._id,
@@ -208,6 +262,29 @@ export class SeederService {
           { user: _User1, change: 'record #3', date: new Date().toISOString() },
           { user: _User2, change: 'record #4', date: new Date().toISOString() },
         ],
+        isArchived: false,
+      },
+      {
+        client: _client1._id,
+        title: 'Худи',
+        barcode: '987654321012',
+        article: '987654',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+        isArchived: true,
+      },
+      {
+        client: _client1._id,
+        title: 'Кепка',
+        barcode: '987654321012',
+        article: '987654',
+        dynamic_fields: [
+          { label: 'Размер', key: 'size', value: '48' },
+          { label: 'Цвет', key: 'color', value: 'Синий' },
+        ],
+        isArchived: true,
       },
       {
         client: _client2._id,
@@ -226,11 +303,25 @@ export class SeederService {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
         products: [{ product: _product3._id, amount: 23 }],
+        isArchived: false,
       },
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
+        products: [{ product: _product2._id, amount: 20 }],
+        isArchived: false,
+      },
+      {
+        name: 'Склад Санкт-Петербург',
+        address: 'Ул. Ленина 100',
+        products: [],
+        isArchived: true,
+      },
+      {
+        name: 'Склад Кант',
+        address: 'Ул. Советская 101',
         products: [{ product: _product2._id, amount: 15 }],
+        isArchived: true,
       },
     ])
 
@@ -246,6 +337,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
         status: 'в сборке',
+        isArchived: false,
       },
       {
         orderNumber: 'ORD-2',
@@ -258,6 +350,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(),
         status: 'в пути',
+        isArchived: false,
       },
       {
         orderNumber: 'ORD-3',
@@ -270,9 +363,38 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'доставлен',
+        isArchived: false,
       },
       {
         orderNumber: 'ORD-4',
+        client: _client1._id,
+        stock: _stock1._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
+          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+        ],
+        price: 3900,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
+        status: 'в сборке',
+        isArchived: true,
+      },
+      {
+        orderNumber: 'ORD-5',
+        client: _client1._id,
+        stock: _stock2._id,
+        products: [
+          { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
+          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+        ],
+        price: 2900,
+        sent_at: new Date().toISOString(),
+        delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
+        status: 'в пути',
+        isArchived: true,
+      },
+      {
+        orderNumber: 'ORD-6',
         client: _client2._id,
         stock: _stock1._id,
         products: [
@@ -285,23 +407,38 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 3 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'order' }, { $set: { seq: 6 } }, { upsert: true })
 
     const [_counterparty1, _counterparty2, _counterparty3] = await this.counterpartyModel.create([
       {
         name: 'ООО "Фулфилмент Партнер"',
         phone_number: '+7 999 123-45-67',
         address: 'Москва, ул. Достоевского, д. 10',
+        isArchived: false,
       },
       {
         name: 'ИП Осмонов',
         phone_number: '+996 700 456-789',
         address: 'Бишкек, пр. Чуй, д. 55',
+        isArchived: false,
       },
       {
         name: 'OОО "Складской Логистик"',
         phone_number: '+996 500 789-456',
         address: 'Бишкек, пр. Манаса, д. 30',
+        isArchived: false,
+      },
+      {
+        name: 'ОсОО "Магнум"',
+        phone_number: '+996 550 555-555',
+        address: 'Бишкек, ул. Горького, д. 321',
+        isArchived: true,
+      },
+      {
+        name: 'ИП Исаев',
+        phone_number: '+996 999 999-999',
+        address: 'Бишкек, ул. Ахунбаева, д. 54',
+        isArchived: true,
       },
     ])
 
@@ -316,6 +453,7 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty2._id,
         pickup_location: 'Ул. Пушкина, д. 67',
+        isArchived: false,
         services: [
           {
             service: _service1._id,
@@ -356,6 +494,7 @@ export class SeederService {
           { user: _admin, change: 'record #3', date: new Date().toISOString() },
           { user: _User2, change: 'record #4', date: new Date().toISOString() },
         ],
+        isArchived: false,
       },
       {
         arrivalNumber: 'ARL-3',
@@ -369,105 +508,173 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty1._id,
         pickup_location: 'Ул. Авиаторов, д. 88',
+        isArchived: false,
+      },
+      {
+        arrivalNumber: 'ARL-4',
+        client: _client1._id,
+        products: [{ product: _product1._id, description: '', amount: 30 }],
+        arrival_price: 100,
+        arrival_status: 'отсортирована',
+        arrival_date: new Date().toISOString(),
+        sent_amount: '5 коробов',
+        stock: _stock1._id,
+        shipping_agent: _counterparty1._id,
+        pickup_location: 'Ул. Авиаторов, д. 88',
+        isArchived: true,
+      },
+      {
+        arrivalNumber: 'ARL-5',
+        client: _client1._id,
+        products: [{ product: _product2._id, description: '', amount: 30 }],
+        arrival_price: 1200,
+        arrival_status: 'отсортирована',
+        arrival_date: new Date().toISOString(),
+        sent_amount: '5 коробов',
+        stock: _stock1._id,
+        shipping_agent: _counterparty1._id,
+        pickup_location: 'Ул. Авиаторов, д. 88',
+        isArchived: true,
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 3 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'arrival' }, { $set: { seq: 5 } }, { upsert: true })
 
     await this.taskModel.create([
       {
         taskNumber: 'TSK-1',
         user: _User1._id,
         title: 'Принять товар из поставки',
-        description: 'Проверить товар на дефекты и внести информацию в базу',
+        description: 'Необходимо принять товар от поставщика, проверить его на соответствие и выявить возможные дефекты. Все данные внести в базу.',
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival1._id,
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-2',
         user: _User2._id,
         title: 'Собрать заказ',
+        description: 'Собрать все товары, указанные в заказе, проверить их наличие и комплектность. Подготовить к следующему этапу обработки.',
         status: 'в работе',
         type: 'заказ',
         associated_order: _order2._id,
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-3',
         user: _User1._id,
         title: 'Упаковка товара для заказа',
+        description: 'Товары должны быть аккуратно упакованы с учётом требований к перевозке. Убедиться в надёжности упаковки и готовности к отправке.',
         status: 'готово',
         type: 'другое',
         date_Done: '2025-03-29T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-4',
         user: _User2._id,
         title: 'Проверить складские остатки',
+        description: 'Провести сверку фактических остатков на складе с данными в системе. Отметить расхождения и при необходимости инициировать корректировку.',
         status: 'в работе',
         type: 'другое',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-5',
         user: _User1._id,
         title: 'Связаться с клиентом по заказу',
+        description: 'Необходимо позвонить или написать клиенту, чтобы уточнить детали по заказу. Зафиксировать результат общения в системе.',
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-23T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-6',
         user: _User4._id,
         title: 'Связаться с клиентом по заказу',
+        description: 'Связаться с клиентом для подтверждения адреса доставки и времени получения. Уточнить, нет ли дополнительных пожеланий.',
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-20T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-7',
         user: _User3._id,
         title: 'Связаться с клиентом по заказу',
+        description: 'Уточнить информацию по текущему заказу у клиента. Подтвердить детали и убедиться, что всё в порядке.',
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-21T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-8',
         user: _User3._id,
         title: 'Связаться с клиентом по заказу',
+        description: 'Обратная связь с клиентом по текущему статусу заказа. Уточнение деталей и согласование условий доставки.',
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-22T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-9',
         user: _User1._id,
         title: 'Решить вопрос по начислению оплаты по заказу',
+        description: 'Проверить корректность расчётов по заказу и начислению оплаты. При необходимости обсудить с клиентом спорные моменты.',
         status: 'готово',
         type: 'заказ',
         associated_order: _order2._id,
         date_Done: '2025-03-23T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-10',
         user: _User5._id,
-        title: 'Связаться с клиентом ',
+        title: 'Связаться с клиентом',
+        description: 'Связаться с клиентом для получения дополнительной информации или обратной связи. Задокументировать результат разговора.',
         status: 'готово',
         type: 'другое',
         date_Done: '2025-03-26T08:27:17.078Z',
+        isArchived: false,
       },
       {
         taskNumber: 'TSK-11',
         user: _User6._id,
-        title: 'Узнать информацию у клиента по прибытию поставки ',
+        title: 'Узнать информацию у клиента по прибытию поставки',
+        description: 'Связаться с клиентом и выяснить, когда и при каких условиях ожидается прибытие поставки. Зафиксировать полученные данные.',
         status: 'к выполнению',
         type: 'поставка',
         associated_arrival: _arrival2._id,
         date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: false,
+      },
+      {
+        taskNumber: 'TSK-12',
+        user: _User2._id,
+        title: 'Разгрузка поставки',
+        status: 'к выполнению',
+        type: 'поставка',
+        associated_arrival: _arrival2._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: true,
+      },
+      {
+        taskNumber: 'TSK-13',
+        user: _User4._id,
+        title: 'Упаковка заказа для отправки',
+        status: 'в работе',
+        type: 'заказ',
+        associated_order: _order1._id,
+        date_Done: '2025-03-28T08:27:17.078Z',
+        isArchived: true,
       },
     ])
 
@@ -512,6 +719,7 @@ export class SeederService {
       },
     ])
 
-    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 11 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 13 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 2 } }, { upsert: true })
   }
 }

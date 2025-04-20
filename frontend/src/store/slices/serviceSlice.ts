@@ -21,6 +21,7 @@ interface ServiceState {
   loadingUpdate: boolean;
   error: GlobalError | null;
   creationAndModificationError: ValidationError | GlobalError | null;
+  deletionError: GlobalError | null;
 }
 
 const initialState: ServiceState = {
@@ -34,11 +35,13 @@ const initialState: ServiceState = {
   loadingUpdate: false,
   error: null,
   creationAndModificationError: null,
+  deletionError: null,
 }
 
 export const selectService = (state: RootState) => state.services.service
 export const selectAllServices = (state: RootState) => state.services.services
 export const selectLoadingFetchService = (state: RootState) => state.services.loadingFetch
+export const selectLoadingFetchOneService = (state: RootState) => state.services.loadingFetchOne
 export const selectLoadingAddService = (state: RootState) => state.services.loadingAdd
 export const selectLoadingArchiveService = (state: RootState) => state.services.loadingArchive
 export const selectLoadingDeleteService = (state: RootState) => state.services.loadingDelete
@@ -52,6 +55,11 @@ const serviceSlice = createSlice({
   reducers: {
     clearCreationAndModificationError: state => {
       state.creationAndModificationError = null
+    },
+    clearServiceError: state => {
+      state.creationAndModificationError = null
+      state.deletionError = null
+      state.error = null
     },
   },
   extraReducers: builder => {
@@ -130,4 +138,4 @@ const serviceSlice = createSlice({
 })
 
 export const serviceReducer = serviceSlice.reducer
-export const { clearCreationAndModificationError } = serviceSlice.actions
+export const { clearCreationAndModificationError, clearServiceError } = serviceSlice.actions

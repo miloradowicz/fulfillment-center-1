@@ -4,12 +4,13 @@ export interface TaskLineProps {
   title: string;
   items: TaskWithPopulate[];
   selectedUser: string | null
+  activeColumnId: string | null
 }
 
 export interface TaskCardProps {
   task: TaskWithPopulate
-  index: number
-  parent: string
+  index?: number
+  parent?: string
   selectedUser: string | null
 }
 

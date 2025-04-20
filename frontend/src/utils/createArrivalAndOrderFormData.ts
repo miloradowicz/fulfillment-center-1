@@ -9,6 +9,7 @@ export const createArrivalAndOrderFormData = (data: ArrivalMutation | OrderMutat
     if (Array.isArray(value)) {
       value.forEach((item, index) => {
         Object.entries(item).forEach(([fieldName, fieldValue]) => {
+          if (fieldValue === undefined || fieldValue === null) return
           const formattedKey = `${ key }[${ index }][${ fieldName }]`
           formData.append(formattedKey, fieldValue.toString())
         })

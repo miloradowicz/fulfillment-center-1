@@ -1,26 +1,43 @@
 import React from 'react'
 import { Modal, Box, Typography, Button } from '@mui/material'
 
-interface DeleteConfirmationModalProps {
+interface ConfirmationModalProps {
   open: boolean;
   entityName: string;
-  actionType: 'delete' | 'archive';
+  actionType: 'delete' | 'archive' | 'unarchive';
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-const ConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+const actionLabels = {
+  delete: {
+    text: 'удалить',
+    color: '#c60000',
+    hoverColor: '#770000',
+  },
+  archive: {
+    text: 'архивировать',
+    color: '#1976d2',
+    hoverColor: '#115293',
+  },
+  unarchive: {
+    text: 'восстановить',
+    color: '#00b608',
+    hoverColor: '#1b5e20',
+  },
+}
+
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   open,
   entityName,
   actionType,
   onConfirm,
   onCancel,
 }) => {
-  const actionText = actionType === 'delete' ? 'удалить' : 'архивировать'
-  const actionTitle = actionType === 'delete' ? 'удалить' : 'архивировать'
+  const { text, color, hoverColor } = actionLabels[actionType]
 
   return (
-    <Modal open={open} onClose={onCancel} aria-labelledby="delete-modal-title">
+    <Modal open={open} onClose={onCancel} aria-labelledby="confirmation-modal-title">
       <Box
         sx={{
           position: 'absolute',
@@ -35,7 +52,7 @@ const ConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
         }}
       >
         <Typography sx={{ mt: 2 }} variant="h6">
-          Вы действительно хотите {actionText} {entityName}?
+          Вы действительно хотите {text} {entityName}?
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
           <Button onClick={onCancel} color="inherit">
@@ -45,13 +62,13 @@ const ConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             onClick={onConfirm}
             variant="contained"
             sx={{
-              backgroundColor: '#c60000',
-              '&:hover': { backgroundColor: '#770000' },
+              backgroundColor: color,
+              '&:hover': { backgroundColor: hoverColor },
               color: 'white',
               ml: 2,
             }}
           >
-            {actionTitle}
+            {text}
           </Button>
         </Box>
       </Box>

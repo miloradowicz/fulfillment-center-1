@@ -30,13 +30,18 @@ export class Invoice {
     service_price?: number
   }[]
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
   totalAmount: number
+
+  @Prop({ type: Number, required: true, default: 0 })
+  paid_amount: number
+
+  @Prop({ type: Number })
+  discount: number
 
   @Prop({
     type: String,
     enum: ['в ожидании', 'оплачено', 'частично оплачено'],
-    required: true,
     default: 'в ожидании',
   })
   status: 'в ожидании' | 'оплачено' | 'частично оплачено'
