@@ -100,6 +100,19 @@ export class UsersService {
     return { message: 'Пользователь перемещен в архив' }
   }
 
+  async unarchive(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (!user.isArchived) throw new ForbiddenException('Пользователь не находится в архиве')
+
+    user.isArchived = false
+    await user.save()
+
+    return { message: 'Пользователь восстановлен из архива' }
+  }
+
   async delete(id: string) {
     const user = await this.userModel.findByIdAndDelete(id)
     if (!user) {

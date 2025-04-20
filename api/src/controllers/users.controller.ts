@@ -66,13 +66,13 @@ export class UsersController {
     return this.usersService.getById(id)
   }
 
-  @Roles('super-admin')
+  @Roles('super-admin', 'admin')
   @Get('archived/all')
   async getArchivedUsers() {
     return this.usersService.getArchivedUsers()
   }
 
-  @Roles('super-admin')
+  @Roles('super-admin', 'admin')
   @Get('archived/:id')
   async getArchivedUserById(@Param('id') id: string) {
     return this.usersService.getArchivedById(id)
@@ -88,6 +88,12 @@ export class UsersController {
   @Patch(':id/archive')
   async archiveUser(@Param('id') id: string) {
     return this.usersService.archive(id)
+  }
+
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveUser(@Param('id') id: string) {
+    return this.usersService.unarchive(id)
   }
 
   @Roles('super-admin')
