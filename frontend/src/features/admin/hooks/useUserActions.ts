@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { useCallback, useEffect, useState } from 'react'
 import {
-  archiveUser,
+  archiveUser, fetchArchivedUsers,
   fetchUserById,
   fetchUsers,
 } from '@/store/thunks/userThunk'
@@ -55,6 +55,7 @@ const useUserActions = (fetchOnDelete: boolean) => {
       } else {
         navigate('/users')
       }
+      await dispatch(fetchArchivedUsers())
       toast.success('Пользователь успешно архивирован!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
