@@ -24,6 +24,14 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
     {
       accessorKey: 'user.displayName',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Исполнитель" />,
+      cell: ({ row }) => (
+        <div className="text-sm">
+          {row.original.user.displayName}
+          {row.original.user.isArchived && (
+            <div className="text-muted-foreground text-xs">(в архиве)</div>
+          )}
+        </div>
+      ),
       enableColumnFilter: true,
       enableHiding: false,
     },

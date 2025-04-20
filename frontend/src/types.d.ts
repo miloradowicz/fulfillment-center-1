@@ -357,6 +357,7 @@ export interface UserTaskReport {
   user: {
     _id: string;
     displayName: string;
+    isArchived: boolean
   };
   tasks: {
     _id: string
