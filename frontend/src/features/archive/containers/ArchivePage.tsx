@@ -41,7 +41,7 @@ const ArchivePage = () =>  {
   const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
   const loadingUsers = useAppSelector(selectUsersLoading)
 
-  const tabNames = React.useMemo(() => ['clients', 'orders', 'arrivals', 'tasks', 'stocks'], [])
+  const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users'], [])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()
