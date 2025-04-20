@@ -329,6 +329,7 @@ export interface Stock {
   name: string
   address: string
   products?: ProductStockPopulate[]
+  defects?: ProductsStockPopulate[]
 }
 
 export interface StockPopulate {

@@ -21,7 +21,7 @@ export class StocksService {
     const stock = await this.stockModel
       .findById(id)
       .populate({
-        path: 'products.product',
+        path: 'products.product defects.product',
         populate: { path: 'client' },
       })
       .exec()

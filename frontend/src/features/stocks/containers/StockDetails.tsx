@@ -1,36 +1,42 @@
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
-import Grid from '@mui/material/Grid2'
-import { DataGrid } from '@mui/x-data-grid'
-import { ruRU } from '@mui/x-data-grid/locales'
 import EditButton from '@/components/Buttons/EditButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
 import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import StockProductsPage from './StockProductsPage.tsx'
+import { useSearchParams } from 'react-router-dom'
+import StockDefectsPage from './StockDefectsPage.tsx'
+
+const tabs = [
+  { value: 'products', label: 'Товары' },
+  { value: 'defects', label: 'Браки' },
+]
 
 const StockDetails = () => {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const currentTab = searchParams.get('tab') || 'products'
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value })
+  }
+
   const {
     stock,
-    isLoading,
     archiveModalOpen,
     showArchiveModal,
     hideArchiveModal,
     handleArchive,
     editModalOpen,
     setEditModalOpen,
-    stockColumns,
   } = useStockDetails()
 
   return (
     <>
-      {isLoading ? (
-        <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Grid>
-      ) : null}
-
       <Modal open={editModalOpen} handleClose={() => setEditModalOpen(false)}>
         <StockForm
           initialData={stock || undefined}
@@ -66,30 +72,34 @@ const StockDetails = () => {
           </Typography>
         </Box>
 
-        <Box className="mt-2 bg-gray-100 p-4 rounded-lg shadow-lg">
-          <Typography variant="h6" className="mb-7 text-center">
-            Товары:
-          </Typography>
-          <DataGrid
-            rows={stock?.products?.map(item => ({
-              id: item._id,
-              amount: item.amount,
-              client: item.product.client.name,
-              title: item.product.title,
-              article: item.product.article,
-              barcode: item.product.barcode,
-            }))}
-            columns={stockColumns}
-            localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-            pageSizeOptions={[5, 10, 20, 100]}
-            className="mt-4"
-            disableRowSelectionOnClick
-          />
-        </Box>
+        <Tabs value={currentTab} onValueChange={handleTabChange}>
+          <div className="flex justify-center">
+            <TabsList className="mb-10 flex flex-wrap justify-center gap-3 sm:gap-4 sm:mb-10">
+              {tabs.map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white px-4 py-2 text-sm sm:text-base rounded-xl transition-all"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+
+          <div className="h-px bg-muted mb-3 w-full" />
+
+          <TabsContent value="products" className="mt-0">
+            <StockProductsPage />
+          </TabsContent>
+          <TabsContent value="defects">
+            <StockDefectsPage />
+          </TabsContent>
+        </Tabs>
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
           <EditButton onClick={() => setEditModalOpen(true)} />
-          <ArchiveButton onClick={showArchiveModal}/>
+          <ArchiveButton onClick={showArchiveModal} />
         </Box>
       </div>
     </>
