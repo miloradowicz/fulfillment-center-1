@@ -6,8 +6,10 @@ import {
   IsInt,
   IsMongoId,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPositive,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -53,6 +55,22 @@ class DefectDto {
   amount: number
 }
 
+export class ServiceDto {
+  @IsNotEmpty({ message: 'Заполните название услуги.' })
+  service: mongoose.Types.ObjectId
+
+  @IsOptional()
+  @IsPositive({ message: 'Количество оказанной услуги должно быть больше 0.' })
+  service_amount: number = 1
+
+  @ValidateIf((o: ServiceDto) => o.service_price !== undefined)
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Цена должна быть числом.' })
+  @IsPositive({ message: 'Цена должна быть больше 0.' })
+  service_price?: number
+}
+
+
 export class CreateOrderDto {
   @IsNotEmpty({ message: 'Поле клиент обязательно для заполнения' })
   client: mongoose.Types.ObjectId
@@ -96,6 +114,12 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => LogDto)
   logs?: LogDto[]
+
+  @IsOptional()
+  @IsArray({ message: 'Заполните список оказанных услуг.' })
+  @ValidateNested({ each: true })
+  @Type(() => ServiceDto)
+  services?: ServiceDto[]
 
   @IsOptional()
   @IsArray({ message: 'Заполните список дефектов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
