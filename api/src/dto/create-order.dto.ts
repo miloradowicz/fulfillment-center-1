@@ -95,35 +95,35 @@ export class CreateOrderDto {
   stock: mongoose.Types.ObjectId
 
   @IsOptional()
-  delivered_at?: string
+  delivered_at?: string = undefined
 
   @IsOptional()
-  comment?: string
+  comment?: string = undefined
 
   @IsOptional()
-  documents?: Array<{ document: string }> | string[] | string
+  documents?: Array<{ document: string }> | string[] | string = undefined
 
   @IsOptional()
   @IsEnum(['в сборке', 'в пути', 'доставлен'], {
     message: 'Статус должен быть одним из: "в сборке", "в пути", "доставлен"',
   })
-  status?: 'в сборке' | 'в пути' | 'доставлен'
+  status?: 'в сборке' | 'в пути' | 'доставлен' = undefined
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ValidateNested({ each: true })
   @Type(() => LogDto)
-  logs?: LogDto[]
+  logs?: LogDto[] = undefined
 
   @IsOptional()
   @IsArray({ message: 'Заполните список оказанных услуг.' })
   @ValidateNested({ each: true })
   @Type(() => ServiceDto)
-  services?: ServiceDto[]
+  services?: ServiceDto[] = undefined
 
   @IsOptional()
   @IsArray({ message: 'Заполните список дефектов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ValidateNested({ each: true })
   @Type(() => DefectDto)
-  defects?: DefectDto[]
+  defects?: DefectDto[] = undefined
 }
