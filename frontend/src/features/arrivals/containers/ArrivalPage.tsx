@@ -36,11 +36,22 @@ const ArrivalPage = () => {
         )}
       </Modal>
 
-      <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <CustomTitle text={'Поставки'} icon={<Truck size={25} />} />
-        <Box display={'flex'} className="gap-3">
-          <CustomButton text={'Добавить товар'} onClick={() => handleOpen('product')} />
-          <CustomButton text={'Добавить поставку'} onClick={() => handleOpen('arrival')} />
+      <Box
+        display="flex"
+        flexDirection={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        justifyContent="space-between"
+        className="max-w-[1000px] mx-auto mb-5 mt-7 w-full gap-4"
+      >
+        <CustomTitle text="Поставки" icon={<Truck size={25} />} />
+        <Box
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          gap={1}
+          width={{ sm: 'auto' }}
+        >
+          <CustomButton text="Добавить товар" onClick={() => handleOpen('product')} />
+          <CustomButton text="Добавить поставку" onClick={() => handleOpen('arrival')} />
         </Box>
       </Box>
 

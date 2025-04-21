@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
         </DialogClose>
 
         <DialogDescription className="sr-only">
-          Форма создания или редактирования товара.
+          Форма создания или редактирования.
         </DialogDescription>
 
         <div className="flex justify-center w-full mb-2">

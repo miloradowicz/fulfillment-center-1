@@ -196,6 +196,10 @@ export type UserMutation = Omit<User, '_id' | 'token'> & {
   password: string
 }
 
+export type UserWithPopulate = Omit<User, 'token'> & {
+  password?: string;
+}
+
 export interface LoginMutation {
   email: string
   password: string
@@ -350,8 +354,6 @@ export interface Counterparty {
 }
 
 export type CounterpartyMutation = Omit<Counterparty, '_id'>
-
-export type StatusColor = 'warning' | 'success' | 'info' | 'default'
 
 export interface UserTaskReport {
   user: {

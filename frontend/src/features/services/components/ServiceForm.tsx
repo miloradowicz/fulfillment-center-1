@@ -1,19 +1,14 @@
 import useServiceForm from '../hooks/useServiceForm'
-import {
-  Autocomplete as _Autocomplete,
-  Box,
-  Button,
-  createFilterOptions,
-  IconButton,
-  LinearProgress,
-  MenuItem,
-  TextField,
-  Typography,
-} from '@mui/material'
-import Grid from '@mui/material/Grid2'
-import { isServiceCategory } from '@/utils/helpers'
-import { ServiceCategory } from '@/types'
-import ClearIcon from '@mui/icons-material/Clear'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
+import { Button } from '@/components/ui/button'
+import { CheckIcon, ChevronDownIcon, Loader2, X } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ChangeEvent, useState } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Progress } from '@/components/ui/progress'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { ScrollArea } from '@/components/ui/scroll-area.tsx'
+import { cn } from '@/lib/utils'
 
 const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () => void }) => {
   const {
@@ -29,157 +24,158 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
     errors,
   } = useServiceForm(serviceId, onClose)
 
-  const Autocomplete = _Autocomplete<ServiceCategory | string, false, false, true>
-
-  const filterOptions = createFilterOptions<ServiceCategory | string>({
-    stringify: option => (isServiceCategory(option) ? option.name : option),
-  })
+  const [inputValue, setInputValue] = useState('')
+  const [open, setOpen] = useState(false)
 
   return (
-    <form onSubmit={onSubmit}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
         {serviceId ? 'Редактировать услугу' : 'Добавить новую услугу'}
-      </Typography>
-      <Grid container direction="column" spacing={2}>
-        <Grid>
-          <Autocomplete
-            freeSolo
-            selectOnFocus
-            clearOnBlur
-            handleHomeEndKeys
-            options={serviceCategories}
-            getOptionLabel={option =>
-              isServiceCategory(option) ? option.name : option
-            }
-            renderOption={(props, option) => {
-              const { key, ...rest } = props
-              return (
-                <li
-                  key={key}
-                  {...rest}
-                  style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
-                >
-                  <span>
-                    {isServiceCategory(option) ? option.name : `Добавить "${ option }"`}
-                  </span>
-                  {isServiceCategory(option) && (
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      onClick={e => {
-                        e.stopPropagation()
-                        handleDeleteCategory(option._id)
-                      }}
-                      aria-label="delete"
-                    >
-                      <ClearIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                </li>
-              )
-            }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Категория услуги"
-                error={!!errors.serviceCategory}
-                helperText={errors.serviceCategory}
+      </h3>
+
+      <div className="space-y-1">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              role="combobox"
+              className={cn(
+                'w-full flex justify-between items-center px-2 py-2 border rounded-md text-sm cursor-pointer text-muted-foreground',
+                open && 'bg-muted',
+                form.serviceCategory && 'text-primary',
+                errors.serviceCategory && 'border-destructive',
+              )}
+            >
+              {form.serviceCategory?.name || 'Выберите/создайте категорию'}
+              <ChevronDownIcon className="ml-2 h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+            <Command shouldFilter={true}>
+              <CommandInput
+                placeholder="Поиск категории..."
+                value={inputValue}
+                onValueChange={value => {
+                  setInputValue(value)
+                }}
               />
+              {inputValue && !serviceCategories.some(cat => cat.name.toLowerCase() === inputValue.toLowerCase()) && (
+                <CommandEmpty>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="cursor-pointer text-sm"
+                    onClick={() => {
+                      handleAutocompleteChange(null, inputValue)
+                      setInputValue('')
+                    }}
+                  >
+                    Добавить категорию «{inputValue}»
+                  </Button>
+                </CommandEmpty>
+              )}
+              <ScrollArea>
+                <CommandGroup>
+                  {serviceCategories.map(category => (
+                    <CommandItem
+                      key={category._id}
+                      value={category.name}
+                      onSelect={() => {
+                        handleAutocompleteChange(null, category)
+                        setInputValue('')
+                        setOpen(false)
+                      }}
+                      className="rounded-md truncate"
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <div className="flex items-center">
+                          <CheckIcon
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              form.serviceCategory?._id === category._id ? 'opacity-100' : 'opacity-0',
+                            )}
+                          />
+                          {category.name}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 hover:bg-transparent"
+                          onClick={e => {
+                            e.stopPropagation()
+                            handleDeleteCategory(category._id)
+                          }}
+                        >
+                          <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </ScrollArea>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        {(addCategoryLoading || fetchCategoryLoading) && <Progress value={0} className="h-1" />}
+        {errors.serviceCategory && <p className="text-sm font-medium text-destructive">{errors.serviceCategory}</p>}
+      </div>
+
+      <div className="space-y-1">
+        <Select
+          name="type"
+          value={form.type}
+          onValueChange={value =>
+            handleInputChange({
+              target: { name: 'type', value },
+            } as ChangeEvent<HTMLInputElement>)
+          }
+        >
+          <SelectTrigger
+            className={cn(
+              'w-full flex justify-between items-center px-2 py-2 border rounded-md text-sm',
+              errors.type && 'border-destructive',
             )}
-            onChange={handleAutocompleteChange}
-            value={form.serviceCategory ? form.serviceCategory.name : ''}
-            isOptionEqualToValue={(option, value) =>
-              isServiceCategory(option)
-                ? option._id === (isServiceCategory(value) ? value._id : '')
-                : option === value
-            }
-            filterOptions={(options, params) => {
-              const filtered = filterOptions(options, params)
-
-              const { inputValue } = params
-              const isExisting = options.some(
-                option =>
-                  (isServiceCategory(option) && option.name === inputValue) ||
-                  option === inputValue,
-              )
-              if (inputValue !== '' && !isExisting) {
-                filtered.push(inputValue)
-              }
-
-              return filtered
-            }}
-          />
-          <Box height={6}>
-            {(addCategoryLoading || fetchCategoryLoading) && <LinearProgress />}
-          </Box>
-        </Grid>
-        <Grid>
-          <TextField
-            select
-            fullWidth
-            label="Тип услуги"
-            name="type"
-            value={form.type}
-            onChange={handleInputChange}
-            size="small"
-            error={!!errors.type}
-            helperText={errors.type}
           >
-            <MenuItem value="внутренняя">Внутренняя услуга</MenuItem>
-            <MenuItem value="внешняя">Внешняя услуга</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid>
-          <TextField
-            name="name"
-            label="Название"
-            value={form.name}
-            onChange={handleInputChange}
-            fullWidth
-            size="small"
-            error={!!errors.name}
-            helperText={errors.name}
-          />
-        </Grid>
+            <SelectValue placeholder="Выберите тип услуги" />
+          </SelectTrigger>
 
-        <Grid>
-          <TextField
-            name="price"
-            label="Цена"
-            type="number"
-            value={form.price}
-            onChange={handleInputChange}
-            fullWidth
-            size="small"
-            error={!!errors.price}
-            helperText={errors.price}
-          />
-        </Grid>
+          <SelectContent className="max-w-full">
+            <SelectItem value="внутренняя">Внутренняя услуга</SelectItem>
+            <SelectItem value="внешняя">Внешняя услуга</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.type && <p className="text-sm font-medium text-destructive">{errors.type}</p>}
+      </div>
 
-        <Grid>
-          <TextField
-            name="description"
-            label="Описание"
-            value={form.description}
-            onChange={handleInputChange}
-            fullWidth
-            size="small"
-            error={!!errors.description}
-            helperText={errors.description}
-          />
-        </Grid>
+      <InputWithError
+        name="name"
+        placeholder="Название"
+        value={form.name}
+        onChange={handleInputChange}
+        error={errors.name}
+      />
 
-        <Grid>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading || addCategoryLoading || fetchCategoryLoading}
-          >
-            {serviceId ? 'Сохранить изменения' : 'Создать услугу'}
-          </Button>
-        </Grid>
-      </Grid>
+      <InputWithError
+        name="price"
+        placeholder="Цена"
+        value={form.price}
+        onChange={handleInputChange}
+        error={errors.price}
+      />
+
+      <InputWithError
+        name="description"
+        placeholder="Описание"
+        value={form.description}
+        onChange={handleInputChange}
+        error={errors.description}
+      />
+
+      <Button type="submit" className="w-full mt-3" disabled={loading || addCategoryLoading || fetchCategoryLoading}>
+        {serviceId ? 'Сохранить' : 'Создать'}
+        {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+      </Button>
     </form>
   )
 }

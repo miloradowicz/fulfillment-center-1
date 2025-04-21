@@ -54,6 +54,14 @@ export const fetchUsers = createAsyncThunk< UserStripped[]>(
   },
 )
 
+export const fetchArchivedUsers = createAsyncThunk<UserStripped[]>(
+  'users/fetchArchivedUsers',
+  async () => {
+    const response = await axiosAPI.get('/users/archived/all')
+    return response.data
+  },
+)
+
 export const fetchUserById = createAsyncThunk<User, string>(
   'users/fetchUserById',
   async (userId: string) => {
@@ -85,6 +93,21 @@ export const archiveUser = createAsyncThunk<{ id: string }, string, { rejectValu
   async (userId, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/users/${ userId }/archive`)
+      return { id: userId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveUser = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'users/unarchiveUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/users/${ userId }/unarchive`)
       return { id: userId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {

@@ -57,6 +57,7 @@ export class SeederService {
         displayName: 'Мария',
         role: 'stock-worker',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'test1@gmail.com',
@@ -65,6 +66,7 @@ export class SeederService {
         displayName: 'Оля Макарова',
         role: 'stock-worker',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe.com',
@@ -73,6 +75,7 @@ export class SeederService {
         displayName: 'Admin',
         role: 'super-admin',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe1.com',
@@ -81,6 +84,7 @@ export class SeederService {
         displayName: 'Артем Иванов',
         role: 'manager',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john@doe12.com',
@@ -89,6 +93,7 @@ export class SeederService {
         displayName: 'Игорь',
         role: 'manager',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john1234@doe.com',
@@ -97,6 +102,7 @@ export class SeederService {
         displayName: 'Кристина',
         role: 'admin',
         token: randomUUID(),
+        isArchived: false,
       },
       {
         email: 'john123а4@doe.com',
@@ -105,6 +111,25 @@ export class SeederService {
         displayName: 'Саша',
         role: 'admin',
         token: randomUUID(),
+        isArchived: false,
+      },
+      {
+        email: 'abc@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Маша',
+        role: 'admin',
+        token: randomUUID(),
+        isArchived: true,
+      },
+      {
+        email: 'xyz@gmail.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+        displayName: 'Даша',
+        role: 'stock-worker',
+        token: randomUUID(),
+        isArchived: true,
       },
     ])
 
@@ -174,24 +199,28 @@ export class SeederService {
         price: 50000,
         type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
+        description: 'Полная проверка поступившего товара на соответствие накладной: пересчет, сверка позиций, фиксация расхождений и подготовка отчета.',
       },
       {
         name: 'Маркировка двойная',
         price: 30000,
         type: 'внутренняя',
         serviceCategory: _serviceCat1._id,
+        description: 'Нанесение двух комплектов маркировок (штрихкодов или стикеров) на каждую единицу товара по требованиям партнера или системы учета.',
       },
       {
         name: 'Погрузка-Разгрузка на складе фулфилмента',
         price: 70000,
         type: 'внешняя',
         serviceCategory: _serviceCat2._id,
+        description: 'Физическая разгрузка поступающего товара и размещение его на складе, а также погрузка товара при его отгрузке или перемещении.',
       },
       {
         name: 'Забор с другого адреса',
         serviceCategory: _serviceCat2._id,
         type: 'внешняя',
         price: 100000,
+        description: 'Организация и выполнение транспортировки товара от указанного клиента адреса до склада, включая координацию времени и логистики.',
       },
     ])
 
