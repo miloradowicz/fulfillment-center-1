@@ -9,4 +9,7 @@ export enum ErrorMessagesList {
   ServiceName = 'Укажите название услуги',
   ServiceAmount = 'Количество услуги должно быть больше 0',
   Default = '',
+  SentAtDate = 'Укажите дату отправки',
+  DeliveredAtDate = 'Укажите дату доставки',
+  OrderPrice = 'Цена заказа должна быть больше 0'
 }
