@@ -3,7 +3,7 @@ import DateRangePicker from '../../components/DateRangePicker.tsx'
 import { useTaskReport } from '../../hooks/useTaskReport.ts'
 import TaskReportDataList from '@/features/reports/taskPeport/components/TaskReportDataList.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { TaskPieChart } from '@/features/reports/taskPeport/components/pieChart.tsx'
+import { TaskPieChart } from '@/features/reports/taskPeport/components/PieChart.tsx'
 import { Card } from '@/components/ui/card.tsx'
 
 const TaskReport = () => {
