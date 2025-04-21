@@ -12,6 +12,7 @@ export const useRangePicker = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
 
+
   useEffect(() => {
     setStartDate(undefined)
     setEndDate(undefined)
@@ -30,9 +31,9 @@ export const useRangePicker = () => {
       setStartDate(parsedStartDate)
       setEndDate(parsedEndDate)
 
-      if (tabParam === 'tasks') {
+      if (tabParam === 'tasks' && startDateParam && endDateParam ) {
         dispatch(fetchTaskReport({ startDate: startDateParam, endDate: endDateParam }))
-      } else if (tabParam === 'clients') {
+      } else if (tabParam === 'clients' && startDateParam && endDateParam ) {
         dispatch(fetchClientReport({ startDate: startDateParam, endDate: endDateParam }))
       }
     }

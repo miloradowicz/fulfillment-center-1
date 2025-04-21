@@ -2,15 +2,16 @@ import DateRangePicker from '../../components/DateRangePicker.tsx'
 import { useClientReport } from '../../hooks/useClientReport.ts'
 import ClientReportDataList from '@/features/reports/clientReport/components/ClientReportDataList.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
+import { Card } from '@/components/ui/card.tsx'
 
 const ClientReport = () => {
   const { clientReport, endDate, startDate, loadingReport } = useClientReport()
 
   return (
     <div className="w-full flex flex-col xl:flex-row xl:items-start xl:justify-between items-center gap-4 px-2">
-      <div className="w-full lg:w-[40%]">
+      <Card className="w-full lg:w-[40%]">
         <DateRangePicker />
-      </div>
+      </Card>
 
       <div className="w-full sm:w-[85%] xl:w-full xl:flex-1 relative min-h-[200px] overflow-x-auto">
         {loadingReport ? (
