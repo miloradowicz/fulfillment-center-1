@@ -3,7 +3,7 @@ import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Button } from '@/components/ui/button'
 import { CheckIcon, ChevronDownIcon, Loader2, X } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Progress } from '@/components/ui/progress'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
@@ -22,10 +22,11 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
     handleDeleteCategory,
     onSubmit,
     errors,
+    inputValue,
+    setInputValue,
+    open,
+    setOpen,
   } = useServiceForm(serviceId, onClose)
-
-  const [inputValue, setInputValue] = useState('')
-  const [open, setOpen] = useState(false)
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
