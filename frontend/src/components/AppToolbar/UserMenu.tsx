@@ -9,7 +9,7 @@ import { useAppDispatch } from '@/app/hooks.ts'
 import { toast } from 'react-toastify'
 import React from 'react'
 import { Separator } from '../ui/separator.tsx'
-import { Ellipsis, LogOut } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
 
 interface Props {
   user: User
@@ -39,7 +39,7 @@ const UserMenu: React.FC<Props> = ({ user }) => {
         {(user.role === 'admin' || user.role === 'super-admin') && (
           <DropdownMenuItem className="text-md mt-2 cursor-pointer" asChild>
             <NavLink to="/admin">
-              <Ellipsis size={25} />
+              <Settings size={25} />
               Админ-панель
             </NavLink>
           </DropdownMenuItem>

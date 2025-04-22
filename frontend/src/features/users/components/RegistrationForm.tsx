@@ -11,12 +11,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
+import { UserUpdateMutation } from '@/types'
 
 interface RegistrationFormProps {
   onSuccess: () => void
+  initialFormData?: Partial<UserUpdateMutation>
 }
 
-const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialFormData }) => {
   const {
     sending,
     backendError,
@@ -28,14 +30,14 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
     validateFields,
     getFieldError,
     isFormValid,
-  } = useRegistrationForm(onSuccess)
+    isEditMode,
+  } = useRegistrationForm(onSuccess, initialFormData)
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="space-y-4"
-    >
-      <h3 className="text-md sm:text-2xl font-semibold text-center">Добавить нового сотрудника</h3>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {isEditMode ? 'Редактировать пользователя' : 'Добавить нового сотрудника'}
+      </h3>
 
       <div className="space-y-1">
         <Input
@@ -64,12 +66,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         )}
       </div>
 
-      <div className=" space-y-1">
+      <div className="space-y-1">
         <Input
           id="password"
           type="password"
           name="password"
-          placeholder="Пароль"
+          placeholder={isEditMode ? 'Новый пароль (необязательно)' : 'Пароль'}
           value={form.password}
           onChange={handleChange}
         />
@@ -96,7 +98,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
       <div className="space-y-1">
         <Select
           value={form.role}
-          onValueChange={(value: string) => handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)}
+          onValueChange={(value: string) =>
+            handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Выберите роль" />
@@ -114,7 +118,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         )}
       </div>
 
-
       <Button
         type="submit"
         className="w-full mt-3"
@@ -125,7 +128,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess }) => {
         }
       >
         {sending ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-        Создать пользователя
+        {isEditMode ? 'Сохранить изменения' : 'Создать пользователя'}
       </Button>
     </form>
   )
