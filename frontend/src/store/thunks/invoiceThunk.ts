@@ -15,7 +15,7 @@ export const fetchInvoices = createAsyncThunk<Invoice[]>(
 )
 
 export const fetchArchivedInvoices = createAsyncThunk<Invoice[]>(
-  'invoices/fetchInvoices',
+  'invoices/fetchArchivedInvoices',
   async () => {
     const response = await axiosAPI.get('/invoices/archived')
     return response.data
@@ -30,7 +30,7 @@ export const fetchInvoiceById = createAsyncThunk<Invoice, string>(
   },
 )
 
-export const createInvoices = createAsyncThunk<Invoice, InvoiceMutation, { rejectValue: ValidationError }>(
+export const createInvoices = createAsyncThunk<void, InvoiceMutation, { rejectValue: ValidationError }>(
   'invoices/createInvoices',
   async (data: InvoiceMutation, { rejectWithValue }) => {
     try {
@@ -45,12 +45,11 @@ export const createInvoices = createAsyncThunk<Invoice, InvoiceMutation, { rejec
   },
 )
 
-export const archiveInvoice = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+export const archiveInvoice = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'invoices/archiveInvoice',
   async (invoiceId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/invoices/${ invoiceId }/archive`)
-      return { id: invoiceId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)
@@ -60,12 +59,11 @@ export const archiveInvoice = createAsyncThunk<{ id: string }, string, { rejectV
   },
 )
 
-export const unarchiveInvoice = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+export const unarchiveInvoice = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'invoice/ unarchiveInvoice',
   async (invoiceId, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/invoices/${ invoiceId }/unarchive`)
-      return { id: invoiceId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)
@@ -87,7 +85,7 @@ export const deleteInvoice = createAsyncThunk<void, string, { rejectValue: Globa
   }
 })
 
-export const updateInvoice = createAsyncThunk<Invoice, { id: string; data: InvoiceMutation }, { rejectValue: ValidationError }>(
+export const updateInvoice = createAsyncThunk<void, { id: string; data: InvoiceMutation }, { rejectValue: ValidationError }>(
   'invoices/updateInvoice',
   async ({ id, data }, { rejectWithValue }) => {
     try {

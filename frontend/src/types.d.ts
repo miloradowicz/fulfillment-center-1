@@ -410,9 +410,9 @@ export interface Invoice  {
     status?: 'в ожидании' | 'оплачено' | 'частично оплачено',
     associatedOrder?: string,
     associatedArrival?:string,
-    logs?: Log[],
+    logs: Log[],
     createdAt:string,
     updatedAt:string,
 }
 
-export type InvoiceMutation = Omit<Invoice, '_id'>
+export type InvoiceMutation = Omit<Invoice, '_id, totalAmount, invoiceNumber, status, createdAt, updatedAt'>
