@@ -12,6 +12,7 @@ import { reportReducer } from '@/store/slices/reportSlice.ts'
 import { serviceCategoryReducer } from '@/store/slices/serviceCategorySlice.ts'
 import { authReducer } from '@/store/slices/authSlice.ts'
 import { filesReducer } from '@/store/slices/deleteFileSlice.ts'
+import { invoicesReducer } from '@/store/slices/invoiceSlice.ts'
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
     counterparties: counterpartyReducer,
     reports: reportReducer,
     serviceCategories: serviceCategoryReducer,
+    invoices: invoicesReducer,
     files: filesReducer,
   },
 })

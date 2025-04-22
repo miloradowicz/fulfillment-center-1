@@ -392,3 +392,27 @@ export interface ClientOrderReport {
 export interface ReportClientResponse {
   clientOrderReport: ClientOrderReport[];
 }
+export interface Invoice  {
+  _id: string
+    isArchived: boolean,
+    invoiceNumber: string,
+    client: Client,
+  services:
+    {
+      service: Service,
+      service_amount?: number,
+      service_price?: number,
+      _id: string
+    }[]
+    totalAmount?: number,
+    paid_amount?: number,
+    discount?: number,
+    status?: 'в ожидании' | 'оплачено' | 'частично оплачено',
+    associatedOrder?: string,
+    associatedArrival?:string,
+    logs?: Log[],
+    createdAt:string,
+    updatedAt:string,
+}
+
+export type InvoiceMutation = Omit<Invoice, '_id'>
