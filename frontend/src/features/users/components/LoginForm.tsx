@@ -1,75 +1,71 @@
-import Grid from '@mui/material/Grid2'
-import { Box, Button, TextField, Typography, CircularProgress } from '@mui/material'
-import { getFieldError } from '@/utils/getFieldError.ts'
-import { useLoginForm } from '../hooks/useLoginForm.ts'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { useLoginForm } from '../hooks/useLoginForm'
+import { getFieldError } from '@/utils/getFieldError'
+import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 const LoginForm = () => {
-  const { form, handleChange, onSubmit, isFormValid, sending, loginError, errors } = useLoginForm()
+  const {
+    form,
+    handleChange,
+    onSubmit,
+    isFormValid,
+    sending,
+    loginError,
+    errors,
+  } = useLoginForm()
 
   return (
-    <Box
-      noValidate
-      component="form"
-      onSubmit={onSubmit}
-      sx={{
-        width: '100%',
-        maxWidth: 400,
-        mx: 'auto',
-        p: 3,
-        boxShadow: 3,
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-      }}
-    >
-      <Typography variant="h5" sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}>
-        Вход в систему
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <TextField
-            required
-            fullWidth
-            size="medium"
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl font-bold">Вход в систему</h1>
+        <p className="text-muted-foreground text-sm">Пожалуйста, войдите, чтобы продолжить</p>
+      </div>
+
+      <div className="grid gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             name="email"
-            label="Email"
+            type="text"
             value={form.email}
             onChange={handleChange}
-            error={Boolean(errors.email || getFieldError('email', loginError))}
-            helperText={errors.email || getFieldError('email', loginError)}
+            disabled={sending}
+            className={cn(errors.email || getFieldError('email', loginError) ? 'border-red-500' : '')}
           />
-        </Grid>
+          {(errors.email || getFieldError('email', loginError)) && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.email || getFieldError('email', loginError)}
+            </p>
+          )}
+        </div>
 
-        <Grid size={12}>
-          <TextField
-            required
-            fullWidth
-            size="medium"
-            type="password"
+        <div className="grid gap-2">
+          <Label htmlFor="password">Пароль</Label>
+          <Input
             id="password"
             name="password"
-            label="Пароль"
+            type="password"
             value={form.password}
             onChange={handleChange}
-            error={Boolean(errors.password || getFieldError('password', loginError))}
-            helperText={errors.password || getFieldError('password', loginError)}
+            disabled={sending}
+            className={cn(errors.password || getFieldError('password', loginError) ? 'border-red-500' : '')}
           />
-        </Grid>
+          {(errors.password || getFieldError('password', loginError)) && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.password || getFieldError('password', loginError)}
+            </p>
+          )}
+        </div>
 
-        <Grid size={12}>
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            color="primary"
-            disabled={!isFormValid || sending}
-            sx={{ py: 1.5, fontSize: '16px' }}
-          >
-            {sending ? <CircularProgress size={24} color="inherit" /> : 'Войти'}
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
+        <Button type="submit" className="w-full" disabled={!isFormValid || sending}>
+          {sending ? <Loader2 className="animate-spin w-5 h-5" /> : 'Войти'}
+        </Button>
+      </div>
+    </form>
   )
 }
 

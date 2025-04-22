@@ -1,18 +1,19 @@
-import React, { PropsWithChildren } from 'react'
-import AppToolbar from '@/components/AppToolbar/AppToolbar.tsx'
-import { Container, CssBaseline } from '@mui/material'
+import { Outlet, useLocation } from 'react-router-dom'
+import AppToolbar from '@/components/AppToolbar/AppToolbar'
 
-const Layout: React.FC<PropsWithChildren> = ({ children }) => {
+const Layout = () => {
+  const location = useLocation()
+  const isLoginPage = location.pathname === '/login'
+
   return (
     <>
-      <CssBaseline />
-      <header>
-        <AppToolbar />
-      </header>
-      <main>
-        <Container maxWidth="xl" sx={{ pt: 10 }}>
-          {children}
-        </Container>
+      {!isLoginPage && (
+        <header className="fixed top-0 left-0 right-0 z-50">
+          <AppToolbar />
+        </header>
+      )}
+      <main className={`pt-16 px-4 md:px-8 xl:px-16 max-w-screen-xl mx-auto w-full ${ isLoginPage ? 'h-screen' : '' }`}>
+        <Outlet />
       </main>
     </>
   )
