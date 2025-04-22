@@ -21,6 +21,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [serviceToArchiveId, setServiceToArchiveId] = useState<string | null>(null)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null)
   const services = useAppSelector(selectAllServices)
   const service = useAppSelector(selectService)
   const error = useAppSelector(selectServiceError)
@@ -29,22 +30,38 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
   const [openDetailsModal, setOpenDetailsModal] = useState(false)
 
   useEffect(() => {
+    dispatch(fetchServices())
+  }, [dispatch])
+
+  // Обработка URL параметра id
+  useEffect(() => {
     if (id) {
-      setOpenDetailsModal(true)
       dispatch(fetchServiceById(id))
-    } else {
-      setOpenDetailsModal(false)
+      setOpenDetailsModal(true)
     }
   }, [id, dispatch])
 
   useEffect(() => {
-    dispatch(fetchServices())
-  }, [dispatch])
+    if (selectedServiceId) {
+      dispatch(fetchServiceById(selectedServiceId))
+    }
+  }, [selectedServiceId, dispatch])
+
+  const handleOpenDetailsModal = useCallback((serviceId: string) => {
+    setSelectedServiceId(serviceId)
+    setOpenDetailsModal(true)
+    // Не используем navigate здесь, чтобы не перенаправлять пользователя на другую страницу
+    // при открытии модального окна с деталями
+  }, [])
 
   const handleCloseDetailsModal = useCallback(() => {
     setOpenDetailsModal(false)
-    navigate('/services', { replace: true })
-  }, [navigate])
+    setSelectedServiceId(null)
+    // Навигация обратно только если мы на странице деталей (с id в URL)
+    if (id) {
+      navigate('/admin?tab=services', { replace: true })
+    }
+  }, [navigate, id])
 
   const clearErrors = useCallback(() => {
     dispatch(clearServiceError())
@@ -78,6 +95,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
 
   const handleClose = () => {
     setOpen(false)
+    setSelectedService(null)
     clearErrors()
   }
 
@@ -100,6 +118,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
     services,
     service,
     selectedService,
+    selectedServiceId,
     open,
     confirmationOpen,
     openDetailsModal,
@@ -110,6 +129,7 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
     archiveOneService,
     handleOpen,
     handleClose,
+    handleOpenDetailsModal,
     handleCloseDetailsModal,
     handleConfirmationOpen,
     handleConfirmationClose,
