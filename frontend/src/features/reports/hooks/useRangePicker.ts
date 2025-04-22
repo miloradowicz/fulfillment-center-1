@@ -3,7 +3,7 @@ import { useAppDispatch } from '@/app/hooks.ts'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fetchClientReport, fetchTaskReport } from '@/store/thunks/reportThunk.ts'
 import { toast } from 'react-toastify'
-import useIMobile from '../utils/UseIMobile.ts'
+import useBreakpoint from '@/hooks/useBreakpoint.ts'
 
 export const useRangePicker = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
@@ -52,7 +52,7 @@ export const useRangePicker = () => {
     return [startOfMonth, endOfMonth]
   }
 
-  const isMobile = useIMobile()
+  const { isMobile } = useBreakpoint()
 
   const getCurrentYear = () => {
     const today = new Date()

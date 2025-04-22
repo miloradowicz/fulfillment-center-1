@@ -58,7 +58,7 @@ export default function ReportTabs() {
 
         <TabsContent value="tasks">
           {loadingTask ? (
-            <Grid sx={{ mt: 8, mb: 7, display: 'flex', justifyContent: 'center' }}>
+            <Grid className="mt-8 mb-7 flex justify-center">
               <Loader/>
             </Grid>
           ) : (

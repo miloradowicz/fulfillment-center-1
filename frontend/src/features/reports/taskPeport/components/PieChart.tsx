@@ -14,14 +14,13 @@ import { TaskSummaryProps } from '@/features/reports/utils/TypesProps.ts'
 import { usePieChart } from '@/features/reports/hooks/usePieChart.ts'
 import RenderInnerLabel from './RenderInnerLableForChart'
 
-
 export const TaskPieChart:React.FC<TaskSummaryProps>  = ({ tasks }) => {
 
   const {
     totalTasks,
     chartData,
     chartConfig,
-    isMobile,
+    isMobileSm,
   } = usePieChart({ tasks })
 
   return (
@@ -51,8 +50,8 @@ export const TaskPieChart:React.FC<TaskSummaryProps>  = ({ tasks }) => {
             </Pie>
             <Legend
               layout={'vertical'}
-              align={isMobile?'center':'right'}
-              verticalAlign={isMobile?'bottom':'middle'}
+              align={isMobileSm.isMobileSm?'center':'right'}
+              verticalAlign={isMobileSm.isMobileSm?'bottom':'middle'}
               iconType='circle'
             />
           </PieChart>

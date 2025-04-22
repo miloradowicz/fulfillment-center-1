@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { X, Search, ChevronDown } from 'lucide-react'
-import useIMobile from '../utils/UseIMobile'
+import useBreakpoint from '@/hooks/useBreakpoint.ts'
 
 type CommonDropdownItem = {
   _id: string
@@ -34,7 +34,7 @@ const Dropdown = <T extends CommonDropdownItem>({
 }: GenericDropdownProps<T>) => {
   const [search, setSearch] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<string>('Все')
-  const isMobile = useIMobile()
+  const { isMobile } = useBreakpoint()
 
   const clearSearch = () => setSearch('')
 

@@ -1,9 +1,9 @@
 import { TaskSummaryProps } from '../utils/TypesProps.ts'
 import { ChartConfig } from '@/components/ui/chart.tsx'
-import useIsMobile from '@/features/reports/utils/UseIMobile.ts'
+import useBreakpoint from '@/hooks/useBreakpoint.ts'
 
 export const usePieChart = ({ tasks }: TaskSummaryProps) => {
-  const isMobile = useIsMobile('sm')
+  const isMobileSm = useBreakpoint()
   const taskStats = tasks?.reduce(
     (acc, task) => {
       if (task.status === 'к выполнению') acc.toDo++
@@ -57,7 +57,7 @@ export const usePieChart = ({ tasks }: TaskSummaryProps) => {
   return {
     totalTasks,
     chartData,
-    isMobile,
+    isMobileSm,
     chartConfig,
   }
 }
