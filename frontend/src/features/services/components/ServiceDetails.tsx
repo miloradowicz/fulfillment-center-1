@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { selectLoadingFetchOneService, selectService } from '@/store/slices/serviceSlice.ts'
 import { fetchServiceById } from '@/store/thunks/serviceThunk.ts'
 import { Badge } from '@/components/ui/badge.tsx'
-import { Box, CircularProgress } from '@mui/material'
+import Loader from '@/components/Loader/Loader.tsx'
 
 interface Props {
   serviceId?: string
@@ -25,9 +25,9 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
 
   if (loading) {
     return (
-      <Box className="flex justify-center mt-4">
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center mt-4">
+        <Loader />
+      </div>
     )
   }
 
