@@ -9,7 +9,7 @@ const ClientReport = () => {
 
   return (
     <div className="w-full flex flex-col xl:flex-row xl:items-start xl:justify-between items-center gap-4 px-2">
-      <Card className="w-full lg:w-[40%]">
+      <Card className="w-auto">
         <DateRangePicker />
       </Card>
 

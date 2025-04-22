@@ -12,17 +12,11 @@ export const useRangePicker = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
 
-
-  useEffect(() => {
-    setStartDate(undefined)
-    setEndDate(undefined)
-  }, [tab])
-
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const startDateParam = searchParams.get('startDate')
     const endDateParam = searchParams.get('endDate')
-    const tabParam = searchParams.get('tab')
+    const tabParam = searchParams.get('tab') || 'tasks'
     setTab(tabParam)
 
     if (startDateParam && endDateParam) {
@@ -31,13 +25,17 @@ export const useRangePicker = () => {
       setStartDate(parsedStartDate)
       setEndDate(parsedEndDate)
 
-      if (tabParam === 'tasks' && startDateParam && endDateParam ) {
+      if (tabParam === 'tasks') {
         dispatch(fetchTaskReport({ startDate: startDateParam, endDate: endDateParam }))
-      } else if (tabParam === 'clients' && startDateParam && endDateParam ) {
+      } else if (tabParam === 'clients') {
         dispatch(fetchClientReport({ startDate: startDateParam, endDate: endDateParam }))
       }
+    } else {
+      setStartDate(undefined)
+      setEndDate(undefined)
     }
   }, [location.search, dispatch])
+
   const getCurrentWeek = () => {
     const today = new Date()
     const dayOfWeek = today.getDay()
