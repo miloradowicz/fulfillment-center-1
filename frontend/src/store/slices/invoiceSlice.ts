@@ -102,7 +102,6 @@ const invoicesSlice = createSlice({
       })
       .addCase(fetchInvoiceById.rejected, state => {
         state.loadingFetch = false
-
       })
 
       .addCase(createInvoices.pending, state => {
