@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { toast } from 'react-toastify'
 import { clearLoginError, selectLoginError, selectLoadingLoginUser } from '@/store/slices/authSlice.ts'
 import { loginUser } from '@/store/thunks/userThunk.ts'
-import { useNavigate } from 'react-router-dom'
 
 class UnauthorizedException extends Error {
   constructor(public message: string) {
@@ -26,7 +25,6 @@ const getErrorMessage = (error: unknown): string | undefined => {
 
 export const useLoginForm = () => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const sending = useAppSelector(selectLoadingLoginUser)
   const loginError = useAppSelector(selectLoginError)
@@ -48,7 +46,6 @@ export const useLoginForm = () => {
       setForm({ email: '', password: '' })
       setErrors({})
       dispatch(clearLoginError())
-      navigate('/clients')
       toast.success('Вы успешно вошли!')
     } catch (error) {
       const errorMessage = getErrorMessage(error)
