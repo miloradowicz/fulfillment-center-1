@@ -113,7 +113,7 @@ export class CreateOrderDto {
   @IsArray({ message: 'Заполните список логов.' }) // Это сообщение пользователь никогда не увидит, т.к. формирование массива происходит программно.
   @ValidateNested({ each: true })
   @Type(() => LogDto)
-  logs?: LogDto[] = undefined
+  logs?: LogDto[]
 
   @IsOptional()
   @IsArray({ message: 'Заполните список оказанных услуг.' })
