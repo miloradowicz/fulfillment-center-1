@@ -13,7 +13,7 @@ import StockDefectsPage from './StockDefectsPage.tsx'
 
 const tabs = [
   { value: 'products', label: 'Товары' },
-  { value: 'defects', label: 'Браки' },
+  { value: 'defects', label: 'Брак' },
 ]
 
 const StockDetails = () => {
