@@ -29,6 +29,7 @@ const useBreakpoint = () => {
 
   return {
     breakpoint: current,
+    isMobileSm:width < breakpoints.sm,
     isMobile: width < breakpoints.md,
     isTablet: width >= breakpoints.md && width < breakpoints.lg,
     isDesktop: width >= breakpoints.lg,

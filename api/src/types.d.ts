@@ -12,6 +12,7 @@ export interface UserTaskReport {
   user: {
     _id: string
     displayName: string
+    isArchived: boolean
   }
   taskCount: number
   tasks: {
@@ -29,6 +30,7 @@ export interface TaskInterface {
   user: {
     _id: Types.ObjectId
     displayName: string
+    isArchived: boolean
   }
   title: string
   date_ToDO: Date | null

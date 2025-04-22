@@ -16,12 +16,12 @@ const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
       {data.length === 0 ? null : (
         <>
           <h6
-            className="mx-auto w-[90%] sm:w-[80%] md:w-[95%] lg:w-[95%] xl:w-[95%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
+            className="mx-auto w-[80%] sm:w-[90%] md:w-[90%] lg:w-[80%] xl:w-[80%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
           >
           Ежедневная динамика общего количества задач за
           период с {startDate} по {endDate}
           </h6>
-          <Card>
+          <Card className="overflow-x-auto flex-grow min-w-[300px] max-w-[600px] w-full md:w-full mx-auto ">
             <CardContent>
               <ResponsiveContainer width="100%" height={containerHeight} style={{ margin: '20px 0', paddingBottom: '10px' }}>
                 <AreaChart data={chartData} margin={{ bottom: 10 }}>
@@ -39,7 +39,7 @@ const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
                     tickSize={10}
                     tickMargin={15}
                     height={30}
-                    interval={Math.ceil(data.length / 10)}
+                    interval="preserveStartEnd"
                   />
                   <YAxis
                     tickMargin={15}
