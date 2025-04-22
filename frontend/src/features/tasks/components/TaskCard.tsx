@@ -1,19 +1,15 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Pencil, Trash2, MoreHorizontal, Link2, Truck, ClipboardList, ListTodo } from 'lucide-react'
+import { ClipboardList, Link2, ListTodo, MoreHorizontal, Pencil, Trash2, Truck } from 'lucide-react'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { CSS } from '@dnd-kit/utilities'
 import React, { memo } from 'react'
 import { TaskCardProps } from '../hooks/TypesProps'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NavLink } from 'react-router-dom'
 import StatusCell from './StatusCell.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -160,12 +156,12 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
           <div className="flex flex-col gap-2">
             <p>{task.title}</p>
             {task.associated_arrival && (
-              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Поставка ${ task.associated_arrival.arrivalNumber }`}
               </NavLink>
             )}
             {task.associated_order && (
-              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Заказ ${ task.associated_order.orderNumber }`}
               </NavLink>
             )}

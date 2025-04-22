@@ -10,8 +10,8 @@ import Loader from '@/components/Loader/Loader.tsx'
 import { X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
-import TaskCard from './TaskCard.tsx'
 import { useState } from 'react'
+import LiteTaskCard from '@/features/tasks/components/LiteTaskCard.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 
 const TaskBoard = () => {
@@ -133,7 +133,7 @@ const TaskBoard = () => {
       )}
       {draggingTask ? (
         <DragOverlay>
-          <TaskCard task={draggingTask}  selectedUser={selectedUser} />
+          <LiteTaskCard task={draggingTask}  selectedUser={selectedUser} />
         </DragOverlay>
       ) : null}
     </DndContext>

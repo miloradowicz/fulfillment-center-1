@@ -1,29 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { IconButton, Stack, Tooltip, Menu, MenuItem, TextField, InputAdornment } from '@mui/material'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import SearchIcon from '@mui/icons-material/Search'
-import ClearIcon from '@mui/icons-material/Clear'
 import { UserStripped } from '@/types'
-import { useAppDispatch } from '@/app/hooks.ts'
-import {
-  fetchTasksByUserIdWithPopulate,
-  fetchTasksWithPopulate,
-} from '@/store/thunks/tasksThunk.ts'
+import { useAppDispatch } from '@/app/hooks'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk'
 import { UserListProps } from '../hooks/TypesProps'
-
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUser }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [searchTerm, setSearchTerm] = useState('')
   const dispatch = useAppDispatch()
+  const [searchTerm, setSearchTerm] = useState('')
   const [topUsers, setTopUsers] = useState<UserStripped[]>(users.slice(0, 4))
   const [remainingUsers, setRemainingUsers] = useState<UserStripped[]>(users.slice(4))
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+  const [open, setOpen] = useState(false)
 
   const handleUserClick = async (userId: string) => {
+    setOpen(false)
     if (selectedUser === userId) {
       setSelectedUser(null)
       await dispatch(fetchTasksWithPopulate())
@@ -31,6 +24,16 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
       setSelectedUser(userId)
       await dispatch(fetchTasksByUserIdWithPopulate(userId))
     }
+  }
+
+  const getInitialUsers = (name: string) => {
+    if (!name) return ''
+    const parts = name.trim().split(/\s+/)
+    if (parts.length === 1) {
+      return parts[0][0]?.toUpperCase() || ''
+    }
+    const initials = parts[0][0] + parts[1][0]
+    return initials.toUpperCase()
   }
 
   const user = remainingUsers.find(u => u._id === selectedUser)
@@ -52,125 +55,95 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
     }
   }, [user])
 
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
-
-  const clearSearch = () => {
-    setSearchTerm('')
-  }
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <div className="flex items-center">
       {topUsers.map(user => (
-        <Tooltip key={user._id} title={user.displayName}>
-          <IconButton
-            onClick={() => handleUserClick(user._id)}
-            sx={{
-              width: screenWidth < 1100 ? '60px' : '80px',
-              border: selectedUser === user._id ? '2px solid #75BDEC' : 'none',
-              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px',
-              fontSize: screenWidth < 1100 ? '14px' : '16px',
-              backgroundColor: selectedUser === user._id ? '#A2D2F2' : '#CFE8F8',
-              borderRadius: '8px',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: selectedUser === user._id ? '#1F91DC' : '#75BDEC',
-              },
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              display: 'inline-block',
-            }}
-          >
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                display: 'block',
-                maxWidth: '100%',
-              }}
+        <Tooltip key={user._id}>
+          <TooltipTrigger asChild>
+            <div
+              className={`relative h-[44px] w-[44px] -ml-2 first:ml-0 z-0 cursor-pointer
+                      hover:z-10 transition-transform duration-100
+                      ${ selectedUser === user._id ? 'z-10' : '' }`}
+              onClick={() => handleUserClick(user._id)}
             >
-              {user.displayName}
-            </span>
-          </IconButton>
+              <div
+                className={`w-full h-full flex items-center justify-center rounded-full bg-white
+                        ${ selectedUser === user._id
+          ? 'border-0'
+          : 'hover:border-2 hover:border-blue-500' }
+                      `}
+              >
+                <div
+                  className="flex items-center justify-center bg-blue-500 text-white text-[18px] rounded-full w-[85%] h-[85%] font-bold"
+                >
+                  {getInitialUsers(user.displayName)}
+                </div>
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <strong>{user.displayName}</strong>
+          </TooltipContent>
         </Tooltip>
       ))}
 
       {remainingUsers.length > 0 && (
-        <Tooltip title={`+${ remainingUsers.length } других пользователей`}>
-          <IconButton
-            onClick={handleMenuOpen}
-            sx={{
-              width: screenWidth < 1100 ? '50px' : '70px',
-              padding: screenWidth < 1100 ? '5px 10px' : '6px 12px',
-              fontSize: screenWidth < 1100 ? '15px' : '17px',
-              backgroundColor: '#CFE8F8',
-              borderRadius: '8px',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: '#75BDEC',
-              },
-            }}
-          >
-            +{remainingUsers.length} <ArrowDropDownIcon />
-          </IconButton>
-        </Tooltip>
+        <Popover open={open} onOpenChange={setOpen}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <div
+                  onClick={() => setOpen(!open)}
+                  className={`relative h-[44px] w-[44px] first:ml-0 z-0 cursor-pointer
+                      hover:z-10 transition-transform duration-100`}
+                >
+                  <div
+                    className="w-full h-full flex items-center justify-center rounded-full bg-white hover:border-2 hover:border-blue-500"
+                  >
+                    <div
+                      className="flex items-center justify-center bg-gray-200 text-gray-500 text-[18px] tracking-[-0.1em] rounded-full w-[85%] h-[85%]"
+                    >
+                      +{remainingUsers.length}
+                    </div>
+                  </div>
+                </div>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Выбрать пользователя
+            </TooltipContent>
+          </Tooltip>
+
+          <PopoverContent className="w-60 p-2">
+            <Command>
+              <CommandInput
+                placeholder="Поиск..."
+                value={searchTerm}
+                onValueChange={setSearchTerm}
+              />
+              <CommandList>
+                <ScrollArea className="h-[200px]">
+                  <CommandEmpty>Пользователи не найдены</CommandEmpty>
+                  {remainingUsers
+                    .filter(user =>
+                      user.displayName.toLowerCase().includes(searchTerm.toLowerCase()),
+                    )
+                    .map(user => (
+                      <CommandItem
+                        key={user._id}
+                        onSelect={() => handleUserClick(user._id)}
+                        className="cursor-pointer"
+                      >
+                        {user.displayName}
+                      </CommandItem>
+                    ))}
+                </ScrollArea>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       )}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem disableRipple>
-          <TextField
-            variant='standard'
-            placeholder="Поиск..."
-            value={searchTerm}
-            size={'small'}
-            sx={{ width:'170px' }}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setSearchTerm(e.target.value)
-            }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    {searchTerm ? (
-                      <IconButton onClick={clearSearch} size="small">
-                        <ClearIcon />
-                      </IconButton>
-                    ) : (
-                      <SearchIcon />
-                    )}
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </MenuItem>
-        {remainingUsers
-          .filter(user => user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
-          .map(user => (
-            <div key={user._id} onClick={() => handleUserClick(user._id)} style={{
-              padding: '8px 12px',
-              cursor: 'pointer',
-              borderRadius: '6px',
-              transition: 'background-color 0.2s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
-              {user.displayName}
-            </div>
-          ))}
-      </Menu>
-    </Stack>
+    </div>
   )
 }
 
