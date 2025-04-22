@@ -7,6 +7,8 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu'
 import DataTable from '@/components/DataTable/DataTable'
 import { Badge } from '@/components/ui/badge'
+import RegistrationForm from '@/features/users/components/RegistrationForm.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 
 const UsersDataList = () => {
   const {
@@ -16,6 +18,9 @@ const UsersDataList = () => {
     handleConfirmationClose,
     handleConfirmationArchive,
     handleOpen,
+    handleClose,
+    selectedUser,
+    open,
   } = useUserActions(true)
 
   const columns: ColumnDef<UserWithPopulate>[] = [
@@ -86,7 +91,7 @@ const UsersDataList = () => {
             row={tableUser}
             handleOpen={handleOpen}
             handleConfirmationOpen={handleConfirmationOpen}
-            showDetailsLink={true}
+            showDetailsLink={false}
             detailsPathPrefix="users"
           />
         )
@@ -105,6 +110,13 @@ const UsersDataList = () => {
         onConfirm={handleConfirmationArchive}
         onCancel={handleConfirmationClose}
       />
+
+      <Modal open={open} handleClose={handleClose}>
+        <RegistrationForm
+          onSuccess={handleClose}
+          initialFormData={selectedUser ?? undefined}
+        />
+      </Modal>
     </div>
   )
 }

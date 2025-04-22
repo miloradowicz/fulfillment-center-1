@@ -200,7 +200,7 @@ export interface User {
 export type UserStripped = Omit<User, 'token'>
 
 export type UserMutation = Omit<User, '_id' | 'token'> & {
-  password: string
+  password?: string
 }
 
 export type UserWithPopulate = Omit<User, 'token'> & {
@@ -217,6 +217,14 @@ export type UserRegistrationMutation = {
   password: string
   displayName: string
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+}
+
+export interface UserUpdateMutation {
+  _id: string
+  email: string
+  displayName: string
+  role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+  password?: string
 }
 
 export interface ErrorsFields {

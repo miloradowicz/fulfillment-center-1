@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '@/app/store'
-import { loginUser, logoutUser, registerUser } from '../thunks/userThunk'
+import { loginUser, logoutUser, registerUser, updateUser } from '../thunks/userThunk'
 import { User, ValidationError, GlobalError } from '@/types'
 
 interface AuthState {
@@ -95,6 +95,18 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, { payload: error }) => {
         state.loadingLogin = false
         state.error = error || null
+      })
+
+      .addCase(updateUser.pending, state => {
+        state.loadingRegister = true
+      })
+      .addCase(updateUser.fulfilled, state => {
+        state.loadingRegister = false
+        state.createError = null
+      })
+      .addCase(updateUser.rejected, (state, { payload: error }) => {
+        state.loadingRegister = false
+        state.createError = error || null
       })
   },
 })
