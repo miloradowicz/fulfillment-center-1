@@ -118,7 +118,6 @@ export interface Arrival {
   _id: string
   client: string
   products: ProductArrival[]
-  arrival_price?: number
   arrival_date: string
   sent_amount: string
   stock: string

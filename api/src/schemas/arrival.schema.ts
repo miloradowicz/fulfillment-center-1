@@ -41,9 +41,6 @@ export class Arrival {
     amount: number
   }[]
 
-  @Prop({ required: true })
-  arrival_price: number
-
   @Prop({
     type: String,
     enum: ['ожидается доставка', 'получена', 'отсортирована'],
