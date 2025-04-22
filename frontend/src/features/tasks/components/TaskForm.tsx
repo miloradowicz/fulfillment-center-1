@@ -1,18 +1,20 @@
-import { Autocomplete, Button, CircularProgress, TextField, Typography } from '@mui/material'
-import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
 import { getFieldError } from '@/utils/getFieldError.ts'
-import Grid from '@mui/material/Grid2'
 import { taskType } from '../state/taskState.ts'
 import useTaskForm from '../hooks/useTaskForm.ts'
 import React from 'react'
 import { TaskWithPopulate } from '@/types'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { Loader2 } from 'lucide-react'
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
 
 interface Props {
   onSuccess?: () => void
   initialData?: TaskWithPopulate
 }
 
-const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
+const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
   const {
     users,
     form,
@@ -26,137 +28,96 @@ const TaskForm:React.FC<Props> = ({ onSuccess, initialData }) => {
     handleSubmit,
     handleBlur,
     setForm,
+    activePopover,
+    setActivePopover,
   } = useTaskForm(onSuccess, initialData)
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Grid container direction="column" spacing={2}>
-        <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
-          { initialData? 'Редактировать данные задачи' : 'Добавить новую задачу'}
-        </Typography>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {initialData ? 'Редактировать задачу' : 'Добавить новую задачу'}
+      </h3>
 
-        <Grid>
-          <Autocomplete
-            id="user"
-            value={getAutocompleteItemName(users, 'displayName', '_id').find(option => option.id === form.user) || null}
-            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, user: newValue?.id || '' }))}
-            size="small"
-            fullWidth
-            disablePortal
-            options={getAutocompleteItemName(users, 'displayName', '_id')}
-            getOptionKey={option => option.id}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Пользователь"
-                error={Boolean(errors.user || getFieldError('user', error))}
-                helperText={errors.user || getFieldError('user', error)}
-                onBlur={e => handleBlur('user', e.target.value)}
-              />
-            )}
-          />
-        </Grid>
+      <CustomSelect
+        value={users?.find(u => u._id === form.user)?.displayName}
+        placeholder="Выберите пользователя"
+        options={users || []}
+        onSelect={userId => {
+          setForm(prev => ({ ...prev, user: userId }))
+          handleBlur('user', userId)
+        }}
+        popoverKey="user"
+        searchPlaceholder="Поиск пользователя..."
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        error={errors.user || getFieldError('user', error)}
+        renderValue={user => user.displayName}
+      />
 
-        <Grid>
-          <TextField
-            label="Название"
-            name="title"
-            value={form.title}
-            onChange={handleInputChange}
-            fullWidth
-            size="small"
-            error={Boolean(errors.title || getFieldError('title', error))}
-            helperText={errors.title || getFieldError('title', error)}
-            onBlur={e => handleBlur('title', e.target.value)}
-          />
-        </Grid>
+      <InputWithError
+        name="title"
+        placeholder="Название"
+        value={form.title}
+        onChange={handleInputChange}
+        error={errors.title || getFieldError('title', error)}
+        onBlur={e => handleBlur('title', e.target.value)}
+      />
 
-        <Grid>
-          <TextField
-            label="Описание задачи"
-            name="description"
-            value={form.description}
-            onChange={handleInputChange}
-            multiline
-            fullWidth
-            size="small"
-          />
-        </Grid>
+      <Textarea
+        name="description"
+        placeholder="Описание задачи"
+        value={form.description}
+        onChange={handleInputChange}
+        className="resize-y min-h-[40px] max-h-[200px]"
+      />
 
-        <Grid>
-          <Autocomplete
-            id="type"
-            value={ form.type && taskType.includes(form.type) ? form.type : null}
-            onChange={(_, newValue) => setForm(prevState => ({ ...prevState, type: newValue || '' }))}
-            size="small"
-            fullWidth
-            disablePortal
-            options={taskType}
-            sx={{ width: '100%' }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Тип задачи"
-                error={Boolean(errors.type || getFieldError('type', error))}
-                helperText={errors.type || getFieldError('type', error)}
-              />
-            )}
-          />
-        </Grid>
+      <CustomSelect
+        value={form.type || ''}
+        placeholder="Выберите тип"
+        options={taskType.map(t => ({ _id: t, name: t }))}
+        onSelect={type => setForm(prev => ({ ...prev, type }))}
+        popoverKey="type"
+        searchPlaceholder="Поиск типа задачи..."
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        error={errors.type || getFieldError('type', error)}
+        renderValue={item => item.name}
+      />
 
-        <Grid>
-          {form.type === 'заказ' && (
-            <Autocomplete
-              id="order"
-              value={getAutocompleteItemName(orders, 'orderNumber', '_id').find(option => option.id === form.associated_order) || null}
-              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_order: newValue?.id || '' }))}
-              size="small"
-              fullWidth
-              disablePortal
-              options={getAutocompleteItemName(orders, 'orderNumber', '_id')}
-              getOptionKey={option => option.id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Заказ"
-                  error={Boolean(errors.associated_order || getFieldError('associated_order', error))}
-                  helperText={errors.associated_order || getFieldError('associated_order', error)}
-                />
-              )}
-            />
-          )}
-        </Grid>
+      {form.type === 'заказ' && (
+        <CustomSelect
+          value={orders?.find(o => o._id === form.associated_order)?.orderNumber}
+          placeholder="Выберите заказ"
+          options={orders || []}
+          onSelect={orderId => setForm(prev => ({ ...prev, associated_order: orderId }))}
+          popoverKey="order"
+          searchPlaceholder="Поиск заказа..."
+          activePopover={activePopover}
+          setActivePopover={setActivePopover}
+          error={errors.associated_order || getFieldError('associated_order', error)}
+          renderValue={order => order.orderNumber ?? ''}
+        />
+      )}
 
-        <Grid>
-          {form.type === 'поставка' && (
-            <Autocomplete
-              id="arrival"
-              value={getAutocompleteItemName(arrivals, 'arrivalNumber', '_id').find(option => option.id === form.associated_arrival) || null}
-              onChange={(_, newValue) => setForm(prevState => ({ ...prevState, associated_arrival: newValue?.id || '' }))}
-              size="small"
-              fullWidth
-              disablePortal
-              options={getAutocompleteItemName(arrivals, 'arrivalNumber', '_id')}
-              getOptionKey={option => option.id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Поставка"
-                  error={Boolean(errors.associated_arrival || getFieldError('associated_arrival', error))}
-                  helperText={errors.associated_arrival || getFieldError('associated_arrival', error)}
-                />
-              )}
-            />
-          )}
-        </Grid>
+      {form.type === 'поставка' && (
+        <CustomSelect
+          value={arrivals?.find(a => a._id === form.associated_arrival)?.arrivalNumber}
+          placeholder="Выберите поставку"
+          options={arrivals || []}
+          onSelect={arrivalId => setForm(prev => ({ ...prev, associated_arrival: arrivalId }))}
+          popoverKey="arrival"
+          searchPlaceholder="Поиск поставки..."
+          activePopover={activePopover}
+          setActivePopover={setActivePopover}
+          error={errors.associated_arrival || getFieldError('associated_arrival', error)}
+          renderValue={arrival => arrival.arrivalNumber || ''}
+        />
+      )}
 
-        <Button type="submit" variant="contained" color="primary" sx={{ mb: 2 }}>
-          {initialData?
-            updateLoading ? <CircularProgress size={24} /> : ' Обновить задачу'
-            : addLoading ? <CircularProgress size={24} /> : ' Создать задачу'
-          }
-        </Button>
-      </Grid>
+      <Button type="submit" disabled={addLoading || updateLoading} className="w-full mt-3">
+        {initialData ? 'Сохранить' : 'Создать'}
+        {addLoading || updateLoading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+      </Button>
     </form>
   )
 }

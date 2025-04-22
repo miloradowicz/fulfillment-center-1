@@ -159,7 +159,7 @@ export class OrdersService {
     const previousStock = existingOrder.stock
     await this.undoStocking(existingOrder)
 
-    const updatedOrder = existingOrder.set(orderDto)
+    const updatedOrder = existingOrder.set({ ...new CreateOrderDto(), ...orderDto })
     const newStock = updatedOrder.stock
     await this.doStocking(updatedOrder)
 

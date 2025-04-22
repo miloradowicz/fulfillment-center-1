@@ -88,6 +88,12 @@ export type ProductOrderMutation = Omit<ProductOrder, 'product'> & {
   product: Product
 }
 
+export interface ServiceOrder {
+  service: string
+  service_amount: number
+  service_price: number
+}
+
 export interface ProductArrival {
   product: string
   description: string
@@ -161,6 +167,7 @@ export interface Order {
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
+  services?: ServiceArrival[]
   documents?: { document: string }[]
 }
 
@@ -227,18 +234,6 @@ export interface ErrorsFields {
   service?: string
   service_amount?: string
   service_price?: string
-}
-
-export interface ProductForOrderForm {
-  product: Product
-  description: string
-  amount: number
-}
-
-export interface DefectForOrderForm {
-  product: Product
-  defect_description: string
-  amount: number
 }
 
 export interface Task {

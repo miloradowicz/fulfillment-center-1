@@ -27,7 +27,7 @@ export class Service {
     ref: 'ServiceCategory',
     required: true,
   })
-  serviceCategory: mongoose.Schema.Types.ObjectId
+  serviceCategory: mongoose.Types.ObjectId
 
   @Prop({
     type: Number,
@@ -57,7 +57,7 @@ export class Service {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
 import TaskCard from './TaskCard.tsx'
 import { useState } from 'react'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 
 const TaskBoard = () => {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
@@ -106,12 +107,13 @@ const TaskBoard = () => {
               selectedUser={selectedUser}
               setSelectedUser={setSelectedUser}
             /> : null}
+
             <div className="flex flex-row items-center max-w-[700px] pr-5 mb-0 flex-grow">
               <div className="mx-3">
                 <Button variant="outline" onClick={clearAllFilters}>Сбросить фильтры</Button>
               </div>
               <div className="ml-auto">
-                <Button variant="outline" onClick={handleOpen}>Добавить задачу</Button>
+                <CustomButton text='Добавить задачу' onClick={handleOpen} />
               </div>
             </div>
           </div>

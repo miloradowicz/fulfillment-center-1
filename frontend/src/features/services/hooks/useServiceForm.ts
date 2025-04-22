@@ -54,6 +54,9 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
   const loading = useAppSelector(selectLoadingAddService)
   const dispatch = useAppDispatch()
 
+  const [inputValue, setInputValue] = useState('')
+  const [open, setOpen] = useState(false)
+
   useEffect(() => {
     dispatch(fetchServiceCategories())
     if (serviceId) {
@@ -267,6 +270,10 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     errors,
     createServiceError,
     createServiceCategoryError,
+    inputValue,
+    setInputValue,
+    open,
+    setOpen,
   }
 }
 

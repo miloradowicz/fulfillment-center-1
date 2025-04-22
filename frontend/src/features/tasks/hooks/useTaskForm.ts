@@ -12,10 +12,12 @@ import { SelectChangeEvent } from '@mui/material'
 import { fetchArrivals } from '@/store/thunks/arrivalThunk.ts'
 import { fetchOrders } from '@/store/thunks/orderThunk.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
+import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 
 const userSelectionError = 'Выберите пользователя'
 const titleMissingError =  'Введите название задачи'
 const taskTypeMissingError =  'Укажите тип задачи'
+const missingAssociatedNumber = (value: string) => toast.error(`Укажите номер ${ value }`)
 
 const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => {
   const dispatch = useAppDispatch()
@@ -27,6 +29,8 @@ const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => 
   const addLoading = useAppSelector(selectLoadingAddTask)
   const updateLoading = useAppSelector(selectLoadingUpdateTask)
   const error = useAppSelector(selectCreateError)
+
+  const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
   useEffect(() => {
     if (!users) {
@@ -61,6 +65,9 @@ const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => 
     if (!form.user) return toast.error(userSelectionError)
     if (!form.title) return toast.error(titleMissingError)
     if (!form.type) return toast.error(taskTypeMissingError)
+
+    if (form.type === 'поставка' && !form.associated_arrival) return missingAssociatedNumber('поставки')
+    if (form.type === 'заказ' && !form.associated_order) return missingAssociatedNumber('заказа')
 
     try {
       if (initialData) {
@@ -116,6 +123,8 @@ const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => 
     handleInputChange,
     handleBlur,
     setForm,
+    activePopover,
+    setActivePopover,
   }
 }
 
