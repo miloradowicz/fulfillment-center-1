@@ -33,7 +33,6 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
     dispatch(fetchServices())
   }, [dispatch])
 
-  // Обработка URL параметра id
   useEffect(() => {
     if (id) {
       dispatch(fetchServiceById(id))
@@ -50,14 +49,12 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
   const handleOpenDetailsModal = useCallback((serviceId: string) => {
     setSelectedServiceId(serviceId)
     setOpenDetailsModal(true)
-    // Не используем navigate здесь, чтобы не перенаправлять пользователя на другую страницу
-    // при открытии модального окна с деталями
+
   }, [])
 
   const handleCloseDetailsModal = useCallback(() => {
     setOpenDetailsModal(false)
     setSelectedServiceId(null)
-    // Навигация обратно только если мы на странице деталей (с id в URL)
     if (id) {
       navigate('/admin?tab=services', { replace: true })
     }
