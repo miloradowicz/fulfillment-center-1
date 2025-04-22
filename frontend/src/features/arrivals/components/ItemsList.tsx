@@ -1,7 +1,7 @@
 import { Defect, ProductArrival, ServiceArrival } from '@/types'
-import Grid from '@mui/material/Grid2'
-import { Button, Divider, Typography } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { Separator } from '@/components/ui/separator.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { Trash } from 'lucide-react'
 
 type Item = ProductArrival | Defect | ServiceArrival
 
@@ -27,66 +27,45 @@ const ItemsList = <T extends Item>({ items, onDelete, getNameById }: Props<T>) =
   return (
     <>
       {items.map((item, i) => (
-        <Grid
-          container
-          key={i}
-          spacing={2}
-          alignItems="center"
-          sx={{ marginBottom: '15px', marginTop: '15px' }}
-        >
-          <Grid container direction="column" spacing={2}>
-            <Grid style={{ textTransform: 'capitalize' }}>
-              <Typography fontWeight="bold">
-                {isDefect(item) || isProduct(item)
-                  ? getNameById?.(item.product)
-                  : isService(item)
-                    ? getNameById?.(item.service)
-                    : ''}
-              </Typography>
-            </Grid>
+        <div key={i} className="flex mb-5">
+          <div className="flex-col space-y-2">
+            <p className="font-bold text-sm">
+              {isDefect(item) || isProduct(item)
+                ? getNameById?.(item.product)
+                : isService(item)
+                  ? getNameById?.(item.service)
+                  : ''}
+            </p>
 
-            <Grid>
-              <Typography variant="body2">
-                {isDefect(item) || isProduct(item)
-                  ? `Количество: ${ item.amount }`
-                  : isService(item)
-                    ? `Количество: ${ item.service_amount }`
-                    : ''}
-              </Typography>
-            </Grid>
+            <p className="text-sm">
+              {isDefect(item) || isProduct(item)
+                ? `Количество: ${ item.amount }`
+                : isService(item)
+                  ? `Количество: ${ item.service_amount }`
+                  : ''}
+            </p>
 
             {isDefect(item) && (
-              <Grid>
-                <Typography variant="body2" color="error">
+              <p className="text-sm">
                   Дефект: {item.defect_description}
-                </Typography>
-              </Grid>
+              </p>
             )}
 
             {isService(item) && (
-              <Grid>
-                <Typography variant="body2">
-                  {item.service_price ? `Цена услуги: ${ item.service_price }` : null}
-                </Typography>
-              </Grid>
+              <p className="text-sm">
+                {item.service_price ? `Цена услуги: ${ item.service_price }` : null}
+              </p>
             )}
 
-            <Grid>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => onDelete(i)}
-                startIcon={<DeleteIcon />}
-              >
-                Удалить
+            <div>
+              <Button className="bg-destructive/20 text-destructive hover:bg-destructive/30" onClick={() => onDelete(i)}>
+                <Trash size={15}/>
               </Button>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
 
-          {items.length > 1 ? (
-            <Divider sx={{ width: '100%', marginTop: '15px' }} />
-          ) : null}
-        </Grid>
+          {items.length > 1 ? <Separator /> : null}
+        </div>
       ))}
     </>
   )
