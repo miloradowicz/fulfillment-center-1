@@ -67,21 +67,21 @@ export class OrdersService {
   }
 
   async doStocking(order: OrderDocument) {
-    if (order.status === 'в пути' || order.status === 'доставлен') {
+    if ((order.status === 'в пути' || order.status === 'доставлен') && order.products?.length) {
       await this.stockManipulationService.decreaseProductStock(order.stock, order.products)
     }
 
-    if (order.status === 'доставлен') {
+    if (order.status === 'доставлен' && order.defects?.length) {
       await this.stockManipulationService.increaseDefectStock(order.stock, order.defects)
     }
   }
 
   async undoStocking(order: OrderDocument) {
-    if (order.status === 'в пути' || order.status === 'доставлен') {
+    if ((order.status === 'в пути' || order.status === 'доставлен') && order.products?.length) {
       await this.stockManipulationService.increaseProductStock(order.stock, order.products)
     }
 
-    if (order.status === 'доставлен') {
+    if (order.status === 'доставлен' && order.defects?.length) {
       await this.stockManipulationService.decreaseDefectStock(order.stock, order.defects)
     }
   }
@@ -116,7 +116,7 @@ export class OrdersService {
       const newOrder = new this.orderModel({
         ...orderDto,
         documents,
-        orderNumber: `ORD-${sequenceNumber}`,
+        orderNumber: `ORD-${ sequenceNumber }`,
       })
 
       this.stockManipulationService.init()

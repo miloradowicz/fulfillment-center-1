@@ -108,12 +108,12 @@ export class ArrivalsService {
   async undoStocking(arrival: ArrivalDocument) {
     if (
       (arrival.arrival_status === 'получена' || arrival.arrival_status === 'отсортирована') &&
-      arrival.received_amount.length
+      arrival.received_amount?.length
     ) {
       await this.stockManipulationService.decreaseProductStock(arrival.stock, arrival.received_amount)
     }
 
-    if (arrival.arrival_status === 'отсортирована' && arrival.defects.length) {
+    if (arrival.arrival_status === 'отсортирована' && arrival.defects?.length) {
       await this.stockManipulationService.increaseProductStock(arrival.stock, arrival.defects)
       await this.stockManipulationService.decreaseDefectStock(arrival.stock, arrival.defects)
     }
@@ -151,7 +151,7 @@ export class ArrivalsService {
     const newArrival = await this.arrivalModel.create({
       ...arrivalDto,
       documents,
-      arrivalNumber: `ARL-${sequenceNumber}`,
+      arrivalNumber: `ARL-${ sequenceNumber }`,
     })
 
     if (
