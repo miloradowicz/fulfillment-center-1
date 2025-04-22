@@ -28,6 +28,7 @@ import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 import { useLocation } from 'react-router-dom'
 import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
 import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
+import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -46,7 +47,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       ? {
         client: initialData.client._id,
         arrival_date: dayjs(initialData.arrival_date).format('YYYY-MM-DD'),
-        arrival_price: initialData.arrival_price,
         sent_amount: initialData.sent_amount,
         stock: initialData.stock._id,
         shipping_agent: initialData.shipping_agent?._id || '',
@@ -61,16 +61,11 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       : { ...initialState },
   )
 
-  const handleRemoveFile = (indexToRemove:number) => {
+  const handleRemoveFile = (indexToRemove: number) => {
     setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
   }
-  const {
-    existingFiles,
-    handleRemoveExistingFile,
-    handleModalConfirm,
-    handleModalCancel,
-    openDeleteModal,
-  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
+  const { existingFiles, handleRemoveExistingFile, handleModalConfirm, handleModalCancel, openDeleteModal } =
+    useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
   const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
@@ -99,6 +94,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
   const [availableItem, setAvailableItem] = useState<Product[]>([])
   const [files, setFiles] = useState<File[]>([])
+  const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
   const [productsModalOpen, setProductsModalOpen] = useState(false)
   const [receivedModalOpen, setReceivedModalOpen] = useState(false)
@@ -216,7 +212,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
       arrival_date: !value ? ErrorMessagesList.ArrivalDate : ErrorMessagesList.Default,
       stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
-      arrival_price: Number(value) <= 0 ? ErrorMessagesList.ArrivalPrice : ErrorMessagesList.Default,
       service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
       service_amount: Number(value) <= 0 ? ErrorMessagesList.ServiceAmount : ErrorMessagesList.Default,
     }
@@ -289,7 +284,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         }
 
         toast.success('Поставка успешно обновлена!')
-
       } else {
         await dispatch(addArrival(updatedForm)).unwrap()
         toast.success('Поставка успешно создана!')
@@ -355,11 +349,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     availableItem,
     files,
     handleFileChange,
-    handleServiceChange,handleModalConfirm,
+    handleServiceChange,
+    handleModalConfirm,
     handleModalCancel,
     handleRemoveExistingFile,
     openDeleteModal,
     existingFiles,
     handleRemoveFile,
+    activePopover,
+    setActivePopover,
   }
 }
