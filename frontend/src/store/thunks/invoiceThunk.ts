@@ -45,11 +45,12 @@ export const createInvoices = createAsyncThunk<void, InvoiceMutation, { rejectVa
   },
 )
 
-export const archiveInvoice = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
+export const archiveInvoice = createAsyncThunk<{id:string}, string, { rejectValue: GlobalError }>(
   'invoices/archiveInvoice',
   async (invoiceId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/invoices/${ invoiceId }/archive`)
+      return { id: invoiceId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)
@@ -59,11 +60,12 @@ export const archiveInvoice = createAsyncThunk<void, string, { rejectValue: Glob
   },
 )
 
-export const unarchiveInvoice = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
+export const unarchiveInvoice = createAsyncThunk<{id:string}, string, { rejectValue: GlobalError }>(
   'invoice/ unarchiveInvoice',
   async (invoiceId, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/invoices/${ invoiceId }/unarchive`)
+      return { id: invoiceId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {
         return rejectWithValue(e.response.data as GlobalError)
