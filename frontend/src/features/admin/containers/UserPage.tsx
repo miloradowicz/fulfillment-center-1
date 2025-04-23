@@ -1,11 +1,10 @@
-import { Box, CircularProgress } from '@mui/material'
+import { Loader2, ContactRound } from 'lucide-react'
 import UsersDataList from '../components/UsersDataList.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import RegistrationForm from '../../users/components/RegistrationForm.tsx'
 import useUserActions from '../hooks/useUserActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
-import { ContactRound } from 'lucide-react'
 
 const UserPage = () => {
   const {
@@ -19,9 +18,9 @@ const UserPage = () => {
   return (
     <>
       {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
+        <div className="flex justify-center items-center my-10">
+          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
+        </div>
       )}
 
       <Modal handleClose={handleClose} open={open}>
@@ -33,14 +32,14 @@ const UserPage = () => {
         />
       </Modal>
 
-      <Box className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-end">
-        <CustomTitle text={'Сотрудники'} icon={<ContactRound size={25} />} />
-        <CustomButton text={'Добавить сотрудника'} onClick={handleOpen} />
-      </Box>
+      <div className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-between gap-4">
+        <CustomTitle text="Сотрудники" icon={<ContactRound size={25} />} />
+        <CustomButton text="Добавить сотрудника" onClick={handleOpen} />
+      </div>
 
-      <Box>
+      <div className="px-4">
         <UsersDataList />
-      </Box>
+      </div>
     </>
   )
 }

@@ -21,6 +21,7 @@ const ServicesDataList = () => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
+    handleOpenDetailsModal,
     openDetailsModal,
     handleCloseDetailsModal,
   } = useServiceActions(true)
@@ -81,6 +82,8 @@ const ServicesDataList = () => {
             handleConfirmationOpen={handleConfirmationOpen}
             showDetailsLink={true}
             detailsPathPrefix="services"
+            handleOpenDetailsModal={handleOpenDetailsModal}
+            useModalForDetails={true}
           />
         )
       },
@@ -100,7 +103,7 @@ const ServicesDataList = () => {
       />
 
       <Modal open={openDetailsModal} handleClose={handleCloseDetailsModal}>
-        <ServiceDetails />
+        <ServiceDetails serviceId={selectedService?._id} />
       </Modal>
 
       <Modal open={open} handleClose={handleClose}>

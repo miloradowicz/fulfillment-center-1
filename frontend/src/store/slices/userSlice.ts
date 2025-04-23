@@ -3,7 +3,6 @@ import { RootState } from '@/app/store'
 import {
   fetchUsers,
   fetchUserById,
-  updateUser,
   deleteUser,
   archiveUser,
   fetchArchivedUsers,
@@ -76,17 +75,6 @@ const userSlice = createSlice({
     })
     builder.addCase(fetchUserById.rejected, state => {
       state.loading = false
-    })
-
-    builder.addCase(updateUser.pending, state => {
-      state.loading = true
-    })
-    builder.addCase(updateUser.fulfilled, state => {
-      state.loading = false
-    })
-    builder.addCase(updateUser.rejected, (state, { payload }) => {
-      state.loading = false
-      state.error = payload || null
     })
 
     builder.addCase(deleteUser.pending, state => {

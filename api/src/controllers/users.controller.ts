@@ -35,7 +35,7 @@ export class UsersController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 
-    const { token, ...userData } = user.toObject()
+    const { token, password, ...userData } = user.toObject()
     return userData
   }
 
@@ -48,7 +48,7 @@ export class UsersController {
   @Get('me')
   getCurrentUser(@User() user: HydratedUser) {
     if (user) {
-      const { token, ...userData } = user.toObject()
+      const { token, password, ...userData } = user.toObject()
       return userData
     } else {
       throw new UnauthorizedException('Вход не выполнен.')

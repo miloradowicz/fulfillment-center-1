@@ -16,6 +16,8 @@ interface Props<T> {
   handleConfirmationOpen: (essenceId: string) => void
   showDetailsLink?: boolean
   detailsPathPrefix?: string
+  handleOpenDetailsModal?: (id: string) => void
+  useModalForDetails?: boolean
 }
 
 const TableActionsMenu = <T extends { _id: string }>({
@@ -24,6 +26,8 @@ const TableActionsMenu = <T extends { _id: string }>({
   handleConfirmationOpen,
   showDetailsLink = true,
   detailsPathPrefix,
+  handleOpenDetailsModal,
+  useModalForDetails = false,
 }: Props<T>) => {
   return (
     <DropdownMenu>
@@ -53,20 +57,35 @@ const TableActionsMenu = <T extends { _id: string }>({
 
         {showDetailsLink && detailsPathPrefix && (
           <DropdownMenuItem className="!bg-transparent px-1.5">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="text-primary bg-transparent transition-colors shadow-sm w-full"
-            >
-              <NavLink
-                to={`/${ detailsPathPrefix }/${ row._id }`}
-                className="inline-flex items-center content-center gap-0.5"
+            {useModalForDetails && handleOpenDetailsModal ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-primary bg-transparent transition-colors shadow-sm w-full"
+                onClick={() => handleOpenDetailsModal(row._id)}
               >
-                Подробнее
-                <ChevronRight size={20} className="stroke-primary" />
-              </NavLink>
-            </Button>
+                <span className="inline-flex items-center content-center gap-0.5">
+                  Подробнее
+                  <ChevronRight size={20} className="stroke-primary" />
+                </span>
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-primary bg-transparent transition-colors shadow-sm w-full"
+              >
+                <NavLink
+                  to={`/${ detailsPathPrefix }/${ row._id }`}
+                  className="inline-flex items-center content-center gap-0.5"
+                >
+                  Подробнее
+                  <ChevronRight size={20} className="stroke-primary" />
+                </NavLink>
+              </Button>
+            )}
           </DropdownMenuItem>
         )}
 

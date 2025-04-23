@@ -1,25 +1,25 @@
 import { Route, Routes } from 'react-router-dom'
-import ClientForm from './features/clients/components/ClientForm.tsx'
 import { createTheme, ThemeProvider, Typography } from '@mui/material'
+import { useAppSelector } from './app/hooks.ts'
+import { selectUser } from './store/slices/authSlice.ts'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import Layout from '@/layout/Layout.tsx'
+import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import LoginPage from './features/users/containers/LoginPage.tsx'
-import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
-import ProductPage from './features/products/containers/ProductPage.tsx'
+import ClientForm from './features/clients/components/ClientForm.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
-import ReportPage from './features/reports/containers/ReportPage.tsx'
-import OrderDetails from './features/orders/containers/OrderDetails.tsx'
-import OrderPage from './features/orders/containers/OrderPage.tsx'
 import ClientDetail from './features/clients/containers/ClientDetail.tsx'
-import TaskBoard from './features/tasks/components/TaskBoard.tsx'
-import ProductDetails from './features/products/containers/ProductDetails.tsx'
+import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
+import ProductPage from './features/products/containers/ProductPage.tsx'
+import ProductDetails from './features/products/containers/ProductDetails.tsx'
+import OrderPage from './features/orders/containers/OrderPage.tsx'
+import OrderDetails from './features/orders/containers/OrderDetails.tsx'
+import ReportPage from './features/reports/containers/ReportPage.tsx'
+import TaskBoard from './features/tasks/components/TaskBoard.tsx'
 import StockPage from './features/stocks/containers/StockPage.tsx'
 import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
-import { useAppSelector } from './app/hooks.ts'
-import { selectUser } from './store/slices/authSlice.ts'
-import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
-import { TooltipProvider } from '@/components/ui/tooltip'
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 import AdminPage from '@/features/admin/containers/AdminPage.tsx'
 
@@ -33,118 +33,49 @@ const App = () => {
   })
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <TooltipProvider>
-          <Layout>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute isAllowed={!!user}>
-                    <ClientPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/clients" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ClientPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/clients/:id" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ClientDetail />
-                </ProtectedRoute>
-              } />
-              <Route path="/arrivals" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ArrivalPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/arrivals/:arrivalId" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ArrivalDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/products" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ProductPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/products/:id" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ProductDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/orders" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <OrderPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/orders/:id" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <OrderDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ReportPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/tasks" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <TaskBoard />
-                </ProtectedRoute>
-              } />
-              <Route path="/tasks/:id" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <TaskBoard />
-                </ProtectedRoute>
-              } />
-              <Route path="/add-new-client" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ClientForm />
-                </ProtectedRoute>
-              } />
-              <Route path="/counterparties" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <CounterpartiesPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/stocks" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <StockPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/stocks/:stockId" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <StockDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/archives" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <ArchivePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin" element={
-                <ProtectedRoute isAllowed={!!user}>
-                  <AdminPage />
-                </ProtectedRoute>
-              } />
-              <Route
-                path="/*"
-                element={
-                  <Typography variant={'h3'} textAlign="center">
-                    Not Found
-                  </Typography>
-                }
-              />
-            </Routes>
-          </Layout>
-        </TooltipProvider>
-      </ThemeProvider>
-    </>
+    <ThemeProvider theme={theme}>
+      <TooltipProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+
+          <Route
+            element={
+              <ProtectedRoute isAllowed={!!user}>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/" element={<ClientPage />} />
+            <Route path="/clients" element={<ClientPage />} />
+            <Route path="/clients/:id" element={<ClientDetail />} />
+            <Route path="/arrivals" element={<ArrivalPage />} />
+            <Route path="/arrivals/:arrivalId" element={<ArrivalDetails />} />
+            <Route path="/products" element={<ProductPage />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/orders" element={<OrderPage />} />
+            <Route path="/orders/:id" element={<OrderDetails />} />
+            <Route path="/reports" element={<ReportPage />} />
+            <Route path="/tasks" element={<TaskBoard />} />
+            <Route path="/tasks/:id" element={<TaskBoard />} />
+            <Route path="/add-new-client" element={<ClientForm />} />
+            <Route path="/counterparties" element={<CounterpartiesPage />} />
+            <Route path="/stocks" element={<StockPage />} />
+            <Route path="/stocks/:stockId" element={<StockDetails />} />
+            <Route path="/archives" element={<ArchivePage />} />
+            <Route path="/admin" element={<AdminPage />} />
+
+            <Route
+              path="*"
+              element={
+                <Typography variant="h3" textAlign="center">
+                  Not Found
+                </Typography>
+              }
+            />
+          </Route>
+        </Routes>
+      </TooltipProvider>
+    </ThemeProvider>
   )
 }
 

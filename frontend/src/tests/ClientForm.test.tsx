@@ -55,7 +55,8 @@ describe('ClientForm', () => {
         banking_data: '',
         ogrn: '',
       },
-      loading: false,
+      loadingAdd: false,
+      loadingUpdate: false,
       inputChangeHandler: jest.fn(),
       onSubmit: jest.fn(),
       getFieldError: jest.fn(),
@@ -67,32 +68,23 @@ describe('ClientForm', () => {
       </Provider>,
     )
 
-    // Проверяем, что все поля формы присутствуют
-    expect(screen.getByLabelText(/ФИО \/ Название компании \*/i)).toBeTruthy()
-    expect(screen.getByLabelText(/Номер телефона \*/i)).toBeTruthy()
-    expect(screen.getByLabelText(/Эл. почта \*/i)).toBeTruthy()
-    expect(screen.getByLabelText(/ИНН \*/i)).toBeTruthy()
-    expect(screen.getByLabelText(/Адрес/i)).toBeTruthy()
-    expect(screen.getByLabelText(/Банковские реквизиты/i)).toBeTruthy()
-    expect(screen.getByLabelText(/ОГРН/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/ФИО \/ Название компании/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/Номер телефона/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/Эл. почта/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/ИНН/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/Адрес/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/Банковские реквизиты/i)).toBeTruthy()
+    expect(screen.getByPlaceholderText(/ОГРН/i)).toBeTruthy()
 
     expect(screen.getByText('Добавить нового клиента')).toBeTruthy()
-
-    expect(screen.getByText('Создать клиента')).toBeTruthy()
+    expect(screen.getByRole('button')).toHaveTextContent('Создать')
   })
 
   it('should render the form with client data when editing existing client', () => {
     (useClientForm as jest.Mock).mockReturnValue({
-      form: {
-        name: mockClient.name,
-        phone_number: mockClient.phone_number,
-        email: mockClient.email,
-        inn: mockClient.inn,
-        address: mockClient.address,
-        banking_data: mockClient.banking_data,
-        ogrn: mockClient.ogrn,
-      },
-      loading: false,
+      form: mockClient,
+      loadingAdd: false,
+      loadingUpdate: false,
       inputChangeHandler: jest.fn(),
       onSubmit: jest.fn(),
       getFieldError: jest.fn(),
@@ -105,24 +97,15 @@ describe('ClientForm', () => {
     )
 
     expect(screen.getByText('Редактировать клиента')).toBeTruthy()
+    expect(screen.getByPlaceholderText(/ФИО \/ Название компании/i)).toHaveValue(mockClient.name)
+    expect(screen.getByPlaceholderText(/Номер телефона/i)).toHaveValue(mockClient.phone_number)
+    expect(screen.getByPlaceholderText(/Эл. почта/i)).toHaveValue(mockClient.email)
+    expect(screen.getByPlaceholderText(/ИНН/i)).toHaveValue(mockClient.inn)
+    expect(screen.getByPlaceholderText(/Адрес/i)).toHaveValue(mockClient.address)
+    expect(screen.getByPlaceholderText(/Банковские реквизиты/i)).toHaveValue(mockClient.banking_data)
+    expect(screen.getByPlaceholderText(/ОГРН/i)).toHaveValue(mockClient.ogrn)
 
-    const nameInput = screen.getByLabelText(/ФИО \/ Название компании \*/i) as HTMLInputElement
-    const phoneInput = screen.getByLabelText(/Номер телефона \*/i) as HTMLInputElement
-    const emailInput = screen.getByLabelText(/Эл. почта \*/i) as HTMLInputElement
-    const innInput = screen.getByLabelText(/ИНН \*/i) as HTMLInputElement
-    const addressInput = screen.getByLabelText(/Адрес/i) as HTMLInputElement
-    const bankingInput = screen.getByLabelText(/Банковские реквизиты/i) as HTMLInputElement
-    const ogrnInput = screen.getByLabelText(/ОГРН/i) as HTMLInputElement
-
-    expect(nameInput.value).toBe(mockClient.name)
-    expect(phoneInput.value).toBe(mockClient.phone_number)
-    expect(emailInput.value).toBe(mockClient.email)
-    expect(innInput.value).toBe(mockClient.inn)
-    expect(addressInput.value).toBe(mockClient.address)
-    expect(bankingInput.value).toBe(mockClient.banking_data)
-    expect(ogrnInput.value).toBe(mockClient.ogrn)
-
-    expect(screen.getByText('Сохранить клиента')).toBeTruthy()
+    expect(screen.getByRole('button')).toHaveTextContent('Сохранить')
   })
 
   it('should call the submit function when the form is submitted', () => {
@@ -155,7 +138,9 @@ describe('ClientForm', () => {
     // Находим форму и отправляем её напрямую
     const form = container.querySelector('form')
     expect(form).not.toBeNull()
-    form && fireEvent.submit(form)
+    if (form) {
+      fireEvent.submit(form)
+    }
 
     // Проверяем, что обработчик отправки был вызван
     expect(mockOnSubmit).toHaveBeenCalledTimes(1)
@@ -187,7 +172,9 @@ describe('ClientForm', () => {
     // Находим форму и отправляем её напрямую
     const form = container.querySelector('form')
     expect(form).not.toBeNull()
-    form && fireEvent.submit(form)
+    if (form) {
+      fireEvent.submit(form)
+    }
 
     // Проверяем наличие сообщения об ошибке
     const errorMessage = screen.queryByText('Поле не может быть пустым')
@@ -226,25 +213,20 @@ describe('ClientForm', () => {
     // Находим форму и отправляем её напрямую
     const form = container.querySelector('form')
     expect(form).not.toBeNull()
-    form && fireEvent.submit(form)
+    if (form) {
+      fireEvent.submit(form)
+    }
 
     // Проверяем, что все обязательные поля показывают ошибки
     const errorMessages = screen.getAllByText('Поле не может быть пустым')
     expect(errorMessages.length).toBe(4)
   })
 
-  it('should display loading indicator when form is submitting', () => {
-    (useClientForm as jest.Mock).mockReturnValue({
-      form: {
-        name: 'Test Company',
-        phone_number: '+1234567890',
-        email: 'test@example.com',
-        inn: '1234567890',
-        address: '123 Street',
-        banking_data: 'Bank XYZ',
-        ogrn: '123456789',
-      },
-      loading: true,
+  it('should display loading indicator when form is submitting', async () => {
+    ;(useClientForm as jest.Mock).mockReturnValue({
+      form: mockClient,
+      loadingAdd: true,
+      loadingUpdate: false,
       inputChangeHandler: jest.fn(),
       onSubmit: jest.fn(),
       getFieldError: jest.fn(),
@@ -256,14 +238,13 @@ describe('ClientForm', () => {
       </Provider>,
     )
 
-    // Проверяем, что кнопка отключена
-    const submitButton = screen.getByRole('button', { name: '' }) as HTMLButtonElement
-    expect(submitButton.disabled).toBe(true)
+    const submitButton = screen.getByRole('button', { name: /создать|сохранить/i })
+    expect(submitButton).toBeDisabled()
 
-    // Проверяем, что отображается индикатор загрузки
-    const loadingIndicator = document.querySelector('.MuiCircularProgress-root')
-    expect(loadingIndicator).toBeTruthy()
+    const svgIcon = submitButton.querySelector('svg')
+    expect(svgIcon).toBeInTheDocument()
   })
+
 
   it('should call inputChangeHandler when input values change', () => {
     const mockInputChangeHandler = jest.fn()
@@ -289,11 +270,8 @@ describe('ClientForm', () => {
       </Provider>,
     )
 
-    // Создаем объект события для имитации изменения input
-    const nameInput = screen.getByLabelText(/ФИО \/ Название компании \*/i)
+    const nameInput = screen.getByPlaceholderText(/ФИО \/ Название компании/i)
     fireEvent.change(nameInput, { target: { name: 'name', value: 'Test Company' } })
-
-    // Проверяем, что обработчик был вызван хотя бы один раз
     expect(mockInputChangeHandler).toHaveBeenCalled()
   })
 
@@ -329,7 +307,10 @@ describe('ClientForm', () => {
     // Находим форму и отправляем её напрямую
     const form = container.querySelector('form')
     expect(form).not.toBeNull()
-    form && fireEvent.submit(form)
+
+    if (form) {
+      fireEvent.submit(form)
+    }
 
     // Проверяем, что onClose был вызван через onSubmit
     expect(mockOnClose).toHaveBeenCalledTimes(1)

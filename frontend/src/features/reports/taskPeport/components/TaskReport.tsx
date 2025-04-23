@@ -1,106 +1,70 @@
-import Grid from '@mui/material/Grid2'
-import { CircularProgress, Typography } from '@mui/material'
-import Box from '@mui/material/Box'
 import TaskCountAreaChart from './TaskCountChart.tsx'
 import DateRangePicker from '../../components/DateRangePicker.tsx'
-import TaskSummary from './TaskStateForReport.tsx'
 import { useTaskReport } from '../../hooks/useTaskReport.ts'
 import TaskReportDataList from '@/features/reports/taskPeport/components/TaskReportDataList.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
+import { TaskPieChart } from '@/features/reports/taskPeport/components/PieChart.tsx'
+import { Card } from '@/components/ui/card.tsx'
 
 const TaskReport = () => {
-
-  const { report,
+  const {
+    report,
     endDate,
     startDate,
     loadingReport,
     tasks,
-    loadingTasks } = useTaskReport()
+    loadingTasks,
+  } = useTaskReport()
 
   return (
-    <Box>
-      <Box display="flex" flexDirection="row" justifyContent="space-around" alignItems="center" gap={2} flexWrap={'wrap'} mb={3}>
-        <Box sx={{
-          flex: 1,
-          display:'flex',
-          justifyContent:'center',
-          minWidth: '500px',
-          maxWidth: '700px',
-          width: '100%',
-          '@media (max-width: 900px)': {
-            width: '100%',
-            minWidth: '100%',
-          },
-        }}>
+    <div>
+      <div className="flex flex-wrap justify-around items-center gap-2 mb-3">
+        <Card className="flex justify-around w-auto min-w-[320px] max-w-[500px] md:w-full ">
           <DateRangePicker />
-        </Box>
+        </Card>
         {loadingTasks ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
+          <div className="mt-3 mb-2 flex justify-center w-full">
+            <Loader />
+          </div>
         ) : (
-          <Box sx={{
-            flex: 1,
-            minWidth: '650px',
-            maxWidth:'650px',
-            width: '100%',
-            '@media (max-width: 900px)': {
-              width: '100%',
-              minWidth: '100%',
-            },
-          }}>
-            <TaskSummary tasks={tasks} />
-          </Box>
+          <TaskPieChart tasks={tasks}  />
         )}
-      </Box>
+      </div>
 
       {loadingReport ? (
-        <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Grid>
+        <div className="mt-3 mb-2 flex justify-center">
+          <Loader />
+        </div>
       ) : (
         report && report.userTaskReports && (
-          <>{!startDate || !endDate? <Typography variant={'h6'} textAlign={'center'} mt={3} sx={{ fontSize: { xs: '14px', sm: '16px' } }}>Период не выбран</Typography>:  <> {(report.userTaskReports.length === 0 && report.dailyTaskCounts.length === 0 ) ? (
-            <Typography variant={'h6'} textAlign={'center'} mt={3} mb={5} sx={{ fontSize: { xs: '14px', sm: '16px' },
-            }}>В выбранном периоде нет выполненных задач</Typography>
-          ) : (
-            <Box
-              display="flex"
-              alignItems="flex-start"
-              justifyContent="space-around"
-              flexWrap="wrap"
-              mt={2}
-            >
-              <Box sx={{
-                flex: 1,
-                minWidth: '500px',
-                maxWidth: '700px',
-                width: '100%',
-                '@media (max-width: 900px)': {
-                  width: '100%',
-                  minWidth: '100%',
-                },
-              }}>
-                <TaskCountAreaChart data={report.dailyTaskCounts} />
-              </Box>
-              <Box flexGrow={1}  sx={{
-                flex: 1,
-                marginLeft: '40px',
-                minWidth: '540px',
-                maxWidth: '600px',
-                width: '100%',
-                '@media (max-width: 900px)': {
-                  marginLeft:'0',
-                  width: '100%',
-                  minWidth: '100%',
-                },
-              }}>
-                <TaskReportDataList userTaskReports={report.userTaskReports} />
-              </Box>
-            </Box>
-          )}</> }
+          <>
+            {!startDate || !endDate ? (
+              <h6
+                className="text-center mt-5 text-sm sm:text-base"
+              >
+                Период не выбран
+              </h6>
+            ) : (
+              (report.userTaskReports.length === 0 && report.dailyTaskCounts.length === 0) ? (
+                <h6
+                  className="text-center mt-5 mb-5 text-sm sm:text-base"
+                >
+                  В выбранном периоде нет выполненных задач
+                </ h6>
+              ) : (
+                <div className="flex flex-wrap justify-around items-start mt-2">
+                  <div className="min-w-[320px] max-w-[700px] w-full md:w-full">
+                    <TaskCountAreaChart data={report.dailyTaskCounts} />
+                  </div>
+                  <TaskReportDataList userTaskReports={report.userTaskReports} />
+                </div>
+              )
+            )}
           </>
         )
       )}
-    </Box>)}
+    </div>
+  )
+}
 
 export default TaskReport

@@ -73,17 +73,17 @@ export const fetchUserById = createAsyncThunk<User, string>(
 export const updateUser = createAsyncThunk<
   void,
   { userId: string; data: UserMutation },
-  { rejectValue: GlobalError }
+  { rejectValue: ValidationError }
 >(
   'users/updateUser',
   async ({ userId, data }, { rejectWithValue }) => {
     try {
       await axiosAPI.put(`/users/${ userId }`, data)
-    } catch (e) {
-      if (isAxiosError(e) && e.response) {
-        return rejectWithValue(e.response.data as GlobalError)
+    } catch (error) {
+      if (isAxiosError(error) && error.response && error.response.status === 400) {
+        return rejectWithValue(error.response.data as ValidationError)
       }
-      throw e
+      throw error
     }
   },
 )
@@ -145,5 +145,3 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: GlobalErro
     }
   },
 )
-
-

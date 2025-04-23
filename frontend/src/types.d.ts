@@ -200,7 +200,7 @@ export interface User {
 export type UserStripped = Omit<User, 'token'>
 
 export type UserMutation = Omit<User, '_id' | 'token'> & {
-  password: string
+  password?: string
 }
 
 export type UserWithPopulate = Omit<User, 'token'> & {
@@ -217,6 +217,14 @@ export type UserRegistrationMutation = {
   password: string
   displayName: string
   role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+}
+
+export interface UserUpdateMutation {
+  _id: string
+  email: string
+  displayName: string
+  role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+  password?: string
 }
 
 export interface ErrorsFields {
@@ -324,6 +332,7 @@ export interface Stock {
   name: string
   address: string
   products?: ProductStockPopulate[]
+  defects?: ProductsStockPopulate[]
 }
 
 export interface StockPopulate {
@@ -354,6 +363,7 @@ export interface UserTaskReport {
   user: {
     _id: string;
     displayName: string;
+    isArchived: boolean
   };
   tasks: {
     _id: string
@@ -392,3 +402,27 @@ export interface ClientOrderReport {
 export interface ReportClientResponse {
   clientOrderReport: ClientOrderReport[];
 }
+export interface Invoice  {
+  _id: string
+    isArchived: boolean,
+    invoiceNumber: string,
+    client: Client,
+  services:
+    {
+      service: Service,
+      service_amount?: number,
+      service_price?: number,
+      _id: string
+    }[]
+    totalAmount?: number,
+    paid_amount?: number,
+    discount?: number,
+    status?: 'в ожидании' | 'оплачено' | 'частично оплачено',
+    associatedOrder?: string,
+    associatedArrival?:string,
+    logs: Log[],
+    createdAt:string,
+    updatedAt:string,
+}
+
+export type InvoiceMutation = Omit<Invoice, '_id, totalAmount, invoiceNumber, status, createdAt, updatedAt'>

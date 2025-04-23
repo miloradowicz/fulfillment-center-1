@@ -84,6 +84,25 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Пользователь не найден')
     }
+
+    if (userDto.email && userDto.email !== user.email) {
+      const existingUser = await this.userModel.findOne({ email: userDto.email }).exec()
+
+      if (existingUser && existingUser.id !== id) {
+        throw new HttpException({
+          type: 'ValidationError',
+          errors: {
+            email: {
+              name: 'DtoValidationError',
+              messages: [
+                'Пользователь с такой электронной почтой уже существует',
+              ],
+            },
+          },
+        }, HttpStatus.BAD_REQUEST)
+      }
+    }
+
     Object.assign(user, userDto)
     user.generateToken()
     await user.save()

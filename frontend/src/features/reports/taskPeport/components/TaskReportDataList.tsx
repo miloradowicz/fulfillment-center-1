@@ -24,6 +24,14 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
     {
       accessorKey: 'user.displayName',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Исполнитель" />,
+      cell: ({ row }) => (
+        <div className="text-sm">
+          {row.original.user.displayName}
+          {row.original.user.isArchived && (
+            <div className="text-muted-foreground text-xs">(в архиве)</div>
+          )}
+        </div>
+      ),
       enableColumnFilter: true,
       enableHiding: false,
     },
@@ -61,7 +69,7 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
   ]
 
   return (
-    <div className="max-w-[1000px] w-full mx-auto space-y-4">
+    <div className="overflow-x-auto flex-grow min-w-[340px] max-w-[600px] w-full md:w-full ">
       <h6
         className="mx-auto w-[90%] sm:w-[80%] md:w-[95%] lg:w-[95%] xl:w-[95%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
       >

@@ -20,3 +20,4 @@ export interface TaskSummaryProps {
 export interface PropsClientTable {
   clientOrderReport:  ClientOrderReport[]
 }
+
