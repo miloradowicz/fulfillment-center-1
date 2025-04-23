@@ -24,6 +24,11 @@ export class UsersService {
     if (!user) {
       throw new UnauthorizedException('Неверный email')
     }
+
+    if (user.isArchived) {
+      throw new ForbiddenException('Ваш аккаунт был деактивирован')
+    }
+
     const isMatch = await user.checkPassword(loginDto.password)
 
     if (!isMatch) {
