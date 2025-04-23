@@ -40,7 +40,9 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
     handleCancelDelete,
   } = UseTaskCard(task, selectedUser)
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task._id,
     data: {
       ...task,
@@ -52,8 +54,6 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
 
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
-    zIndex: isDragging ? 9999 : 'auto',
-    opacity: isDragging ? 0.9 : 1,
     touchAction: 'none',
   }
 
@@ -83,8 +83,6 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
       "
       style={{
         transform: style.transform,
-        zIndex: style.zIndex,
-        opacity: style.opacity,
       }}
       {...attributes}
       onClick={e => {
