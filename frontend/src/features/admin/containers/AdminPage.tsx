@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import UserPage from './UserPage'
 import { Settings } from 'lucide-react'
 import ServicesPage from '@/features/services/containers/ServicesPage.tsx'
+import InvoicesPage from '@/features/invoices/containers/InvoicesPage.tsx'
 
 const tabs = [
   { value: 'users', label: 'Сотрудники' },
@@ -31,7 +32,7 @@ const AdminPage = () => {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="data-[state=active]:bg-primary data-[state=active]:text-white px-4 py-2 text-sm sm:text-base rounded-xl transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-4 py-2 text-sm sm:text-base rounded-xl transition-all cursor-pointer"
               >
                 {tab.label}
               </TabsTrigger>
@@ -48,7 +49,7 @@ const AdminPage = () => {
           <ServicesPage />
         </TabsContent>
         <TabsContent value="invoices">
-          <div>Счета на оплату</div>
+          <InvoicesPage/>
         </TabsContent>
       </Tabs>
     </div>

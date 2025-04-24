@@ -687,7 +687,8 @@ export class SeederService {
         associatedOrder: _order1._id,
         client: _client1._id,
         totalAmount: 306000,
-        status: 'в ожидании',
+        paid_amount: 306000,
+        status: 'оплачено',
         services: [
           {
             service: _service3._id,
@@ -706,7 +707,9 @@ export class SeederService {
         associatedArrival: _arrival2._id,
         client: _client1._id,
         totalAmount: 66000,
-        status: 'оплачено',
+        paid_amount: 20000,
+        status: 'частично оплачено',
+        discount: 10,
         services: [
           {
             service: _service1._id,
@@ -720,9 +723,70 @@ export class SeederService {
           },
         ],
       },
+      {
+        invoiceNumber: 'INV-3',
+        associatedArrival: _arrival3._id,
+        client: _client1._id,
+        totalAmount: 66000,
+        paid_amount: 0,
+        status: 'в ожидании',
+        services: [
+          {
+            service: _service1._id,
+            service_price: 2000,
+            service_amount: 3,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 2,
+          },
+        ],
+      },
+      {
+        invoiceNumber: 'INV-4',
+        associatedOrder: _order1._id,
+        client: _client1._id,
+        totalAmount: 206000,
+        paid_amount: 66000,
+        status: 'частично оплачено',
+        services: [
+          {
+            service: _service1._id,
+            service_price: 2000,
+            service_amount: 3,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 2,
+          },
+        ],
+      },
+      {
+        invoiceNumber: 'INV-5',
+        associatedArrival: _arrival1._id,
+        client: _client1._id,
+        totalAmount: 66000,
+        paid_amount: 10000,
+        discount: 20,
+        status: 'частично оплачено',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 2000,
+            service_amount: 3,
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 2,
+          },
+        ],
+      },
     ])
 
     await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 13 } }, { upsert: true })
-    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 2 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 5 } }, { upsert: true })
   }
 }

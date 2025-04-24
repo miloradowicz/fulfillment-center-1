@@ -7,11 +7,11 @@ import { useEffect } from 'react'
 
 
 const images = [
-  'public/login/illustration-1.jpg',
-  'public/login/illustration-2.jpg',
-  'public/login/illustration-3.jpg',
-  'public/login/illustration-4.jpg',
-  'public/login/illustration-5.jpg',
+  '/login/illustration-1.jpg',
+  '/login/illustration-2.jpg',
+  '/login/illustration-3.jpg',
+  '/login/illustration-4.jpg',
+  '/login/illustration-5.jpg',
 ]
 
 export default function LoginPage() {
