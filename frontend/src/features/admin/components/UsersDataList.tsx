@@ -63,10 +63,17 @@ const UsersDataList = () => {
       },
       cell: ({ row }) => {
         const role = row.original.role
-        const variant = role === 'super-admin' ? 'destructive' :
-          role === 'admin' ? 'default' : 'secondary'
+        const variant =
+          role === 'super-admin' ? 'destructive'
+            : role === 'admin' ? 'default'
+              : role === 'stock-worker' ? 'secondary'
+                : undefined
+
         return (
-          <Badge variant={variant}>
+          <Badge
+            variant={variant}
+            className={role === 'manager' ? 'bg-gray-500 text-white hover:bg-gray-700' : undefined}
+          >
             {role === 'super-admin' && 'Супер-админ'}
             {role === 'admin' && 'Администратор'}
             {role === 'manager' && 'Менеджер'}
