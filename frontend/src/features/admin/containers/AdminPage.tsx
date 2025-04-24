@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import UserPage from './UserPage'
 import { Settings } from 'lucide-react'
 import ServicesPage from '@/features/services/containers/ServicesPage.tsx'
+import InvoicesPage from '@/features/invoices/containers/InvoicesPage.tsx'
 
 const tabs = [
   { value: 'users', label: 'Сотрудники' },
@@ -48,7 +49,7 @@ const AdminPage = () => {
           <ServicesPage />
         </TabsContent>
         <TabsContent value="invoices">
-          <div>Счета на оплату</div>
+          <InvoicesPage/>
         </TabsContent>
       </Tabs>
     </div>
