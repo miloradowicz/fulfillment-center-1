@@ -1,14 +1,10 @@
-import { TextField } from '@mui/material'
-import Autocomplete from '@mui/material/Autocomplete'
-import ItemsList from './ItemsList.tsx'
 import { useArrivalForm } from '../hooks/useArrivalForm.ts'
-import { Defect, ProductArrival } from '@/types'
+import { Defect, ProductArrival, ServiceArrival } from '@/types'
 import { initialItemState, initialServiceState } from '../state/arrivalState.ts'
 import { getFieldError } from '@/utils/getFieldError.ts'
 import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 import React from 'react'
 import { getArrayItemNameById } from '@/utils/getArrayItemName.ts'
-import { getAutocompleteItemName } from '@/utils/getAutocompleteItemName.ts'
 import { ItemType } from '@/constants.ts'
 import { ArrivalData } from '../utils/arrivalTypes.ts'
 import { Button } from '@/components/ui/button.tsx'
@@ -22,6 +18,7 @@ import { Label } from '@/components/ui/label.tsx'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { cn } from '@/lib/utils.ts'
+import FormAccordion from '@/components/FormAccordion/FormAccordion.tsx'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -137,14 +134,16 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           renderValue={shipping_agent => shipping_agent.name}
         />
 
-        <Label htmlFor="pickup_location">Адрес доставки</Label>
-        <Input
-          id="pickup_location"
-          name="pickup_location"
-          placeholder="Адрес доставки"
-          value={form.pickup_location}
-          onChange={e => inputChangeHandler(e, setForm)}
-        />
+        <div className="space-y-2.5">
+          <Label htmlFor="pickup_location">Адрес доставки</Label>
+          <Input
+            id="pickup_location"
+            name="pickup_location"
+            placeholder="Адрес доставки"
+            value={form.pickup_location}
+            onChange={e => inputChangeHandler(e, setForm)}
+          />
+        </div>
 
         <CustomSelect
           label="Статус доставки"
@@ -173,19 +172,27 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           className="w-full"
         />
 
-        <Label htmlFor="sent_amount">Количество отправленного товара</Label>
-        <Input
-          id="sent_amount"
-          name="sent_amount"
-          placeholder="Шт/мешков/коробов"
-          value={form.sent_amount}
-          onChange={e => inputChangeHandler(e, setForm)}
-        />
+        <div className="space-y-2.5">
+          <Label htmlFor="sent_amount">Количество отправленного товара</Label>
+          <Input
+            id="sent_amount"
+            name="sent_amount"
+            placeholder="Шт/мешков/коробов"
+            value={form.sent_amount}
+            onChange={e => inputChangeHandler(e, setForm)}
+          />
+        </div>
 
-        <Separator/>
+        <Separator />
 
-        <h6 className="font-bold text-center">Товары</h6>
         <div>
+          <FormAccordion<ProductArrival>
+            title="Отправленные товары"
+            items={productsForm}
+            onDelete={i => deleteItem(i, setProductsForm)}
+            getNameById={i => getArrayItemNameById(products, i)}
+          />
+
           <Button
             type="button"
             variant="outline"
@@ -194,37 +201,29 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           >
             <Plus size={17} /> Отправленные
           </Button>
-          <ItemsList<ProductArrival>
-            items={productsForm}
-            onDelete={i => deleteItem(i, setProductsForm)}
-            getNameById={i => getArrayItemNameById(products, i)}
-          />
         </div>
 
         {productsModalOpen && (
-          <div>
-            <Autocomplete
-              fullWidth
-              size="small"
-              disablePortal
-              options={products ?? []}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setNewItem(prev => ({ ...prev, product: newValue._id }))
-                }
+          <div className="space-y-2.5">
+            <CustomSelect
+              label="Товар"
+              value={
+                products?.find(p => p._id === newItem.product) &&
+                `${ products.find(p => p._id === newItem.product)!.title }. Артикул: ${ products.find(p => p._id === newItem.product)!.article }`
+              }
+              placeholder="Выберите товар"
+              options={products || []}
+              onSelect={productId => {
+                setNewItem(prev => ({ ...prev, product: productId }))
+                handleBlur('product', productId)
               }}
-              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
-              isOptionEqualToValue={(option, value) => option._id === value._id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Товар"
-                  error={Boolean(errors.product || getFieldError('product', error))}
-                  helperText={errors.product || getFieldError('product', error)}
-                  onBlur={e => handleBlur('product', e.target.value)}
-                />
-              )}
-              sx={{ marginBottom: '15px' }}
+              popoverKey="product"
+              searchPlaceholder="Поиск товара..."
+              activePopover={activePopover}
+              setActivePopover={setActivePopover}
+              error={errors.product || getFieldError('product', error)}
+              onBlur={e => handleBlur('product', e.target.value)}
+              renderValue={product => `${ product.title }. Артикул: ${ product.article }`}
             />
 
             <Label htmlFor="amount">Количество</Label>
@@ -267,7 +266,14 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
         <Separator />
 
-        <div className="space-y-2.5">
+        <div>
+          <FormAccordion<ProductArrival>
+            title="Полученные товары"
+            items={receivedForm}
+            onDelete={i => deleteItem(i, setReceivedForm)}
+            getNameById={i => getArrayItemNameById(products, i)}
+          />
+
           <Button
             type="button"
             variant="outline"
@@ -276,38 +282,29 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           >
             <Plus size={17} /> Полученные
           </Button>
-
-          <ItemsList<ProductArrival>
-            items={receivedForm}
-            onDelete={i => deleteItem(i, setReceivedForm)}
-            getNameById={i => getArrayItemNameById(products, i)}
-          />
         </div>
 
         {receivedModalOpen && (
           <div className="space-y-2.5">
-            <Autocomplete
-              fullWidth
-              size="small"
-              disablePortal
-              options={availableItem ?? []}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setNewItem(prev => ({ ...prev, product: newValue._id }))
-                }
+            <CustomSelect
+              label="Товар"
+              value={
+                products?.find(p => p._id === newItem.product) &&
+                `${ products.find(p => p._id === newItem.product)!.title }. Артикул: ${ products.find(p => p._id === newItem.product)!.article }`
+              }
+              placeholder="Выберите товар"
+              options={availableItem || []}
+              onSelect={productId => {
+                setNewItem(prev => ({ ...prev, product: productId }))
+                handleBlur('product', productId)
               }}
-              getOptionLabel={option => `${ option.title }. Артикул: ${ option.article }`}
-              isOptionEqualToValue={(option, value) => option._id === value._id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Товар"
-                  error={Boolean(errors.product || getFieldError('product', error))}
-                  helperText={errors.product || getFieldError('product', error)}
-                  onBlur={e => handleBlur('product', e.target.value)}
-                />
-              )}
-              sx={{ marginBottom: '15px' }}
+              popoverKey="product"
+              searchPlaceholder="Поиск товара..."
+              activePopover={activePopover}
+              setActivePopover={setActivePopover}
+              error={errors.product || getFieldError('product', error)}
+              onBlur={e => handleBlur('product', e.target.value)}
+              renderValue={product => `${ product.title }. Артикул: ${ product.article }`}
             />
 
             <Label htmlFor="amount">Количество</Label>
@@ -348,30 +345,48 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </div>
         )}
 
-        <Separator/>
+        <Separator />
 
         <div>
+          <FormAccordion<Defect>
+            title="Дефектные товары"
+            items={defectsForm}
+            onDelete={i => deleteItem(i, setDefectForm)}
+            getNameById={i => getArrayItemNameById(products, i)}
+          />
+
           <Button
             type="button"
             variant="outline"
             onClick={() => openModal(ItemType.DEFECTS, initialItemState)}
             className={cn(defectsModalOpen && 'hidden')}
           >
-            <Plus size={17}/> Дефекты
+            <Plus size={17} /> Дефекты
           </Button>
-
-          <ItemsList<Defect>
-            items={defectsForm}
-            onDelete={i => deleteItem(i, setDefectForm)}
-            getNameById={i => getArrayItemNameById(products, i)}
-          />
-
         </div>
 
         {defectsModalOpen && (
           <div className="space-y-2.5">
-
-
+            <CustomSelect
+              label="Дефектный товар"
+              value={
+                products?.find(p => p._id === newItem.product) &&
+                `${ products.find(p => p._id === newItem.product)!.title }. Артикул: ${ products.find(p => p._id === newItem.product)!.article }`
+              }
+              placeholder="Выберите товар"
+              options={availableItem || []}
+              onSelect={productId => {
+                setNewItem(prev => ({ ...prev, product: productId }))
+                handleBlur('product', productId)
+              }}
+              popoverKey="product"
+              searchPlaceholder="Поиск товара..."
+              activePopover={activePopover}
+              setActivePopover={setActivePopover}
+              error={errors.product || getFieldError('product', error)}
+              onBlur={e => handleBlur('product', e.target.value)}
+              renderValue={product => `${ product.title }. Артикул: ${ product.article }`}
+            />
 
             <Label htmlFor="amount">Количество</Label>
             <InputWithError
@@ -413,12 +428,11 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </div>
         )}
 
-        <Separator/>
+        <Separator />
 
-        <div className="space-y-2.5">
-          <h6 className="text-start font-bold">Услуги</h6>
-
-          <ItemsList
+        <div>
+          <FormAccordion<ServiceArrival>
+            title="Услуги"
             items={servicesForm}
             onDelete={i => deleteItem(i, setServicesForm)}
             getNameById={i => getArrayItemNameById(services, i, true)}
@@ -430,34 +444,28 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             onClick={() => openModal(ItemType.SERVICES, initialServiceState)}
             className={cn(servicesModalOpen && 'hidden')}
           >
-            <Plus size={17}/> Услуги
+            <Plus size={17} /> Услуги
           </Button>
         </div>
 
         {servicesModalOpen && (
           <div className="space-y-2.5">
-            <Autocomplete
-              fullWidth
-              size="small"
-              disablePortal
-              options={getAutocompleteItemName(services, 'name', '_id')}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setNewService(prev => ({ ...prev, service: newValue.id }))
-                }
+            <CustomSelect
+              label="Услуга"
+              value={services?.find(s => s._id === newService.service)?.name}
+              placeholder="Выберите услугу"
+              options={services || []}
+              onSelect={serviceId => {
+                setNewService(prev => ({ ...prev, service: serviceId }))
+                handleBlur('service', serviceId)
               }}
-              getOptionLabel={option => `${ option.label }`}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Услуга"
-                  error={Boolean(errors.service || getFieldError('service', error))}
-                  helperText={errors.service || getFieldError('service', error)}
-                  onBlur={e => handleBlur('service', e.target.value)}
-                />
-              )}
-              sx={{ marginBottom: '15px' }}
+              popoverKey="service"
+              searchPlaceholder="Поиск услуги..."
+              activePopover={activePopover}
+              setActivePopover={setActivePopover}
+              error={errors.service || getFieldError('service', error)}
+              onBlur={e => handleBlur('service', e.target.value)}
+              renderValue={service => service.name}
             />
 
             <Label htmlFor="service_amount">Количество</Label>
@@ -472,7 +480,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               onBlur={e => handleBlur('service_amount', e.target.value)}
             />
 
-            <Label htmlFor="service_price">Цена</Label>
+            <Label htmlFor="service_price">Цена (за 1)</Label>
             <InputWithError
               id="service_price"
               type="number"
@@ -509,7 +517,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           </div>
         )}
 
-        <Separator/>
+        <Separator />
 
         <FileAttachments
           existingFiles={existingFiles}
