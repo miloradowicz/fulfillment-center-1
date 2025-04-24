@@ -35,6 +35,7 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
     },
     {
       accessorKey: 'invoiceNumber',
+      enableHiding: false,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Номер счета" />,
       cell: ({ row }) => {
         const invoice = row.original
