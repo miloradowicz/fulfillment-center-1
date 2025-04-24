@@ -17,6 +17,7 @@ export type PopoverType =
   | 'services'
   | 'arrival_status'
   | 'product'
+  | 'service'
   | null
 
 interface CustomSelectProps<T> {
