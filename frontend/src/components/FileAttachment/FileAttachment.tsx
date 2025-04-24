@@ -54,7 +54,10 @@ const FileAttachments: React.FC<FileAttachmentsProps> = ({
                         <Button
                           variant="ghost"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => onRemoveExistingFile(index)}
+                          onClick={e => {
+                            e.preventDefault()
+                            onRemoveExistingFile(index)
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -76,7 +79,10 @@ const FileAttachments: React.FC<FileAttachmentsProps> = ({
                         <Button
                           variant="ghost"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => onRemoveFile(index)}
+                          onClick={e => {
+                            e.preventDefault()
+                            onRemoveFile(index)
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
