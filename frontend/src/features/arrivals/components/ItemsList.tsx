@@ -1,7 +1,6 @@
-import { Defect, ProductArrival, ServiceArrival } from '@/types'
-import { Separator } from '@/components/ui/separator.tsx'
+import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
 import { Button } from '@/components/ui/button.tsx'
-import { Trash } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 
 type Item = ProductArrival | Defect | ServiceArrival
 
@@ -15,60 +14,57 @@ function isDefect(item: Item): item is Defect {
   return 'product' in item && 'defect_description' in item
 }
 
-function isProduct(item: Item): item is ProductArrival {
+function isProduct(item: Item): item is ProductArrival | ProductOrder {
   return 'product' in item && 'description' in item
 }
 
-function isService(item: Item): item is ServiceArrival {
+function isService(item: Item): item is ServiceArrival | ServiceOrder {
   return 'service' in item
 }
 
 const ItemsList = <T extends Item>({ items, onDelete, getNameById }: Props<T>) => {
+  const getItemText = (item: Item) => {
+    let mainText = ''
+    let amountText = ''
+    let servicePrice = ''
+
+    if (isDefect(item) || isProduct(item)) {
+      mainText = getNameById?.(item.product) || ''
+      amountText = `x ${ item.amount }`
+    } else if (isService(item)) {
+      mainText = getNameById?.(item.service) || ''
+      amountText = `x ${ item.service_amount }`
+      servicePrice = `${ item.service_price }`
+    }
+
+    return { mainText, amountText, servicePrice }
+  }
+
   return (
-    <>
-      {items.map((item, i) => (
-        <div key={i} className="flex mb-5">
-          <div className="flex-col space-y-2">
-            <p className="font-bold text-sm">
-              {isDefect(item) || isProduct(item)
-                ? getNameById?.(item.product)
-                : isService(item)
-                  ? getNameById?.(item.service)
-                  : ''}
-            </p>
+    <div className="space-y-2">
+      {items.map((item, i) => {
+        const { mainText, amountText, servicePrice } = getItemText(item)
 
-            <p className="text-sm">
-              {isDefect(item) || isProduct(item)
-                ? `Количество: ${ item.amount }`
-                : isService(item)
-                  ? `Количество: ${ item.service_amount }`
-                  : ''}
-            </p>
-
-            {isDefect(item) && (
-              <p className="text-sm">
-                  Дефект: {item.defect_description}
-              </p>
-            )}
-
-            {isService(item) && (
-              <p className="text-sm">
-                {item.service_price ? `Цена услуги: ${ item.service_price }` : null}
-              </p>
-            )}
-
-            <div>
-              <Button className="bg-destructive/20 text-destructive hover:bg-destructive/30" onClick={() => onDelete(i)}>
-                <Trash size={15}/>
-              </Button>
+        return (
+          <div key={i} className="flex items-center justify-between gap-2">
+            <div className="flex-1 flex items-center justify-between gap-2 p-2 border rounded-md bg-muted shadow-sm min-w-0">
+              <span className="font-semibold text-sm truncate">{mainText}{servicePrice && `, ${ servicePrice }`}</span>
+              <span className="text-sm font-bold whitespace-nowrap">{amountText}</span>
             </div>
-          </div>
 
-          {items.length > 1 ? <Separator /> : null}
-        </div>
-      ))}
-    </>
+            <Button
+              variant="ghost"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onDelete(i)}
+            >
+              <Trash2 size={15} />
+            </Button>
+          </div>
+        )
+      })}
+    </div>
   )
+
 }
 
 export default ItemsList
