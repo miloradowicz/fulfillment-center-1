@@ -7,12 +7,12 @@ import TaskDetails from '@/features/tasks/components/TaskDetails.tsx'
 import UserList from './UserList'
 import Modal from '@/components/Modal/Modal.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { X, Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
-import LiteTaskCard from '@/features/tasks/components/LiteTaskCard.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import TaskCard from './TaskCard.tsx'
 
 const TaskBoard = () => {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
@@ -133,7 +133,7 @@ const TaskBoard = () => {
       )}
       {draggingTask ? (
         <DragOverlay>
-          <LiteTaskCard task={draggingTask}  selectedUser={selectedUser} />
+          <TaskCard task={draggingTask}  selectedUser={selectedUser} />
         </DragOverlay>
       ) : null}
     </DndContext>

@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { getUsersInitials } from '@/utils/getUsersInitials.ts'
 
 const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUser }) => {
   const dispatch = useAppDispatch()
@@ -24,16 +25,6 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
       setSelectedUser(userId)
       await dispatch(fetchTasksByUserIdWithPopulate(userId))
     }
-  }
-
-  const getInitialUsers = (name: string) => {
-    if (!name) return ''
-    const parts = name.trim().split(/\s+/)
-    if (parts.length === 1) {
-      return parts[0][0]?.toUpperCase() || ''
-    }
-    const initials = parts[0][0] + parts[1][0]
-    return initials.toUpperCase()
   }
 
   const user = remainingUsers.find(u => u._id === selectedUser)
@@ -76,7 +67,7 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
                 <div
                   className="flex items-center justify-center bg-blue-500 text-white text-[18px] rounded-full w-[85%] h-[85%] font-bold"
                 >
-                  {getInitialUsers(user.displayName)}
+                  {getUsersInitials(user.displayName)}
                 </div>
               </div>
             </div>

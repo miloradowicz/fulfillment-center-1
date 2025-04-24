@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectTask } from '@/store/slices/taskSlice.ts'
-import {
-  fetchTaskById,
-} from '@/store/thunks/tasksThunk.ts'
+import { fetchTaskById } from '@/store/thunks/tasksThunk.ts'
 import { Badge } from '@/components/ui/badge'
-import { User, Link2 } from 'lucide-react'
+import { Link2, User } from 'lucide-react'
 import { getStatusStyles } from '@/features/tasks/utils/statusStyle.ts'
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
@@ -25,7 +23,6 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
       navigate(`/tasks/${ taskId }`, { replace: true })
     }
   }, [dispatch, taskId, navigate])
-
 
   if (!task) {
     return <div>Задача не найдена...</div>
