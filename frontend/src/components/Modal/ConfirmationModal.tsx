@@ -1,30 +1,26 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils.ts'
 import React from 'react'
-import { Modal, Box, Typography, Button } from '@mui/material'
 
 interface ConfirmationModalProps {
-  open: boolean;
-  entityName: string;
-  actionType: 'delete' | 'archive' | 'unarchive';
-  onConfirm: () => void;
-  onCancel: () => void;
+  open: boolean
+  entityName: string
+  actionType: 'delete' | 'archive' | 'unarchive'
+  onConfirm: () => void
+  onCancel: () => void
 }
 
 const actionLabels = {
-  delete: {
-    text: 'удалить',
-    color: '#c60000',
-    hoverColor: '#770000',
-  },
-  archive: {
-    text: 'архивировать',
-    color: '#1976d2',
-    hoverColor: '#115293',
-  },
-  unarchive: {
-    text: 'восстановить',
-    color: '#00b608',
-    hoverColor: '#1b5e20',
-  },
+  delete: { text: 'удалить', color: 'bg-red-200 text-red-800 hover:bg-red-300' },
+  archive: { text: 'архивировать', color: 'bg-blue-200 text-blue-800 hover:bg-blue-300' },
+  unarchive: { text: 'восстановить', color: 'bg-green-200 text-green-800 hover:bg-green-300' },
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -34,45 +30,26 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const { text, color, hoverColor } = actionLabels[actionType]
+  const { text, color } = actionLabels[actionType]
 
   return (
-    <Modal open={open} onClose={onCancel} aria-labelledby="confirmation-modal-title">
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'white',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-          minWidth: 300,
-        }}
-      >
-        <Typography sx={{ mt: 2 }} variant="h6">
-          Вы действительно хотите {text} {entityName}?
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-          <Button onClick={onCancel} color="inherit">
+    <Dialog open={open} onOpenChange={onCancel}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="leading-snug">
+            Вы действительно хотите {text} {entityName}?
+          </DialogTitle>
+        </DialogHeader>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onCancel}>
             Отмена
           </Button>
-          <Button
-            onClick={onConfirm}
-            variant="contained"
-            sx={{
-              backgroundColor: color,
-              '&:hover': { backgroundColor: hoverColor },
-              color: 'white',
-              ml: 2,
-            }}
-          >
+          <Button className={cn(color, 'capitalize')} onClick={onConfirm}>
             {text}
           </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
