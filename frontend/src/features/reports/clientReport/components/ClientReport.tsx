@@ -12,7 +12,6 @@ const ClientReport = () => {
       <Card className="w-auto">
         <DateRangePicker />
       </Card>
-
       <div className="w-full sm:w-[85%] xl:w-full xl:flex-1 relative min-h-[200px] overflow-x-auto">
         {loadingReport ? (
           <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
