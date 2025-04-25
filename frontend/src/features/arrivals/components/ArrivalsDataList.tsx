@@ -61,11 +61,6 @@ const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
       cell: ({ row }) => dayjs(row.original.arrival_date).format('DD.MM.YYYY'),
     },
     {
-      accessorKey: 'arrival_price',
-      header: 'Цена доставки',
-      cell: ({ row }) => row.original.arrival_price,
-    },
-    {
       accessorKey: 'arrival_status',
       header: 'Статус',
       cell: ({ row }) => <StatusArrivalCell row={row.original} />,

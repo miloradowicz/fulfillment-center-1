@@ -11,6 +11,7 @@ import {
   selectLoadingUpdateProduct,
 } from '@/store/slices/productSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
+import { PopoverType } from '@/components/CustomSelect/CustomSelect'
 
 const initialState: ProductMutation = {
   client: '',
@@ -37,7 +38,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
       }
       : { ...initialState },
   )
-  const [selectedClient, setSelectedClient] = useState(initialData ? initialData.client._id : '')
+  const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
   const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(
     initialData?.dynamic_fields
@@ -71,7 +72,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
       ...prevState,
       [name]: value,
     }))
-
   }
 
   const addDynamicField = () => {
@@ -111,7 +111,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
         toast.success('Товар успешно создан.')
         setForm(initialState)
         setDynamicFields([])
-        setSelectedClient('')
       }
       setErrors({})
     } catch (e) {
@@ -141,7 +140,6 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
 
   return {
     form,
-    selectedClient,
     dynamicFields,
     newField,
     showNewFieldInputs,
@@ -154,12 +152,12 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
     onSubmit,
     setForm,
     setDynamicFields,
-    setSelectedClient,
     setNewField,
     setShowNewFieldInputs,
-    setErrors,
     errors,
     createError,
+    activePopover,
+    setActivePopover,
   }
 }
 
