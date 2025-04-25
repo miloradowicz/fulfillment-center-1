@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, children }) => {
           Форма создания или редактирования.
         </DialogDescription>
 
-        <div className="flex justify-center w-full mb-2">
+        <div className="flex justify-center w-full mb-2 overflow-x-hidden">
           <div className="w-full sm:max-w-full">
             {children}
           </div>

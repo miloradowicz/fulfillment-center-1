@@ -9,6 +9,7 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle'
 import TaskReport from '../taskPeport/components/TaskReport'
 import ClientReport from '../clientReport/components/ClientReport'
 import Loader from '@/components/Loader/Loader.tsx'
+import { tabTriggerClass } from '@/features/reports/utils/StyleCinstants.ts'
 
 export default function ReportTabs() {
   const [value, setValue] = useState('tasks')
@@ -47,11 +48,11 @@ export default function ReportTabs() {
       <Tabs value={value} onValueChange={handleChange} className="w-full">
         <TabsList className="mb-5 w-full h-auto">
           <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer" value="tasks">Задачи</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer"  value="clients">Клиенты</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer"  value="orders">Заказы</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer"  value="arrivals">Поставки</TabsTrigger>
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer"  value="stocks">Склады</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="tasks">Задачи</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="orders">Заказы</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass}  value="arrivals">Поставки</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="stocks">Склады</TabsTrigger>
           </div>
         </TabsList>
 

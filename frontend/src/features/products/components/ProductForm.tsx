@@ -6,7 +6,7 @@ import { Loader2, Plus } from 'lucide-react'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import ClientCombobox from '@/components/ClientCombobox/ClientCombobox.tsx'
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
 
 interface Props {
   initialData?: ProductWithPopulate
@@ -16,7 +16,6 @@ interface Props {
 const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     form,
-    selectedClient,
     dynamicFields,
     newField,
     showNewFieldInputs,
@@ -28,12 +27,12 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     onChangeDynamicFieldValue,
     onSubmit,
     setForm,
-    setSelectedClient,
     setNewField,
     setShowNewFieldInputs,
-    setErrors,
     errors,
     createError,
+    activePopover,
+    setActivePopover,
   } = useProductForm(initialData, onSuccess)
 
   return (
@@ -42,18 +41,20 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         {initialData ? 'Редактировать данные товара' : 'Добавить новый товар'}
       </h3>
 
-      <div className="space-y-1">
-        <ClientCombobox
-          clients={clients ?? []}
-          selectedClientId={selectedClient}
-          onSelectClient={id => {
-            setSelectedClient(id)
-            setForm(prev => ({ ...prev, client: id }))
-            setErrors(prev => ({ ...prev, client: '' }))
-          }}
-          error={errors.client || getFieldError('client', createError)}
-        />
-      </div>
+      <CustomSelect
+        value={clients?.find(c => c._id === form.client)?.name}
+        placeholder="Выберите клиента"
+        options={clients || []}
+        onSelect={clientId => {
+          setForm(prev => ({ ...prev, client: clientId }))
+        }}
+        popoverKey="client"
+        searchPlaceholder="Поиск клиента..."
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        error={errors.client || getFieldError('client', createError)}
+        renderValue={client => client.name}
+      />
 
       <InputWithError
         name="title"

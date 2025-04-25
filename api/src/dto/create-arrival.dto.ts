@@ -87,10 +87,6 @@ export class CreateArrivalDto {
   @Type(() => ProductDto)
   products: ProductDto[]
 
-  @IsNotEmpty({ message: 'Заполните цену доставки.' })
-  @IsPositive({ message: 'Цена доставки должна быть больше 0.' })
-  arrival_price: number
-
   @IsNotEmpty({ message: 'Заполните дату прибытия' })
   @IsDate({ message: 'Заполните дату прибытия' })
   @Type(() => Date)
