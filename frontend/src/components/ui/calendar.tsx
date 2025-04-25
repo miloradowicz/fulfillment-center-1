@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
+import { ru } from 'date-fns/locale'
+import { format } from 'date-fns'
 
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
@@ -14,7 +16,15 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      locale={ru}
       className={cn('p-3', className)}
+      formatters={{
+        formatCaption: date => {
+          const caption = format(date, 'LLLL yyyy', { locale: ru })
+          return caption.charAt(0).toUpperCase() + caption.slice(1)
+        },
+        formatWeekdayName: date => format(date, 'EEEEEE', { locale: ru }).replace(/./, c => c.toUpperCase()),
+      }}
       classNames={{
         months: 'flex flex-col sm:flex-row gap-2',
         month: 'flex flex-col gap-4',

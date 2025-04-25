@@ -19,7 +19,6 @@ export type ErrorMessages = Pick<
   | 'stock'
   | 'defect_description'
   | 'arrival_status'
-  | 'arrival_price'
   | 'service'
   | 'service_amount'
   | 'service_price'
