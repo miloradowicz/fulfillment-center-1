@@ -92,7 +92,7 @@ const TaskBoard = () => {
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center">
                   {searchQuery ? (
-                    <Button variant="ghost" size="icon" onClick={clearSearch}>
+                    <Button variant="link" size="sm" onClick={clearSearch}>
                       <X className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   ) : (
@@ -112,7 +112,7 @@ const TaskBoard = () => {
               <div className="mx-3">
                 <Button variant="outline" onClick={clearAllFilters}>Сбросить фильтры</Button>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto mr-5">
                 <CustomButton text='Добавить задачу' onClick={handleOpen} />
               </div>
             </div>

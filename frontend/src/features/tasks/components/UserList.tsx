@@ -52,7 +52,7 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
         <Tooltip key={user._id}>
           <TooltipTrigger asChild>
             <div
-              className={`relative h-[44px] w-[44px] -ml-2 first:ml-0 z-0 cursor-pointer
+              className={`relative h-[52px] w-[52px] -ml-3 first:ml-0 z-0 cursor-pointer
                       hover:z-10 transition-transform duration-100
                       ${ selectedUser === user._id ? 'z-10' : '' }`}
               onClick={() => handleUserClick(user._id)}
@@ -89,7 +89,7 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
                       hover:z-10 transition-transform duration-100`}
                 >
                   <div
-                    className="w-full h-full flex items-center justify-center rounded-full bg-white hover:border-2 hover:border-blue-500"
+                    className="w-full h-full flex items-center justify-center rounded-full bg-white hover:border-2 hover:border-gray-300"
                   >
                     <div
                       className="flex items-center justify-center bg-gray-200 text-gray-500 text-[18px] tracking-[-0.1em] rounded-full w-[85%] h-[85%]"
