@@ -6,7 +6,7 @@ import { TaskWithPopulate } from '@/types'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
 
 interface Props {
@@ -116,7 +116,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
 
       <Button type="submit" disabled={addLoading || updateLoading} className="w-full mt-3">
         {initialData ? 'Сохранить' : 'Создать'}
-        {addLoading || updateLoading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {addLoading || updateLoading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

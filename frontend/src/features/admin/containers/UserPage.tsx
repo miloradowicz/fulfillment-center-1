@@ -1,10 +1,11 @@
-import { Loader2, ContactRound } from 'lucide-react'
+import { ContactRound } from 'lucide-react'
 import UsersDataList from '../components/UsersDataList.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import RegistrationForm from '../../users/components/RegistrationForm.tsx'
 import useUserActions from '../hooks/useUserActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
 
 const UserPage = () => {
   const {
@@ -17,11 +18,7 @@ const UserPage = () => {
 
   return (
     <>
-      {loading && (
-        <div className="flex justify-center items-center my-10">
-          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
-        </div>
-      )}
+      {loading ? <Loader/> :  null}
 
       <Modal handleClose={handleClose} open={open}>
         <RegistrationForm
