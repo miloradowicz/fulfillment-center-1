@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StockProductsPage from './StockProductsPage.tsx'
 import { useSearchParams } from 'react-router-dom'
 import StockDefectsPage from './StockDefectsPage.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const tabs = [
   { value: 'products', label: 'Товары' },
@@ -98,8 +99,12 @@ const StockDetails = () => {
         </Tabs>
 
         <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
-          <EditButton onClick={() => setEditModalOpen(true)} />
-          <ArchiveButton onClick={showArchiveModal} />
+          <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+            <EditButton onClick={() => setEditModalOpen(true)} />
+          </ProtectedElement>
+          <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+            <ArchiveButton onClick={showArchiveModal} />
+          </ProtectedElement>
         </Box>
       </div>
     </>

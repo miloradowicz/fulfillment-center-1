@@ -8,6 +8,7 @@ import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { Truck } from 'lucide-react'
 import ProductForm from '@/features/products/components/ProductForm.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ArrivalPage = () => {
   const {
@@ -50,8 +51,12 @@ const ArrivalPage = () => {
           gap={1}
           width={{ sm: 'auto' }}
         >
-          <CustomButton text="Добавить товар" onClick={() => handleOpen('product')} />
-          <CustomButton text="Добавить поставку" onClick={() => handleOpen('arrival')} />
+          <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+            <CustomButton text="Добавить товар" onClick={() => handleOpen('product')} />
+          </ProtectedElement>
+          <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+            <CustomButton text="Добавить поставку" onClick={() => handleOpen('arrival')} />
+          </ProtectedElement>
         </Box>
       </Box>
 
