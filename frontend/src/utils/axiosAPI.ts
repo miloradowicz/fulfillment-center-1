@@ -2,11 +2,24 @@ import { RootState } from '@/app/store'
 import { setUser, unsetUser } from '@/store/slices/authSlice'
 import { Store } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { sanitizeData } from '@/utils/sanitizeData.ts'
 
 const axiosAPI = axios.create({
   baseURL: 'http://localhost:8000',
   withCredentials: true,
   xsrfCookieName: 'XSRF-TOKEN',
+})
+
+axiosAPI.interceptors.request.use(config => {
+  const method = config.method?.toLowerCase()
+
+  if (config.data && (method === 'post' || method === 'put' || method === 'patch')) {
+    config.data = sanitizeData(config.data)
+  }
+
+  return config
+}, error => {
+  return Promise.reject(error)
 })
 
 export const addCsrf = async () => {
