@@ -18,8 +18,8 @@ const TaskReport = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap justify-around items-center gap-2 mb-3">
-        <Card className="flex justify-around w-auto min-w-[320px] max-w-[500px] md:w-full ">
+      <div className="w-full flex flex-col xl:flex-row xl:items-start xl:justify-between items-center gap-4 px-2">
+        <Card className="w-auto">
           <DateRangePicker />
         </Card>
         {loadingTasks ? (
@@ -52,8 +52,8 @@ const TaskReport = () => {
                   В выбранном периоде нет выполненных задач
                 </ h6>
               ) : (
-                <div className="flex flex-wrap justify-around items-start mt-2">
-                  <div className="min-w-[320px] max-w-[700px] w-full md:w-full">
+                <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between items-center mt-2 ">
+                  <div className="min-w-[320px] max-w-[700px] md:w-full">
                     <TaskCountAreaChart data={report.dailyTaskCounts} />
                   </div>
                   <TaskReportDataList userTaskReports={report.userTaskReports} />

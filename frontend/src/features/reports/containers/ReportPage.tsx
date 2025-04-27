@@ -8,8 +8,8 @@ import { FileText } from 'lucide-react'
 import CustomTitle from '@/components/CustomTitle/CustomTitle'
 import TaskReport from '../taskPeport/components/TaskReport'
 import ClientReport from '../clientReport/components/ClientReport'
-import Grid from '@mui/material/Grid2'
 import Loader from '@/components/Loader/Loader.tsx'
+import { tabTriggerClass } from '@/features/reports/utils/StyleCinstants.ts'
 
 export default function ReportTabs() {
   const [value, setValue] = useState('tasks')
@@ -47,20 +47,20 @@ export default function ReportTabs() {
       </div>
       <Tabs value={value} onValueChange={handleChange} className="w-full">
         <TabsList className="mb-5 w-full h-auto">
-          <div className="inline-flex gap-2 flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-            <TabsTrigger className="mx-1 md:mx-0" value="tasks">Задачи</TabsTrigger>
-            <TabsTrigger className="mx-1 md:mx-0" value="clients">Клиенты</TabsTrigger>
-            <TabsTrigger className="mx-1 md:mx-0" value="orders">Заказы</TabsTrigger>
-            <TabsTrigger className="mx-1 md:mx-0" value="arrivals">Поставки</TabsTrigger>
-            <TabsTrigger className="mx-1 md:mx-0" value="stocks">Склады</TabsTrigger>
+          <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
+            <TabsTrigger className={tabTriggerClass} value="tasks">Задачи</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="orders">Заказы</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass}  value="arrivals">Поставки</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="stocks">Склады</TabsTrigger>
           </div>
         </TabsList>
 
         <TabsContent value="tasks">
           {loadingTask ? (
-            <Grid className="mt-8 mb-7 flex justify-center">
+            <div className="mt-8 mb-7 flex justify-center">
               <Loader/>
-            </Grid>
+            </div>
           ) : (
             <TaskReport />
           )}

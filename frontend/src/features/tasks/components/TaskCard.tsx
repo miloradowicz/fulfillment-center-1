@@ -22,6 +22,7 @@ import UseTaskCard from '@/features/tasks/hooks/useTaskCard.ts'
 import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 import { getTaskIcon } from '@/features/tasks/utils/getTaskIcon.tsx'
 import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, parent }) => {
   const { isMobile } = useBreakpoint()
@@ -115,32 +116,34 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
                 {tooltipText}
               </TooltipContent>
             </Tooltip>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto"
-                >
-                  <MoreHorizontal className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleEdit}>
-                  <Pencil className="mr-2 h-4 w-4 text-blue-500" />
-                  Редактировать
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={e => {
-                    e.stopPropagation()
-                    setOpenDeleteModal(true)
-                  }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4 text-red-500" />
-                  Переместить в архив
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-auto"
+                  >
+                    <MoreHorizontal className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <Pencil className="mr-2 h-4 w-4 text-blue-500" />
+                    Редактировать
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={e => {
+                      e.stopPropagation()
+                      setOpenDeleteModal(true)
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                    Переместить в архив
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </ProtectedElement>
           </div>
           <div className="flex flex-col gap-2">
             <p>{task.title}</p>

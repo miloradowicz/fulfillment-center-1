@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import 'react-day-picker/style.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -133,3 +134,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+.rdp-root {
+  --rdp-accent-color: var(--muted-foreground) !important;
+  --rdp-day-height: 33px;
+  --rdp-day-width: 33px;
+  --rdp-day_button-height:30px;
+  --rdp-day_button-width: 30px;
+  --rdp-day_button-border-radius: 20%;
+  --rdp-selected-font-weight: normal;
+}
+
+.rdp-root .rdp-month_caption {
+  font-size: medium;
+  padding-left: 10px;
+}
+
+.rdp-root .rdp-range_middle{
+  font-weight: normal;
+  font-size: medium;
+}
+.rdp-root .rdp-range_start {
+  font-weight: normal;
+}
+.rdp-root .rdp-range_end {
+  font-weight: normal;
+}
+ .rdp-root .rdp-day_button{
+   margin: 2px;
+ }

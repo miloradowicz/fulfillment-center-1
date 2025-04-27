@@ -28,6 +28,7 @@ import { getArrivalStatusColor } from '@/utils/getOrderStatusColor.ts'
 import ArchiveButton from '../../../components/Buttons/ArchiveButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
 import EditButton from '@/components/Buttons/EditButton.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 
 const ArrivalDetails = () => {
@@ -184,8 +185,12 @@ const ArrivalDetails = () => {
               justifyContent: 'flex-end',
             }}
           >
-            <EditButton onClick={() => setEditModalOpen(true)} />
-            <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <EditButton onClick={() => setEditModalOpen(true)} />
+            </ProtectedElement>
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
+            </ProtectedElement>
           </Box>
         </Card>
       </Container>

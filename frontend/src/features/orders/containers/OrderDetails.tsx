@@ -28,6 +28,7 @@ import { basename } from 'path-browserify'
 import EditButton from '@/components/Buttons/EditButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
 import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const OrderDetails = () => {
   const {
@@ -156,8 +157,12 @@ const OrderDetails = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <EditButton onClick={() => handleOpenEdit()} />
-          <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
+          <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+            <EditButton onClick={() => handleOpenEdit()} />
+          </ProtectedElement>
+          <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+            <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
+          </ProtectedElement>
 
           <Modal handleClose={() => setOpen(false)} open={open}>
             <OrderForm onSuccess={() => setOpen(false)} />

@@ -30,7 +30,7 @@ export const TaskPieChart:React.FC<TaskSummaryProps>  = ({ tasks }) => {
       </CardHeader>
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-square max-h-[320px]  [&_.recharts-pie-label-text]:fill-foreground pt-0 w-full sm:w-[500px] h-[315px]"
+        className="mx-auto aspect-square max-h-[300px]  [&_.recharts-pie-label-text]:fill-foreground pt-0 w-full sm:w-[500px] h-[315px]"
       >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

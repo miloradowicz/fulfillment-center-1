@@ -6,6 +6,7 @@ import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { useClientActions } from '../hooks/useClientActions.ts'
 import { Users } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ClientsPage = () => {
   const { open, handleOpen, handleClose, loading } = useClientActions(true)
@@ -23,7 +24,9 @@ const ClientsPage = () => {
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
         <CustomTitle text={'Клиенты'} icon={<Users size={25} />}/>
-        <CustomButton text={'Добавить клиента'} onClick={handleOpen} />
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <CustomButton text={'Добавить клиента'} onClick={handleOpen} />
+        </ProtectedElement>
       </Box>
       <Box className="my-8">
         <ClientsDataList />
