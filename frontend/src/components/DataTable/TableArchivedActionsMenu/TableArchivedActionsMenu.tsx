@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 interface Props<T> {
   row: T
@@ -45,18 +46,19 @@ const TableArchivedActionsMenu = <T extends { _id: string }>({
             <RotateCcw size={18} className="stroke-green-600 ml-2" />
           </Button>
         </DropdownMenuItem>
-
-        <DropdownMenuItem className="!bg-transparent px-1.5">
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => onDelete(row._id)}
-            className="text-destructive hover:bg-destructive/10 bg-transparent w-full transition-colors shadow-sm"
-          >
-            Удалить
-            <Trash size={18} className="stroke-destructive ml-2" />
-          </Button>
-        </DropdownMenuItem>
+        <ProtectedElement allowedRoles={['super-admin']}>
+          <DropdownMenuItem className="!bg-transparent px-1.5">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => onDelete(row._id)}
+              className="text-destructive hover:bg-destructive/10 bg-transparent w-full transition-colors shadow-sm"
+            >
+              Удалить
+              <Trash size={18} className="stroke-destructive ml-2" />
+            </Button>
+          </DropdownMenuItem>
+        </ProtectedElement>
       </DropdownMenuContent>
     </DropdownMenu>
   )
