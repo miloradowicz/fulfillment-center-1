@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import TaskCard from './TaskCard.tsx'
 import { useState } from 'react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const TaskBoard = () => {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
@@ -113,7 +114,9 @@ const TaskBoard = () => {
                 <Button variant="outline" onClick={clearAllFilters}>Сбросить фильтры</Button>
               </div>
               <div className="ml-auto">
-                <CustomButton text='Добавить задачу' onClick={handleOpen} />
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <CustomButton text='Добавить задачу' onClick={handleOpen} />
+                </ProtectedElement>
               </div>
             </div>
           </div>

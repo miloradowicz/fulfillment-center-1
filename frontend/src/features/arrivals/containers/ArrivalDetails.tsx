@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { ArrowUpRight, File, Truck } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const statusStyles: Record<string, string> = {
   'ожидается доставка': 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800',
@@ -109,8 +110,12 @@ const ArrivalDetails = () => {
 
               <div className="flex flex-col items-center justify-between">
                 <div className="flex gap-2">
-                  <EditButton onClick={() => setEditModalOpen(true)} />
-                  <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <EditButton onClick={() => setEditModalOpen(true)} />
+                  </ProtectedElement>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
+                  </ProtectedElement>
                 </div>
               </div>
             </div>

@@ -9,22 +9,23 @@ const TaskCountAreaChart: React.FC<PropsCountChart> = ({ data }) => {
   const { containerHeight,
     chartData,
     startDate,
-    endDate } = useTaskCountAreaChart({ data })
+    endDate, margin } = useTaskCountAreaChart({ data })
+
 
   return (
     <div className={'mb-5'}>
       {data.length === 0 ? null : (
         <>
           <h6
-            className="mx-auto w-[80%] sm:w-[90%] md:w-[90%] lg:w-[80%] xl:w-[80%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
+            className="mx-auto xl:mx-5 w-[80%] sm:w-[90%] md:w-[80%] lg:w-[80%] xl:w-[80%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
           >
           Ежедневная динамика общего количества задач за
           период с {startDate} по {endDate}
           </h6>
-          <Card className="overflow-x-auto flex-grow min-w-[300px] max-w-[600px] w-full md:w-full mx-auto ">
+          <Card className="mx-auto xl:mx-0 overflow-x-auto min-w-[300px] max-w-[500px] md:w-full">
             <CardContent>
               <ResponsiveContainer width="100%" height={containerHeight} style={{ margin: '20px 0', paddingBottom: '10px' }}>
-                <AreaChart data={chartData} margin={{ bottom: 10 }}>
+                <AreaChart data={chartData}  margin={margin}>
                   <defs>
                     <linearGradient id="colorTaskCount" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />

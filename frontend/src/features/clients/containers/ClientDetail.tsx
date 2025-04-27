@@ -14,6 +14,7 @@ import { useClientActions } from '../hooks/useClientActions.ts'
 import EditButton from '@/components/Buttons/EditButton.tsx'
 import BackButton from '@/components/Buttons/BackButton.tsx'
 import ArchiveButton from '../../../components/Buttons/ArchiveButton.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ClientDetail = () => {
   const {
@@ -120,8 +121,12 @@ const ClientDetail = () => {
                   gap: 2,
                   justifyContent: 'flex-end',
                 }}>
-                  <EditButton onClick={() => handleOpen()} />
-                  <ArchiveButton onClick={() => handleConfirmationOpen(client._id)} />
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <EditButton onClick={() => handleOpen()} />
+                  </ProtectedElement>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <ArchiveButton onClick={() => handleConfirmationOpen(client._id)} />
+                  </ProtectedElement>
                 </Box>
               </>
             )}

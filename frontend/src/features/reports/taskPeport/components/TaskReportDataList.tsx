@@ -69,7 +69,7 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
   ]
 
   return (
-    <div className="overflow-x-auto flex-grow min-w-[340px] max-w-[600px] w-full md:w-full ">
+    <div className="overflow-x-auto flex-grow min-w-[340px] max-w-[570px] w-full md:w-full">
       <h6
         className="mx-auto w-[90%] sm:w-[80%] md:w-[95%] lg:w-[95%] xl:w-[95%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
       >

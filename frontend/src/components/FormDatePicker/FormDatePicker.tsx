@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar.tsx'
 import { Label } from '@/components/ui/label.tsx'
+import { ru } from 'date-fns/locale'
 
 dayjs.locale('ru')
 
@@ -66,7 +67,7 @@ const FormDatePicker: React.FC<FormDatePickerProps> = ({ value, onChange, onBlur
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          <Calendar mode="single" selected={date} onSelect={handleDateSelect} initialFocus />
+          <Calendar mode="single" selected={date} onSelect={handleDateSelect} locale={ru} initialFocus />
         </PopoverContent>
       </Popover>
 

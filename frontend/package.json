@@ -51,7 +51,7 @@
     "path-browserify": "^1.0.1",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-toastify": "^11.0.5",

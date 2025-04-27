@@ -7,6 +7,7 @@ import ProductForm from '../components/ProductForm.tsx'
 import EditButton from '@/components/Buttons/EditButton.tsx'
 import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -113,8 +114,12 @@ const ProductDetails = () => {
                 </Card>
 
                 <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                  <EditButton onClick={() => handleOpen()} />
-                  <ArchiveButton onClick={() => handleConfirmationOpen(product._id)} />
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <EditButton onClick={() => handleOpen()} />
+                  </ProtectedElement>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <ArchiveButton onClick={() => handleConfirmationOpen(product._id)} />
+                  </ProtectedElement>
                 </Box>
               </>
             )}

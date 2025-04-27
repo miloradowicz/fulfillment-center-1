@@ -6,6 +6,7 @@ import useUserActions from '../hooks/useUserActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const UserPage = () => {
   const {
@@ -31,7 +32,9 @@ const UserPage = () => {
 
       <div className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-between gap-4">
         <CustomTitle text="Сотрудники" icon={<ContactRound size={25} />} />
-        <CustomButton text="Добавить сотрудника" onClick={handleOpen} />
+        <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+          <CustomButton text="Добавить сотрудника" onClick={handleOpen} />
+        </ProtectedElement>
       </div>
 
       <div className="px-4">
