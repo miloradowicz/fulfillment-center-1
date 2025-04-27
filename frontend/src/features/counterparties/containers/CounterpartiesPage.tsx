@@ -24,7 +24,7 @@ const CounterpartiesPage = () => {
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
         <CustomTitle text={'Контрагенты'} icon={<BookUser size={25} />}/>
-        <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
           <CustomButton text={'Добавить контрагента'} onClick={handleOpen}/>
         </ProtectedElement>
       </Box>

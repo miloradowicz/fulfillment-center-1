@@ -118,7 +118,7 @@ const App = () => {
             }/>
 
             <Route path="/counterparties" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin']}>
+              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
                 <CounterpartiesPage />
               </AllowedRoute>
             }/>
