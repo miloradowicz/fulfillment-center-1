@@ -20,7 +20,6 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
   useEffect(() => {
     if (taskId) {
       dispatch(fetchTaskById(taskId))
-      navigate(`/tasks/${ taskId }`, { replace: true })
     }
   }, [dispatch, taskId, navigate])
 
@@ -29,8 +28,8 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
   }
 
   return (
-    <div className="p-4 mx-auto md:text-[16px] text-[14px] text-gray-600">
-      <div className="flex md:flex-nowrap flex-wrap border-1 rounded-md min-h-[370px]">
+    <div className="pt-10 max-w-[350px] mx-auto md:text-[16px] text-[14px] text-gray-600 h-full">
+      <div className="flex flex-col justify-between border-1 rounded-md ">
         <div className="flex-8 p-4 space-y-4">
           <div className="flex justify-between items-center border-b-1 sm:text-[18px] text-sm pb-2 font-bold">
             <span>{task.taskNumber}</span>
@@ -41,7 +40,7 @@ const TaskDetails: React.FC<Props> = ({ taskId }) => {
           <div className="flex justify-between items-start">
             <h3 className="font-bold md:text-xl sm:text-xl text-[16px] text-gray-800">{task.title}</h3>
           </div>
-          <div className="max-h-[300px] overflow-y-auto">
+          <div className="overflow-y-auto">
             <p>{task.description}</p>
           </div>
         </div>

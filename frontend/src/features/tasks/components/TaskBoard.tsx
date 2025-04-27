@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import TaskCard from './TaskCard.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 
 const TaskBoard = () => {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
@@ -49,9 +50,9 @@ const TaskBoard = () => {
     <Modal handleClose={handleClose} open={open}>
       <TaskForm onSuccess={handleClose} />
     </Modal>
-    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} >
+    <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
       <TaskDetails taskId={id}/>
-    </Modal>
+    </RightPanel>
     <DndContext
       sensors={sensors}
       collisionDetection={rectIntersection}
@@ -76,7 +77,10 @@ const TaskBoard = () => {
       }}
     >
       {selectFetchUser || loading ? (
-        <Loader/>
+        <div className="mt-5">
+          <Loader/>
+        </div>
+
       ) : (
         <div className="flex flex-col p-2 justify-between min-w-[950px] overflow-hidden">
           <div className="flex items-center space-x-1 w-full ml-5 mt-2.5 mb-0">
@@ -118,7 +122,7 @@ const TaskBoard = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 mt-4">
+          <div className="flex gap-4 mt-1">
             <div className="w-1/3">
               <TaskLine selectedUser={selectedUser} title="к выполнению" items={filterTasks(todoItems)} activeColumnId={activeColumnId}/>
             </div>

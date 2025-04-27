@@ -19,6 +19,7 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import useBreakpoint from '@/hooks/useBreakpoint.ts'
 import UseTaskCard from '@/features/tasks/hooks/useTaskCard.ts'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 
 const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, parent }) => {
   const { isMobile } = useBreakpoint()
@@ -178,9 +179,9 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
       </Modal>
-      <Modal open={openDetailModal} handleClose={() => setOpenDetailModal(false)}>
-        <TaskDetails taskId={task._id}/>
-      </Modal>
+      <RightPanel open={openDetailModal} onOpenChange={setOpenDetailModal}>
+        <TaskDetails taskId={task._id} />
+      </RightPanel>
     </div>
   )
 })
