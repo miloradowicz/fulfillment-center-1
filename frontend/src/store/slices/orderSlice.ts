@@ -15,6 +15,7 @@ import {
   deleteOrder, fetchArchivedOrders,
   fetchOrderById, fetchOrderByIdWithPopulate,
   fetchOrders,
+  fetchOrdersByClientId,
   fetchOrdersWithClient, unarchiveOrder,
   updateOrder,
 } from '../thunks/orderThunk.ts'
@@ -119,6 +120,17 @@ const orderSlice = createSlice({
       state.ordersWithClient = action.payload
     })
     builder.addCase(fetchOrdersWithClient.rejected, state => {
+      state.loadingFetch = false
+    })
+    builder.addCase(fetchOrdersByClientId.pending, state => {
+      state.loadingFetch = true
+      state.populateOrder = null
+    })
+    builder.addCase(fetchOrdersByClientId.fulfilled, (state, action) => {
+      state.loadingFetch = false
+      state.orders = action.payload
+    })
+    builder.addCase(fetchOrdersByClientId.rejected, state => {
       state.loadingFetch = false
     })
     builder.addCase(fetchOrderById.pending, state => {

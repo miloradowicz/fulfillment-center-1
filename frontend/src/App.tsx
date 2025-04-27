@@ -22,6 +22,7 @@ import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 import AdminPage from '@/features/admin/containers/AdminPage.tsx'
+import InvoicesFormPage from './features/invoices/components/InvoicesFormPage.tsx'
 
 const App = () => {
   const user = useAppSelector(selectUser)
@@ -45,107 +46,165 @@ const App = () => {
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ClientPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <ClientPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/clients" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ClientPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/clients"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <ClientPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/clients/:id" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ClientDetail />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/clients/:id"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <ClientDetail />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/arrivals" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <ArrivalPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/arrivals"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <ArrivalPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/arrivals/:arrivalId" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <ArrivalDetails />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/arrivals/:arrivalId"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <ArrivalDetails />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/products" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ProductPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/products"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <ProductPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/products/:id" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ProductDetails />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/products/:id"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <ProductDetails />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/orders" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <OrderPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/orders"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <OrderPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/orders/:id" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <OrderDetails />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/orders/:id"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <OrderDetails />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/reports" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin']}>
-                <ReportPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/reports"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin']}>
+                  <ReportPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/tasks" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <TaskBoard />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/tasks"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <TaskBoard />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/tasks/:id" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
-                <TaskBoard />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/tasks/:id"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
+                  <TaskBoard />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/counterparties" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <CounterpartiesPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/counterparties"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <CounterpartiesPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/stocks" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <StockPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/stocks"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <StockPage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/stocks/:stockId" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <StockDetails />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/stocks/:stockId"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <StockDetails />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/archives" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin']}>
-                <ArchivePage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/archives"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin']}>
+                  <ArchivePage />
+                </AllowedRoute>
+              }
+            />
 
-            <Route path="/admin" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin']}>
-                <AdminPage />
-              </AllowedRoute>
-            }/>
+            <Route
+              path="/admin"
+              element={
+                <AllowedRoute allowedRoles={['super-admin', 'admin']}>
+                  <AdminPage />
+                </AllowedRoute>
+              }
+            />
+
+            <Route
+              path="/invoices/new"
+              element={
+                <InvoicesFormPage />
+              }
+            />
 
             <Route
               path="*"

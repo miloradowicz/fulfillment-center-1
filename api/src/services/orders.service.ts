@@ -16,20 +16,33 @@ export class OrdersService {
     private readonly counterService: CounterService,
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
-  ) { }
+  ) {}
 
-  async getAll() {
-    const orders = await this.orderModel.find({ isArchived: false }).populate('stock').exec()
-    return orders.reverse()
+  async getAllByClient(clientId: string, populate: boolean) {
+    const unarchived = this.orderModel.find({ isArchived: false }).populate('stock')
+
+    if (populate) {
+      return (await unarchived.find({ client: clientId }).populate('client')).reverse()
+    }
+
+    return (await unarchived.find({ client: clientId })).reverse()
+  }
+
+  async getAll(populate: boolean) {
+    const unarchived = this.orderModel.find({ isArchived: false }).populate('stock')
+
+    if (populate) {
+      return (await unarchived.populate('client')).reverse()
+    }
+
+    return (await unarchived).reverse()
   }
 
   async getAllArchived() {
-    const orders = await this.orderModel
-      .find({ isArchived: true })
-      .populate('client stock')
-      .exec()
+    const orders = await this.orderModel.find({ isArchived: true }).populate('client stock').exec()
     return orders.reverse()
   }
+
   async getAllWithClient() {
     const orders = await this.orderModel.find({ isArchived: false }).populate('client stock').exec()
     return orders.reverse()
@@ -46,10 +59,7 @@ export class OrdersService {
   }
 
   async getByIdWithPopulate(id: string) {
-    const order = await this.orderModel
-      .findById(id)
-      .populate('client products.product defects.product stock')
-      .exec()
+    const order = await this.orderModel.findById(id).populate('client products.product defects.product stock').exec()
     if (!order) throw new NotFoundException('Заказ не найден')
 
     if (order.isArchived) throw new ForbiddenException('Заказ в архиве')

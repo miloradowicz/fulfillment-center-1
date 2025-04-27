@@ -241,6 +241,8 @@ export interface ErrorsFields {
   service?: string
   service_amount?: string
   service_price?: string
+  paid_amount?: string
+  discount?: string
 }
 
 export interface Task {
@@ -303,7 +305,7 @@ export interface Service {
   serviceCategory: string
   price: number
   description: string
-  type: string
+  type: 'внутренняя' | 'внешняя'
   logs?: Log[]
 }
 
@@ -417,11 +419,18 @@ export interface Invoice  {
     paid_amount?: number,
     discount?: number,
     status?: 'в ожидании' | 'оплачено' | 'частично оплачено',
-    associatedOrder?: string,
-    associatedArrival?:string,
+    associatedOrder?: Order,
+    associatedArrival?: Arrival,
     logs: Log[],
     createdAt:string,
     updatedAt:string,
 }
 
-export type InvoiceMutation = Omit<Invoice, '_id, totalAmount, invoiceNumber, status, createdAt, updatedAt'>
+export type InvoiceMutation = Pick<
+  Invoice,'paid_amount' | 'discount'
+  > & {
+  client: string
+  associatedOrder?: string
+  associatedArrival?: string
+  services: ServiceArrival[]
+}
