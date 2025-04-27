@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import { ClipboardList, Link2, ListTodo, MoreHorizontal, Pencil, Trash2, Truck } from 'lucide-react'
+import { Link2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,8 @@ import Modal from '@/components/Modal/Modal.tsx'
 import useBreakpoint from '@/hooks/useBreakpoint.ts'
 import UseTaskCard from '@/features/tasks/hooks/useTaskCard.ts'
 import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import { getTaskIcon } from '@/features/tasks/utils/getTaskIcon.tsx'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
 
 const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, parent }) => {
   const { isMobile } = useBreakpoint()
@@ -39,9 +41,8 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
     handleEdit,
     handleDelete,
     handleCancelDelete,
+    dispatch,
   } = UseTaskCard(task, selectedUser)
-
-
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task._id,
@@ -56,17 +57,6 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
     touchAction: 'none',
-  }
-
-  const getTaskIcon = (type: string, className = '') => {
-    switch (type) {
-    case 'поставка':
-      return <Truck className={className} />
-    case 'заказ':
-      return <ClipboardList className={className} />
-    default:
-      return <ListTodo className={className} />
-    }
   }
 
   return (
@@ -179,8 +169,20 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
       </Modal>
-      <RightPanel open={openDetailModal} onOpenChange={setOpenDetailModal}>
-        <TaskDetails taskId={task._id} />
+      <RightPanel
+        open={openDetailModal}
+        onOpenChange={value => {
+          setOpenDetailModal(value)
+          if (!value) {
+            if (selectedUser) {
+              dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+            } else {
+              dispatch(fetchTasksWithPopulate())
+            }
+          }
+        }}
+      >
+        <TaskDetails taskId={task._id} selectedUser={selectedUser}/>
       </RightPanel>
     </div>
   )

@@ -51,7 +51,7 @@ const TaskBoard = () => {
       <TaskForm onSuccess={handleClose} />
     </Modal>
     <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
-      <TaskDetails taskId={id}/>
+      <TaskDetails taskId={id} selectedUser={selectedUser}/>
     </RightPanel>
     <DndContext
       sensors={sensors}

@@ -23,4 +23,5 @@ export interface UserListProps {
 export interface PropsStatus {
   task: TaskWithPopulate,
   selectedUser: string | null
+  taskId?: string
 }
