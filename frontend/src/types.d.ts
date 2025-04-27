@@ -176,7 +176,7 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
 
 export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
   products: ProductForOrderForm[]
-  defects: DefectForOrderForm[]
+  defects: DefectWithPopulate[]
   client: Client
   stock: Stock
 }
