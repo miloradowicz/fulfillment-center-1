@@ -15,6 +15,7 @@ export const useStockDetails = () => {
 
   const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const [writeOffModalOpen, setWriteOffModalOpen] = useState(false)
 
   const stockColumns = [
     { field: 'client', headerName: 'Клиент', flex: 1 },
@@ -58,6 +59,9 @@ export const useStockDetails = () => {
     setArchiveModalOpen(false)
   }
 
+  const openWriteOffModal = () => setWriteOffModalOpen(true)
+  const closeWriteOffModal = () => setWriteOffModalOpen(false)
+
   return {
     stock,
     stockId,
@@ -69,5 +73,8 @@ export const useStockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    writeOffModalOpen,
+    openWriteOffModal,
+    closeWriteOffModal,
   }
 }

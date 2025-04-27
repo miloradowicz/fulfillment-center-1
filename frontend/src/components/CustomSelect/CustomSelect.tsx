@@ -33,6 +33,7 @@ interface CustomSelectProps<T> {
   renderValue?: (item: T) => string
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   label?: string
+  disabled?: boolean
 }
 
 export const CustomSelect = <T extends { _id: string }>({
@@ -48,6 +49,7 @@ export const CustomSelect = <T extends { _id: string }>({
   renderValue,
   onBlur,
   label,
+  disabled,
 }: CustomSelectProps<T>) => {
   const handleSelection = (id: string) => {
     onSelect(id)
@@ -78,7 +80,7 @@ export const CustomSelect = <T extends { _id: string }>({
       {label && <Label className="text-sm font-medium leading-none">{label}</Label>}
 
       <Popover open={activePopover === popoverKey} onOpenChange={open => setActivePopover(open ? popoverKey : null)}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button variant="outline" className={cn('w-full justify-between', error && 'border-destructive')}>
             {value || placeholder}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

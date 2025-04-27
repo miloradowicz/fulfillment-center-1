@@ -128,14 +128,17 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = <T extends ItemType>(type: T, initialState: ItemInitialStateMap[T]) => {
+  const openModal = <T extends Extract<ItemType, ItemType.PRODUCTS | ItemType.RECEIVED_AMOUNT | ItemType.DEFECTS | ItemType.SERVICES>>(type: T, initialState: ItemInitialStateMap[T]) => {
     if (type === ItemType.SERVICES) {
       setNewService(initialState as ServiceArrival)
     } else {
       setNewItem(initialState as ProductArrival | Defect)
     }
 
-    const modalSetters: Record<ItemType, React.Dispatch<React.SetStateAction<boolean>>> = {
+    const modalSetters: Record<
+      Extract<ItemType, ItemType.PRODUCTS | ItemType.RECEIVED_AMOUNT | ItemType.DEFECTS | ItemType.SERVICES>,
+      React.Dispatch<React.SetStateAction<boolean>>
+    > = {
       [ItemType.PRODUCTS]: setProductsModalOpen,
       [ItemType.RECEIVED_AMOUNT]: setReceivedModalOpen,
       [ItemType.DEFECTS]: setDefectsModalOpen,

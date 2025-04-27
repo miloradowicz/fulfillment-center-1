@@ -47,5 +47,6 @@ export enum ItemType {
   RECEIVED_AMOUNT = 'received_amount',
   DEFECTS = 'defects',
   SERVICES = 'services',
+  WRITEOFFS = 'write_offs'
 }
 

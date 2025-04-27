@@ -2,6 +2,7 @@ import { FC, PropsWithChildren, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '@/app/hooks.ts'
 import { selectUser } from '@/store/slices/authSlice.ts'
+import { featureProtection } from '@/constants'
 
 interface Props extends PropsWithChildren {
   allowedRoles: string[]
@@ -17,11 +18,7 @@ const AllowedRoute: FC<Props> = ({ allowedRoles, children }) => {
     }
   }, [user, allowedRoles, navigate])
 
-  if (!user) {
-    return null
-  }
-
-  if (!allowedRoles.includes(user.role)) {
+  if (featureProtection && (!user || !allowedRoles.includes(user.role))) {
     return null
   }
 
