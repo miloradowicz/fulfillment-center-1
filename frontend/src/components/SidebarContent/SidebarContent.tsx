@@ -21,7 +21,7 @@ interface Props {
 const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
   return (
     <nav className="flex flex-col gap-1 mt-4 px-2">
-      <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+      <ProtectedElement allowedRoles={['super-admin', 'admin']}>
         <NavLink
           to="/admin"
           onClick={onLinkClick}
@@ -133,7 +133,7 @@ const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
         </NavLink>
       </ProtectedElement>
 
-      <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+      <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
         <NavLink
           to="/counterparties"
           onClick={onLinkClick}
@@ -147,7 +147,7 @@ const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
         </NavLink>
       </ProtectedElement>
 
-      <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+      <ProtectedElement allowedRoles={['super-admin', 'admin']}>
         <NavLink
           to="/archives"
           onClick={onLinkClick}
