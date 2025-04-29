@@ -27,6 +27,8 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
     }
   }
 
+
+
   const user = remainingUsers.find(u => u._id === selectedUser)
 
   useEffect(() => {
@@ -58,14 +60,17 @@ const UserList: React.FC<UserListProps> = ({ users, selectedUser, setSelectedUse
               onClick={() => handleUserClick(user._id)}
             >
               <div
-                className={`w-full h-full flex items-center justify-center rounded-full bg-white
+                className={`w-full h-full flex items-center justify-center rounded-full bg-white group
                         ${ selectedUser === user._id
-          ? 'border-0'
-          : 'hover:border-2 hover:border-blue-500' }
+          ? 'border-2 border-blue-400'
+          : 'hover:border-2 hover:border-blue-400' }
                       `}
               >
                 <div
-                  className="flex items-center justify-center bg-blue-500 text-white text-[18px] rounded-full w-[85%] h-[85%] font-bold"
+                  className={`flex items-center justify-center   text-gray-600 text-[18px] rounded-full w-[85%] h-[85%] font-bold
+                  ${ selectedUser === user._id
+          ? 'bg-blue-200'
+          : 'bg-gray-200 group-hover:bg-blue-200' }`}
                 >
                   {getUsersInitials(user.displayName)}
                 </div>
