@@ -49,6 +49,7 @@ export const CustomSelect = <T extends { _id: string }>({
   onBlur,
   label,
 }: CustomSelectProps<T>) => {
+
   const handleSelection = (id: string) => {
     onSelect(id)
     setActivePopover(null)
@@ -60,24 +61,23 @@ export const CustomSelect = <T extends { _id: string }>({
     }
   }
 
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (onBlur) {
-      const syntheticEvent = {
-        ...e,
-        target: {
-          ...e.target,
-          value: value || '',
-        },
-      } as React.FocusEvent<HTMLInputElement>
-      onBlur(syntheticEvent)
-    }
-  }
-
   return (
     <div className="space-y-2">
       {label && <Label className="text-sm font-medium leading-none">{label}</Label>}
 
-      <Popover open={activePopover === popoverKey} onOpenChange={open => setActivePopover(open ? popoverKey : null)}>
+      <Popover open={activePopover === popoverKey}
+        onOpenChange={open => {
+          setActivePopover(open ? popoverKey : null)
+
+          if (!open && !value && onBlur) {
+            const syntheticEvent = {
+              target: {
+                value: '',
+              },
+            } as React.FocusEvent<HTMLInputElement>
+            onBlur(syntheticEvent)
+          }
+        }}>
         <PopoverTrigger asChild>
           <Button variant="outline" className={cn('w-full justify-between', error && 'border-destructive')}>
             {value || placeholder}
@@ -86,7 +86,7 @@ export const CustomSelect = <T extends { _id: string }>({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder={searchPlaceholder} onBlur={handleInputBlur} />
+            <CommandInput placeholder={searchPlaceholder} />
             <CommandEmpty>Ничего не найдено.</CommandEmpty>
             <CommandList>
               {options?.map(item => (
