@@ -1,4 +1,4 @@
-export const copyToClipboard = (text: string | null) => {
+export const copyToClipboard = (text: string | null | undefined) => {
   if (text) {
     const tempInput = document.createElement('input')
     document.body.appendChild(tempInput)
