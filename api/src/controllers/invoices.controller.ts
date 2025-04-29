@@ -62,6 +62,12 @@ export class InvoicesController {
     return await this.invoicesService.archive(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveInvoice(@Param('id') id: string) {
+    return this.invoicesService.unarchive(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteInvoice(@Param('id') id: string) {

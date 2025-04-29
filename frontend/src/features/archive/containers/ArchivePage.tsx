@@ -27,6 +27,9 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { ArchiveRestore } from 'lucide-react'
 import ArchivedUsers from '@/features/archive/components/ArchivedUsers.tsx'
 import { selectUsersLoading } from '@/store/slices/userSlice.ts'
+import ArchivedServices from '@/features/archive/components/ArchivedServices.tsx'
+import { selectLoadingFetchArchiveService } from '@/store/slices/serviceSlice.ts'
+import ArchivedInvoices from '@/features/archive/components/ArchivedInvoices.tsx'
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -40,8 +43,9 @@ const ArchivePage = () =>  {
   const loadingTasks = useAppSelector(selectLoadingFetchArchivedTasks)
   const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
   const loadingUsers = useAppSelector(selectUsersLoading)
+  const loadingServices = useAppSelector(selectLoadingFetchArchiveService)
 
-  const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users'], [])
+  const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users', 'services', 'invoices'], [])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()
@@ -106,6 +110,8 @@ const ArchivePage = () =>  {
           <Tab label="Склады" {...TabProps(5)} />
           <Tab label="Контрагенты" {...TabProps(6)} />
           <Tab label="Пользователи" {...TabProps(7)} />
+          <Tab label="Услуги" {...TabProps(8)} />
+          <Tab label="Счета" {...TabProps(9)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -193,6 +199,28 @@ const ArchivePage = () =>  {
         ) : (
           <>
             <ArchivedUsers/>
+          </>
+        )}
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={8}>
+        {loadingServices ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedServices isActive={value === 8}/>
+          </>
+        )}
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={9}>
+        {loadingServices ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedInvoices isActive={value === 9}/>
           </>
         )}
       </CustomTabPanel>
