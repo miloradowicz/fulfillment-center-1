@@ -2,7 +2,7 @@ import useProductForm from '../hooks/useProductForm.ts'
 import { ProductWithPopulate } from '@/types'
 import React from 'react'
 import { getFieldError } from '@/utils/getFieldError.ts'
-import { Loader2, Plus } from 'lucide-react'
+import { LoaderCircle, Plus } from 'lucide-react'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -122,7 +122,7 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
       <Button type="submit" className="w-full mt-3" disabled={loadingAdd || loadingUpdate}>
         {initialData ? 'Сохранить' : 'Создать'}
-        {loadingAdd || loadingUpdate ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {loadingAdd || loadingUpdate ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

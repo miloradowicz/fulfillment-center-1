@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
-  selectArrivalError,
   selectArrivalWithPopulate,
   selectLoadingFetchArrival,
 } from '@/store/slices/arrivalSlice.ts'
@@ -17,12 +16,21 @@ const useArrivalDetails = () => {
 
   const arrival = useAppSelector(selectArrivalWithPopulate)
   const loading = useAppSelector(selectLoadingFetchArrival)
-  const error = useAppSelector(selectArrivalError)
+
   const [confirmArchiveModalOpen, setConfirmArchiveModalOpen] = useState(false)
   const [isArchived, setIsArchived] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
-  const [productsTab, setProductsTabs] = useState(0)
-  const [infoTab, setInfoTab] = useState(0)
+  const [tabs, setTabs] = useState(0)
+
+  const arrivalStatusStyles: Record<string, string> = {
+    'ожидается доставка': 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800 transition-colors',
+    'получена': 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-900 transition-colors',
+    'отсортирована': 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-900 transition-colors',
+    'default': 'bg-primary/10 text-primary/80 border hover:bg-primary/20 hover:text-primary transition-colors',
+  }
+
+  const tabStyles =
+    'data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary sm:px-3 py-1 my-1 text-sm rounded-xl transition-all cursor-pointer font-bold'
 
   useEffect(() => {
     if (arrivalId) {
@@ -30,16 +38,12 @@ const useArrivalDetails = () => {
     }
   }, [dispatch, arrivalId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleArchive = async () => {
     if (arrivalId) {
       try {
         await dispatch(archiveArrival(arrivalId)).unwrap()
         toast.success('Поставка успешно архивирована!')
-        setIsArchived(true)
+        setIsArchived(!isArchived)
         navigate('/arrivals')
       } catch (e) {
         if (hasMessage(e)) {
@@ -50,36 +54,21 @@ const useArrivalDetails = () => {
         }
       }
     }
-
     setConfirmArchiveModalOpen(false)
   }
 
-  const getStepDescription = (index: number) => {
-    const descriptions = [
-      'Товар отправлен заказчиком',
-      'Товар прибыл на склад',
-      'Товар отсортирован на складе',
-    ]
-    return descriptions[index] || ''
-  }
-
   return {
-    arrivalId,
     arrival,
     loading,
-    error,
-    productsTab,
-    infoTab,
     confirmArchiveModalOpen,
-    isArchived,
     handleArchive,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
-    setProductsTabs,
     setConfirmArchiveModalOpen,
-    setInfoTab,
-    getStepDescription,
+    tabs,
+    setTabs,
+    arrivalStatusStyles,
+    tabStyles,
   }
 }
 

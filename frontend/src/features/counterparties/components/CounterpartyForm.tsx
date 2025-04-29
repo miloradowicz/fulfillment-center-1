@@ -3,8 +3,8 @@ import { useCounterpartyForm } from '../hooks/useCounterpartyForm.ts'
 import { getFieldError } from '@/utils/getFieldError.ts'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Input } from '@/components/ui/input.tsx'
-import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
+import { LoaderCircle } from 'lucide-react'
 
 const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterparty | null; onClose?: () => void }) => {
   const {
@@ -46,10 +46,9 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
         onChange={inputChangeHandler}
       />
 
-
       <Button type="submit" disabled={loading} className="w-full mt-3">
         {counterparty ? 'Сохранить' : 'Создать'}
-        {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {loading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

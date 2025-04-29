@@ -1,9 +1,10 @@
 import Modal from '@/components/Modal/Modal.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
-import { Receipt, Loader2 } from 'lucide-react'
+import { Receipt } from 'lucide-react'
 import InvoicesDataList from '@/features/invoices/components/InvoicesDataList.tsx'
 import { useInvoicesPage } from '@/features/invoices/hooks/useInvoicesPage.ts'
+import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const InvoicesPage = () => {
@@ -12,11 +13,7 @@ const InvoicesPage = () => {
 
   return (
     <>
-      {loading && (
-        <div className="flex justify-center items-center my-10">
-          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
-        </div>
-      )}
+      {loading ? <Loader/> : null}
       <Modal handleClose={handleClose} open={open}>Форма создания</Modal>
       <div className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-between gap-4">
         <CustomTitle text={'Счета'} icon={<Receipt size={25} />}/>

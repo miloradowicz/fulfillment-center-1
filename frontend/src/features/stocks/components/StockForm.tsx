@@ -5,7 +5,7 @@ import { getFieldError } from '@/utils/getFieldError.ts'
 import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 
 interface Props {
   initialData?: Stock | undefined
@@ -44,7 +44,7 @@ const StockForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
       <Button type="submit" disabled={isLoading} className="w-full mt-3">
         {initialData ? 'Сохранить' : 'Создать'}
-        {isLoading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {isLoading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

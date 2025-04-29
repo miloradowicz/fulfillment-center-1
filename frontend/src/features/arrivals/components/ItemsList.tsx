@@ -2,7 +2,7 @@ import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder } fr
 import { Button } from '@/components/ui/button.tsx'
 import { Trash2 } from 'lucide-react'
 
-type Item = ProductArrival | Defect | ServiceArrival
+type Item = ProductArrival | Defect | ServiceArrival | ProductOrder | ServiceOrder
 
 interface Props<T extends Item> {
   items: T[]
