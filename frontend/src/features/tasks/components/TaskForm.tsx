@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Loader2 } from 'lucide-react'
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -24,7 +25,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
     errors,
     addLoading,
     updateLoading,
-    handleInputChange,
     handleSubmit,
     handleBlur,
     setForm,
@@ -58,7 +58,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
         name="title"
         placeholder="Название"
         value={form.title}
-        onChange={handleInputChange}
+        onChange={e => inputChangeHandler(e, setForm)}
         error={errors.title || getFieldError('title', error)}
         onBlur={e => handleBlur('title', e.target.value)}
       />
@@ -67,7 +67,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
         name="description"
         placeholder="Описание задачи"
         value={form.description}
-        onChange={handleInputChange}
+        onChange={e => inputChangeHandler(e, setForm)}
         className="resize-y min-h-[40px] max-h-[200px]"
       />
 
