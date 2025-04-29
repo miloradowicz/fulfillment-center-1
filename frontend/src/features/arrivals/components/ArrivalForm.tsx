@@ -19,6 +19,7 @@ import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { cn } from '@/lib/utils.ts'
 import FormAccordion from '@/components/FormAccordion/FormAccordion.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -526,6 +527,20 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           onRemoveFile={handleRemoveFile}
           onFileChange={handleFileChange}
         />
+
+        <Separator/>
+
+        <div className="space-y-2.5">
+          <Label htmlFor="comment">Комментарий к поставке</Label>
+          <Textarea
+            id="comment"
+            name="comment"
+            placeholder="Ваш комментарий..."
+            value={form.comment}
+            onChange={e => inputChangeHandler(e, setForm)}
+            className="resize-y min-h-[40px] max-h-[250px]"
+          />
+        </div>
 
         <Button type="submit" className="w-full mt-3" disabled={isLoading}>
           {initialData ? 'Сохранить' : 'Создать'}
