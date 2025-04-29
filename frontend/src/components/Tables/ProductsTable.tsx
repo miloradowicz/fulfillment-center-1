@@ -13,7 +13,7 @@ const ProductsTable: React.FC<Props> = ({ products, defects }) => {
 
   return (
     data?.length !== 0 ?
-      <Table className="mt-3">
+      <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="font-bold">Наименование</TableHead>
@@ -48,7 +48,7 @@ const ProductsTable: React.FC<Props> = ({ products, defects }) => {
         </TableBody>
       </Table>
       : <p className="text-sm text-muted-foreground font-bold text-center mt-3">
-        {isDefectsTable ? 'Дефекты отсутствуют' : 'Товары отсутствуют'}
+        {isDefectsTable ? 'Дефекты отсутствуют.' : 'Товары отсутствуют.'}
       </p>
   )
 }
