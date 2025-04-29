@@ -12,6 +12,7 @@ export const initialState = {
   received_amount: [],
   arrival_status: '',
   documents: [],
+  comment: '',
 }
 
 export const initialItemState = {
