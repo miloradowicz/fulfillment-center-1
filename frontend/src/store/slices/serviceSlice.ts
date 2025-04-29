@@ -30,7 +30,7 @@ interface ServiceState {
 const initialState: ServiceState = {
   service: null,
   services: [],
-  archivedServices:[],
+  archivedServices:null,
   loadingFetch: false,
   loadingFetchOne: false,
   loadingFetchArchive:false,

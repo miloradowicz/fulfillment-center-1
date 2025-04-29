@@ -6,11 +6,9 @@ import useArchivedServicesActions from '@/features/archive/hooks/useArchivedServ
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
-import React from 'react'
-type Props = {
-  isActive: boolean
-}
-const ArchivedServices:React.FC<Props> = ({ isActive }) => {
+import { Loader2 } from 'lucide-react'
+
+const ArchivedServices = () => {
   const {
     services,
     confirmationOpen,
@@ -18,7 +16,8 @@ const ArchivedServices:React.FC<Props> = ({ isActive }) => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-  } = useArchivedServicesActions(isActive)
+    loading,
+  } = useArchivedServicesActions()
 
   const columns: ColumnDef<PopulatedService>[] = [
     {
@@ -71,7 +70,11 @@ const ArchivedServices:React.FC<Props> = ({ isActive }) => {
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      <DataTable columns={columns} data={services ?? []}/>
+      {loading?
+        <div className="flex justify-center items-center my-10">
+          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
+        </div> :<><DataTable columns={columns} data={services ?? []}/></>}
+
 
       <ConfirmationModal
         open={confirmationOpen}

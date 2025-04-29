@@ -1,17 +1,15 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Service } from '@/types'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { deleteService, fetchArchivedServices, unarchiveService } from '@/store/thunks/serviceThunk.ts'
 import {
-  selectAllArchivedServices,
-  selectLoadingFetchArchiveService,
-  selectServiceError,
+  selectAllArchivedServices, selectLoadingFetchArchiveService,
 } from '@/store/slices/serviceSlice.ts'
 
-const useArchivedServiceActions = (isActive: boolean) => {
+const useArchivedServiceActions = () => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -22,17 +20,18 @@ const useArchivedServiceActions = (isActive: boolean) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const loading = useAppSelector(selectLoadingFetchArchiveService)
-  const error = useAppSelector(selectServiceError)
-
-  const fetchServices = useCallback(() => {
-    dispatch(fetchArchivedServices())
-  }, [dispatch])
+  const [searchParams] = useSearchParams()
+  const tab = searchParams.get('tab')
 
   useEffect(() => {
-    if (isActive && !loading && (!services || services.length === 0)) {
-      fetchServices()
+    if (tab === 'services') {
+      const fetchData = async () => {
+        await dispatch(fetchArchivedServices())
+      }
+      void fetchData()
     }
-  }, [isActive, loading, services, fetchServices])
+  }, [dispatch, tab])
+
 
   const deleteOneService = async (id: string) => {
     try {
@@ -106,14 +105,13 @@ const useArchivedServiceActions = (isActive: boolean) => {
     handleClose,
     id,
     navigate,
-    loading,
-    error,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
     serviceToActionId,
+    loading,
   }
 }
 

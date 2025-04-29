@@ -5,12 +5,10 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
-import React from 'react'
 import useArchivedInvoiceActions from '@/features/archive/hooks/useArchivedInvoiceActions.ts'
-type Props = {
-  isActive: boolean
-}
-const ArchivedInvoices:React.FC<Props> = ({ isActive }) => {
+import { Loader2 } from 'lucide-react'
+
+const ArchivedInvoices = () => {
   const {
     invoices,
     confirmationOpen,
@@ -18,7 +16,8 @@ const ArchivedInvoices:React.FC<Props> = ({ isActive }) => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-  } = useArchivedInvoiceActions(isActive)
+    loading,
+  } = useArchivedInvoiceActions()
 
   const columns: ColumnDef<Invoice>[] = [
     {
@@ -102,7 +101,10 @@ const ArchivedInvoices:React.FC<Props> = ({ isActive }) => {
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      <DataTable columns={columns} data={invoices ?? []}/>
+      {loading?
+        <div className="flex justify-center items-center my-10">
+          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
+        </div> :<> <DataTable columns={columns} data={invoices ?? []}/></>}
 
       <ConfirmationModal
         open={confirmationOpen}

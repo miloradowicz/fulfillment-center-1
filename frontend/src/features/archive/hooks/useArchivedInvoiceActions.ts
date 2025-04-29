@@ -1,14 +1,15 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import {  useEffect, useState } from 'react'
 import { Invoice } from '@/types'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
-import { selectServiceError } from '@/store/slices/serviceSlice.ts'
-import { selectAllArchivedInvoices, selectLoadingFetchArchive } from '@/store/slices/invoiceSlice.ts'
+import {
+  selectAllArchivedInvoices, selectLoadingFetchArchiveInvoice,
+} from '@/store/slices/invoiceSlice.ts'
 import { deleteInvoice, fetchArchivedInvoices, unarchiveInvoice } from '@/store/thunks/invoiceThunk.ts'
 
-const useArchivedInvoiceActions = (isActive: boolean) => {
+const useArchivedInvoiceActions = () => {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -18,18 +19,18 @@ const useArchivedInvoiceActions = (isActive: boolean) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const { id } = useParams()
   const navigate = useNavigate()
-  const loading = useAppSelector(selectLoadingFetchArchive)
-  const error = useAppSelector(selectServiceError)
-
-  const fetchInvoices = useCallback(() => {
-    dispatch(fetchArchivedInvoices())
-  }, [dispatch])
+  const loading = useAppSelector(selectLoadingFetchArchiveInvoice)
+  const [searchParams] = useSearchParams()
+  const tab = searchParams.get('tab')
 
   useEffect(() => {
-    if (isActive && !loading && (!invoices || invoices.length === 0)) {
-      fetchInvoices()
+    if (tab === 'invoices') {
+      const fetchData = async () => {
+        await dispatch(fetchArchivedInvoices())
+      }
+      void fetchData()
     }
-  }, [isActive, loading, invoices, fetchInvoices])
+  }, [dispatch, tab])
 
   const deleteOneInvoice = async (id: string) => {
     try {
@@ -103,14 +104,13 @@ const useArchivedInvoiceActions = (isActive: boolean) => {
     handleClose,
     id,
     navigate,
-    loading,
-    error,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
     invoiceToActionId,
+    loading,
   }
 }
 
