@@ -91,6 +91,19 @@ export class ServicesService {
     return { message: 'Услуга перемещена в архив' }
   }
 
+  async unarchive(id: string) {
+    const service = await this.serviceModel.findById(id)
+
+    if (!service) throw new NotFoundException('Услуга не найдена')
+
+    if (!service.isArchived) throw new ForbiddenException('Услуга не находится в архиве')
+
+    service.isArchived = false
+    await service.save()
+
+    return { message: 'Услуга восстановлена из архива' }
+  }
+
   async delete(id: string) {
     const service = await this.serviceModel.findByIdAndDelete(id)
     if (!service) throw new NotFoundException('Услуга не найдена')

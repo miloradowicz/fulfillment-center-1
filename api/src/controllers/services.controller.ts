@@ -36,6 +36,12 @@ export class ServicesController {
     return this.servicesService.getArchivedById(id)
   }
 
+  @Roles('super-admin', 'admin')
+  @Patch(':id/unarchive')
+  async unarchiveService(@Param('id') id: string) {
+    return this.servicesService.unarchive(id)
+  }
+
   @Post()
   async createService(@Body() serviceDto: CreateServiceDto) {
     return this.servicesService.create(serviceDto)
