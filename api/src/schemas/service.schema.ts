@@ -42,7 +42,7 @@ export class Service {
     type: String,
     enum: ['внутренняя', 'внешняя'],
     required: true,
-    default: 'internal',
+    default: 'внутренняя',
   })
   type: 'внутренняя' | 'внешняя'
 

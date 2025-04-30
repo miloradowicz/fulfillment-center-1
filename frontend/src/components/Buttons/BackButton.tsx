@@ -2,14 +2,22 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button.tsx'
 import { ChevronLeft } from 'lucide-react'
 
-const BackButton = () => {
+interface BackButtonProps {
+  to?: string
+}
+
+const BackButton: React.FC<BackButtonProps> = ({ to }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
   const pathWithoutId = location.pathname.split('/').slice(0, -1).join('/')
 
   const handleClick = () => {
-    navigate(pathWithoutId)
+    if (to) {
+      navigate(to)
+    } else {
+      navigate(pathWithoutId)
+    }
   }
 
   return (

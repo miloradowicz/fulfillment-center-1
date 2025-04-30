@@ -24,6 +24,9 @@ export class InvoiceServiceDto {
   @IsNumber({}, { message: 'Цена должна быть числом.' })
   @IsPositive({ message: 'Цена должна быть больше 0.' })
   service_price?: number
+
+  @IsEnum(['внутренняя', 'внешняя'], { message: 'Тип услуги должен быть "внутренняя" или "внешняя".' })
+  service_type: 'внутренняя' | 'внешняя'
 }
 
 export class InvoiceLogDto {
@@ -45,6 +48,18 @@ export class CreateInvoiceDto {
   @ValidateNested({ each: true })
   @Type(() => InvoiceServiceDto)
   services: InvoiceServiceDto[]
+
+  @IsOptional()
+  @IsArray({ message: 'Список услуг из поставки должен быть массивом.' })
+  @ValidateNested({ each: true })
+  @Type(() => InvoiceServiceDto)
+  associatedArrivalServices?: InvoiceServiceDto[]
+
+  @IsOptional()
+  @IsArray({ message: 'Список услуг из заказа должен быть массивом.' })
+  @ValidateNested({ each: true })
+  @Type(() => InvoiceServiceDto)
+  associatedOrderServices?: InvoiceServiceDto[]
 
   @IsOptional()
   @IsPositive({ message: 'Сумма должна быть больше 0.' })
