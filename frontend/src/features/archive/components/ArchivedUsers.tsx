@@ -28,34 +28,20 @@ const ArchivedUsers = () => {
     },
     {
       accessorKey: 'displayName',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Отображаемое имя" />
-      ),
-      meta: {
-        title: 'Отображаемое имя',
-      },
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Отображаемое имя" />,
       cell: ({ row }) => (
         <div className="font-medium">{row.original.displayName}</div>
       ),
+      enableHiding: false,
     },
     {
       accessorKey: 'email',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Email" />
-      ),
-      meta: {
-        title: 'Email',
-      },
+      header:'Email' ,
       cell: ({ row }) => <div>{row.original.email}</div>,
     },
     {
       accessorKey: 'role',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Роль" />
-      ),
-      meta: {
-        title: 'Роль',
-      },
+      header:'Роль',
       cell: ({ row }) => {
         const role = row.original.role
         const variant = role === 'super-admin' ? 'destructive' :

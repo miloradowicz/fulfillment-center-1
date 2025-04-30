@@ -35,12 +35,13 @@ const ArchivedInvoices = () => {
         const invoice = row.original
         return (
           <div
-            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 hover:text-blue-800 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
+            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
           >
             {invoice.invoiceNumber}
           </div>
         )
       },
+      enableHiding: false,
     },
     {
       accessorKey: 'client.name',
@@ -108,7 +109,7 @@ const ArchivedInvoices = () => {
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="эту услугу"
+        entityName="этот счет"
         actionType={actionType}
         onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}

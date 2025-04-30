@@ -3,14 +3,17 @@ import { selectAllArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteArrival, fetchArchivedArrivals, unarchiveArrival } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
+import { ArrivalWithClient } from '@/types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArchivedArrivalsActions = () => {
   const dispatch = useAppDispatch()
   const arrivals = useAppSelector(selectAllArchivedArrivals)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [unarchiveModalOpen, setUnarchiveModalOpen] = useState(false)
-  const [selectedArrivalId, setSelectedArrivalId] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [arrivalToActionId, setArrivalToActionId] = useState<string | null>(null)
+  const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
+  const [selectedArrival, setSelectedArrival] = useState<ArrivalWithClient | null>(null)
 
   const fetchAllArchivedArrivals = useCallback(async () => {
     await dispatch(fetchArchivedArrivals())
@@ -20,61 +23,82 @@ export const useArchivedArrivalsActions = () => {
     void dispatch(fetchArchivedArrivals())
   }, [dispatch])
 
+  const deleteOneArrival = async (id: string) => {
+    try {
+      await dispatch(deleteArrival(id)).unwrap()
+      await fetchAllArchivedArrivals()
+      toast.success('Поставка успешно удалена!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось удалить поставку')
+      }
+      console.error(e)
+    }
+  }
+
+  const unarchiveOneArrival = async (id: string) => {
+    try {
+      await dispatch(unarchiveArrival(id)).unwrap()
+      await fetchAllArchivedArrivals()
+      toast.success('Поставка успешно восстановлена!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось восстановить поставку')
+      }
+      console.error(e)
+    }
+  }
+
+  const handleOpen = (arrival?: ArrivalWithClient) => {
+    if (arrival) {
+      setSelectedArrival(arrival)
+    }
+    setOpen(true)
+  }
+
   const handleClose = () => {
-    setIsOpen(false)
-    setDeleteModalOpen(false)
-    setUnarchiveModalOpen(false)
+    setOpen(false)
   }
 
-  const handleDeleteClick = (arrivalId: string) => {
-    setSelectedArrivalId(arrivalId)
-    setDeleteModalOpen(true)
+  const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
+    setArrivalToActionId(id)
+    setActionType(type)
+    setConfirmationOpen(true)
   }
 
-  const handleUnarchiveClick = (arrivalId: string) => {
-    setSelectedArrivalId(arrivalId)
-    setUnarchiveModalOpen(true)
+  const handleConfirmationClose = () => {
+    setConfirmationOpen(false)
+    setArrivalToActionId(null)
   }
 
-  const handleConfirmDelete = async () => {
-    try {
-      if (selectedArrivalId) {
-        await dispatch(deleteArrival(selectedArrivalId))
-        await fetchAllArchivedArrivals()
-        toast.success('Поставка успешно удалена.')
-      }
-    } catch (e) {
-      toast.error('Ошибка при удалении поставки.')
-      console.error(e)
-    } finally {
-      handleClose()
+  const handleConfirmationAction = async () => {
+    if (!arrivalToActionId) return
+
+    if (actionType === 'delete') {
+      await deleteOneArrival(arrivalToActionId)
+    } else {
+      await unarchiveOneArrival(arrivalToActionId)
     }
+
+    handleConfirmationClose()
   }
 
-  const handleConfirmUnarchive = async () => {
-    try {
-      if (selectedArrivalId) {
-        await dispatch(unarchiveArrival(selectedArrivalId))
-        await fetchAllArchivedArrivals()
-        toast.success('Поставка успешно восстановлена!')
-      }
-    } catch (e) {
-      toast.error('Ошибка при восстановлении поставки.')
-      console.error(e)
-    } finally {
-      handleClose()
-    }
-  }
 
   return {
     arrivals,
-    handleDeleteClick,
-    handleConfirmDelete,
-    handleUnarchiveClick,
-    handleConfirmUnarchive,
-    isOpen,
-    deleteModalOpen,
-    unarchiveModalOpen,
+    selectedArrival,
+    open,
+    handleOpen,
     handleClose,
+    confirmationOpen,
+    actionType,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationAction,
+    arrivalToActionId,
   }
 }

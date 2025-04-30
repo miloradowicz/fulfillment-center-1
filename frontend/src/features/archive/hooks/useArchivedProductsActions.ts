@@ -7,28 +7,20 @@ import {
 } from '@/store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
 import {
-  clearErrorProduct, selectAllArchivedProducts, selectArchivedProduct, selectLoadingFetchArchivedProduct,
-  selectProductError,
+  clearErrorProduct, selectAllArchivedProducts,
 } from '@/store/slices/productSlice.ts'
-import { useNavigate, useParams } from 'react-router-dom'
 import { ProductWithPopulate } from '@/types'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 
 const useArchivedProductActions = () => {
   const dispatch = useAppDispatch()
+  const products = useAppSelector(selectAllArchivedProducts)
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const [productToDeleteId, setProductToDeleteId] = useState<string | null>(null)
-  const products = useAppSelector(selectAllArchivedProducts)
+  const [productToActionId, setProductToActionId] = useState<string | null>(null)
+  const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
-  const [unarchiveConfirmationOpen, setUnarchiveConfirmationOpen] = useState(false)
-  const [productToUnarchiveId, setProductToUnarchiveId] = useState<string | null>(null)
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const product = useAppSelector(selectArchivedProduct)
-  const loading = useAppSelector(selectLoadingFetchArchivedProduct)
-  const error = useAppSelector(selectProductError)
 
   const clearErrors = useCallback(() => {
     dispatch(clearErrorProduct())
@@ -47,30 +39,33 @@ const useArchivedProductActions = () => {
     void fetchAllProducts()
   }, [fetchAllProducts])
 
-  const handleUnarchiveProduct = async (id: string) => {
-    try {
-      await dispatch(unarchiveProduct(id)).unwrap()
-      toast.success('Продукт успешно восстановлен!')
-      fetchArchivedProducts()
-    } catch (e) {
-      if (isGlobalError(e) || hasMessage(e)) {
-        toast.error(e.message)
-      } else {
-        toast.error('Ошибка при восстановлении продукта')
-      }
-    }
-  }
+
 
   const deleteOneProduct = async (id: string) => {
     try {
       await dispatch(deleteProduct(id)).unwrap()
       await dispatch(fetchArchivedProducts())
-      toast.success('Товар успешно удалён!')
+      toast.success('Товар успешно удален!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
       } else {
         toast.error('Не удалось удалить товар')
+      }
+      console.error(e)
+    }
+  }
+
+  const unarchiveOneProduct = async (id: string) => {
+    try {
+      await dispatch(unarchiveProduct(id)).unwrap()
+      fetchArchivedProducts()
+      toast.success('Товар успешно восстановлен!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось восстановить товар')
       }
       console.error(e)
     }
@@ -85,64 +80,42 @@ const useArchivedProductActions = () => {
 
   const handleClose = () => {
     setOpen(false)
-    clearErrors()
   }
 
-  const handleConfirmationOpen = (id: string) => {
-    setProductToDeleteId(id)
+  const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
+    setProductToActionId(id)
+    setActionType(type)
     setConfirmationOpen(true)
   }
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false)
-    setProductToDeleteId(null)
+    setProductToActionId(null)
   }
 
-  const handleConfirmationDelete = async () => {
-    if (productToDeleteId) await deleteOneProduct(productToDeleteId)
-    handleConfirmationClose()
-  }
+  const handleConfirmationAction = async () => {
+    if (!productToActionId) return
 
-  const handleUnarchiveConfirmationOpen = (id: string) => {
-    setProductToUnarchiveId(id)
-    setUnarchiveConfirmationOpen(true)
-  }
-
-  const handleUnarchiveConfirmationClose = () => {
-    setUnarchiveConfirmationOpen(false)
-    setProductToUnarchiveId(null)
-  }
-
-  const handleUnarchiveConfirm = async () => {
-    if (productToUnarchiveId) {
-      await handleUnarchiveProduct(productToUnarchiveId)
+    if (actionType === 'delete') {
+      await deleteOneProduct(productToActionId)
+    } else {
+      await unarchiveOneProduct(productToActionId)
     }
-    handleUnarchiveConfirmationClose()
+
+    handleConfirmationClose()
   }
 
   return {
     products,
-    product,
     selectedProduct,
-    deleteOneProduct,
-    fetchAllProducts,
     open,
     handleOpen,
     handleClose,
-    id,
-    navigate,
-    loading,
-    error,
     confirmationOpen,
-    unarchiveConfirmationOpen,
+    actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    handleUnarchiveProduct,
-    handleUnarchiveConfirmationOpen,
-    handleUnarchiveConfirmationClose,
-    handleUnarchiveConfirm,
-    productToDeleteId,
+    handleConfirmationAction,
   }
 }
 

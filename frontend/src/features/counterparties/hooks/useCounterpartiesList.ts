@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
-import { archiveCounterparty, fetchAllCounterparties } from '@/store/thunks/counterpartyThunk.ts'
+import {
+  archiveCounterparty,
+  fetchAllArchivedCounterparties,
+  fetchAllCounterparties,
+} from '@/store/thunks/counterpartyThunk.ts'
 import { selectAllCounterparties, selectLoadingFetch } from '@/store/slices/counterpartySlices.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
@@ -27,6 +31,7 @@ export const useCounterpartiesList = () => {
     try {
       await dispatch(archiveCounterparty(id)).unwrap()
       await dispatch(fetchCounterparties)
+      await dispatch(fetchAllArchivedCounterparties())
       navigate('/counterparties')
       void fetchAllCounterparties()
       toast.success('Контрагент успешно архивирован!')

@@ -1,137 +1,80 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import UnarchiveIcon from '@mui/icons-material/Unarchive'
 import { Counterparty } from '@/types'
-import { ruRU } from '@mui/x-data-grid/locales'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { useArchivedCounterpartiesActions } from '../hooks/useArchivedCounterpartiesActions.ts'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
 
 const ArchivedCounterparties = () => {
   const {
     counterparties,
-    loading,
     confirmationOpen,
-    unarchiveConfirmationOpen,
+    actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    handleUnarchiveConfirmationOpen,
-    handleUnarchiveConfirmationClose,
-    handleUnarchiveConfirm,
+    handleConfirmationAction,
   } = useArchivedCounterpartiesActions(true)
 
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const columns: ColumnDef<Counterparty>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: 'name',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Название" />,
+      enableColumnFilter: true,
+      enableHiding: false,
+      cell: info => info.getValue(),
+    },
+    {
+      accessorKey: 'phone_number',
+      header: 'Телефон',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
+    },
+    {
+      accessorKey: 'address',
+      header: 'Адрес',
+      enableColumnFilter: true,
+      cell: info => info.getValue() || '—',
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableCounterparty = row.original
 
-  const columns: GridColDef<Counterparty>[] = [
-    {
-      field: 'name',
-      headerName: 'Название',
-      flex: 1,
-      minWidth: isMediumScreen ? 220 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      sortable: true,
-    },
-    {
-      field: 'phone_number',
-      headerName: 'Телефон',
-      flex: 1,
-      minWidth: isMediumScreen ? 140 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-    },
-    {
-      field: 'address',
-      headerName: 'Адрес',
-      flex: 1,
-      minWidth: isMediumScreen ? 220 : 160,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: true,
-    },
-    {
-      field: 'Actions',
-      headerName: '',
-      minWidth: isMediumScreen ? 80 : 80,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Box>
-          <IconButton onClick={() => handleConfirmationOpen(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <IconButton onClick={() => handleUnarchiveConfirmationOpen(row._id)}>
-            <UnarchiveIcon />
-          </IconButton>
-        </Box>
-      ),
+        return (
+          <TableArchivedActionsMenu<Counterparty>
+            row={tableCounterparty}
+            onDelete={id => handleConfirmationOpen(id, 'delete')}
+            onRestore={id => handleConfirmationOpen(id, 'unarchive')}
+          />
+        )
+      },
     },
   ]
 
   return (
-    <Box className="max-w-[1100px] mx-auto w-full">
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={counterparties || []}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={{
-            '& .MuiDataGrid-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              padding: '8px 16px',
-            },
-          }}
-        />
-      )}
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={counterparties ?? []}/>
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="этого контрагента"
-        actionType="delete"
-        onConfirm={handleConfirmationDelete}
+        entityName="этого клиента"
+        actionType={actionType}
+        onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}
       />
-
-      <ConfirmationModal
-        open={unarchiveConfirmationOpen}
-        entityName="этого контрагента"
-        actionType="unarchive"
-        onConfirm={handleUnarchiveConfirm}
-        onCancel={handleUnarchiveConfirmationClose}
-      />
-    </Box>
+    </div>
   )
 }
 

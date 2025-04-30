@@ -4,31 +4,24 @@ import { deleteClient, fetchArchivedClients, unarchiveClient } from '@/store/thu
 import {
   clearClientError,
   selectAllArchivedClients,
-  selectArchivedClient,
-  selectClientError,
   selectLoadingArchivedClients,
 } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { Client } from '@/types'
 
-export const useArchivedClientActions = (fetchOnDelete: boolean) => {
+
+export const useArchivedClientActions = () => {
   const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
-  const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const [clientToDeleteId, setClientToDeleteId] = useState<string | null>(null)
-
-  const [unarchiveConfirmationOpen, setUnarchiveConfirmationOpen] = useState(false)
-  const [clientToUnarchiveId, setClientToUnarchiveId] = useState<string | null>(null)
-
   const clients = useAppSelector(selectAllArchivedClients)
-  const { id } = useParams()
-  const client = useAppSelector(selectArchivedClient)
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-  const error = useAppSelector(selectClientError)
   const loading = useAppSelector(selectLoadingArchivedClients)
   const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [clientToActionId, setClientToActionId] = useState<string | null>(null)
+  const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 
   const clearErrors = useCallback(() => {
     dispatch(clearClientError())
@@ -46,34 +39,32 @@ export const useArchivedClientActions = (fetchOnDelete: boolean) => {
     void fetchAllArchivedClients()
   }, [fetchAllArchivedClients])
 
-  const handleUnarchiveClient = async (id: string) => {
-    try {
-      await dispatch(unarchiveClient(id)).unwrap()
-      toast.success('Клиент успешно восстановлен!')
-      await fetchAllArchivedClients()
-    } catch (e) {
-      if (isGlobalError(e) || hasMessage(e)) {
-        toast.error(e.message)
-      } else {
-        toast.error('Ошибка при восстановлении клиента')
-      }
-    }
-  }
 
   const deleteOneClient = async (id: string) => {
     try {
       await dispatch(deleteClient(id)).unwrap()
-      if (fetchOnDelete) {
-        await fetchAllArchivedClients()
-      } else {
-        navigate('/clients')
-      }
-      toast.success('Клиент успешно удалён!')
+      await fetchAllArchivedClients()
+      toast.success('Клиент успешно удален!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)
       } else {
         toast.error('Не удалось удалить клиента')
+      }
+      console.error(e)
+    }
+  }
+
+  const unarchiveOneClient = async (id: string) => {
+    try {
+      await dispatch(unarchiveClient(id)).unwrap()
+      await fetchAllArchivedClients()
+      toast.success('Клиент успешно восстановлен!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось восстановить клиента')
       }
       console.error(e)
     }
@@ -88,61 +79,44 @@ export const useArchivedClientActions = (fetchOnDelete: boolean) => {
 
   const handleClose = () => {
     setOpen(false)
-    clearErrors()
   }
 
-  const handleConfirmationOpen = (id: string) => {
-    setClientToDeleteId(id)
+  const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
+    setClientToActionId(id)
+    setActionType(type)
     setConfirmationOpen(true)
   }
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false)
-    setClientToDeleteId(null)
+    setClientToActionId(null)
   }
 
-  const handleConfirmationDelete = () => {
-    if (clientToDeleteId) deleteOneClient(clientToDeleteId)
-    handleConfirmationClose()
-  }
+  const handleConfirmationAction = async () => {
+    if (!clientToActionId) return
 
-  const handleUnarchiveConfirmationOpen = (id: string) => {
-    setClientToUnarchiveId(id)
-    setUnarchiveConfirmationOpen(true)
-  }
-
-  const handleUnarchiveConfirmationClose = () => {
-    setUnarchiveConfirmationOpen(false)
-    setClientToUnarchiveId(null)
-  }
-
-  const handleUnarchiveConfirm = async () => {
-    if (clientToUnarchiveId) {
-      await handleUnarchiveClient(clientToUnarchiveId)
+    if (actionType === 'delete') {
+      await deleteOneClient(clientToActionId)
+    } else {
+      await unarchiveOneClient(clientToActionId)
     }
-    handleUnarchiveConfirmationClose()
+
+    handleConfirmationClose()
   }
 
   return {
     clients,
-    client,
     selectedClient,
     open,
-    confirmationOpen,
-    unarchiveConfirmationOpen,
-    error,
-    loading,
-    id,
-    navigate,
-    handleUnarchiveClient,
-    deleteOneClient,
     handleOpen,
     handleClose,
+    navigate,
+    confirmationOpen,
+    actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    handleUnarchiveConfirmationOpen,
-    handleUnarchiveConfirmationClose,
-    handleUnarchiveConfirm,
+    handleConfirmationAction,
+    clientToActionId,
+    loading,
   }
 }

@@ -1,18 +1,20 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { deleteOrder, unarchiveOrder, fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { selectAllArchivedOrders, selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import { OrderWithClient } from '@/types'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArchivedOrdersActions = () => {
   const dispatch = useAppDispatch()
   const orders = useAppSelector(selectAllArchivedOrders) as OrderWithClient[] | null
   const isLoading = useAppSelector(selectLoadingFetchArchivedOrders)
-
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [unarchiveModalOpen, setUnarchiveModalOpen] = useState(false)
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [orderToActionId, setOrderToActionId] = useState<string | null>(null)
+  const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithClient | null>(null)
 
   useEffect(() => {
     if (!orders && !isLoading) {
@@ -20,58 +22,82 @@ export const useArchivedOrdersActions = () => {
     }
   }, [dispatch, orders, isLoading])
 
-  const handleDeleteClick = useCallback((orderId: string) => {
-    setSelectedOrderId(orderId)
-    setDeleteModalOpen(true)
-  }, [])
-
-  const handleUnarchiveClick = useCallback((orderId: string) => {
-    setSelectedOrderId(orderId)
-    setUnarchiveModalOpen(true)
-  }, [])
-
-  const handleConfirmDelete = useCallback(async () => {
-    if (!selectedOrderId) return
+  const deleteOneOrder = async (id: string) => {
     try {
-      await dispatch(deleteOrder(selectedOrderId)).unwrap()
+      await dispatch(deleteOrder(id)).unwrap()
       await dispatch(fetchArchivedOrders())
-      toast.success('Заказ успешно удалён')
-    } catch (error) {
-      toast.error('Ошибка при удалении заказа')
-      console.error(error)
-    } finally {
-      setDeleteModalOpen(false)
+      toast.success('Заказ успешно удален!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось удалить заказ')
+      }
+      console.error(e)
     }
-  }, [dispatch, selectedOrderId])
+  }
 
-  const handleConfirmUnarchive = useCallback(async () => {
-    if (!selectedOrderId) return
+  const unarchiveOneOrder = async (id: string) => {
     try {
-      await dispatch(unarchiveOrder(selectedOrderId)).unwrap()
+      await dispatch(unarchiveOrder(id)).unwrap()
       await dispatch(fetchArchivedOrders())
-      toast.success('Заказ успешно восстановлен')
-    } catch (error) {
-      toast.error('Ошибка при восстановлении заказа')
-      console.error(error)
-    } finally {
-      setUnarchiveModalOpen(false)
+      toast.success('Заказ успешно восстановлен!')
+    } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось восстановить заказ')
+      }
+      console.error(e)
     }
-  }, [dispatch, selectedOrderId])
+  }
 
-  const handleCloseModals = useCallback(() => {
-    setDeleteModalOpen(false)
-    setUnarchiveModalOpen(false)
-  }, [])
+  const handleOpen = (order?: OrderWithClient) => {
+    if (order) {
+      setSelectedOrder(order)
+    }
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
+    setOrderToActionId(id)
+    setActionType(type)
+    setConfirmationOpen(true)
+  }
+
+  const handleConfirmationClose = () => {
+    setConfirmationOpen(false)
+    setOrderToActionId(null)
+  }
+
+  const handleConfirmationAction = async () => {
+    if (!orderToActionId) return
+
+    if (actionType === 'delete') {
+      await deleteOneOrder(orderToActionId)
+    } else {
+      await unarchiveOneOrder(orderToActionId)
+    }
+
+    handleConfirmationClose()
+  }
+
 
   return {
     orders,
     isLoading,
-    deleteModalOpen,
-    unarchiveModalOpen,
-    handleDeleteClick,
-    handleUnarchiveClick,
-    handleConfirmDelete,
-    handleConfirmUnarchive,
-    handleClose: handleCloseModals,
+    selectedOrder,
+    open,
+    handleOpen,
+    handleClose,
+    confirmationOpen,
+    actionType,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationAction,
   }
 }
