@@ -9,7 +9,8 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle'
 import TaskReport from '../taskPeport/components/TaskReport'
 import ClientReport from '../clientReport/components/ClientReport'
 import Loader from '@/components/Loader/Loader.tsx'
-import { tabTriggerClass } from '@/features/reports/utils/StyleCinstants.ts'
+import { tabTriggerStyles } from '@/utils/commonStyles.ts'
+
 
 export default function ReportTabs() {
   const [value, setValue] = useState('tasks')
@@ -48,11 +49,11 @@ export default function ReportTabs() {
       <Tabs value={value} onValueChange={handleChange} className="w-full">
         <TabsList className="mb-5 w-full h-auto">
           <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-            <TabsTrigger className={tabTriggerClass} value="tasks">Задачи</TabsTrigger>
-            <TabsTrigger className={tabTriggerClass} value="clients">Клиенты</TabsTrigger>
-            <TabsTrigger className={tabTriggerClass} value="orders">Заказы</TabsTrigger>
-            <TabsTrigger className={tabTriggerClass}  value="arrivals">Поставки</TabsTrigger>
-            <TabsTrigger className={tabTriggerClass} value="stocks">Склады</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="tasks">Задачи</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="orders">Заказы</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles}  value="arrivals">Поставки</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="stocks">Склады</TabsTrigger>
           </div>
         </TabsList>
 
