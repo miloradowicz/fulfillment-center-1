@@ -104,12 +104,7 @@ const ArchivedArrivals = () => {
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-
-
-      <> <DataTable columns={columns} data={arrivals ?? []}/>
-
-      </>
-
+      <DataTable columns={columns} data={arrivals ?? []}/>
 
       <ConfirmationModal
         open={confirmationOpen}

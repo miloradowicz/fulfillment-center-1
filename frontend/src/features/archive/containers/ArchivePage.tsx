@@ -1,13 +1,6 @@
 import * as React from 'react'
-import { useEffect } from 'react'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import Box from '@mui/material/Box'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { TabProps } from '../../reports/utils/TabProps.ts'
-import { CustomTabPanel } from '../../reports/utils/CustomTabPanel.tsx'
-import Grid from '@mui/material/Grid2'
-import { CircularProgress } from '@mui/material'
 import { selectLoadingArchiveClient } from '@/store/slices/clientSlice.ts'
 import { useAppSelector } from '@/app/hooks.ts'
 import ArchivedClients from '../components/ArchivedClients.tsx'
@@ -31,10 +24,12 @@ import ArchivedServices from '@/features/archive/components/ArchivedServices.tsx
 import ArchivedInvoices from '@/features/archive/components/ArchivedInvoices.tsx'
 import { selectLoadingFetchArchiveService } from '@/store/slices/serviceSlice.ts'
 import { selectLoadingFetchArchiveInvoice } from '@/store/slices/invoiceSlice.ts'
-
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { tabTriggerClass } from '@/features/reports/utils/StyleCinstants.ts'
+import Loader from '@/components/Loader/Loader.tsx'
 
 const ArchivePage = () =>  {
-  const [value, setValue] = React.useState(0)
+  const [value, setValue] = useState('clients')
   const location = useLocation()
   const navigate = useNavigate()
   const loadingClients = useAppSelector(selectLoadingArchiveClient)
@@ -50,184 +45,165 @@ const ArchivePage = () =>  {
 
   const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users', 'services', 'invoices'], [])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    event.stopPropagation()
-    const tabName = tabNames[newValue]
-    navigate(`?tab=${ tabName }`, { replace: true })
-    setValue(newValue)
+  const handleChange = (newTab: string) => {
+    navigate({
+      pathname: '/archives',
+      search: `?tab=${ newTab }`,
+    })
+    setValue(newTab)
   }
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const tab = queryParams.get('tab')
-    if (tab) {
-      const tabIndex = tabNames.indexOf(tab)
-      if (tabIndex !== -1) {
-        setValue(tabIndex)
-      }
+    if (tab && tabNames.includes(tab)) {
+      setValue(tab)
     }
   }, [location, tabNames])
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box style={{ textAlign: 'center', margin: '10px 0 15px' }}>
-        <CustomTitle text={'Архив'} icon={<ArchiveRestore size={25} />} />
-      </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-          scrollButtons="auto"
-          sx={{
-            '.MuiTabs-flexContainer': {
-              'display': 'flex',
-              'flexWrap': 'nowrap',
-              'scrollBehavior': 'smooth',
-              '@media (max-width: 870px)': {
-                overflowX: 'auto',
-                justifyContent: 'flex-start',
-              },
-              '@media (min-width: 871px)': {
-                justifyContent: 'center',
-              },
-            },
-            '.MuiTab-root': {
-              fontSize: '1rem',
-              padding: '4px 16px',
-              width: 'auto',
-            },
-            '@media (max-width: 630px)': {
-              '.MuiTab-root': {
-                fontSize: '0.8rem',
-                padding: '2px 4px',
-              },
-            },
-          }}
-        >
-          <Tab label="Клиенты" {...TabProps(0)} />
-          <Tab label="Товары" {...TabProps(1)} />
-          <Tab label="Поставки" {...TabProps(2)} />
-          <Tab label="Заказы" {...TabProps(3)} />
-          <Tab label="Задачи" {...TabProps(4)} />
-          <Tab label="Склады" {...TabProps(5)} />
-          <Tab label="Контрагенты" {...TabProps(6)} />
-          <Tab label="Пользователи" {...TabProps(7)} />
-          <Tab label="Услуги" {...TabProps(8)} />
-          <Tab label="Счета" {...TabProps(9)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        {loadingClients ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedClients />
-          </>
+    <div className="max-w-[1300px] mx-auto">
+      <div className="text-center ml-5 my-4">
+        <CustomTitle text="Архив" icon={<ArchiveRestore size={25} />} />
+      </div>
+      <Tabs value={value} onValueChange={handleChange} className="w-full">
+        <TabsList className="mb-5 w-full h-auto">
+          <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
+            <TabsTrigger className={tabTriggerClass} value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="products">Товары</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass}  value="arrivals">Поставки</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="orders">Заказы</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="tasks">Задачи</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="stocks">Склады</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="counterparties">Контрагенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="users">Сотрудники</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="services">Услуги</TabsTrigger>
+            <TabsTrigger className={tabTriggerClass} value="invoices">Счета</TabsTrigger>
+          </div>
+        </TabsList>
+
+        {value === 'clients' && (
+          <TabsContent value="clients">
+            {loadingClients ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedClients/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        {loadingProducts ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedProducts />
-          </>
+        {value === 'products' && (
+          <TabsContent value="products">
+            {loadingProducts ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedProducts/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        {loadingArrivals ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedArrivals />
-          </>
+
+        {value === 'arrivals' && (
+          <TabsContent value="arrivals">
+            {loadingArrivals ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedArrivals/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={3}>
-        {loadingOrders ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedOrders />
-          </>
+
+        {value === 'orders' && (
+          <TabsContent value="orders">
+            {loadingOrders ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedOrders/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={4}>
-        {loadingTasks ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedTasks />
-          </>
+
+        {value === 'tasks' && (
+          <TabsContent value="tasks">
+            {loadingTasks ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedTasks/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={5}>
-        {loadingStocks ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedStocks />
-          </>
+
+        {value === 'stocks' && (
+          <TabsContent value="stocks">
+            {loadingStocks ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedStocks/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={6}>
-        {loadingCounterparties ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedCounterparties />
-          </>
+
+        {value === 'counterparties' && (
+          <TabsContent value="counterparties">
+            {loadingCounterparties ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedCounterparties/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={7}>
-        {loadingUsers ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedUsers />
-          </>
+
+        {value === 'users' && (
+          <TabsContent value="users">
+            {loadingUsers ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedUsers/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={8}>
-        {loadingServices ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedServices />
-          </>
+
+        {value === 'services' && (
+          <TabsContent value="services">
+            {loadingServices? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedServices/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={9}>
-        {loadingInvoices ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedInvoices />
-          </>
+
+        {value === 'invoices' && (
+          <TabsContent value="invoices">
+            {loadingInvoices ? (
+              <div className="mt-8 mb-7 flex justify-center">
+                <Loader/>
+              </div>
+            ) : (
+              < ArchivedInvoices/>
+            )}
+          </TabsContent>
         )}
-      </CustomTabPanel>
-    </Box>
+
+      </Tabs>
+
+    </div>
   )
 }
 
