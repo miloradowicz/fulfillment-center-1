@@ -98,6 +98,10 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "coveragePathIgnorePatterns": [
+      "node_modules",
+      "dist"
+    ],
     "coverageDirectory": "./coverage",
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/src/$1"
