@@ -7,6 +7,7 @@ import StockForm from '../components/StockForm.tsx'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { Warehouse } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const StockPage = () => {
   const { open, handleOpen, isLoading, handleClose, stocks } = useStockPage()
@@ -25,7 +26,9 @@ const StockPage = () => {
 
       <Box display={'flex'} className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
         <CustomTitle text={'Склады'} icon={<Warehouse size={25} />}/>
-        <CustomButton text={'Добавить склад'} onClick={handleOpen}/>
+        <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+          <CustomButton text={'Добавить склад'} onClick={handleOpen}/>
+        </ProtectedElement>
       </Box>
 
       <div className="max-w-[1040px] mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-10">

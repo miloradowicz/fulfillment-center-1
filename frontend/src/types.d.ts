@@ -130,6 +130,7 @@ export interface Arrival {
   logs?: Log[]
   arrivalNumber?: string
   documents?: { document: string }[]
+  comment?: string
 }
 
 export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent' | 'services'> & {
@@ -176,7 +177,7 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
 
 export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
   products: ProductForOrderForm[]
-  defects: DefectForOrderForm[]
+  defects: DefectWithPopulate[]
   client: Client
   stock: Stock
 }

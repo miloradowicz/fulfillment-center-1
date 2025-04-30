@@ -57,6 +57,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
         arrival_status: initialData.arrival_status,
         documents: [],
         services: [],
+        comment: initialData.comment || '',
       }
       : { ...initialState },
   )
@@ -84,7 +85,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const [receivedForm, setReceivedForm] = useState<ProductArrival[]>(
     normalizeField((initialData?.received_amount as ProductArrival[]) || []),
   )
-  const [defectsForm, setDefectForm] = useState<Defect[]>(normalizeField((initialData?.defects as Defect[]) || []))
+  const [defectsForm, setDefectsForm] = useState<Defect[]>(normalizeField((initialData?.defects as Defect[]) || []))
   const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
     normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
@@ -187,7 +188,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setReceivedModalOpen(false)
       break
     case ItemType.DEFECTS:
-      setDefectForm(prev => [...prev, baseItem as Defect])
+      setDefectsForm(prev => [...prev, baseItem as Defect])
       setDefectsModalOpen(false)
       break
     case ItemType.SERVICES:
@@ -293,7 +294,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setForm({ ...initialState })
       setProductsForm([])
       setReceivedForm([])
-      setDefectForm([])
+      setDefectsForm([])
 
       if (onSuccess) onSuccess()
     } catch (error) {
@@ -322,7 +323,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     receivedForm,
     setReceivedForm,
     defectsForm,
-    setDefectForm,
+    setDefectsForm,
     productsModalOpen,
     setProductsModalOpen,
     receivedModalOpen,

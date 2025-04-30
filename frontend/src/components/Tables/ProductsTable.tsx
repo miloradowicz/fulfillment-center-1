@@ -1,37 +1,56 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
-import { ProductArrivalWithPopulate, ProductForOrderForm } from '@/types'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { DefectWithPopulate, ProductArrivalWithPopulate } from '@/types'
 import React from 'react'
 
 interface Props {
-  products: ProductForOrderForm[] | ProductArrivalWithPopulate[] | []
+  products?: ProductArrivalWithPopulate[]
+  defects?: DefectWithPopulate[]
 }
 
-const ProductsTable: React.FC<Props> = ({ products }) => {
+const ProductsTable: React.FC<Props> = ({ products, defects }) => {
+  const isDefectsTable = defects !== undefined
+  const data = defects ?? products
+
   return (
-    <TableContainer>
-      <Table  size="small">
-        <TableHead>
+    data?.length !== 0 ?
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell sx={{ width: '40%' }}>Наименование</TableCell>
-            <TableCell align="center" sx={{ width: '10%' }}>Количество</TableCell>
-            <TableCell align="center" sx={{ width: '25%' }}>Штрихкод</TableCell>
-            <TableCell align="center" sx={{ width: '25%' }}>Артикул</TableCell>
+            <TableHead className="font-bold">Наименование</TableHead>
+            <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">
+              {isDefectsTable ? 'Дефект' : 'Штрихкод'}
+            </TableHead>
+            {!isDefectsTable && (
+              <TableHead className="font-bold">Артикул</TableHead>
+            )}
           </TableRow>
-        </TableHead>
+        </TableHeader>
         <TableBody>
-          {products.map((item, index) => (
+          {data?.map((item, index) => (
             <TableRow key={`${ item.product._id }-${ index }`}>
-              <TableCell component="th" scope="row" className="!border-0">
-                {item.product.title}
+              <TableCell className="font-medium">{item.product.title}</TableCell>
+              <TableCell>
+                {isDefectsTable ? (item as DefectWithPopulate).amount : (item as ProductArrivalWithPopulate).amount}
               </TableCell>
-              <TableCell align="center" className="!border-0">{item.amount}</TableCell>
-              <TableCell align="center" className="!border-0">{item.product.barcode}</TableCell>
-              <TableCell align="center" className="!border-0">{item.product.article}</TableCell>
+              <TableCell>
+                {isDefectsTable
+                  ? (item as DefectWithPopulate).defect_description
+                  : (item as ProductArrivalWithPopulate).product.barcode}
+              </TableCell>
+              {!isDefectsTable && (
+                <TableCell>
+                  {(item as ProductArrivalWithPopulate).product.article}
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+      : <p className="text-sm text-muted-foreground font-bold text-center mt-3">
+        {isDefectsTable ? 'Дефекты отсутствуют.' : 'Товары отсутствуют.'}
+      </p>
   )
 }
+
 export default ProductsTable

@@ -137,6 +137,9 @@ export class Arrival {
     service_amount: number
     service_price: number
   }[]
+
+  @Prop({ default: null }) comment: string
+
 }
 
 const ArrivalSchema = SchemaFactory.createForClass(Arrival)

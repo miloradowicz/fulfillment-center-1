@@ -161,6 +161,19 @@ export class InvoicesService {
     return { message: 'Счёт перемещён в архив.' }
   }
 
+  async unarchive(id: string) {
+    const invoice = await this.invoiceModel.findById(id)
+
+    if (!invoice) throw new NotFoundException('Счёт не найден')
+
+    if (!invoice.isArchived) throw new ForbiddenException('Счёт не находится в архиве')
+
+    invoice.isArchived = false
+    await invoice.save()
+
+    return { message: 'Счёт восстановлен из архива' }
+  }
+
   async delete(id: string) {
     const invoice = await this.invoiceModel.findByIdAndDelete(id)
 

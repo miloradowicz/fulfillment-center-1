@@ -1,19 +1,15 @@
 import { useDraggable } from '@dnd-kit/core'
-import { Pencil, Trash2, MoreHorizontal, Link2, Truck, ClipboardList, ListTodo } from 'lucide-react'
+import { Link2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { CSS } from '@dnd-kit/utilities'
 import React, { memo } from 'react'
 import { TaskCardProps } from '../hooks/TypesProps'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NavLink } from 'react-router-dom'
 import StatusCell from './StatusCell.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -23,6 +19,10 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import useBreakpoint from '@/hooks/useBreakpoint.ts'
 import UseTaskCard from '@/features/tasks/hooks/useTaskCard.ts'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import { getTaskIcon } from '@/features/tasks/utils/getTaskIcon.tsx'
+import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, parent }) => {
   const { isMobile } = useBreakpoint()
@@ -42,9 +42,10 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
     handleEdit,
     handleDelete,
     handleCancelDelete,
+    dispatch,
   } = UseTaskCard(task, selectedUser)
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task._id,
     data: {
       ...task,
@@ -56,20 +57,7 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
 
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : 'none',
-    zIndex: isDragging ? 9999 : 'auto',
-    opacity: isDragging ? 0.9 : 1,
     touchAction: 'none',
-  }
-
-  const getTaskIcon = (type: string, className = '') => {
-    switch (type) {
-    case 'поставка':
-      return <Truck className={className} />
-    case 'заказ':
-      return <ClipboardList className={className} />
-    default:
-      return <ListTodo className={className} />
-    }
   }
 
   return (
@@ -87,8 +75,6 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
       "
       style={{
         transform: style.transform,
-        zIndex: style.zIndex,
-        opacity: style.opacity,
       }}
       {...attributes}
       onClick={e => {
@@ -130,42 +116,44 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
                 {tooltipText}
               </TooltipContent>
             </Tooltip>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto"
-                >
-                  <MoreHorizontal className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleEdit}>
-                  <Pencil className="mr-2 h-4 w-4 text-blue-500" />
-                  Редактировать
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={e => {
-                    e.stopPropagation()
-                    setOpenDeleteModal(true)
-                  }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4 text-red-500" />
-                  Переместить в архив
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-auto"
+                  >
+                    <MoreHorizontal className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <Pencil className="mr-2 h-4 w-4 text-blue-500" />
+                    Редактировать
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={e => {
+                      e.stopPropagation()
+                      setOpenDeleteModal(true)
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                    Переместить в архив
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </ProtectedElement>
           </div>
           <div className="flex flex-col gap-2">
             <p>{task.title}</p>
             {task.associated_arrival && (
-              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Поставка ${ task.associated_arrival.arrivalNumber }`}
               </NavLink>
             )}
             {task.associated_order && (
-              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4">
+              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Заказ ${ task.associated_order.orderNumber }`}
               </NavLink>
             )}
@@ -184,9 +172,21 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
       <Modal open={openEditModal} handleClose={() => setOpenEditModal(false)}>
         <TaskForm initialData={task} onSuccess={() => setOpenEditModal(false)}/>
       </Modal>
-      <Modal open={openDetailModal} handleClose={() => setOpenDetailModal(false)}>
-        <TaskDetails taskId={task._id}/>
-      </Modal>
+      <RightPanel
+        open={openDetailModal}
+        onOpenChange={value => {
+          setOpenDetailModal(value)
+          if (!value) {
+            if (selectedUser) {
+              dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
+            } else {
+              dispatch(fetchTasksWithPopulate())
+            }
+          }
+        }}
+      >
+        <TaskDetails taskId={task._id} selectedUser={selectedUser}/>
+      </RightPanel>
     </div>
   )
 })

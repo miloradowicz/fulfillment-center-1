@@ -1,10 +1,10 @@
 import React from 'react'
-import { DefectForOrderForm } from '@/types'
+import { DefectWithPopulate } from '@/types'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 
 
 interface Props {
-  defects: DefectForOrderForm[]
+  defects: DefectWithPopulate[]
 }
 
 const DefectsTable: React.FC<Props> = ({ defects }) => {

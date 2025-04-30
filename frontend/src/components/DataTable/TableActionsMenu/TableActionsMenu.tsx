@@ -1,4 +1,4 @@
-import { ChevronRight, Edit, MoreHorizontal, Trash } from 'lucide-react'
+import { ArchiveX, ChevronRight, Edit, MoreHorizontal } from 'lucide-react'
 import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu.tsx'
 import { NavLink } from 'react-router-dom'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 interface Props<T> {
   row: T
@@ -43,17 +44,19 @@ const TableActionsMenu = <T extends { _id: string }>({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="!bg-transparent px-1.5" onClick={() => handleOpen(row)}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-primary bg-transparent transition-colors shadow-sm"
-          >
-            Редактировать
-            <Edit size={18} className="stroke-primary" />
-          </Button>
-        </DropdownMenuItem>
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <DropdownMenuItem className="!bg-transparent px-1.5" onClick={() => handleOpen(row)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-primary bg-transparent transition-colors shadow-sm"
+            >
+              Редактировать
+              <Edit size={18} className="stroke-primary" />
+            </Button>
+          </DropdownMenuItem>
+        </ProtectedElement>
 
         {showDetailsLink && detailsPathPrefix && (
           <DropdownMenuItem className="!bg-transparent px-1.5">
@@ -91,17 +94,19 @@ const TableActionsMenu = <T extends { _id: string }>({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="!bg-transparent px-1.5">
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => handleConfirmationOpen(row._id)}
-            className="text-destructive hover:bg-destructive/10 bg-transparent w-full transition-colors shadow-sm"
-          >
-            Удалить
-            <Trash size={18} className="stroke-destructive" />
-          </Button>
-        </DropdownMenuItem>
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <DropdownMenuItem className="!bg-transparent px-1.5">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => handleConfirmationOpen(row._id)}
+              className="text-blue-600 hover:bg-blue-100 bg-transparent w-full transition-colors shadow-sm"
+            >
+              Архивировать
+              <ArchiveX size={18} className="stroke-blue-600" />
+            </Button>
+          </DropdownMenuItem>
+        </ProtectedElement>
       </DropdownMenuContent>
     </DropdownMenu>
   )

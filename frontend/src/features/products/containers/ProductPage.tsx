@@ -6,6 +6,7 @@ import useProductActions from '../hooks/useProductActions.ts'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { Package } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ProductPage = () => {
   const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)
@@ -25,7 +26,9 @@ const ProductPage = () => {
       </Modal>
       <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
         <CustomTitle text={'Товары'} icon={<Package size={25} />}/>
-        <CustomButton text={'Добавить товар'} onClick={handleOpen}/>
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <CustomButton text={'Добавить товар'} onClick={handleOpen}/>
+        </ProtectedElement>
       </Box>
       <Box><ProductsDataList/></Box>
     </>
