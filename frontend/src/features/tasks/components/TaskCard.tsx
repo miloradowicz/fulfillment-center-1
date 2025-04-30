@@ -148,12 +148,12 @@ const TaskCard: React.FC<TaskCardProps> =  memo(({ task, selectedUser, index, pa
           <div className="flex flex-col gap-2">
             <p>{task.title}</p>
             {task.associated_arrival && (
-              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
+              <NavLink to={`/arrivals/${ task.associated_arrival._id }`} className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Поставка ${ task.associated_arrival.arrivalNumber }`}
               </NavLink>
             )}
             {task.associated_order && (
-              <NavLink to={`/orders/${ task.associated_order._id }`} target="_blank" className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
+              <NavLink to={`/orders/${ task.associated_order._id }`} className="text-blue-600 font-medium hover:underline underline-offset-4 self-start">
                 {`Заказ ${ task.associated_order.orderNumber }`}
               </NavLink>
             )}
