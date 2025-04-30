@@ -77,11 +77,6 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
       cell: ({ row }) => <StatusOrderCell row={row.original} />,
     },
     {
-      accessorKey: 'products',
-      header: 'Товаров',
-      cell: ({ row }) => row.original.products.length,
-    },
-    {
       id: 'actions',
       header: 'Действия',
       enableGlobalFilter: false,
