@@ -6,7 +6,6 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
 import useArchivedInvoiceActions from '@/features/archive/hooks/useArchivedInvoiceActions.ts'
-import { Loader2 } from 'lucide-react'
 
 const ArchivedInvoices = () => {
   const {
@@ -16,7 +15,6 @@ const ArchivedInvoices = () => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    loading,
   } = useArchivedInvoiceActions()
 
   const columns: ColumnDef<Invoice>[] = [
@@ -102,10 +100,7 @@ const ArchivedInvoices = () => {
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      {loading?
-        <div className="flex justify-center items-center my-10">
-          <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
-        </div> :<> <DataTable columns={columns} data={invoices ?? []}/></>}
+      <DataTable columns={columns} data={invoices ?? []}/>
 
       <ConfirmationModal
         open={confirmationOpen}

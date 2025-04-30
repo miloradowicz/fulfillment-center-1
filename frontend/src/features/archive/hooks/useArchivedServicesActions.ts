@@ -1,13 +1,14 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useEffect, useState } from 'react'
 import { Service } from '@/types'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { deleteService, fetchArchivedServices, unarchiveService } from '@/store/thunks/serviceThunk.ts'
 import {
-  selectAllArchivedServices, selectLoadingFetchArchiveService,
+  selectAllArchivedServices,
 } from '@/store/slices/serviceSlice.ts'
+import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 
 const useArchivedServiceActions = () => {
   const dispatch = useAppDispatch()
@@ -19,18 +20,13 @@ const useArchivedServiceActions = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const { id } = useParams()
   const navigate = useNavigate()
-  const loading = useAppSelector(selectLoadingFetchArchiveService)
-  const [searchParams] = useSearchParams()
-  const tab = searchParams.get('tab')
+  const loading = useAppSelector(selectUsersLoading)
 
   useEffect(() => {
-    if (tab === 'services') {
-      const fetchData = async () => {
-        await dispatch(fetchArchivedServices())
-      }
-      void fetchData()
+    if (!services && !loading) {
+      dispatch(fetchArchivedServices())
     }
-  }, [dispatch, tab])
+  }, [dispatch, services, loading])
 
 
   const deleteOneService = async (id: string) => {

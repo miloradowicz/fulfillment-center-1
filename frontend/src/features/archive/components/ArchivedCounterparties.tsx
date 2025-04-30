@@ -69,7 +69,7 @@ const ArchivedCounterparties = () => {
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="этого клиента"
+        entityName="этого контрагента"
         actionType={actionType}
         onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}

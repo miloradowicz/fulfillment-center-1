@@ -20,7 +20,7 @@ import { selectLoadingFetchArchivedStocks } from '@/store/slices/stocksSlice.ts'
 import ArchivedCounterparties from '../components/ArchivedCounterparties.tsx'
 import { selectLoadingFetchArchive } from '@/store/slices/counterpartySlices.ts'
 import { selectLoadingFetchArchivedTasks } from '@/store/slices/taskSlice.ts'
-import ArchivedTasksPage from '../components/ArchivedTasksPage.tsx'
+import ArchivedTasks from '../components/ArchivedTasks.tsx'
 import ArchivedOrders from '../components/ArchivedOrders.tsx'
 import { selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
@@ -29,6 +29,8 @@ import ArchivedUsers from '@/features/archive/components/ArchivedUsers.tsx'
 import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 import ArchivedServices from '@/features/archive/components/ArchivedServices.tsx'
 import ArchivedInvoices from '@/features/archive/components/ArchivedInvoices.tsx'
+import { selectLoadingFetchArchiveService } from '@/store/slices/serviceSlice.ts'
+import { selectLoadingFetchArchiveInvoice } from '@/store/slices/invoiceSlice.ts'
 
 
 const ArchivePage = () =>  {
@@ -43,6 +45,8 @@ const ArchivePage = () =>  {
   const loadingTasks = useAppSelector(selectLoadingFetchArchivedTasks)
   const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
   const loadingUsers = useAppSelector(selectUsersLoading)
+  const loadingServices = useAppSelector(selectLoadingFetchArchiveService)
+  const loadingInvoices = useAppSelector(selectLoadingFetchArchiveInvoice)
 
   const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users', 'services', 'invoices'], [])
 
@@ -164,7 +168,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedTasksPage />
+            <ArchivedTasks />
           </>
         )}
       </CustomTabPanel>
@@ -202,14 +206,26 @@ const ArchivePage = () =>  {
         )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={8}>
-        <>
-          <ArchivedServices />
-        </>
+        {loadingServices ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedServices />
+          </>
+        )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={9}>
-        <>
-          <ArchivedInvoices />
-        </>
+        {loadingInvoices ? (
+          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <ArchivedInvoices />
+          </>
+        )}
       </CustomTabPanel>
     </Box>
   )

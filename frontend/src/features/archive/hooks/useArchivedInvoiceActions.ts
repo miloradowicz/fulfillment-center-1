@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {  useEffect, useState } from 'react'
 import { Invoice } from '@/types'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import {
@@ -17,20 +17,14 @@ const useArchivedInvoiceActions = () => {
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const invoices = useAppSelector(selectAllArchivedInvoices)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
-  const { id } = useParams()
   const navigate = useNavigate()
   const loading = useAppSelector(selectLoadingFetchArchiveInvoice)
-  const [searchParams] = useSearchParams()
-  const tab = searchParams.get('tab')
 
   useEffect(() => {
-    if (tab === 'invoices') {
-      const fetchData = async () => {
-        await dispatch(fetchArchivedInvoices())
-      }
-      void fetchData()
+    if (!invoices && !loading) {
+      dispatch(fetchArchivedInvoices())
     }
-  }, [dispatch, tab])
+  }, [dispatch, invoices, loading])
 
   const deleteOneInvoice = async (id: string) => {
     try {
@@ -102,7 +96,6 @@ const useArchivedInvoiceActions = () => {
     open,
     handleOpen,
     handleClose,
-    id,
     navigate,
     confirmationOpen,
     actionType,

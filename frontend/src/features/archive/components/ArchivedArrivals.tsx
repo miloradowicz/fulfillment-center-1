@@ -113,7 +113,7 @@ const ArchivedArrivals = () => {
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="эту услугу"
+        entityName="эту поставку"
         actionType={actionType}
         onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}

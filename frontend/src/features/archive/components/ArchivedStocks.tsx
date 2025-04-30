@@ -1,127 +1,76 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import UnarchiveIcon from '@mui/icons-material/Unarchive'
-import { ruRU } from '@mui/x-data-grid/locales'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import useArchivedStocksActions from '../hooks/useArchivedStocksActions.ts'
 import { Stock } from '@/types'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+import { ColumnDef } from '@tanstack/react-table'
 
 const ArchivedStocks = () => {
   const {
     stocks,
-    loading,
     confirmationOpen,
-    unarchiveConfirmationOpen,
+    actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    handleUnarchiveConfirmationOpen,
-    handleUnarchiveConfirmationClose,
-    handleUnarchiveConfirm,
-  } = useArchivedStocksActions(true)
+    handleConfirmationAction,
+  } = useArchivedStocksActions()
 
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
 
-  const columns: GridColDef<Stock>[] = [
+  const columns: ColumnDef<Stock>[] = [
     {
-      field: 'name',
-      headerName: 'Название',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'address',
-      headerName: 'Адрес',
-      flex: 1,
-      minWidth: isMediumScreen ? 200 : 160,
-      align: 'left',
-      headerAlign: 'left',
+      accessorKey: 'name',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Название" />,
+      enableColumnFilter: true,
+      enableHiding: false,
+      cell: info => info.getValue(),
+
     },
     {
-      field: 'Actions',
-      headerName: '',
-      minWidth: 80,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => handleConfirmationOpen(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <IconButton onClick={() => handleUnarchiveConfirmationOpen(row._id)}>
-            <UnarchiveIcon />
-          </IconButton>
-        </Box>
-      ),
+      accessorKey: 'address',
+      header: 'Адрес',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableStock = row.original
+
+        return (
+          <TableArchivedActionsMenu<Stock>
+            row={tableStock}
+            onDelete={id => handleConfirmationOpen(id, 'delete')}
+            onRestore={id => handleConfirmationOpen(id, 'unarchive')}
+          />
+        )
+      },
     },
   ]
 
   return (
-    <Box className="max-w-[1100px] mx-auto w-full">
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={stocks || []}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={{
-            '& .center-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 !important',
-            },
-            '& .MuiDataGrid-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              padding: '8px 16px',
-            },
-          }}
-        />
-      )}
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={stocks ?? []}/>
 
       <ConfirmationModal
         open={confirmationOpen}
         entityName="этот склад"
-        actionType="delete"
-        onConfirm={handleConfirmationDelete}
+        actionType={actionType}
+        onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}
       />
-
-      <ConfirmationModal
-        open={unarchiveConfirmationOpen}
-        entityName="этот склад"
-        actionType="unarchive"
-        onConfirm={handleUnarchiveConfirm}
-        onCancel={handleUnarchiveConfirmationClose}
-      />
-    </Box>
+    </div>
   )
 }
 

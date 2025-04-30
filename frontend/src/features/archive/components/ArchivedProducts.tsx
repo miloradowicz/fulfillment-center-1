@@ -76,7 +76,7 @@ const ArchivedProducts = () => {
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="этот счет"
+        entityName="этот товар"
         actionType={actionType}
         onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}
