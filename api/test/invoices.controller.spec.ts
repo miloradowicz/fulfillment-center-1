@@ -1,8 +1,8 @@
 /**
  * Тесты для контроллера счетов
- * 
+ *
  * ВАЖНО: В этих тестах мы мокаем RolesGuard, чтобы обойти проверку ролей.
- * Это позволяет нам тестировать логику контроллера без необходимости настраивать 
+ * Это позволяет нам тестировать логику контроллера без необходимости настраивать
  * полную аутентификацию и авторизацию.
  */
 
@@ -20,8 +20,8 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common'
 // Мокаем RolesGuard, чтобы он пропускал все запросы
 jest.mock('../src/guards/roles.guard', () => ({
   RolesGuard: jest.fn().mockImplementation(() => ({
-    canActivate: jest.fn().mockReturnValue(true)
-  }))
+    canActivate: jest.fn().mockReturnValue(true),
+  })),
 }))
 
 describe('InvoicesController', () => {
@@ -36,13 +36,13 @@ describe('InvoicesController', () => {
       {
         service: 'service-id',
         service_amount: 1,
-        service_price: 100
-      }
+        service_price: 100,
+      },
     ],
     totalAmount: 100,
     paid_amount: 0,
     status: 'в ожидании',
-    isArchived: false
+    isArchived: false,
   }
 
   const mockInvoicesService = {
@@ -53,15 +53,15 @@ describe('InvoicesController', () => {
     create: jest.fn(),
     update: jest.fn(),
     archive: jest.fn(),
-    delete: jest.fn()
+    delete: jest.fn(),
   }
 
   const mockTokenAuthService = {
-    validateToken: jest.fn().mockResolvedValue(true)
+    validateToken: jest.fn().mockResolvedValue(true),
   }
 
   const mockRolesService = {
-    checkRoles: jest.fn().mockReturnValue(true)
+    checkRoles: jest.fn().mockReturnValue(true),
   }
 
   beforeEach(async () => {
@@ -70,27 +70,27 @@ describe('InvoicesController', () => {
       providers: [
         {
           provide: InvoicesService,
-          useValue: mockInvoicesService
+          useValue: mockInvoicesService,
         },
         {
           provide: RolesGuard,
           useValue: {
-            canActivate: jest.fn().mockReturnValue(true)
-          }
+            canActivate: jest.fn().mockReturnValue(true),
+          },
         },
         {
           provide: TokenAuthService,
-          useValue: mockTokenAuthService
+          useValue: mockTokenAuthService,
         },
         {
           provide: RolesService,
-          useValue: mockRolesService
-        }
-      ]
+          useValue: mockRolesService,
+        },
+      ],
     })
-    .overrideGuard(RolesGuard)
-    .useValue({ canActivate: () => true })
-    .compile()
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<InvoicesController>(InvoicesController)
     service = module.get<InvoicesService>(InvoicesService)
@@ -110,7 +110,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.getAll.mockResolvedValue(invoices)
 
       const result = await controller.getAllInvoices()
-      
+
       expect(service.getAll).toHaveBeenCalled()
       expect(result).toEqual(invoices)
     })
@@ -122,7 +122,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.getArchived.mockResolvedValue(archivedInvoices)
 
       const result = await controller.getArchivedInvoices()
-      
+
       expect(service.getArchived).toHaveBeenCalled()
       expect(result).toEqual(archivedInvoices)
     })
@@ -133,7 +133,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.getOne.mockResolvedValue(mockInvoice)
 
       const result = await controller.getOneInvoice('invoice-id')
-      
+
       expect(service.getOne).toHaveBeenCalledWith('invoice-id')
       expect(result).toEqual(mockInvoice)
     })
@@ -157,7 +157,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.getArchivedOne.mockResolvedValue(archivedInvoice)
 
       const result = await controller.getOneArchivedInvoice('invoice-id', '1')
-      
+
       expect(service.getArchivedOne).toHaveBeenCalledWith('invoice-id', true)
       expect(result).toEqual(archivedInvoice)
     })
@@ -183,17 +183,17 @@ describe('InvoicesController', () => {
           {
             service: new mongoose.Types.ObjectId('607f1f77bcf86cd799439022'),
             service_amount: 1,
-            service_price: 100
-          }
+            service_price: 100,
+          },
         ],
         paid_amount: 0,
-        totalAmount: 100
+        totalAmount: 100,
       } as any
 
       mockInvoicesService.create.mockResolvedValue(mockInvoice)
 
       const result = await controller.createInvoice(createInvoiceDto)
-      
+
       expect(service.create).toHaveBeenCalledWith(createInvoiceDto)
       expect(result).toEqual(mockInvoice)
     })
@@ -208,13 +208,13 @@ describe('InvoicesController', () => {
       const updatedInvoice = {
         ...mockInvoice,
         paid_amount: 50,
-        status: 'частично оплачено'
+        status: 'частично оплачено',
       }
 
       mockInvoicesService.update.mockResolvedValue(updatedInvoice)
 
       const result = await controller.updateInvoice('invoice-id', updateInvoiceDto)
-      
+
       expect(service.update).toHaveBeenCalledWith('invoice-id', updateInvoiceDto)
       expect(result).toEqual(updatedInvoice)
     })
@@ -236,7 +236,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.archive.mockResolvedValue(archiveResult)
 
       const result = await controller.archiveInvoice('invoice-id')
-      
+
       expect(service.archive).toHaveBeenCalledWith('invoice-id')
       expect(result).toEqual(archiveResult)
     })
@@ -260,7 +260,7 @@ describe('InvoicesController', () => {
       mockInvoicesService.delete.mockResolvedValue(deleteResult)
 
       const result = await controller.deleteInvoice('invoice-id')
-      
+
       expect(service.delete).toHaveBeenCalledWith('invoice-id')
       expect(result).toEqual(deleteResult)
     })
@@ -271,4 +271,4 @@ describe('InvoicesController', () => {
       await expect(controller.deleteInvoice('nonexistent-id')).rejects.toThrow(NotFoundException)
     })
   })
-}) 
+})

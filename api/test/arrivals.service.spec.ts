@@ -1,25 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ArrivalsService, DocumentObject } from '../src/services/arrivals.service';
-import { getModelToken } from '@nestjs/mongoose';
-import { Arrival, ArrivalDocument } from '../src/schemas/arrival.schema';
-import { CounterService } from '../src/services/counter.service';
-import { FilesService } from '../src/services/files.service';
-import { StockManipulationService } from '../src/services/stock-manipulation.service';
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { Model, Query } from 'mongoose';
-import * as mongoose from 'mongoose';
-import { CreateArrivalDto } from '../src/dto/create-arrival.dto';
-import { UpdateArrivalDto } from '../src/dto/update-arrival.dto';
-import { Readable } from 'stream';
+import { Test, TestingModule } from '@nestjs/testing'
+import { ArrivalsService } from '../src/services/arrivals.service'
+import { getModelToken } from '@nestjs/mongoose'
+import { Arrival, ArrivalDocument } from '../src/schemas/arrival.schema'
+import { CounterService } from '../src/services/counter.service'
+import { FilesService } from '../src/services/files.service'
+import { StockManipulationService } from '../src/services/stock-manipulation.service'
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common'
+import * as mongoose from 'mongoose'
+import { Model } from 'mongoose'
+import { CreateArrivalDto } from '../src/dto/create-arrival.dto'
+import { UpdateArrivalDto } from '../src/dto/update-arrival.dto'
+import { Readable } from 'stream'
 
-type MockFile = Express.Multer.File;
+type MockFile = Express.Multer.File
 
 describe('ArrivalsService', () => {
-  let service: ArrivalsService;
-  let arrivalModel: Model<ArrivalDocument>;
-  let counterService: CounterService;
-  let filesService: FilesService;
-  let stockManipulationService: StockManipulationService;
+  let service: ArrivalsService
+  let arrivalModel: Model<ArrivalDocument>
+  let counterService: CounterService
+  let filesService: FilesService
+  let stockManipulationService: StockManipulationService
 
   const mockArrival = {
     _id: new mongoose.Types.ObjectId().toString(),
@@ -38,14 +38,16 @@ describe('ArrivalsService', () => {
     sent_amount: '',
     pickup_location: '',
     logs: [],
-    populate: jest.fn().mockImplementation(function() { return this; }),
+    populate: jest.fn().mockImplementation(function () {
+      return this
+    }),
     exec: jest.fn().mockReturnThis(),
     save: jest.fn().mockResolvedValue(this),
-    set: jest.fn().mockImplementation(function(data) { 
-      Object.assign(this, data);
-      return this;
+    set: jest.fn().mockImplementation(function (data) {
+      Object.assign(this, data)
+      return this
     }),
-  };
+  }
 
   const mockArrivalArray = [
     { ...mockArrival },
@@ -54,12 +56,12 @@ describe('ArrivalsService', () => {
       _id: new mongoose.Types.ObjectId().toString(),
       arrivalNumber: 'ARL-2',
     },
-  ];
+  ]
 
   const mockArchivedArrival = {
     ...mockArrival,
     isArchived: true,
-  };
+  }
 
   // Вспомогательные моки для nested queries
   const mockFindQuery = {
@@ -67,7 +69,7 @@ describe('ArrivalsService', () => {
     populate: jest.fn().mockReturnThis(),
     exec: jest.fn().mockResolvedValue(mockArrivalArray),
     reverse: jest.fn().mockReturnValue(mockArrivalArray),
-  };
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -92,7 +94,7 @@ describe('ArrivalsService', () => {
         {
           provide: FilesService,
           useValue: {
-            getFilePath: jest.fn().mockImplementation((filename) => `uploads/${filename}`),
+            getFilePath: jest.fn().mockImplementation(filename => `uploads/${ filename }`),
           },
         },
         {
@@ -107,166 +109,166 @@ describe('ArrivalsService', () => {
           },
         },
       ],
-    }).compile();
+    }).compile()
 
-    service = module.get<ArrivalsService>(ArrivalsService);
-    arrivalModel = module.get<Model<ArrivalDocument>>(getModelToken(Arrival.name));
-    counterService = module.get<CounterService>(CounterService);
-    filesService = module.get<FilesService>(FilesService);
-    stockManipulationService = module.get<StockManipulationService>(StockManipulationService);
-    
+    service = module.get<ArrivalsService>(ArrivalsService)
+    arrivalModel = module.get<Model<ArrivalDocument>>(getModelToken(Arrival.name))
+    counterService = module.get<CounterService>(CounterService)
+    filesService = module.get<FilesService>(FilesService)
+    stockManipulationService = module.get<StockManipulationService>(StockManipulationService)
+
     // Сбросим моки перед каждым тестом
-    jest.clearAllMocks();
-  });
+    jest.clearAllMocks()
+  })
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+    expect(service).toBeDefined()
+  })
 
   describe('getAllByClient', () => {
     it('should return all unarchived arrivals for a client without populating', async () => {
-      const clientId = new mongoose.Types.ObjectId().toString();
-      
-      const result = await service.getAllByClient(clientId, false);
-      
-      expect(mockFindQuery.find).toHaveBeenCalledWith({ client: clientId });
-      expect(result).toEqual(mockArrivalArray);
-    });
+      const clientId = new mongoose.Types.ObjectId().toString()
+
+      const result = await service.getAllByClient(clientId, false)
+
+      expect(mockFindQuery.find).toHaveBeenCalledWith({ client: clientId })
+      expect(result).toEqual(mockArrivalArray)
+    })
 
     it('should return all unarchived arrivals for a client with populating', async () => {
-      const clientId = new mongoose.Types.ObjectId().toString();
-      
-      const result = await service.getAllByClient(clientId, true);
-      
-      expect(mockFindQuery.find).toHaveBeenCalledWith({ client: clientId });
-      expect(mockFindQuery.populate).toHaveBeenCalledWith('client');
-      expect(result).toEqual(mockArrivalArray);
-    });
-  });
+      const clientId = new mongoose.Types.ObjectId().toString()
+
+      const result = await service.getAllByClient(clientId, true)
+
+      expect(mockFindQuery.find).toHaveBeenCalledWith({ client: clientId })
+      expect(mockFindQuery.populate).toHaveBeenCalledWith('client')
+      expect(result).toEqual(mockArrivalArray)
+    })
+  })
 
   describe('getAll', () => {
     it('should return all unarchived arrivals without populating', async () => {
-      const result = await service.getAll(false);
-      
-      expect(result).toEqual(mockArrivalArray);
-    });
+      const result = await service.getAll(false)
+
+      expect(result).toEqual(mockArrivalArray)
+    })
 
     it('should return all unarchived arrivals with populating', async () => {
-      const result = await service.getAll(true);
-      
-      expect(mockFindQuery.populate).toHaveBeenCalledWith('client stock shipping_agent');
-      expect(result).toEqual(mockArrivalArray);
-    });
-  });
+      const result = await service.getAll(true)
+
+      expect(mockFindQuery.populate).toHaveBeenCalledWith('client stock shipping_agent')
+      expect(result).toEqual(mockArrivalArray)
+    })
+  })
 
   describe('getArchivedAll', () => {
     it('should return all archived arrivals without populating', async () => {
-      await service.getArchivedAll(false);
-      
-      expect(arrivalModel.find).toHaveBeenCalledWith({ isArchived: true });
-    });
+      await service.getArchivedAll(false)
+
+      expect(arrivalModel.find).toHaveBeenCalledWith({ isArchived: true })
+    })
 
     it('should return all archived arrivals with populating', async () => {
-      await service.getArchivedAll(true);
-      
-      expect(arrivalModel.find).toHaveBeenCalledWith({ isArchived: true });
+      await service.getArchivedAll(true)
+
+      expect(arrivalModel.find).toHaveBeenCalledWith({ isArchived: true })
       expect(mockFindQuery.populate).toHaveBeenCalledWith({
         path: 'client stock shipping_agent',
         select: 'name',
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('getOne', () => {
     it('should return one arrival without populating', async () => {
       // Создаем правильный мок для findById
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrival);
-      
-      const result = await service.getOne(mockArrival._id, false);
-      
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id);
-      expect(result).toEqual(mockArrival);
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrival)
+
+      const result = await service.getOne(mockArrival._id, false)
+
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id)
+      expect(result).toEqual(mockArrival)
+    })
 
     it('should return one arrival with populating', async () => {
       // Создаем правильный мок для findById с populate
-      const mockPopulate2 = jest.fn().mockResolvedValue(mockArrival);
-      const mockPopulate1 = jest.fn().mockReturnValue({ populate: mockPopulate2 });
-      const mockFindByIdResult = { populate: mockPopulate1 };
-      
-      jest.spyOn(arrivalModel, 'findById').mockReturnValue(mockFindByIdResult as any);
-      
-      const result = await service.getOne(mockArrival._id, true);
-      
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id);
+      const mockPopulate2 = jest.fn().mockResolvedValue(mockArrival)
+      const mockPopulate1 = jest.fn().mockReturnValue({ populate: mockPopulate2 })
+      const mockFindByIdResult = { populate: mockPopulate1 }
+
+      jest.spyOn(arrivalModel, 'findById').mockReturnValue(mockFindByIdResult as any)
+
+      const result = await service.getOne(mockArrival._id, true)
+
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id)
       expect(mockPopulate1).toHaveBeenCalledWith(
-        'client products.product defects.product received_amount.product stock shipping_agent services.service'
-      );
+        'client products.product defects.product received_amount.product stock shipping_agent services.service',
+      )
       expect(mockPopulate2).toHaveBeenCalledWith({
         path: 'logs.user',
         select: '-password -token',
-      });
-      expect(result).toEqual(mockArrival);
-    });
+      })
+      expect(result).toEqual(mockArrival)
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
       // Мокаем возвращаемое значение как null
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(null);
-      
-      await expect(service.getOne('nonexistent-id', false)).rejects.toThrow(NotFoundException);
-      expect(arrivalModel.findById).toHaveBeenCalledWith('nonexistent-id');
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(null)
+
+      await expect(service.getOne('nonexistent-id', false)).rejects.toThrow(NotFoundException)
+      expect(arrivalModel.findById).toHaveBeenCalledWith('nonexistent-id')
+    })
 
     it('should throw ForbiddenException if arrival is archived', async () => {
       // Мокаем возвращаемое значение как архивированный заказ
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArchivedArrival);
-      
-      await expect(service.getOne(mockArchivedArrival._id, false)).rejects.toThrow(ForbiddenException);
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id);
-    });
-  });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArchivedArrival)
+
+      await expect(service.getOne(mockArchivedArrival._id, false)).rejects.toThrow(ForbiddenException)
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id)
+    })
+  })
 
   describe('getArchivedOne', () => {
     it('should return one archived arrival', async () => {
       // Создаем правильный мок для findById с архивированной поставкой
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArchivedArrival);
-      
-      const result = await service.getArchivedOne(mockArchivedArrival._id, false);
-      
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id);
-      expect(result).toEqual(mockArchivedArrival);
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArchivedArrival)
+
+      const result = await service.getArchivedOne(mockArchivedArrival._id, false)
+
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id)
+      expect(result).toEqual(mockArchivedArrival)
+    })
 
     it('should return one archived arrival with populating', async () => {
       // Создаем правильный мок для findById с populate для архивированной поставки
-      const mockPopulate2 = jest.fn().mockResolvedValue(mockArchivedArrival);
-      const mockPopulate1 = jest.fn().mockReturnValue({ populate: mockPopulate2 });
-      const mockFindByIdResult = { populate: mockPopulate1 };
-      
-      jest.spyOn(arrivalModel, 'findById').mockReturnValue(mockFindByIdResult as any);
-      
-      const result = await service.getArchivedOne(mockArchivedArrival._id, true);
-      
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id);
-      expect(result).toEqual(mockArchivedArrival);
-    });
+      const mockPopulate2 = jest.fn().mockResolvedValue(mockArchivedArrival)
+      const mockPopulate1 = jest.fn().mockReturnValue({ populate: mockPopulate2 })
+      const mockFindByIdResult = { populate: mockPopulate1 }
+
+      jest.spyOn(arrivalModel, 'findById').mockReturnValue(mockFindByIdResult as any)
+
+      const result = await service.getArchivedOne(mockArchivedArrival._id, true)
+
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArchivedArrival._id)
+      expect(result).toEqual(mockArchivedArrival)
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
       // Мокаем возвращаемое значение как null
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(null);
-      
-      await expect(service.getArchivedOne('nonexistent-id', false)).rejects.toThrow(NotFoundException);
-      expect(arrivalModel.findById).toHaveBeenCalledWith('nonexistent-id');
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(null)
+
+      await expect(service.getArchivedOne('nonexistent-id', false)).rejects.toThrow(NotFoundException)
+      expect(arrivalModel.findById).toHaveBeenCalledWith('nonexistent-id')
+    })
 
     it('should throw ForbiddenException if arrival is not archived', async () => {
       // Мокаем возвращаемое значение как неархивированная поставка
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrival);
-      
-      await expect(service.getArchivedOne(mockArrival._id, false)).rejects.toThrow(ForbiddenException);
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id);
-    });
-  });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrival)
+
+      await expect(service.getArchivedOne(mockArrival._id, false)).rejects.toThrow(ForbiddenException)
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id)
+    })
+  })
 
   describe('doStocking and undoStocking', () => {
     const mockArrivalWithReceivedAmount = {
@@ -276,7 +278,7 @@ describe('ArrivalsService', () => {
         { product: 'product1', quantity: 5 },
         { product: 'product2', quantity: 10 },
       ],
-    };
+    }
 
     const mockArrivalWithDefects = {
       ...mockArrival,
@@ -285,78 +287,78 @@ describe('ArrivalsService', () => {
         { product: 'product1', quantity: 5 },
         { product: 'product2', quantity: 10 },
       ],
-      defects: [
-        { product: 'product1', quantity: 2 },
-      ],
-    };
+      defects: [{ product: 'product1', quantity: 2 }],
+    }
 
     it('should increase product stock when arrival status is "получена"', async () => {
-      await service.doStocking(mockArrivalWithReceivedAmount as any);
-      
+      await service.doStocking(mockArrivalWithReceivedAmount as any)
+
       expect(stockManipulationService.increaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithReceivedAmount.stock,
-        mockArrivalWithReceivedAmount.received_amount
-      );
-    });
+        mockArrivalWithReceivedAmount.received_amount,
+      )
+    })
 
     it('should increase product and defect stock when arrival status is "отсортирована"', async () => {
-      await service.doStocking(mockArrivalWithDefects as any);
-      
+      await service.doStocking(mockArrivalWithDefects as any)
+
       expect(stockManipulationService.increaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.received_amount
-      );
+        mockArrivalWithDefects.received_amount,
+      )
       expect(stockManipulationService.decreaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.defects
-      );
+        mockArrivalWithDefects.defects,
+      )
       expect(stockManipulationService.increaseDefectStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.defects
-      );
-    });
+        mockArrivalWithDefects.defects,
+      )
+    })
 
     it('should decrease product stock when undoing "получена" status', async () => {
-      await service.undoStocking(mockArrivalWithReceivedAmount as any);
-      
+      await service.undoStocking(mockArrivalWithReceivedAmount as any)
+
       expect(stockManipulationService.decreaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithReceivedAmount.stock,
-        mockArrivalWithReceivedAmount.received_amount
-      );
-    });
+        mockArrivalWithReceivedAmount.received_amount,
+      )
+    })
 
     it('should undo product and defect stock when undoing "отсортирована" status', async () => {
-      await service.undoStocking(mockArrivalWithDefects as any);
-      
+      await service.undoStocking(mockArrivalWithDefects as any)
+
       expect(stockManipulationService.decreaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.received_amount
-      );
+        mockArrivalWithDefects.received_amount,
+      )
       expect(stockManipulationService.increaseProductStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.defects
-      );
+        mockArrivalWithDefects.defects,
+      )
       expect(stockManipulationService.decreaseDefectStock).toHaveBeenCalledWith(
         mockArrivalWithDefects.stock,
-        mockArrivalWithDefects.defects
-      );
-    });
-  });
+        mockArrivalWithDefects.defects,
+      )
+    })
+  })
 
   describe('create', () => {
     const createArrivalDto: CreateArrivalDto = {
       client: new mongoose.Types.ObjectId(),
       stock: new mongoose.Types.ObjectId(),
       arrival_status: 'ожидается доставка',
-      products: [{
-        product: new mongoose.Types.ObjectId().toString(),
-        description: 'Product description',
-        amount: 10
-      }],
+      products: [
+        {
+          product: new mongoose.Types.ObjectId().toString(),
+          description: 'Product description',
+          amount: 10,
+        },
+      ],
       arrival_date: new Date(),
       sent_amount: '',
       pickup_location: '',
-    } as unknown as CreateArrivalDto;
+    } as unknown as CreateArrivalDto
 
     const mockFiles: MockFile[] = [
       {
@@ -371,99 +373,97 @@ describe('ArrivalsService', () => {
         buffer: Buffer.from('test'),
         stream: new Readable(),
       },
-    ];
+    ]
 
     it('should create a new arrival with default values', async () => {
-      const result = await service.create(createArrivalDto);
-      
-      expect(counterService.getNextSequence).toHaveBeenCalledWith('arrival');
+      const result = await service.create(createArrivalDto)
+
+      expect(counterService.getNextSequence).toHaveBeenCalledWith('arrival')
       expect(arrivalModel.create).toHaveBeenCalledWith({
         ...createArrivalDto,
         documents: [],
         arrivalNumber: 'ARL-1',
-      });
-      expect(result).toEqual(mockArrival);
-    });
+      })
+      expect(result).toEqual(mockArrival)
+    })
 
     it('should create a new arrival with uploaded files', async () => {
-      const result = await service.create(createArrivalDto, mockFiles);
-      
-      expect(filesService.getFilePath).toHaveBeenCalledWith(mockFiles[0].filename);
+      const result = await service.create(createArrivalDto, mockFiles)
+
+      expect(filesService.getFilePath).toHaveBeenCalledWith(mockFiles[0].filename)
       expect(arrivalModel.create).toHaveBeenCalledWith({
         ...createArrivalDto,
-        documents: [{ document: `uploads/${mockFiles[0].filename}` }],
+        documents: [{ document: `uploads/${ mockFiles[0].filename }` }],
         arrivalNumber: 'ARL-1',
-      });
-      expect(result).toEqual(mockArrival);
-    });
+      })
+      expect(result).toEqual(mockArrival)
+    })
 
     it('should create a new arrival with existing documents', async () => {
       const dtoWithDocuments = {
         ...createArrivalDto,
         documents: JSON.stringify([{ document: 'existing-document.pdf' }]),
-      };
-      
-      const result = await service.create(dtoWithDocuments, mockFiles);
-      
+      }
+
+      const result = await service.create(dtoWithDocuments, mockFiles)
+
       expect(arrivalModel.create).toHaveBeenCalledWith({
         ...createArrivalDto,
-        documents: [
-          { document: 'existing-document.pdf' },
-          { document: `uploads/${mockFiles[0].filename}` },
-        ],
+        documents: [{ document: 'existing-document.pdf' }, { document: `uploads/${ mockFiles[0].filename }` }],
         arrivalNumber: 'ARL-1',
-      });
-      expect(result).toEqual(mockArrival);
-    });
+      })
+      expect(result).toEqual(mockArrival)
+    })
 
     it('should handle string documents in the DTO', async () => {
       const dtoWithStringDocuments = {
         ...createArrivalDto,
         documents: JSON.stringify(['doc1.pdf', 'doc2.pdf']),
-      };
-      
-      await service.create(dtoWithStringDocuments);
-      
+      }
+
+      await service.create(dtoWithStringDocuments)
+
       expect(arrivalModel.create).toHaveBeenCalledWith({
         ...createArrivalDto,
-        documents: [
-          { document: 'doc1.pdf' },
-          { document: 'doc2.pdf' },
-        ],
+        documents: [{ document: 'doc1.pdf' }, { document: 'doc2.pdf' }],
         arrivalNumber: 'ARL-1',
-      });
-    });
+      })
+    })
 
     it('should throw BadRequestException when arrival status is "получена" without received_amount', async () => {
       const invalidDto = {
         ...createArrivalDto,
         arrival_status: 'получена' as const,
-      };
-      
+      }
+
       jest.spyOn(arrivalModel, 'create').mockResolvedValueOnce({
         ...mockArrival,
         arrival_status: 'получена',
         received_amount: [],
-      } as any);
-      
-      await expect(service.create(invalidDto)).rejects.toThrow(BadRequestException);
-    });
-  });
+      } as any)
+
+      await expect(service.create(invalidDto)).rejects.toThrow(BadRequestException)
+    })
+  })
 
   describe('update', () => {
     const updateArrivalDto: UpdateArrivalDto = {
       arrival_status: 'получена',
-      received_amount: [{ 
-        product: new mongoose.Types.ObjectId(),
-        description: 'Received product',
-        amount: 5
-      }],
-      services: [{ 
-        service: new mongoose.Types.ObjectId(),
-        service_amount: 1,
-        service_price: 100
-      }],
-    } as unknown as UpdateArrivalDto;
+      received_amount: [
+        {
+          product: new mongoose.Types.ObjectId(),
+          description: 'Received product',
+          amount: 5,
+        },
+      ],
+      services: [
+        {
+          service: new mongoose.Types.ObjectId(),
+          service_amount: 1,
+          service_price: 100,
+        },
+      ],
+    } as unknown as UpdateArrivalDto
 
     const mockFiles: MockFile[] = [
       {
@@ -478,7 +478,7 @@ describe('ArrivalsService', () => {
         buffer: Buffer.from('test'),
         stream: new Readable(),
       },
-    ];
+    ]
 
     const mockArrivalWithDocuments = {
       ...mockArrival,
@@ -491,109 +491,109 @@ describe('ArrivalsService', () => {
           documents: [{ document: 'existing-doc.pdf' }],
         }),
       }),
-    };
+    }
 
     beforeEach(() => {
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrivalWithDocuments as any);
-      jest.spyOn(service, 'undoStocking').mockResolvedValue(undefined);
-      jest.spyOn(service, 'doStocking').mockResolvedValue(undefined);
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValue(mockArrivalWithDocuments as any)
+      jest.spyOn(service, 'undoStocking').mockResolvedValue(undefined)
+      jest.spyOn(service, 'doStocking').mockResolvedValue(undefined)
+    })
 
     it('should update an arrival', async () => {
-      const result = await service.update(mockArrival._id, updateArrivalDto);
-      
-      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id);
-      expect(service.undoStocking).toHaveBeenCalled();
-      expect(service.doStocking).toHaveBeenCalled();
-      expect(stockManipulationService.saveStock).toHaveBeenCalledTimes(2);
-      expect(result).toBeDefined();
-    });
+      const result = await service.update(mockArrival._id, updateArrivalDto)
+
+      expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id)
+      expect(service.undoStocking).toHaveBeenCalled()
+      expect(service.doStocking).toHaveBeenCalled()
+      expect(stockManipulationService.saveStock).toHaveBeenCalledTimes(2)
+      expect(result).toBeDefined()
+    })
 
     it('should update an arrival with new files', async () => {
-      const result = await service.update(mockArrival._id, updateArrivalDto, mockFiles);
-      
-      expect(filesService.getFilePath).toHaveBeenCalledWith(mockFiles[0].filename);
-      expect(result).toBeDefined();
-    });
+      const result = await service.update(mockArrival._id, updateArrivalDto, mockFiles)
+
+      expect(filesService.getFilePath).toHaveBeenCalledWith(mockFiles[0].filename)
+      expect(result).toBeDefined()
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(null);
-      
-      await expect(service.update('nonexistent-id', updateArrivalDto)).rejects.toThrow(NotFoundException);
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(null)
+
+      await expect(service.update('nonexistent-id', updateArrivalDto)).rejects.toThrow(NotFoundException)
+    })
 
     it('should throw BadRequestException when changing status to "получена" without received_amount', async () => {
       const invalidDto: UpdateArrivalDto = {
         arrival_status: 'получена',
         received_amount: [],
-      } as unknown as UpdateArrivalDto;
-      
-      await expect(service.update(mockArrival._id, invalidDto)).rejects.toThrow(BadRequestException);
-    });
-  });
+      } as unknown as UpdateArrivalDto
+
+      await expect(service.update(mockArrival._id, invalidDto)).rejects.toThrow(BadRequestException)
+    })
+  })
 
   describe('archive', () => {
     it('should archive an arrival', async () => {
-      const result = await service.archive(mockArrival._id);
-      
-      expect(arrivalModel.findByIdAndUpdate).toHaveBeenCalledWith(mockArrival._id, { isArchived: true });
-      expect(result).toEqual({ message: 'Поставка перемещена в архив.' });
-    });
+      const result = await service.archive(mockArrival._id)
+
+      expect(arrivalModel.findByIdAndUpdate).toHaveBeenCalledWith(mockArrival._id, { isArchived: true })
+      expect(result).toEqual({ message: 'Поставка перемещена в архив.' })
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
-      jest.spyOn(arrivalModel, 'findByIdAndUpdate').mockResolvedValueOnce(null);
-      
-      await expect(service.archive('nonexistent-id')).rejects.toThrow(NotFoundException);
-    });
+      jest.spyOn(arrivalModel, 'findByIdAndUpdate').mockResolvedValueOnce(null)
+
+      await expect(service.archive('nonexistent-id')).rejects.toThrow(NotFoundException)
+    })
 
     it('should throw ForbiddenException if arrival already archived', async () => {
-      jest.spyOn(arrivalModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockArchivedArrival);
-      
-      await expect(service.archive(mockArchivedArrival._id)).rejects.toThrow(ForbiddenException);
-    });
-  });
+      jest.spyOn(arrivalModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockArchivedArrival)
+
+      await expect(service.archive(mockArchivedArrival._id)).rejects.toThrow(ForbiddenException)
+    })
+  })
 
   describe('unarchive', () => {
     it('should unarchive an arrival', async () => {
       jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce({
         ...mockArchivedArrival,
         save: jest.fn().mockResolvedValue(mockArrival),
-      });
-      
-      const result = await service.unarchive(mockArchivedArrival._id);
-      
-      expect(result).toEqual({ message: 'Клиент восстановлен из архива' });
-    });
+      })
+
+      const result = await service.unarchive(mockArchivedArrival._id)
+
+      expect(result).toEqual({ message: 'Клиент восстановлен из архива' })
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(null);
-      
-      await expect(service.unarchive('nonexistent-id')).rejects.toThrow(NotFoundException);
-    });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(null)
+
+      await expect(service.unarchive('nonexistent-id')).rejects.toThrow(NotFoundException)
+    })
 
     it('should throw ForbiddenException if arrival is not archived', async () => {
-      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(mockArrival);
-      
-      await expect(service.unarchive(mockArrival._id)).rejects.toThrow(ForbiddenException);
-    });
-  });
+      jest.spyOn(arrivalModel, 'findById').mockResolvedValueOnce(mockArrival)
+
+      await expect(service.unarchive(mockArrival._id)).rejects.toThrow(ForbiddenException)
+    })
+  })
 
   describe('delete', () => {
     it('should delete an arrival', async () => {
-      jest.spyOn(service, 'undoStocking').mockResolvedValueOnce(undefined);
-      
-      const result = await service.delete(mockArrival._id);
-      
-      expect(arrivalModel.findByIdAndDelete).toHaveBeenCalledWith(mockArrival._id);
-      expect(service.undoStocking).toHaveBeenCalled();
-      expect(stockManipulationService.saveStock).toHaveBeenCalled();
-      expect(result).toEqual({ message: 'Поставка успешно удалена.' });
-    });
+      jest.spyOn(service, 'undoStocking').mockResolvedValueOnce(undefined)
+
+      const result = await service.delete(mockArrival._id)
+
+      expect(arrivalModel.findByIdAndDelete).toHaveBeenCalledWith(mockArrival._id)
+      expect(service.undoStocking).toHaveBeenCalled()
+      expect(stockManipulationService.saveStock).toHaveBeenCalled()
+      expect(result).toEqual({ message: 'Поставка успешно удалена.' })
+    })
 
     it('should throw NotFoundException if arrival not found', async () => {
-      jest.spyOn(arrivalModel, 'findByIdAndDelete').mockResolvedValueOnce(null);
-      
-      await expect(service.delete('nonexistent-id')).rejects.toThrow(NotFoundException);
-    });
-  });
-}); 
+      jest.spyOn(arrivalModel, 'findByIdAndDelete').mockResolvedValueOnce(null)
+
+      await expect(service.delete('nonexistent-id')).rejects.toThrow(NotFoundException)
+    })
+  })
+})

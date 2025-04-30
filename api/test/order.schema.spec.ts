@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import * as mongoose from 'mongoose'
 import { Order, OrderSchemaFactory } from '../src/schemas/order.schema'
 
@@ -33,7 +35,7 @@ describe('OrderSchema', () => {
 
   beforeEach(() => {
     // Очищаем модели перед каждым тестом
-    Object.keys(mongoose.models).forEach(key => {
+    Object.keys(mongoose.models).forEach((key) => {
       delete mongoose.models[key]
     })
 

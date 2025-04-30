@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Test, TestingModule } from '@nestjs/testing'
 import { ServicesController } from '../src/controllers/services.controller'
 import { ServicesService } from '../src/services/services.service'
@@ -110,7 +112,7 @@ describe('ServicesController', () => {
         serviceCategory: new mongoose.Types.ObjectId(),
         price: 100,
         description: 'Service description',
-        type: 'внутренняя'
+        type: 'внутренняя',
       }
       const result = { ...dto, id: '123' }
       mockService.create.mockResolvedValue(result)
@@ -125,7 +127,7 @@ describe('ServicesController', () => {
       const id = '123'
       const dto: UpdateServiceDto = {
         name: 'Updated Service',
-        price: 150
+        price: 150,
       }
       const result = { id, name: 'Updated Service', price: 150 }
       mockService.update.mockResolvedValue(result)
@@ -156,4 +158,4 @@ describe('ServicesController', () => {
       expect(mockService.delete).toHaveBeenCalledWith(id)
     })
   })
-}) 
+})

@@ -1,19 +1,19 @@
+/* eslint-disable */
+
 /**
  * Тесты для контроллера заказов
- * 
+ *
  * ВАЖНО: В этих тестах мы мокаем RolesGuard, чтобы обойти проверку ролей.
- * Это позволяет нам тестировать логику контроллера без необходимости настраивать 
+ * Это позволяет нам тестировать логику контроллера без необходимости настраивать
  * полную аутентификацию и авторизацию.
  */
 
 import { Test, TestingModule } from '@nestjs/testing'
 import { OrdersController } from '../src/controllers/orders.controller'
 import { OrdersService } from '../src/services/orders.service'
-import { CreateOrderDto } from '../src/dto/create-order.dto'
 import { UpdateOrderDto } from '../src/dto/update-order.dto'
 import { Readable } from 'stream'
 import mongoose from 'mongoose'
-import { FileUploadInterceptor } from '../src/utils/uploadFiles'
 import { RolesGuard } from '../src/guards/roles.guard'
 import { TokenAuthService } from '../src/services/token-auth.service'
 import { RolesService } from '../src/services/roles.service'
@@ -21,9 +21,9 @@ import { RolesService } from '../src/services/roles.service'
 // Мокаем RolesGuard, чтобы он пропускал все запросы
 jest.mock('../src/guards/roles.guard', () => ({
   RolesGuard: jest.fn().mockImplementation(() => ({
-    canActivate: jest.fn().mockReturnValue(true)
-  }))
-}));
+    canActivate: jest.fn().mockReturnValue(true),
+  })),
+}))
 
 describe('OrdersController', () => {
   let controller: OrdersController
@@ -37,13 +37,13 @@ describe('OrdersController', () => {
     products: [
       {
         product: 'product-id',
-        amount: 5
-      }
+        amount: 5,
+      },
     ],
     price: 500,
     sent_at: new Date(),
     status: 'в сборке',
-    isArchived: false
+    isArchived: false,
   }
 
   const mockOrdersService = {
@@ -57,15 +57,15 @@ describe('OrdersController', () => {
     update: jest.fn(),
     archive: jest.fn(),
     unarchive: jest.fn(),
-    delete: jest.fn()
+    delete: jest.fn(),
   }
 
   const mockTokenAuthService = {
-    validateToken: jest.fn().mockResolvedValue(true)
+    validateToken: jest.fn().mockResolvedValue(true),
   }
 
   const mockRolesService = {
-    checkRoles: jest.fn().mockReturnValue(true)
+    checkRoles: jest.fn().mockReturnValue(true),
   }
 
   beforeEach(async () => {
@@ -74,27 +74,27 @@ describe('OrdersController', () => {
       providers: [
         {
           provide: OrdersService,
-          useValue: mockOrdersService
+          useValue: mockOrdersService,
         },
         {
           provide: RolesGuard,
           useValue: {
-            canActivate: jest.fn().mockReturnValue(true)
-          }
+            canActivate: jest.fn().mockReturnValue(true),
+          },
         },
         {
           provide: TokenAuthService,
-          useValue: mockTokenAuthService
+          useValue: mockTokenAuthService,
         },
         {
           provide: RolesService,
-          useValue: mockRolesService
-        }
-      ]
+          useValue: mockRolesService,
+        },
+      ],
     })
-    .overrideGuard(RolesGuard)
-    .useValue({ canActivate: () => true })
-    .compile()
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<OrdersController>(OrdersController)
     service = module.get<OrdersService>(OrdersService)
@@ -114,7 +114,7 @@ describe('OrdersController', () => {
       mockOrdersService.getAll.mockResolvedValue(orders)
 
       const result = await controller.getAllOrders()
-      
+
       expect(service.getAll).toHaveBeenCalled()
       expect(result).toEqual(orders)
     })
@@ -124,7 +124,7 @@ describe('OrdersController', () => {
       mockOrdersService.getAllWithClient.mockResolvedValue(orders)
 
       const result = await controller.getAllOrders('1')
-      
+
       expect(service.getAllWithClient).toHaveBeenCalled()
       expect(result).toEqual(orders)
     })
@@ -136,7 +136,7 @@ describe('OrdersController', () => {
       mockOrdersService.getAllArchived.mockResolvedValue(archivedOrders)
 
       const result = await controller.getAllArchivedOrders()
-      
+
       expect(service.getAllArchived).toHaveBeenCalled()
       expect(result).toEqual(archivedOrders)
     })
@@ -147,7 +147,7 @@ describe('OrdersController', () => {
       mockOrdersService.getById.mockResolvedValue(mockOrder)
 
       const result = await controller.getOrderById('order-id', 'false')
-      
+
       expect(service.getById).toHaveBeenCalledWith('order-id')
       expect(result).toEqual(mockOrder)
     })
@@ -158,17 +158,17 @@ describe('OrdersController', () => {
         client: { _id: mockOrder.client, name: 'Test Client' },
         stock: { _id: mockOrder.stock, name: 'Test Stock' },
         products: [
-          { 
-            product: { _id: mockOrder.products[0].product, name: 'Test Product' }, 
-            amount: 5 
-          }
-        ]
+          {
+            product: { _id: mockOrder.products[0].product, name: 'Test Product' },
+            amount: 5,
+          },
+        ],
       }
 
       mockOrdersService.getByIdWithPopulate.mockResolvedValue(populatedOrder)
 
       const result = await controller.getOrderById('order-id', 'true')
-      
+
       expect(service.getByIdWithPopulate).toHaveBeenCalledWith('order-id')
       expect(result.client).toBeDefined()
       expect(result.stock).toBeDefined()
@@ -182,7 +182,7 @@ describe('OrdersController', () => {
       mockOrdersService.getArchivedById.mockResolvedValue(archivedOrder)
 
       const result = await controller.getArchivedOrder('order-id')
-      
+
       expect(service.getArchivedById).toHaveBeenCalledWith('order-id')
       expect(result).toEqual(archivedOrder)
     })
@@ -197,36 +197,38 @@ describe('OrdersController', () => {
           {
             product: new mongoose.Types.ObjectId(),
             amount: 5,
-            description: 'Тестовый продукт'
-          }
+            description: 'Тестовый продукт',
+          },
         ],
         price: 500,
         sent_at: new Date(),
-        status: 'в сборке'
+        status: 'в сборке',
       }
 
-      const files: Express.Multer.File[] = [{
-        fieldname: 'file',
-        originalname: 'test.pdf',
-        encoding: '7bit',
-        mimetype: 'application/pdf',
-        destination: './uploads',
-        filename: 'test-123.pdf',
-        path: 'uploads/test-123.pdf',
-        size: 12345,
-        buffer: Buffer.from('test'),
-        stream: new Readable({
-          read() {
-            this.push(null);
-          }
-        })
-      }]
+      const files: Express.Multer.File[] = [
+        {
+          fieldname: 'file',
+          originalname: 'test.pdf',
+          encoding: '7bit',
+          mimetype: 'application/pdf',
+          destination: './uploads',
+          filename: 'test-123.pdf',
+          path: 'uploads/test-123.pdf',
+          size: 12345,
+          buffer: Buffer.from('test'),
+          stream: new Readable({
+            read() {
+              this.push(null)
+            },
+          }),
+        },
+      ]
 
       const newOrder = { ...mockOrder, ...createOrderDto }
       mockOrdersService.create.mockResolvedValue(newOrder)
 
       const result = await controller.createOrder(createOrderDto, files)
-      
+
       expect(service.create).toHaveBeenCalledWith(createOrderDto, files)
       expect(result).toEqual(newOrder)
     })
@@ -236,32 +238,34 @@ describe('OrdersController', () => {
     it('should update an order successfully', async () => {
       const updateOrderDto: UpdateOrderDto = {
         price: 600,
-        status: 'в пути'
+        status: 'в пути',
       }
 
-      const files: Express.Multer.File[] = [{
-        fieldname: 'file',
-        originalname: 'updated.pdf',
-        encoding: '7bit',
-        mimetype: 'application/pdf',
-        destination: './uploads',
-        filename: 'updated-123.pdf',
-        path: 'uploads/updated-123.pdf',
-        size: 12345,
-        buffer: Buffer.from('test'),
-        stream: new Readable({
-          read() {
-            this.push(null);
-          }
-        })
-      }]
+      const files: Express.Multer.File[] = [
+        {
+          fieldname: 'file',
+          originalname: 'updated.pdf',
+          encoding: '7bit',
+          mimetype: 'application/pdf',
+          destination: './uploads',
+          filename: 'updated-123.pdf',
+          path: 'uploads/updated-123.pdf',
+          size: 12345,
+          buffer: Buffer.from('test'),
+          stream: new Readable({
+            read() {
+              this.push(null)
+            },
+          }),
+        },
+      ]
 
       const updatedOrder = { ...mockOrder, ...updateOrderDto }
-      
+
       mockOrdersService.update.mockResolvedValue(updatedOrder)
 
       const result = await controller.updateOrder('order-id', updateOrderDto, files)
-      
+
       expect(service.update).toHaveBeenCalledWith('order-id', updateOrderDto, files)
       expect(result.price).toBe(updateOrderDto.price)
       expect(result.status).toBe(updateOrderDto.status)
@@ -271,11 +275,11 @@ describe('OrdersController', () => {
   describe('archiveOrder', () => {
     it('should archive an order successfully', async () => {
       const archiveMessage = { message: 'Заказ перемещен в архив' }
-      
+
       mockOrdersService.archive.mockResolvedValue(archiveMessage)
 
       const result = await controller.archiveOrder('order-id')
-      
+
       expect(service.archive).toHaveBeenCalledWith('order-id')
       expect(result).toEqual(archiveMessage)
     })
@@ -284,11 +288,11 @@ describe('OrdersController', () => {
   describe('unarchiveOrder', () => {
     it('should unarchive an order successfully', async () => {
       const unarchiveMessage = { message: 'Заказ восстановлен из архива' }
-      
+
       mockOrdersService.unarchive.mockResolvedValue(unarchiveMessage)
 
       const result = await controller.unarchiveOrder('order-id')
-      
+
       expect(service.unarchive).toHaveBeenCalledWith('order-id')
       expect(result).toEqual(unarchiveMessage)
     })
@@ -297,13 +301,13 @@ describe('OrdersController', () => {
   describe('deleteOrder', () => {
     it('should delete an order successfully', async () => {
       const deleteMessage = { message: 'Заказ успешно удален' }
-      
+
       mockOrdersService.delete.mockResolvedValue(deleteMessage)
 
       const result = await controller.deleteOrder('order-id')
-      
+
       expect(service.delete).toHaveBeenCalledWith('order-id')
       expect(result).toEqual(deleteMessage)
     })
   })
-}) 
+})

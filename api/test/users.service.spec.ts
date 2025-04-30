@@ -1,7 +1,9 @@
+/* eslint-disable */
+
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersService } from '../src/services/user.service'
 import { getModelToken } from '@nestjs/mongoose'
-import { User, UserDocument } from '../src/schemas/user.schema'
+import { User } from '../src/schemas/user.schema'
 import { ForbiddenException, HttpException, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { CreateUserDto } from '../src/dto/create-user.dto'
 import { LoginDto } from '../src/dto/auth-user.dto'
@@ -30,19 +32,19 @@ describe('UsersService', () => {
       role: 'manager',
       token: 'test-token',
       password: 'hashed-password',
-      isArchived: false
-    })
+      isArchived: false,
+    }),
   }
 
   beforeEach(async () => {
     const mockUserModel = {
       findOne: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null)
+        exec: jest.fn().mockResolvedValue(null),
       }),
       find: jest.fn().mockReturnValue({
         select: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([mockUser]),
-        reverse: jest.fn().mockReturnValue([mockUser])
+        reverse: jest.fn().mockReturnValue([mockUser]),
       }),
       findById: jest.fn().mockResolvedValue(mockUser),
       findByIdAndUpdate: jest.fn().mockResolvedValue(mockUser),
@@ -50,27 +52,27 @@ describe('UsersService', () => {
       findByIdAndDelete: jest.fn().mockResolvedValue(mockUser),
       new: jest.fn().mockImplementation(() => ({
         ...mockUser,
-        save: jest.fn().mockResolvedValue(mockUser)
+        save: jest.fn().mockResolvedValue(mockUser),
       })),
-      constructor: jest.fn().mockImplementation(dto => ({
+      constructor: jest.fn().mockImplementation((dto) => ({
         ...dto,
-        save: jest.fn().mockResolvedValue({ _id: 'new-user-id', ...dto })
-      }))
+        save: jest.fn().mockResolvedValue({ _id: 'new-user-id', ...dto }),
+      })),
     }
-    
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         {
           provide: getModelToken(User.name),
-          useValue: mockUserModel
-        }
+          useValue: mockUserModel,
+        },
       ],
     }).compile()
 
     service = module.get<UsersService>(UsersService)
     userModel = module.get(getModelToken(User.name))
-    
+
     jest.clearAllMocks()
   })
 
@@ -84,16 +86,16 @@ describe('UsersService', () => {
         email: 'new@example.com',
         password: 'password123',
         displayName: 'New User',
-        role: 'manager'
+        role: 'manager',
       }
-      
+
       const expectedResult = {
         _id: 'new-user-id',
-        ...createUserDto
+        ...createUserDto,
       }
-      
+
       userModel.findOne = jest.fn().mockReturnValue(null)
-      
+
       const originalCreate = service.create
       service.create = jest.fn().mockImplementation(async (dto) => {
         const existingUser = await userModel.findOne({ email: dto.email })
@@ -102,12 +104,12 @@ describe('UsersService', () => {
         }
         return expectedResult
       })
-      
+
       const result = await service.create(createUserDto)
-      
+
       expect(userModel.findOne).toHaveBeenCalledWith({ email: createUserDto.email })
       expect(result).toEqual(expectedResult)
-      
+
       service.create = originalCreate
     })
 
@@ -116,11 +118,11 @@ describe('UsersService', () => {
         email: 'existing@example.com',
         password: 'password123',
         displayName: 'Existing User',
-        role: 'manager'
+        role: 'manager',
       }
 
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce({ email: 'existing@example.com' })
+        exec: jest.fn().mockResolvedValueOnce({ email: 'existing@example.com' }),
       })
 
       await expect(service.create(createUserDto)).rejects.toThrow(HttpException)
@@ -131,7 +133,7 @@ describe('UsersService', () => {
     it('should login user successfully with correct credentials', async () => {
       const loginDto: LoginDto = {
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       }
 
       const userDoc = {
@@ -139,15 +141,15 @@ describe('UsersService', () => {
         isArchived: false,
         checkPassword: jest.fn().mockResolvedValue(true),
         generateToken: jest.fn(),
-        save: jest.fn().mockResolvedValue(mockUser)
+        save: jest.fn().mockResolvedValue(mockUser),
       }
 
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce(userDoc)
+        exec: jest.fn().mockResolvedValueOnce(userDoc),
       })
 
       const result = await service.login(loginDto)
-      
+
       expect(userModel.findOne).toHaveBeenCalledWith({ email: loginDto.email })
       expect(userDoc.checkPassword).toHaveBeenCalledWith(loginDto.password)
       expect(userDoc.generateToken).toHaveBeenCalled()
@@ -158,11 +160,11 @@ describe('UsersService', () => {
     it('should throw UnauthorizedException if user not found', async () => {
       const loginDto: LoginDto = {
         email: 'nonexistent@example.com',
-        password: 'password123'
+        password: 'password123',
       }
 
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce(null)
+        exec: jest.fn().mockResolvedValueOnce(null),
       })
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException)
@@ -171,16 +173,16 @@ describe('UsersService', () => {
     it('should throw ForbiddenException if user is archived', async () => {
       const loginDto: LoginDto = {
         email: 'archived@example.com',
-        password: 'password123'
+        password: 'password123',
       }
 
       const archivedUser = {
         ...mockUser,
-        isArchived: true
+        isArchived: true,
       }
 
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce(archivedUser)
+        exec: jest.fn().mockResolvedValueOnce(archivedUser),
       })
 
       await expect(service.login(loginDto)).rejects.toThrow(ForbiddenException)
@@ -189,16 +191,16 @@ describe('UsersService', () => {
     it('should throw UnauthorizedException if password is incorrect', async () => {
       const loginDto: LoginDto = {
         email: 'test@example.com',
-        password: 'wrongpassword'
+        password: 'wrongpassword',
       }
 
       const userDoc = {
         ...mockUser,
-        checkPassword: jest.fn().mockResolvedValueOnce(false)
+        checkPassword: jest.fn().mockResolvedValueOnce(false),
       }
 
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce(userDoc)
+        exec: jest.fn().mockResolvedValueOnce(userDoc),
       })
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException)
@@ -211,13 +213,13 @@ describe('UsersService', () => {
       const userDoc = {
         ...mockUser,
         clearToken: jest.fn(),
-        save: jest.fn().mockResolvedValueOnce(true)
+        save: jest.fn().mockResolvedValueOnce(true),
       }
 
       userModel.findById.mockResolvedValueOnce(userDoc)
 
       const result = await service.logout(userId)
-      
+
       expect(userModel.findById).toHaveBeenCalledWith(userId)
       expect(userDoc.clearToken).toHaveBeenCalled()
       expect(userDoc.save).toHaveBeenCalled()
@@ -236,14 +238,14 @@ describe('UsersService', () => {
   describe('getAll', () => {
     it('should return all non-archived users', async () => {
       const users = [mockUser]
-      
+
       userModel.find.mockReturnValueOnce({
         select: jest.fn().mockReturnThis(),
-        reverse: jest.fn().mockReturnValue(users)
+        reverse: jest.fn().mockReturnValue(users),
       })
 
       const result = await service.getAll()
-      
+
       expect(userModel.find).toHaveBeenCalledWith({ isArchived: false })
       expect(result).toEqual(users)
     })
@@ -252,14 +254,14 @@ describe('UsersService', () => {
   describe('getArchivedUsers', () => {
     it('should return all archived users', async () => {
       const archivedUsers = [{ ...mockUser, isArchived: true }]
-      
+
       userModel.find.mockReturnValueOnce({
         select: jest.fn().mockReturnThis(),
-        reverse: jest.fn().mockReturnValue(archivedUsers)
+        reverse: jest.fn().mockReturnValue(archivedUsers),
       })
 
       const result = await service.getArchivedUsers()
-      
+
       expect(userModel.find).toHaveBeenCalledWith({ isArchived: true })
       expect(result).toEqual(archivedUsers)
     })
@@ -268,18 +270,18 @@ describe('UsersService', () => {
   describe('getById', () => {
     it('should return a user by id', async () => {
       const userId = 'user-id'
-      
+
       userModel.findById.mockResolvedValueOnce(mockUser)
 
       const result = await service.getById(userId)
-      
+
       expect(userModel.findById).toHaveBeenCalledWith(userId)
       expect(result).toEqual(mockUser)
     })
 
     it('should throw NotFoundException if user not found', async () => {
       const userId = 'nonexistent-id'
-      
+
       userModel.findById.mockResolvedValueOnce(null)
 
       await expect(service.getById(userId)).rejects.toThrow(NotFoundException)
@@ -288,7 +290,7 @@ describe('UsersService', () => {
     it('should throw ForbiddenException if user is archived', async () => {
       const userId = 'archived-id'
       const archivedUser = { ...mockUser, isArchived: true }
-      
+
       userModel.findById.mockResolvedValueOnce(archivedUser)
 
       await expect(service.getById(userId)).rejects.toThrow(ForbiddenException)
@@ -299,18 +301,18 @@ describe('UsersService', () => {
     it('should return an archived user by id', async () => {
       const userId = 'archived-id'
       const archivedUser = { ...mockUser, isArchived: true }
-      
+
       userModel.findById.mockResolvedValueOnce(archivedUser)
 
       const result = await service.getArchivedById(userId)
-      
+
       expect(userModel.findById).toHaveBeenCalledWith(userId)
       expect(result).toEqual(archivedUser)
     })
 
     it('should throw NotFoundException if user not found', async () => {
       const userId = 'nonexistent-id'
-      
+
       userModel.findById.mockResolvedValueOnce(null)
 
       await expect(service.getArchivedById(userId)).rejects.toThrow(NotFoundException)
@@ -318,7 +320,7 @@ describe('UsersService', () => {
 
     it('should throw ForbiddenException if user is not archived', async () => {
       const userId = 'user-id'
-      
+
       userModel.findById.mockResolvedValueOnce(mockUser)
 
       await expect(service.getArchivedById(userId)).rejects.toThrow(ForbiddenException)
@@ -331,20 +333,20 @@ describe('UsersService', () => {
       const updateUserDto: Partial<UpdateUserDto> = {
         displayName: 'Updated Name',
         email: 'test@example.com',
-        role: 'manager'
+        role: 'manager',
       }
-      
-      const updatedUser = { 
-        ...mockUser, 
+
+      const updatedUser = {
+        ...mockUser,
         displayName: 'Updated Name',
         generateToken: jest.fn(),
-        save: jest.fn().mockResolvedValueOnce({ ...mockUser, displayName: 'Updated Name' })
+        save: jest.fn().mockResolvedValueOnce({ ...mockUser, displayName: 'Updated Name' }),
       }
-      
+
       userModel.findById.mockResolvedValueOnce(updatedUser)
 
       const result = await service.update(userId, updateUserDto as UpdateUserDto)
-      
+
       expect(userModel.findById).toHaveBeenCalledWith(userId)
       expect(updatedUser.generateToken).toHaveBeenCalled()
       expect(updatedUser.save).toHaveBeenCalled()
@@ -356,9 +358,9 @@ describe('UsersService', () => {
       const updateUserDto: Partial<UpdateUserDto> = {
         displayName: 'Updated Name',
         email: 'test@example.com',
-        role: 'manager'
+        role: 'manager',
       }
-      
+
       userModel.findById.mockResolvedValueOnce(null)
 
       await expect(service.update(userId, updateUserDto as UpdateUserDto)).rejects.toThrow(NotFoundException)
@@ -369,21 +371,21 @@ describe('UsersService', () => {
       const updateUserDto: Partial<UpdateUserDto> = {
         email: 'existing@example.com',
         displayName: 'Test User',
-        role: 'manager'
+        role: 'manager',
       }
-      
+
       const existingUser = {
         id: 'other-id',
-        email: 'existing@example.com'
+        email: 'existing@example.com',
       }
-      
+
       userModel.findById.mockResolvedValueOnce({
         ...mockUser,
-        email: 'test@example.com'
+        email: 'test@example.com',
       })
-      
+
       userModel.findOne.mockReturnValueOnce({
-        exec: jest.fn().mockResolvedValueOnce(existingUser)
+        exec: jest.fn().mockResolvedValueOnce(existingUser),
       })
 
       await expect(service.update(userId, updateUserDto as UpdateUserDto)).rejects.toThrow(HttpException)
@@ -393,21 +395,21 @@ describe('UsersService', () => {
   describe('archive', () => {
     it('should archive a user successfully', async () => {
       const userId = 'user-id'
-      
+
       userModel.findByIdAndUpdate.mockResolvedValueOnce({
         ...mockUser,
-        isArchived: false
+        isArchived: false,
       })
 
       const result = await service.archive(userId)
-      
+
       expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(userId, { isArchived: true })
       expect(result).toEqual({ message: 'Пользователь перемещен в архив' })
     })
 
     it('should throw NotFoundException if user not found', async () => {
       const userId = 'nonexistent-id'
-      
+
       userModel.findByIdAndUpdate.mockResolvedValueOnce(null)
 
       await expect(service.archive(userId)).rejects.toThrow(NotFoundException)
@@ -415,10 +417,10 @@ describe('UsersService', () => {
 
     it('should throw ForbiddenException if user already archived', async () => {
       const userId = 'archived-id'
-      
+
       userModel.findByIdAndUpdate.mockResolvedValueOnce({
         ...mockUser,
-        isArchived: true
+        isArchived: true,
       })
 
       await expect(service.archive(userId)).rejects.toThrow(ForbiddenException)
@@ -428,22 +430,22 @@ describe('UsersService', () => {
   describe('unarchive', () => {
     it('should unarchive a user successfully', async () => {
       const userId = 'archived-id'
-      
+
       userModel.findById.mockResolvedValueOnce({
         ...mockUser,
         isArchived: true,
-        save: jest.fn().mockResolvedValueOnce(true)
+        save: jest.fn().mockResolvedValueOnce(true),
       })
 
       const result = await service.unarchive(userId)
-      
+
       expect(userModel.findById).toHaveBeenCalledWith(userId)
       expect(result).toEqual({ message: 'Пользователь восстановлен из архива' })
     })
 
     it('should throw NotFoundException if user not found', async () => {
       const userId = 'nonexistent-id'
-      
+
       userModel.findById.mockResolvedValueOnce(null)
 
       await expect(service.unarchive(userId)).rejects.toThrow(NotFoundException)
@@ -451,7 +453,7 @@ describe('UsersService', () => {
 
     it('should throw ForbiddenException if user is not archived', async () => {
       const userId = 'user-id'
-      
+
       userModel.findById.mockResolvedValueOnce(mockUser)
 
       await expect(service.unarchive(userId)).rejects.toThrow(ForbiddenException)
@@ -461,21 +463,21 @@ describe('UsersService', () => {
   describe('delete', () => {
     it('should delete a user successfully', async () => {
       const userId = 'user-id'
-      
+
       userModel.findByIdAndDelete.mockResolvedValueOnce(mockUser)
 
       const result = await service.delete(userId)
-      
+
       expect(userModel.findByIdAndDelete).toHaveBeenCalledWith(userId)
       expect(result).toEqual({ message: 'Пользователь успешно удалён' })
     })
 
     it('should throw NotFoundException if user not found', async () => {
       const userId = 'nonexistent-id'
-      
+
       userModel.findByIdAndDelete.mockResolvedValueOnce(null)
 
       await expect(service.delete(userId)).rejects.toThrow(NotFoundException)
     })
   })
-}) 
+})

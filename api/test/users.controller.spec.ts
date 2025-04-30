@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersController } from '../src/controllers/users.controller'
 import { UsersService } from '../src/services/user.service'
@@ -15,7 +17,7 @@ describe('UsersController', () => {
 
   const mockResponse = {
     cookie: jest.fn(),
-    clearCookie: jest.fn()
+    clearCookie: jest.fn(),
   }
 
   const mockUser = {
@@ -33,8 +35,8 @@ describe('UsersController', () => {
       role: 'manager',
       token: 'test-token',
       password: 'hashed-password',
-      isArchived: false
-    })
+      isArchived: false,
+    }),
   }
 
   const mockUsersService = {
@@ -48,15 +50,15 @@ describe('UsersController', () => {
     update: jest.fn(),
     archive: jest.fn(),
     unarchive: jest.fn(),
-    delete: jest.fn()
+    delete: jest.fn(),
   }
 
   const mockRolesService = {
-    checkRoles: jest.fn().mockReturnValue(true)
+    checkRoles: jest.fn().mockReturnValue(true),
   }
 
   const mockTokenAuthService = {
-    validateToken: jest.fn().mockResolvedValue(true)
+    validateToken: jest.fn().mockResolvedValue(true),
   }
 
   beforeEach(async () => {
@@ -65,27 +67,27 @@ describe('UsersController', () => {
       providers: [
         {
           provide: UsersService,
-          useValue: mockUsersService
+          useValue: mockUsersService,
         },
         {
           provide: RolesService,
-          useValue: mockRolesService
+          useValue: mockRolesService,
         },
         {
           provide: TokenAuthService,
-          useValue: mockTokenAuthService
+          useValue: mockTokenAuthService,
         },
         {
           provide: RolesGuard,
           useValue: {
-            canActivate: jest.fn().mockReturnValue(true)
-          }
-        }
-      ]
+            canActivate: jest.fn().mockReturnValue(true),
+          },
+        },
+      ],
     })
-    .overrideGuard(RolesGuard)
-    .useValue({ canActivate: () => true })
-    .compile()
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
 
     controller = module.get<UsersController>(UsersController)
     service = module.get<UsersService>(UsersService)
@@ -105,13 +107,13 @@ describe('UsersController', () => {
         email: 'new@example.com',
         password: 'password123',
         displayName: 'New User',
-        role: 'manager'
+        role: 'manager',
       }
 
       mockUsersService.create.mockResolvedValue({ ...createUserDto, _id: 'new-id' })
 
       const result = await controller.createUser(createUserDto)
-      
+
       expect(service.create).toHaveBeenCalledWith(createUserDto)
       expect(result).toEqual({ ...createUserDto, _id: 'new-id' })
     })
@@ -121,28 +123,28 @@ describe('UsersController', () => {
     it('should login a user successfully', async () => {
       const loginDto: LoginDto = {
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       }
 
       mockUsersService.login.mockResolvedValue(mockUser)
 
       const result = await controller.login(loginDto, mockResponse as any)
-      
+
       expect(service.login).toHaveBeenCalledWith(loginDto)
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'token',
         'test-token',
         expect.objectContaining({
           httpOnly: true,
-          secure: true
-        })
+          secure: true,
+        }),
       )
       expect(result).toEqual({
         _id: 'user-id',
         email: 'test@example.com',
         displayName: 'Test User',
         role: 'manager',
-        isArchived: false
+        isArchived: false,
       })
     })
   })
@@ -150,11 +152,11 @@ describe('UsersController', () => {
   describe('logout', () => {
     it('should logout a user successfully', async () => {
       const logoutMessage = { message: 'Вы вышли из системы.' }
-      
+
       mockUsersService.logout.mockResolvedValue(logoutMessage)
 
       const result = await controller.logout(mockUser as any, mockResponse as any)
-      
+
       expect(service.logout).toHaveBeenCalledWith('user-id')
       expect(mockResponse.clearCookie).toHaveBeenCalledWith('token')
       expect(result).toEqual(logoutMessage)
@@ -164,13 +166,13 @@ describe('UsersController', () => {
   describe('getCurrentUser', () => {
     it('should return the current user when authenticated', () => {
       const result = controller.getCurrentUser(mockUser as any)
-      
+
       expect(result).toEqual({
         _id: 'user-id',
         email: 'test@example.com',
         displayName: 'Test User',
         role: 'manager',
-        isArchived: false
+        isArchived: false,
       })
     })
 
@@ -184,11 +186,11 @@ describe('UsersController', () => {
   describe('getUsers', () => {
     it('should return all users', async () => {
       const users = [mockUser]
-      
+
       mockUsersService.getAll.mockResolvedValue(users)
 
       const result = await controller.getUsers()
-      
+
       expect(service.getAll).toHaveBeenCalled()
       expect(result).toEqual(users)
     })
@@ -199,7 +201,7 @@ describe('UsersController', () => {
       mockUsersService.getById.mockResolvedValue(mockUser)
 
       const result = await controller.getUserById('user-id')
-      
+
       expect(service.getById).toHaveBeenCalledWith('user-id')
       expect(result).toEqual(mockUser)
     })
@@ -208,11 +210,11 @@ describe('UsersController', () => {
   describe('getArchivedUsers', () => {
     it('should return all archived users', async () => {
       const archivedUsers = [{ ...mockUser, isArchived: true }]
-      
+
       mockUsersService.getArchivedUsers.mockResolvedValue(archivedUsers)
 
       const result = await controller.getArchivedUsers()
-      
+
       expect(service.getArchivedUsers).toHaveBeenCalled()
       expect(result).toEqual(archivedUsers)
     })
@@ -221,11 +223,11 @@ describe('UsersController', () => {
   describe('getArchivedUserById', () => {
     it('should return an archived user by id', async () => {
       const archivedUser = { ...mockUser, isArchived: true }
-      
+
       mockUsersService.getArchivedById.mockResolvedValue(archivedUser)
 
       const result = await controller.getArchivedUserById('user-id')
-      
+
       expect(service.getArchivedById).toHaveBeenCalledWith('user-id')
       expect(result).toEqual(archivedUser)
     })
@@ -236,18 +238,18 @@ describe('UsersController', () => {
       const updateUserDto: Partial<UpdateUserDto> = {
         displayName: 'Updated Name',
         email: 'test@example.com',
-        role: 'manager'
+        role: 'manager',
       }
-      
-      const updatedUser = { 
-        ...mockUser, 
-        displayName: 'Updated Name' 
+
+      const updatedUser = {
+        ...mockUser,
+        displayName: 'Updated Name',
       }
-      
+
       mockUsersService.update.mockResolvedValue(updatedUser)
 
       const result = await controller.updateUser('user-id', updateUserDto as UpdateUserDto)
-      
+
       expect(service.update).toHaveBeenCalledWith('user-id', updateUserDto)
       expect(result).toEqual(updatedUser)
     })
@@ -256,11 +258,11 @@ describe('UsersController', () => {
   describe('archiveUser', () => {
     it('should archive a user successfully', async () => {
       const archiveMessage = { message: 'Пользователь перемещен в архив' }
-      
+
       mockUsersService.archive.mockResolvedValue(archiveMessage)
 
       const result = await controller.archiveUser('user-id')
-      
+
       expect(service.archive).toHaveBeenCalledWith('user-id')
       expect(result).toEqual(archiveMessage)
     })
@@ -269,11 +271,11 @@ describe('UsersController', () => {
   describe('unarchiveUser', () => {
     it('should unarchive a user successfully', async () => {
       const unarchiveMessage = { message: 'Пользователь восстановлен из архива' }
-      
+
       mockUsersService.unarchive.mockResolvedValue(unarchiveMessage)
 
       const result = await controller.unarchiveUser('user-id')
-      
+
       expect(service.unarchive).toHaveBeenCalledWith('user-id')
       expect(result).toEqual(unarchiveMessage)
     })
@@ -282,13 +284,13 @@ describe('UsersController', () => {
   describe('deleteUser', () => {
     it('should delete a user successfully', async () => {
       const deleteMessage = { message: 'Пользователь успешно удалён' }
-      
+
       mockUsersService.delete.mockResolvedValue(deleteMessage)
 
       const result = await controller.deleteUser('user-id')
-      
+
       expect(service.delete).toHaveBeenCalledWith('user-id')
       expect(result).toEqual(deleteMessage)
     })
   })
-}) 
+})
