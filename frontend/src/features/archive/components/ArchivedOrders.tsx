@@ -7,6 +7,8 @@ import SelectableColumn from '@/components/DataTable/SelectableColumn/Selectable
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge.tsx'
+import { NumberBadge } from '@/components/NumberBadge/NumberBadge.tsx'
 
 const ArchivedOrders = () => {
   const {
@@ -31,15 +33,7 @@ const ArchivedOrders = () => {
       accessorKey: 'orderNumber',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Номер заказа" />,
       cell: ({ row }) => {
-        const tableOrder = row.original
-
-        return (
-          <div
-            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
-          >
-            {tableOrder.orderNumber}
-          </div>
-        )
+        return <NumberBadge number={row.original.orderNumber} />
       },
       enableHiding: false,
     },
@@ -74,33 +68,14 @@ const ArchivedOrders = () => {
       header: 'Статус',
       cell: ({ row }) => {
         const status = row.original.status
-
-        const statusStyles: Record<'в сборке' | 'доставлен' | 'в пути', string> = {
-          'в сборке':
-            'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
-          'доставлен':
-            'bg-emerald-100 text-emerald-700 transition-colors rounded-lg font-bold px-4 py-2',
-          'в пути':
-            'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
+        const arrivalStatusStyles = {
+          'в сборке': 'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
+          'доставлен': 'bg-emerald-100 text-emerald-700 rounded-lg font-bold px-4 py-2',
+          'в пути': 'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
         }
 
-        const capitalizeFirstLetter = (str: string) => {
-          return str.charAt(0).toUpperCase() + str.slice(1)
-        }
-
-        const statusClass = statusStyles[status as keyof typeof statusStyles] || 'bg-primary/10 text-primary/80 border font-bold px-4 py-2'
-
-        return (
-          <span className={statusClass}>
-            {capitalizeFirstLetter(status as string)}
-          </span>
-        )
+        return <StatusBadge status={status} stylesMap={arrivalStatusStyles}/>
       },
-    },
-    {
-      accessorKey: 'products',
-      header: 'Товаров',
-      cell: ({ row }) => row.original.products.length,
     },
     {
       id: 'actions',

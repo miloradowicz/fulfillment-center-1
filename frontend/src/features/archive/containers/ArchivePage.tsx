@@ -82,124 +82,105 @@ const ArchivePage = () =>  {
           </div>
         </TabsList>
 
-        {value === 'clients' && (
-          <TabsContent value="clients">
-            {loadingClients ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedClients/>
-            )}
-          </TabsContent>
-        )}
-        {value === 'products' && (
-          <TabsContent value="products">
-            {loadingProducts ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedProducts/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="clients">
+          {loadingClients ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedClients/>
+          )}
+        </TabsContent>
 
-        {value === 'arrivals' && (
-          <TabsContent value="arrivals">
-            {loadingArrivals ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedArrivals/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="products">
+          {loadingProducts ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedProducts/>
+          )}
+        </TabsContent>
 
-        {value === 'orders' && (
-          <TabsContent value="orders">
-            {loadingOrders ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedOrders/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="arrivals">
+          {loadingArrivals ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedArrivals/>
+          )}
+        </TabsContent>
 
-        {value === 'tasks' && (
-          <TabsContent value="tasks">
-            {loadingTasks ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedTasks/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="orders">
+          {loadingOrders ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedOrders/>
+          )}
+        </TabsContent>
 
-        {value === 'stocks' && (
-          <TabsContent value="stocks">
-            {loadingStocks ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedStocks/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="tasks">
+          {loadingTasks ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedTasks/>
+          )}
+        </TabsContent>
 
-        {value === 'counterparties' && (
-          <TabsContent value="counterparties">
-            {loadingCounterparties ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedCounterparties/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="stocks">
+          {loadingStocks ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedStocks/>
+          )}
+        </TabsContent>
 
-        {value === 'users' && (
-          <TabsContent value="users">
-            {loadingUsers ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedUsers/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="counterparties">
+          {loadingCounterparties ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedCounterparties/>
+          )}
+        </TabsContent>
 
-        {value === 'services' && (
-          <TabsContent value="services">
-            {loadingServices? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedServices/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="users">
+          {loadingUsers ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedUsers/>
+          )}
+        </TabsContent>
 
-        {value === 'invoices' && (
-          <TabsContent value="invoices">
-            {loadingInvoices ? (
-              <div className="mt-8 mb-7 flex justify-center">
-                <Loader/>
-              </div>
-            ) : (
-              < ArchivedInvoices/>
-            )}
-          </TabsContent>
-        )}
+        <TabsContent value="services">
+          {loadingServices? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedServices/>
+          )}
+        </TabsContent>
+
+        <TabsContent value="invoices">
+          {loadingInvoices ? (
+            <div className="mt-8 mb-7 flex justify-center">
+              <Loader/>
+            </div>
+          ) : (
+            < ArchivedInvoices/>
+          )}
+        </TabsContent>
 
       </Tabs>
 

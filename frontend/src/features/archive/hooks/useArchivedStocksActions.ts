@@ -11,18 +11,13 @@ import {
 } from '@/store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
-import { Stock } from '@/types'
 
 const useArchivedStocksActions = () => {
   const dispatch = useAppDispatch()
   const stocks = useAppSelector(selectAllArchivedStocks)
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [stockToActionId, setStockToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
-
-
 
   const clearErrors = useCallback(() => {
     dispatch(clearStockError())
@@ -73,17 +68,6 @@ const useArchivedStocksActions = () => {
     }
   }
 
-  const handleOpen = (stock?: Stock) => {
-    if (stock) {
-      setSelectedStock(stock)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setStockToActionId(id)
     setActionType(type)
@@ -109,10 +93,6 @@ const useArchivedStocksActions = () => {
 
   return {
     stocks,
-    selectedStock,
-    open,
-    handleOpen,
-    handleClose,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

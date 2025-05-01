@@ -3,17 +3,14 @@ import { selectAllArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteArrival, fetchArchivedArrivals, unarchiveArrival } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
-import { ArrivalWithClient } from '@/types'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArchivedArrivalsActions = () => {
   const dispatch = useAppDispatch()
   const arrivals = useAppSelector(selectAllArchivedArrivals)
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [arrivalToActionId, setArrivalToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedArrival, setSelectedArrival] = useState<ArrivalWithClient | null>(null)
 
   const fetchAllArchivedArrivals = useCallback(async () => {
     await dispatch(fetchArchivedArrivals())
@@ -53,17 +50,6 @@ export const useArchivedArrivalsActions = () => {
     }
   }
 
-  const handleOpen = (arrival?: ArrivalWithClient) => {
-    if (arrival) {
-      setSelectedArrival(arrival)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setArrivalToActionId(id)
     setActionType(type)
@@ -90,15 +76,10 @@ export const useArchivedArrivalsActions = () => {
 
   return {
     arrivals,
-    selectedArrival,
-    open,
-    handleOpen,
-    handleClose,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    arrivalToActionId,
   }
 }

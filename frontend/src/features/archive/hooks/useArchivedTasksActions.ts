@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { TaskWithPopulate } from '@/types'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { selectAllArchivedTasks, selectLoadingFetchArchivedTasks } from '@/store/slices/taskSlice.ts'
 import { deleteTask, fetchArchivedTasks, unarchiveTask } from '@/store/thunks/tasksThunk.ts'
@@ -9,11 +8,9 @@ import { deleteTask, fetchArchivedTasks, unarchiveTask } from '@/store/thunks/ta
 
 const useArchivedTasksActions = () => {
   const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [taskToActionId, setTaskToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedTask, setSelectedTask] = useState<TaskWithPopulate | null>(null)
   const tasks = useAppSelector(selectAllArchivedTasks)
   const isLoading = useAppSelector(selectLoadingFetchArchivedTasks)
 
@@ -53,17 +50,6 @@ const useArchivedTasksActions = () => {
     }
   }
 
-  const handleOpen = (task?: TaskWithPopulate) => {
-    if (task) {
-      setSelectedTask(task)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setTaskToActionId(id)
     setActionType(type)
@@ -89,10 +75,6 @@ const useArchivedTasksActions = () => {
 
   return {
     tasks,
-    open,
-    selectedTask,
-    handleOpen,
-    handleClose,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

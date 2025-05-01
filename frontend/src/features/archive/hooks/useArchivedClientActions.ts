@@ -4,24 +4,17 @@ import { deleteClient, fetchArchivedClients, unarchiveClient } from '@/store/thu
 import {
   clearClientError,
   selectAllArchivedClients,
-  selectLoadingArchivedClients,
 } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
-import { Client } from '@/types'
 
 
 export const useArchivedClientActions = () => {
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllArchivedClients)
-  const loading = useAppSelector(selectLoadingArchivedClients)
-  const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [clientToActionId, setClientToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 
   const clearErrors = useCallback(() => {
     dispatch(clearClientError())
@@ -70,17 +63,6 @@ export const useArchivedClientActions = () => {
     }
   }
 
-  const handleOpen = (client?: Client) => {
-    if (client) {
-      setSelectedClient(client)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setClientToActionId(id)
     setActionType(type)
@@ -106,17 +88,10 @@ export const useArchivedClientActions = () => {
 
   return {
     clients,
-    selectedClient,
-    open,
-    handleOpen,
-    handleClose,
-    navigate,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    clientToActionId,
-    loading,
   }
 }

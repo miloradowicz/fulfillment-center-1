@@ -4,7 +4,6 @@ import { clearClientError } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
-import { Counterparty } from '@/types'
 import {
   selectAllArchivedCounterparties,
 } from '@/store/slices/counterpartySlices.ts'
@@ -18,11 +17,9 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
   const dispatch = useAppDispatch()
   const counterparties = useAppSelector(selectAllArchivedCounterparties)
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [counterpartyToActionId, setCounterpartyToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedCounterparty, setSelectedCounterparty] = useState<Counterparty | null>(null)
 
   const clearErrors = useCallback(() => {
     dispatch(clearClientError())
@@ -80,17 +77,6 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
     }
   }
 
-  const handleOpen = (counterparty?: Counterparty) => {
-    if (counterparty) {
-      setSelectedCounterparty(counterparty)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setCounterpartyToActionId(id)
     setActionType(type)
@@ -114,19 +100,12 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
     handleConfirmationClose()
   }
 
-
   return {
     counterparties,
-    selectedCounterparty,
-    open,
-    handleOpen,
-    handleClose,
-    navigate,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    counterpartyToActionId,
   }
 }

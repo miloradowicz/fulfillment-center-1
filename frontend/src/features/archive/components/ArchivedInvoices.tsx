@@ -6,6 +6,8 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
 import useArchivedInvoiceActions from '@/features/archive/hooks/useArchivedInvoiceActions.ts'
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge.tsx'
+import { NumberBadge } from '@/components/NumberBadge/NumberBadge.tsx'
 
 const ArchivedInvoices = () => {
   const {
@@ -30,14 +32,7 @@ const ArchivedInvoices = () => {
       accessorKey: 'invoiceNumber',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Номер счета" />,
       cell: ({ row }) => {
-        const invoice = row.original
-        return (
-          <div
-            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
-          >
-            {invoice.invoiceNumber}
-          </div>
-        )
+        return <NumberBadge number={row.original.invoiceNumber} />
       },
       enableHiding: false,
     },
@@ -56,27 +51,13 @@ const ArchivedInvoices = () => {
       header: 'Статус оплаты',
       cell: ({ row }) => {
         const status = row.original.status
-
-        const statusStyles: Record<'в ожидании' | 'оплачено' | 'частично оплачено', string> = {
-          'в ожидании':
-            'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
-          'оплачено':
-            'bg-emerald-100 text-emerald-700 transition-colors rounded-lg font-bold px-4 py-2',
-          'частично оплачено':
-            'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
+        const arrivalStatusStyles = {
+          'в ожидании': 'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
+          'оплачено': 'bg-emerald-100 text-emerald-700 rounded-lg font-bold px-4 py-2',
+          'частично оплачено': 'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
         }
 
-        const capitalizeFirstLetter = (str: string) => {
-          return str.charAt(0).toUpperCase() + str.slice(1)
-        }
-
-        const statusClass = statusStyles[status as keyof typeof statusStyles] || 'bg-primary/10 text-primary/80 border font-bold px-4 py-2'
-
-        return (
-          <span className={statusClass}>
-            {capitalizeFirstLetter(status as string)}
-          </span>
-        )
+        return <StatusBadge status={status ?? '—'} stylesMap={arrivalStatusStyles}/>
       },
     },
     {

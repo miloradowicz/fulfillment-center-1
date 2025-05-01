@@ -6,6 +6,8 @@ import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedAction
 import DataTable from '@/components/DataTable/DataTable.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import useArchivedTasksActions from '@/features/archive/hooks/useArchivedTasksActions.ts'
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge.tsx'
+import { NumberBadge } from '@/components/NumberBadge/NumberBadge.tsx'
 
 const ArchivedTasks = () => {
   const {
@@ -29,15 +31,7 @@ const ArchivedTasks = () => {
       accessorKey: 'taskNumber',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Номер задачи" />,
       cell: ({ row }) => {
-        const tableTask = row.original
-
-        return (
-          <div
-            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
-          >
-            {tableTask.taskNumber}
-          </div>
-        )
+        return <NumberBadge number={row.original.taskNumber} />
       },
       enableHiding: false,
     },
@@ -56,27 +50,13 @@ const ArchivedTasks = () => {
       header: 'Статус',
       cell: ({ row }) => {
         const status = row.original.status
-
-        const statusStyles: Record<'к выполнению' | 'готово' | 'в работе', string> = {
-          'к выполнению':
-            'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
-          'готово':
-            'bg-emerald-100 text-emerald-700 transition-colors rounded-lg font-bold px-4 py-2',
-          'в работе':
-            'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
+        const arrivalStatusStyles = {
+          'к выполнению': 'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
+          'готова': 'bg-emerald-100 text-emerald-700 rounded-lg font-bold px-4 py-2',
+          'в работе': 'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
         }
 
-        const capitalizeFirstLetter = (str: string) => {
-          return str.charAt(0).toUpperCase() + str.slice(1)
-        }
-
-        const statusClass = statusStyles[status as keyof typeof statusStyles] || 'bg-primary/10 text-primary/80 border font-bold px-4 py-2'
-
-        return (
-          <span className={statusClass}>
-            {capitalizeFirstLetter(status as string)}
-          </span>
-        )
+        return <StatusBadge status={status} stylesMap={arrivalStatusStyles}/>
       },
     },
     {

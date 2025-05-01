@@ -9,18 +9,14 @@ import { toast } from 'react-toastify'
 import {
   clearErrorProduct, selectAllArchivedProducts,
 } from '@/store/slices/productSlice.ts'
-import { ProductWithPopulate } from '@/types'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
-
 
 const useArchivedProductActions = () => {
   const dispatch = useAppDispatch()
   const products = useAppSelector(selectAllArchivedProducts)
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [productToActionId, setProductToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
 
   const clearErrors = useCallback(() => {
     dispatch(clearErrorProduct())
@@ -30,7 +26,6 @@ const useArchivedProductActions = () => {
     await dispatch(fetchArchivedProducts())
   }, [dispatch])
 
-
   useEffect(() => {
     void clearErrors()
   }, [clearErrors])
@@ -38,7 +33,6 @@ const useArchivedProductActions = () => {
   useEffect(() => {
     void fetchAllProducts()
   }, [fetchAllProducts])
-
 
 
   const deleteOneProduct = async (id: string) => {
@@ -71,17 +65,6 @@ const useArchivedProductActions = () => {
     }
   }
 
-  const handleOpen = (product?: ProductWithPopulate) => {
-    if (product) {
-      setSelectedProduct(product)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setProductToActionId(id)
     setActionType(type)
@@ -107,10 +90,6 @@ const useArchivedProductActions = () => {
 
   return {
     products,
-    selectedProduct,
-    open,
-    handleOpen,
-    handleClose,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

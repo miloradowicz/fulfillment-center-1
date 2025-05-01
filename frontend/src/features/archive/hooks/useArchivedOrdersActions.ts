@@ -10,11 +10,9 @@ export const useArchivedOrdersActions = () => {
   const dispatch = useAppDispatch()
   const orders = useAppSelector(selectAllArchivedOrders) as OrderWithClient[] | null
   const isLoading = useAppSelector(selectLoadingFetchArchivedOrders)
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [orderToActionId, setOrderToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-  const [selectedOrder, setSelectedOrder] = useState<OrderWithClient | null>(null)
 
   useEffect(() => {
     if (!orders && !isLoading) {
@@ -52,17 +50,6 @@ export const useArchivedOrdersActions = () => {
     }
   }
 
-  const handleOpen = (order?: OrderWithClient) => {
-    if (order) {
-      setSelectedOrder(order)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setOrderToActionId(id)
     setActionType(type)
@@ -86,14 +73,8 @@ export const useArchivedOrdersActions = () => {
     handleConfirmationClose()
   }
 
-
   return {
     orders,
-    isLoading,
-    selectedOrder,
-    open,
-    handleOpen,
-    handleClose,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

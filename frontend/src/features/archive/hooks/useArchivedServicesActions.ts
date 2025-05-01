@@ -1,7 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useEffect, useState } from 'react'
-import { Service } from '@/types'
-import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { deleteService, fetchArchivedServices, unarchiveService } from '@/store/thunks/serviceThunk.ts'
@@ -12,14 +10,10 @@ import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 
 const useArchivedServiceActions = () => {
   const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [serviceToActionId, setServiceToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const services = useAppSelector(selectAllArchivedServices)
-  const [selectedService, setSelectedService] = useState<Service | null>(null)
-  const { id } = useParams()
-  const navigate = useNavigate()
   const loading = useAppSelector(selectUsersLoading)
 
   useEffect(() => {
@@ -59,17 +53,6 @@ const useArchivedServiceActions = () => {
     }
   }
 
-  const handleOpen = (service?: Service) => {
-    if (service) {
-      setSelectedService(service)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setServiceToActionId(id)
     setActionType(type)
@@ -95,19 +78,11 @@ const useArchivedServiceActions = () => {
 
   return {
     services,
-    selectedService,
-    open,
-    handleOpen,
-    handleClose,
-    id,
-    navigate,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    serviceToActionId,
-    loading,
   }
 }
 
