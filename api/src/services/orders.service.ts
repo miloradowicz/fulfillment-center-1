@@ -48,10 +48,22 @@ export class OrdersService {
   async getByIdWithPopulate(id: string) {
     const order = await this.orderModel
       .findById(id)
-      .populate('client products.product defects.product stock')
+      .populate([
+        { path: 'client' },
+        { path: 'products.product' },
+        { path: 'defects.product' },
+        { path: 'stock' },
+        {
+          path: 'services.service',
+          populate: {
+            path: 'serviceCategory',
+            model: 'ServiceCategory',
+          },
+        },
+      ])
       .exec()
-    if (!order) throw new NotFoundException('Заказ не найден')
 
+    if (!order) throw new NotFoundException('Заказ не найден')
     if (order.isArchived) throw new ForbiddenException('Заказ в архиве')
 
     return order
