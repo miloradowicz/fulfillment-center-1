@@ -14,6 +14,8 @@ import FormAccordion from '@/components/FormAccordion/FormAccordion.tsx'
 import { useInvoiceForm } from '../hooks/useInvoiceForm'
 import { InvoiceData } from '../types/invoiceTypes'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { invoiceStatusStyles } from '@/utils/commonStyles'
 
 interface Props {
   initialData?: InvoiceData | undefined
@@ -47,6 +49,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     totalAmount,
     availableArrivalsWithDummy,
     availableOrdersWithDummy,
+    invoiceStatus,
   } = useInvoiceForm(initialData, onSuccess)
 
   return (
@@ -193,13 +196,18 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
         <div className="space-y-2.5">
           <Label htmlFor="total_amount">К оплате</Label>
-          <Input
-            id="total_amount"
-            name="total_amount"
-            placeholder="К оплате"
-            value={totalAmount}
-            disabled
-          />
+          <Input id="total_amount" name="total_amount" placeholder="К оплате" value={totalAmount} disabled />
+        </div>
+
+        <Separator />
+
+        <div className="flex justify-between">
+          <Label>Статус</Label>
+          <Badge
+            className={`justify-between gap-2 px-3 py-1 rounded-md text-sm font-medium ${ invoiceStatusStyles[String(invoiceStatus)] }`}
+          >
+            {invoiceStatus as string}
+          </Badge>
         </div>
 
         <Separator />

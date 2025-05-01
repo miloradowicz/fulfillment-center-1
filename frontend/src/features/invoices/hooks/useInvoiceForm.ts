@@ -21,6 +21,7 @@ import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
 import { createInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
 import { selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
+import { X } from 'lucide-react'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -29,6 +30,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   const isLoading = useAppSelector(selectLoadingAddArrival)
   const services = useAppSelector(selectAllServices)
   const location = useLocation()
+  const [invoiceStatus, setInvoiceStatus] = useState<'в ожидании' | 'частично оплачено' | 'оплачено'>('в ожидании')
 
   const [form, setForm] = useState<InvoiceMutation>(
     initialData
@@ -50,6 +52,20 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
         service: typeof item.service === 'string' ? item.service : item.service._id,
       }),
     })) || []
+
+  const [arrivalServicesForm, setArrivalServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services.map(x => {
+      const { _id: _, ...rest } = { ...x, service: x.service._id }
+      return rest
+    }) as ServiceArrival[]) || []),
+  )
+
+  const [orderServicesForm, setOrderServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services.map(x => {
+      const { _id: _, ...rest } = { ...x, service: x.service._id }
+      return rest
+    }) as ServiceArrival[]) || []),
+  )
 
   const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
     normalizeField((initialData?.services.map(x => {
@@ -96,28 +112,53 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }, [availableArrivals, availableOrders, form.associatedArrival, form.associatedOrder])
 
   useEffect(() => {
-    const allServices: ServiceArrival[] = []
-
     if (availableArrivals?.length) {
-      allServices.push(...(availableArrivals.find(x => x._id === form.associatedArrival)?.services ?? []))
+      const arrival = availableArrivals.find(x => x._id === form.associatedArrival)
+      setArrivalServicesForm(arrival?.services?.map(x => {
+        const service = services.find(y => y._id === x.service)
+
+        return ({
+          ...x,
+          service_amount: x.service_amount ?? 1,
+          service_price: x.service_price ?? service?.price,
+          service_type: x.service_type ?? service?.type,
+        })
+      }) ?? [])
     }
 
     if (availableOrders?.length) {
-      allServices.push(...(availableOrders.find(x => x._id === form.associatedOrder)?.services ?? []))
-    }
+      const order = availableOrders.find(x => x._id === form.associatedOrder)
+      setOrderServicesForm(
+        order?.services?.map(x => {
+          const service = services.find(y => y._id === x.service)
 
-    if (servicesForm.length) {
-      allServices.push(...servicesForm)
+          return {
+            ...x,
+            service_amount: x.service_amount ?? 1,
+            service_price: x.service_price ?? service?.price,
+            service_type: x.service_type ?? service?.type,
+          }
+        }) ?? [],
+      )
     }
+  },
+  [
+    form.associatedArrival,
+    form.associatedOrder,
+    availableArrivals,
+    availableOrders,
+    services,
+  ])
 
-    const totalAmount = allServices
+  useEffect(() => {
+    const totalAmount = servicesForm.concat(arrivalServicesForm, orderServicesForm)
       .map(x => {
         const service = services.find(y => y._id === x.service)
 
         return (
           x.service_amount *
           (x.service_price ?? service?.price) *
-          (service?.type === 'внутренняя' ? 1 - (form.discount ?? 0) / 100 : 1)
+          ((x.service_type ?? service?.type) === 'внутренняя' ? 1 - (form.discount ?? 0) / 100 : 1)
         )
       })
       .reduce((a, x) => a + x, 0)
@@ -125,14 +166,25 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
     setTotalAmount(totalAmount)
   },
   [
-    form.associatedArrival,
-    form.associatedOrder,
-    form.services,
+    arrivalServicesForm,
+    orderServicesForm,
     servicesForm,
     form.discount,
     services,
-    availableArrivals,
-    availableOrders,
+  ])
+
+  useEffect(() => {
+    if (form.paid_amount === undefined || form.paid_amount === 0) {
+      setInvoiceStatus('в ожидании')
+    } else if (form.paid_amount < totalAmount) {
+      setInvoiceStatus('частично оплачено')
+    } else {
+      setInvoiceStatus('оплачено')
+    }
+  },
+  [
+    totalAmount,
+    form.paid_amount,
   ])
 
   const openModal = () => {
@@ -148,6 +200,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       service: newService.service,
       service_amount: Number(newService.service_amount),
       service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+      service_type: newService.service_type,
     }
 
     if (!baseService.service || baseService.service_amount <= 0) {
@@ -194,8 +247,10 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
         services: servicesForm,
         ...(form.associatedArrival && { associateArrival: form.associatedArrival }),
         ...(form.associatedOrder && { associateOrder: form.associatedOrder }),
-        ...(form.paid_amount && { paid_amount: form.paid_amount }),
-        ...(form.discount && { discount: form.discount }),
+        associatedArrivalServices: arrivalServicesForm,
+        associatedOrderServices: orderServicesForm,
+        paid_amount: form.paid_amount ?? 0,
+        discount: form.discount ?? 0,
       }
 
       if (initialData) {
@@ -258,5 +313,6 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
     totalAmount,
     availableArrivalsWithDummy,
     availableOrdersWithDummy,
+    invoiceStatus,
   }
 }
