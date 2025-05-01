@@ -171,7 +171,7 @@ const useInvoiceDetails = () => {
           const thinBorder = { style: 'thin', color: { rgb: '000000' } }
           const cellType = typeof val === 'number' ? 'n' : 's'
 
-          styles[cell] = {
+          const cellStyles: XLSX.CellObject = {
             v: val,
             t: cellType,
             s: {
@@ -180,6 +180,12 @@ const useInvoiceDetails = () => {
               alignment: { vertical: 'center', wrapText: true },
             },
           }
+
+          if (colIndex === 4) {
+            cellStyles.s.alignment = { vertical: 'center', horizontal: 'center' }
+          }
+
+          styles[cell] = cellStyles
         })
         rowIndex++
       })

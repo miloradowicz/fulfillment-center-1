@@ -5,6 +5,7 @@ import { fetchPopulatedArrivals, updateArrival } from '@/store/thunks/arrivalThu
 import { ArrivalStatus } from '@/constants'
 
 import CommonStatusCell from '@/components/CommonStatusCell/CommonStatusCell.tsx'
+import { arrivalStatusStyles } from '@/utils/commonStyles.ts'
 
 export interface Props {
   row: ArrivalWithClient
@@ -12,16 +13,6 @@ export interface Props {
 
 const StatusArrivalCell: React.FC<Props> = ({ row }) => {
   const dispatch = useAppDispatch()
-
-  const statusStyles: Record<string, string> = {
-    'ожидается доставка':
-      'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800 transition-colors rounded-lg font-bold',
-    'получена':
-      'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-900 transition-colors rounded-lg font-bold',
-    'отсортирована':
-    'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-900 transition-colors rounded-lg font-bold',
-    default: 'bg-primary/10 text-primary/80 border font-bold hover:bg-primary/20 hover:text-primary',
-  }
 
   const handleStatusChange = async (row: ArrivalWithClient, newStatus: string) => {
     const updatedData = {
@@ -41,7 +32,7 @@ const StatusArrivalCell: React.FC<Props> = ({ row }) => {
       row={row}
       statusKey="arrival_status"
       statusOptions={ArrivalStatus}
-      statusStyles={statusStyles}
+      statusStyles={arrivalStatusStyles}
       onChangeStatus={handleStatusChange}
     />
   )

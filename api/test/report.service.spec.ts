@@ -1,3 +1,5 @@
+
+
 import { getModelToken } from '@nestjs/mongoose'
 import { Test, TestingModule } from '@nestjs/testing'
 import { Order } from '../src/schemas/order.schema'
@@ -133,10 +135,11 @@ describe('ReportService', () => {
   })
 
   it('should handle no orders case for a client', async () => {
-    orderModel.find.mockImplementation(() =>
-      ({
-        populate: jest.fn().mockResolvedValue([]),
-      } as unknown as Query<Order[], Order>)
+    orderModel.find.mockImplementation(
+      () =>
+        ({
+          populate: jest.fn().mockResolvedValue([]),
+        }) as unknown as Query<Order[], Order>,
     )
 
     const startDate = new Date('2025-04-09')
@@ -168,5 +171,4 @@ describe('ReportService', () => {
     expect(result.dailyTaskCounts[0]).toEqual({ date: '2025-04-09', taskCount: 2 })
     expect(result.dailyTaskCounts[1]).toEqual({ date: '2025-04-10', taskCount: 3 })
   })
-
 })

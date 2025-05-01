@@ -340,7 +340,7 @@ export class SeederService {
         status: 'в сборке',
         isArchived: false,
         services: [
-          { service: _service1._id },
+          { service: _service1._id, service_price: _service1.price },
           { service: _service2._id, service_amount: 5, service_price: 1000 },
         ],
       },
@@ -366,7 +366,7 @@ export class SeederService {
         status: 'доставлен',
         isArchived: false,
         services: [
-          { service: _service1._id, service_amount: 10 },
+          { service: _service1._id, service_amount: 10, service_price: _service1.price },
           { service: _service2._id, service_price: 1000 },
         ],
       },
