@@ -20,14 +20,19 @@ export class Invoice {
         service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
         service_amount: { type: Number, required: true, default: 1 },
         service_price: { type: Number, required: false },
+        service_type: { type: String,
+          enum: ['внутренняя', 'внешняя'],
+          required: true,
+          default: 'внутренняя' },
       },
     ],
     required: true,
   })
   services: {
-    service: mongoose.Schema.Types.ObjectId
+    service: mongoose.Types.ObjectId
     service_amount: number
     service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
   }[]
 
   @Prop({ type: Number })
@@ -51,6 +56,38 @@ export class Invoice {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: false })
   associatedOrder?: mongoose.Types.ObjectId
+
+  @Prop({
+    type: [
+      {
+        service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
+        service_amount: { type: Number, required: true, default: 1 },
+        service_price: { type: Number, required: false },
+      },
+    ],
+    default: [],
+  })
+  associatedArrivalServices: {
+    service: mongoose.Types.ObjectId
+    service_amount: number
+    service_price?: number
+  }[]
+
+  @Prop({
+    type: [
+      {
+        service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
+        service_amount: { type: Number, required: true, default: 1 },
+        service_price: { type: Number, required: false },
+      },
+    ],
+    default: [],
+  })
+  associatedOrderServices: {
+    service: mongoose.Types.ObjectId
+    service_amount: number
+    service_price?: number
+  }[]
 
   @Prop({
     type: [

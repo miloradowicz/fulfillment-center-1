@@ -52,7 +52,10 @@ describe('InvoicesService', () => {
 
   const mockInvoiceModel = {
     find: jest.fn(),
-    findById: jest.fn(),
+    findById: jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(mockInvoice),
+    }),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
   }
@@ -113,9 +116,17 @@ describe('InvoicesService', () => {
     it('should return an invoice by id', async () => {
       jest.spyOn(mockInvoiceModel, 'findById').mockReturnValue({
         populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue(mockInvoice),
+          populate: jest.fn().mockReturnValue({
+            populate: jest.fn().mockReturnValue({
+              populate: jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue({
+                  populate: jest.fn().mockResolvedValue(mockInvoice),
+                }),
+              }),
+            }),
+          }),
         }),
-      } as any)
+      } as any);
 
       const result = await service.getOne('invoice-id-1')
       expect(result).toEqual(mockInvoice)
@@ -124,7 +135,15 @@ describe('InvoicesService', () => {
     it('should throw NotFoundException if invoice not found', async () => {
       jest.spyOn(mockInvoiceModel, 'findById').mockReturnValue({
         populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue(null),
+          populate: jest.fn().mockReturnValue({
+            populate: jest.fn().mockReturnValue({
+              populate: jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue({
+                  populate: jest.fn().mockResolvedValue(null),
+                }),
+              }),
+            }),
+          }),
         }),
       } as any)
 
@@ -134,7 +153,15 @@ describe('InvoicesService', () => {
     it('should throw ForbiddenException if invoice is archived', async () => {
       jest.spyOn(mockInvoiceModel, 'findById').mockReturnValue({
         populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue(mockArchivedInvoice),
+          populate: jest.fn().mockReturnValue({
+            populate: jest.fn().mockReturnValue({
+              populate: jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue({
+                  populate: jest.fn().mockResolvedValue(mockArchivedInvoice),
+                }),
+              }),
+            }),
+          }),
         }),
       } as any)
 
@@ -162,7 +189,13 @@ describe('InvoicesService', () => {
       jest.spyOn(mockInvoiceModel, 'findById').mockReturnValue({
         populate: jest.fn().mockReturnValue({
           populate: jest.fn().mockReturnValue({
-            populate: jest.fn().mockResolvedValue(mockArchivedInvoice),
+            populate: jest.fn().mockReturnValue({
+              populate: jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue({
+                  populate: jest.fn().mockResolvedValue(mockArchivedInvoice),
+                }),
+              }),
+            }),
           }),
         }),
       } as any)

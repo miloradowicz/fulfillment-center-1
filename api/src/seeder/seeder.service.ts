@@ -383,6 +383,10 @@ export class SeederService {
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'в сборке',
         isArchived: true,
+        services: [
+          { service: _service1._id, service_amount: 10 },
+          { service: _service2._id, service_price: 1000 },
+        ],
       },
       {
         orderNumber: 'ORD-5',
@@ -397,6 +401,10 @@ export class SeederService {
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'в пути',
         isArchived: true,
+        services: [
+          { service: _service1._id, service_amount: 10 },
+          { service: _service2._id, service_price: 1000 },
+        ],
       },
       {
         orderNumber: 'ORD-6',
@@ -407,6 +415,10 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
         status: 'в сборке',
+        services: [
+          { service: _service1._id, service_amount: 10 },
+          { service: _service2._id, service_price: 1000 },
+        ],
       },
     ])
 
@@ -511,6 +523,17 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty1._id,
         pickup_location: 'Ул. Авиаторов, д. 88',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         isArchived: false,
       },
       {
@@ -524,6 +547,17 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty1._id,
         pickup_location: 'Ул. Авиаторов, д. 88',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         isArchived: true,
       },
       {
@@ -537,6 +571,17 @@ export class SeederService {
         stock: _stock1._id,
         shipping_agent: _counterparty1._id,
         pickup_location: 'Ул. Авиаторов, д. 88',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
         isArchived: true,
       },
     ])
@@ -694,12 +739,18 @@ export class SeederService {
             service: _service3._id,
             service_price: 3000,
             service_amount: 2,
+            service_type: 'внешняя',
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 3,
+            service_type: 'внутренняя',
           },
+        ],
+        associatedOrderServices: [
+          { service: _service1._id },
+          { service: _service2._id, service_amount: 5, service_price: 1000 },
         ],
       },
       {
@@ -715,11 +766,24 @@ export class SeederService {
             service: _service1._id,
             service_price: 2000,
             service_amount: 3,
+            service_type: 'внешняя',
           },
           {
             service: _service2._id,
             service_price: _service2.price,
             service_amount: 2,
+            service_type: 'внутренняя',
+          },
+        ],
+        associatedArrivalServices: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
           },
         ],
       },
@@ -735,11 +799,24 @@ export class SeederService {
             service: _service1._id,
             service_price: 2000,
             service_amount: 3,
+            service_type: 'внешняя',
           },
           {
             service: _service2._id,
             service_price: _service2.price,
             service_amount: 2,
+            service_type: 'внутренняя',
+          },
+        ],
+        associatedArrivalServices: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
           },
         ],
       },
@@ -755,17 +832,24 @@ export class SeederService {
             service: _service1._id,
             service_price: 2000,
             service_amount: 3,
+            service_type: 'внешняя',
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 2,
+            service_type: 'внутренняя',
           },
+        ],
+        associatedOrderServices: [
+          { service: _service1._id },
+          { service: _service2._id, service_amount: 5, service_price: 1000 },
         ],
       },
       {
         invoiceNumber: 'INV-5',
         associatedArrival: _arrival1._id,
+        associatedOrder: _order1._id,
         client: _client1._id,
         totalAmount: 66000,
         paid_amount: 10000,
@@ -776,12 +860,29 @@ export class SeederService {
             service: _service3._id,
             service_price: 2000,
             service_amount: 3,
+            service_type: 'внешняя',
           },
           {
             service: _service2._id,
             service_price: _service2.price,
             service_amount: 2,
+            service_type: 'внутренняя',
           },
+        ],
+        associatedArrivalServices: [
+          {
+            service: _service3._id,
+            service_price: 72000,
+          },
+          {
+            service: _service4._id,
+            service_price: _service4.price,
+            service_amount: 5,
+          },
+        ],
+        associatedOrderServices: [
+          { service: _service1._id },
+          { service: _service2._id, service_amount: 5, service_price: 1000 },
         ],
       },
     ])
