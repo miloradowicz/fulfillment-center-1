@@ -56,7 +56,7 @@ const useInvoiceDetails = () => {
       try {
         await dispatch(archiveInvoice(invoiceId)).unwrap()
         toast.success('Счёт успешно архивирован!')
-        navigate('/invoices')
+        navigate('/admin?tab=invoices')
       } catch (e) {
         if (hasMessage(e)) {
           toast.error(e.message)
