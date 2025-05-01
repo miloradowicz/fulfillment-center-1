@@ -51,7 +51,7 @@ const InvoiceDetails = () => {
           />
 
           <div className="w-full max-w-[700px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
-            <BackButton to="/admin?tab=invoices" />
+            <BackButton />
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
