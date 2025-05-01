@@ -8,24 +8,10 @@ import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StockProductsPage from './StockProductsPage.tsx'
-import { useSearchParams } from 'react-router-dom'
 import StockDefectsPage from './StockDefectsPage.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
-const tabs = [
-  { value: 'products', label: 'Товары' },
-  { value: 'defects', label: 'Брак' },
-]
-
 const StockDetails = () => {
-
-  const [searchParams, setSearchParams] = useSearchParams()
-  const currentTab = searchParams.get('tab') || 'products'
-
-  const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value })
-  }
-
   const {
     stock,
     archiveModalOpen,
@@ -34,6 +20,9 @@ const StockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    tabs,
+    currentTab,
+    handleTabChange,
   } = useStockDetails()
 
   return (

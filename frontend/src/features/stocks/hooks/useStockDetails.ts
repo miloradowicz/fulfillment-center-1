@@ -15,6 +15,12 @@ export const useStockDetails = () => {
 
   const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const [currentTab, setCurrentTab] = useState('products')
+
+  const tabs = [
+    { value: 'products', label: 'Товары' },
+    { value: 'defects', label: 'Брак' },
+  ]
 
   const stockColumns = [
     { field: 'client', headerName: 'Клиент', flex: 1 },
@@ -29,6 +35,20 @@ export const useStockDetails = () => {
       dispatch(fetchStockById(stockId))
     }
   }, [dispatch, stockId])
+
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const tab = searchParams.get('tab')
+    if (tab) setCurrentTab(tab)
+  }, [])
+
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value)
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.set('tab', value)
+    window.history.replaceState(null, '', `${ location.pathname }?${ searchParams.toString() }`)
+  }
 
   const handleArchive = async () => {
     if (stockId) {
@@ -69,5 +89,8 @@ export const useStockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    tabs,
+    currentTab,
+    handleTabChange,
   }
 }
