@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TaskMutation, TaskWithPopulate } from '@/types'
 import { initialErrorState, initialState, TaskError } from '../state/taskState.ts'
 import { selectAllUsers } from '@/store/slices/userSlice.ts'
@@ -8,7 +8,6 @@ import { selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 import { selectCreateError, selectLoadingAddTask, selectLoadingUpdateTask } from '@/store/slices/taskSlice.ts'
 import { toast } from 'react-toastify'
 import { addTask, fetchTasksWithPopulate, updateTask } from '@/store/thunks/tasksThunk.ts'
-import { SelectChangeEvent } from '@mui/material'
 import { fetchArrivals } from '@/store/thunks/arrivalThunk.ts'
 import { fetchOrders } from '@/store/thunks/orderThunk.ts'
 import { fetchUsers } from '@/store/thunks/userThunk.ts'
@@ -86,14 +85,6 @@ const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => 
     }
   }
 
-  const handleInputChange = (
-    e: SelectChangeEvent | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target
-
-    setForm(prevForm => ({ ...prevForm, [name]: value }))
-  }
-
   const handleBlur = (field: keyof TaskError, value: string) => {
     type ErrorMessages = {
       [key in keyof TaskError]: string
@@ -120,7 +111,6 @@ const UseTaskForm = (onSuccess?: () => void, initialData?: TaskWithPopulate) => 
     addLoading,
     updateLoading,
     handleSubmit,
-    handleInputChange,
     handleBlur,
     setForm,
     activePopover,

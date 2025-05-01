@@ -1,7 +1,7 @@
 import useServiceForm from '../hooks/useServiceForm'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Button } from '@/components/ui/button'
-import { CheckIcon, ChevronDownIcon, Loader2, X } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, LoaderCircle, X } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ChangeEvent } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -175,7 +175,7 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
 
       <Button type="submit" className="w-full mt-3" disabled={loading || addCategoryLoading || fetchCategoryLoading}>
         {serviceId ? 'Сохранить' : 'Создать'}
-        {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {loading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

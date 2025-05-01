@@ -22,6 +22,7 @@ import StockDetails from './features/stocks/containers/StockDetails.tsx'
 import CounterpartiesPage from './features/counterparties/containers/CounterpartiesPage.tsx'
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 import AdminPage from '@/features/admin/containers/AdminPage.tsx'
+import InvoiceDetails from './features/invoices/containers/InvoiceDetails.tsx'
 import InvoicesFormPage from './features/invoices/components/InvoicesFormPage.tsx'
 
 const App = () => {
@@ -205,6 +206,12 @@ const App = () => {
                 <InvoicesFormPage />
               }
             />
+
+            <Route path="/invoices/:invoiceId" element={
+              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                <InvoiceDetails />
+              </AllowedRoute>
+            }/>
 
             <Route
               path="*"

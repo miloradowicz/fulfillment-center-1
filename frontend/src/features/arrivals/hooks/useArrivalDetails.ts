@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
-  selectArrivalError,
   selectArrivalWithPopulate,
   selectLoadingFetchArrival,
 } from '@/store/slices/arrivalSlice.ts'
@@ -17,12 +16,11 @@ const useArrivalDetails = () => {
 
   const arrival = useAppSelector(selectArrivalWithPopulate)
   const loading = useAppSelector(selectLoadingFetchArrival)
-  const error = useAppSelector(selectArrivalError)
+
   const [confirmArchiveModalOpen, setConfirmArchiveModalOpen] = useState(false)
   const [isArchived, setIsArchived] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
-  const [productsTab, setProductsTabs] = useState(0)
-  const [infoTab, setInfoTab] = useState(0)
+  const [tabs, setTabs] = useState(0)
 
   useEffect(() => {
     if (arrivalId) {
@@ -30,16 +28,12 @@ const useArrivalDetails = () => {
     }
   }, [dispatch, arrivalId])
 
-  const navigateBack = () => {
-    navigate(-1)
-  }
-
   const handleArchive = async () => {
     if (arrivalId) {
       try {
         await dispatch(archiveArrival(arrivalId)).unwrap()
         toast.success('Поставка успешно архивирована!')
-        setIsArchived(true)
+        setIsArchived(!isArchived)
         navigate('/arrivals')
       } catch (e) {
         if (hasMessage(e)) {
@@ -50,36 +44,19 @@ const useArrivalDetails = () => {
         }
       }
     }
-
     setConfirmArchiveModalOpen(false)
   }
 
-  const getStepDescription = (index: number) => {
-    const descriptions = [
-      'Товар отправлен заказчиком',
-      'Товар прибыл на склад',
-      'Товар отсортирован на складе',
-    ]
-    return descriptions[index] || ''
-  }
-
   return {
-    arrivalId,
     arrival,
     loading,
-    error,
-    productsTab,
-    infoTab,
     confirmArchiveModalOpen,
-    isArchived,
     handleArchive,
-    navigateBack,
     editModalOpen,
     setEditModalOpen,
-    setProductsTabs,
     setConfirmArchiveModalOpen,
-    setInfoTab,
-    getStepDescription,
+    tabs,
+    setTabs,
   }
 }
 

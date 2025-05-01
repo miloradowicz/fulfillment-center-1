@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import { UserUpdateMutation } from '@/types'
 
 interface RegistrationFormProps {
@@ -127,7 +127,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           sending
         }
       >
-        {sending ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+        {sending ? <LoaderCircle className="animate-spin h-4 w-4 mr-2" /> : null}
         {isEditMode ? 'Сохранить изменения' : 'Создать пользователя'}
       </Button>
     </form>

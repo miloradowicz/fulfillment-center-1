@@ -2,15 +2,20 @@ import { useAppDispatch } from '@/app/hooks.ts'
 import React from 'react'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SquareArrowOutDownRight } from 'lucide-react'
-import { fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate, updateTask } from '@/store/thunks/tasksThunk.ts'
+import {
+  fetchTaskById,
+  fetchTasksByUserIdWithPopulate,
+  fetchTasksWithPopulate,
+  updateTask,
+} from '@/store/thunks/tasksThunk.ts'
 import { PropsStatus } from '../hooks/TypesProps'
 
-const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
+const StatusCell:React.FC<PropsStatus> =({ task, selectedUser, taskId  })  => {
   const dispatch = useAppDispatch()
 
   const statusColors: Record<string, string> = {
@@ -48,7 +53,9 @@ const StatusCell:React.FC<PropsStatus> =({ task, selectedUser  })  => {
         updatedData.date_inProgress = null
       }
       await dispatch(updateTask({ taskId: task._id, data: updatedData })).unwrap()
-      if (!selectedUser) {
+      if (taskId) {
+        dispatch(fetchTaskById(taskId))
+      } else if (!selectedUser) {
         await dispatch(fetchTasksWithPopulate())
       } else {
         await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))

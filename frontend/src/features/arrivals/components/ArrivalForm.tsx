@@ -8,7 +8,7 @@ import { getArrayItemNameById } from '@/utils/getArrayItemName.ts'
 import { ItemType } from '@/constants.ts'
 import { ArrivalData } from '../utils/arrivalTypes.ts'
 import { Button } from '@/components/ui/button.tsx'
-import { Loader2, Plus } from 'lucide-react'
+import { LoaderCircle, Plus } from 'lucide-react'
 import FileAttachments from '@/components/FileAttachment/FileAttachment.tsx'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
@@ -19,6 +19,7 @@ import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { cn } from '@/lib/utils.ts'
 import FormAccordion from '@/components/FormAccordion/FormAccordion.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
 
 interface Props {
   initialData?: ArrivalData | undefined
@@ -40,7 +41,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     receivedForm,
     setReceivedForm,
     defectsForm,
-    setDefectForm,
+    setDefectsForm,
     productsModalOpen,
     setProductsModalOpen,
     receivedModalOpen,
@@ -351,7 +352,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           <FormAccordion<Defect>
             title="Дефектные товары"
             items={defectsForm}
-            onDelete={i => deleteItem(i, setDefectForm)}
+            onDelete={i => deleteItem(i, setDefectsForm)}
             getNameById={i => getArrayItemNameById(products, i)}
           />
 
@@ -527,9 +528,23 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           onFileChange={handleFileChange}
         />
 
+        <Separator/>
+
+        <div className="space-y-2.5">
+          <Label htmlFor="comment">Комментарий к поставке</Label>
+          <Textarea
+            id="comment"
+            name="comment"
+            placeholder="Ваш комментарий..."
+            value={form.comment}
+            onChange={e => inputChangeHandler(e, setForm)}
+            className="resize-y min-h-[40px] max-h-[250px]"
+          />
+        </div>
+
         <Button type="submit" className="w-full mt-3" disabled={isLoading}>
           {initialData ? 'Сохранить' : 'Создать'}
-          {isLoading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+          {isLoading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
         </Button>
       </form>
 

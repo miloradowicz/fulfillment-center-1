@@ -48,7 +48,44 @@ export class InvoicesService {
   async getOne(id: string) {
     const invoice = await this.invoiceModel
       .findById(id)
-      .populate('client services.service')
+      .populate('client')
+      .populate({
+        path: 'services.service',
+        populate: {
+          path: 'serviceCategory',
+          model: 'ServiceCategory',
+        },
+      })
+      .populate({
+        path: 'associatedArrivalServices.service',
+        populate: {
+          path: 'serviceCategory',
+          model: 'ServiceCategory',
+        },
+      })
+      .populate({
+        path: 'associatedOrderServices.service',
+        populate: {
+          path: 'serviceCategory',
+          model: 'ServiceCategory',
+        },
+      })
+      .populate([
+        {
+          path: 'associatedOrder',
+          select: 'orderNumber services',
+          populate: {
+            path: 'services.service',
+          },
+        },
+        {
+          path: 'associatedArrival',
+          select: 'arrivalNumber services',
+          populate: {
+            path: 'services.service',
+          },
+        },
+      ])
       .populate({ path: 'logs.user', select: '-password -token' })
 
     if (!invoice) throw new NotFoundException('Счёт не найден.')
@@ -68,7 +105,43 @@ export class InvoicesService {
       invoice = await this.invoiceModel
         .findById(id)
         .populate('client')
-        .populate('services.service')
+        .populate({
+          path: 'services.service',
+          populate: {
+            path: 'serviceCategory',
+            model: 'ServiceCategory',
+          },
+        })
+        .populate({
+          path: 'associatedArrivalServices.service',
+          populate: {
+            path: 'serviceCategory',
+            model: 'ServiceCategory',
+          },
+        })
+        .populate({
+          path: 'associatedOrderServices.service',
+          populate: {
+            path: 'serviceCategory',
+            model: 'ServiceCategory',
+          },
+        })
+        .populate([
+          {
+            path: 'associatedOrder',
+            select: 'orderNumber services',
+            populate: {
+              path: 'services.service',
+            },
+          },
+          {
+            path: 'associatedArrival',
+            select: 'arrivalNumber services',
+            populate: {
+              path: 'services.service',
+            },
+          },
+        ])
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       invoice = await this.invoiceModel.findById(id)
@@ -159,6 +232,19 @@ export class InvoicesService {
     await invoice.save()
 
     return { message: 'Счёт перемещён в архив.' }
+  }
+
+  async unarchive(id: string) {
+    const invoice = await this.invoiceModel.findById(id)
+
+    if (!invoice) throw new NotFoundException('Счёт не найден')
+
+    if (!invoice.isArchived) throw new ForbiddenException('Счёт не находится в архиве')
+
+    invoice.isArchived = false
+    await invoice.save()
+
+    return { message: 'Счёт восстановлен из архива' }
   }
 
   async delete(id: string) {

@@ -92,6 +92,7 @@ const UseTaskCard = (task: TaskWithPopulate, selectedUser: string | null) => {
     handleEdit,
     handleDelete,
     handleCancelDelete,
+    dispatch,
   }
 }
 

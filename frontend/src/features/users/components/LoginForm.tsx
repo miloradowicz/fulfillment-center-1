@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label'
 import { useLoginForm } from '../hooks/useLoginForm'
 import { getFieldError } from '@/utils/getFieldError'
 import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 
 const LoginForm = () => {
   const {
@@ -62,7 +62,7 @@ const LoginForm = () => {
         </div>
 
         <Button type="submit" className="w-full" disabled={!isFormValid || sending}>
-          {sending ? <Loader2 className="animate-spin w-5 h-5" /> : 'Войти'}
+          {sending ? <LoaderCircle className="animate-spin w-5 h-5" /> : 'Войти'}
         </Button>
       </div>
     </form>

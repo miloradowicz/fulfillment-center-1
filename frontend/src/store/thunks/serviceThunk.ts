@@ -19,6 +19,14 @@ export const fetchServices = createAsyncThunk<PopulatedService[], void, { reject
   },
 )
 
+export const fetchArchivedServices = createAsyncThunk<PopulatedService[]>(
+  'services/fetchArchivedServices',
+  async () => {
+    const response = await axiosAPI.get('/services/archived/all')
+    return response.data
+  },
+)
+
 export const fetchServiceById = createAsyncThunk<PopulatedService, string, { rejectValue: GlobalError }>(
   'services/fetchById',
   async (id, { rejectWithValue }) => {
@@ -79,6 +87,21 @@ export const archiveService = createAsyncThunk<{ id: string }, string, { rejectV
         return rejectWithValue(error.response.data as GlobalError)
       }
       throw error
+    }
+  },
+)
+
+export const unarchiveService = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'services/unarchiveService',
+  async (serviceId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/services/${ serviceId }/unarchive`)
+      return { id: serviceId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
     }
   },
 )

@@ -7,12 +7,13 @@ import TaskDetails from '@/features/tasks/components/TaskDetails.tsx'
 import UserList from './UserList'
 import Modal from '@/components/Modal/Modal.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { X, Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input'
-import TaskCard from './TaskCard.tsx'
 import { useState } from 'react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import TaskCard from './TaskCard.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const TaskBoard = () => {
@@ -50,9 +51,9 @@ const TaskBoard = () => {
     <Modal handleClose={handleClose} open={open}>
       <TaskForm onSuccess={handleClose} />
     </Modal>
-    <Modal handleClose={handleCloseDetailsModal} open={openDetailsModal} >
-      <TaskDetails taskId={id}/>
-    </Modal>
+    <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
+      <TaskDetails taskId={id} selectedUser={selectedUser}/>
+    </RightPanel>
     <DndContext
       sensors={sensors}
       collisionDetection={rectIntersection}
@@ -77,7 +78,10 @@ const TaskBoard = () => {
       }}
     >
       {selectFetchUser || loading ? (
-        <Loader/>
+        <div className="mt-5">
+          <Loader/>
+        </div>
+
       ) : (
         <div className="flex flex-col p-2 justify-between min-w-[950px] overflow-hidden">
           <div className="flex items-center space-x-1 w-full ml-5 mt-2.5 mb-0">
@@ -93,7 +97,7 @@ const TaskBoard = () => {
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center">
                   {searchQuery ? (
-                    <Button variant="ghost" size="icon" onClick={clearSearch}>
+                    <Button variant="link" size="sm" onClick={clearSearch}>
                       <X className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   ) : (
@@ -113,7 +117,7 @@ const TaskBoard = () => {
               <div className="mx-3">
                 <Button variant="outline" onClick={clearAllFilters}>Сбросить фильтры</Button>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto mr-5">
                 <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                   <CustomButton text='Добавить задачу' onClick={handleOpen} />
                 </ProtectedElement>
