@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   selectAllArchivedUsers,
   selectUsersLoading,
@@ -15,12 +15,6 @@ const useArchivedUsersActions = () => {
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const users = useAppSelector(selectAllArchivedUsers)
   const loading = useAppSelector(selectUsersLoading)
-
-  useEffect(() => {
-    if (!users && !loading) {
-      dispatch(fetchArchivedUsers())
-    }
-  }, [dispatch, users, loading])
 
   const deleteOneUser = async (id: string) => {
     try {
@@ -77,6 +71,7 @@ const useArchivedUsersActions = () => {
 
   return {
     users,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

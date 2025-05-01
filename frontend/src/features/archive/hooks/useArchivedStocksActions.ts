@@ -1,13 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   deleteStock,
   fetchArchivedStocks,
   unarchiveStock,
 } from '@/store/thunks/stocksThunk.ts'
 import {
-  clearStockError,
-  selectAllArchivedStocks,
+  selectAllArchivedStocks, selectLoadingFetchArchivedStocks,
 } from '@/store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
@@ -18,30 +17,12 @@ const useArchivedStocksActions = () => {
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [stockToActionId, setStockToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-
-  const clearErrors = useCallback(() => {
-    dispatch(clearStockError())
-  }, [dispatch])
-
-  const fetchAllArchivedStocks = useCallback(async () => {
-    await dispatch(fetchArchivedStocks())
-  }, [dispatch])
-
-  useEffect(() => {
-    void clearErrors()
-  }, [clearErrors])
-
-  useEffect(() => {
-    if (!stocks) {
-      void fetchAllArchivedStocks()
-    }
-  }, [fetchAllArchivedStocks, stocks])
-
+  const loading = useAppSelector(selectLoadingFetchArchivedStocks)
 
   const deleteOneStock = async (id: string) => {
     try {
       await dispatch(deleteStock(id)).unwrap()
-      await fetchAllArchivedStocks()
+      await dispatch(fetchArchivedStocks())
       toast.success('Склад успешно удален!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
@@ -56,7 +37,7 @@ const useArchivedStocksActions = () => {
   const unarchiveOneStock = async (id: string) => {
     try {
       await dispatch(unarchiveStock(id)).unwrap()
-      await fetchAllArchivedStocks()
+      await dispatch(fetchArchivedStocks())
       toast.success('Склад успешно восстановлен!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
@@ -93,6 +74,7 @@ const useArchivedStocksActions = () => {
 
   return {
     stocks,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

@@ -1,12 +1,11 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { deleteService, fetchArchivedServices, unarchiveService } from '@/store/thunks/serviceThunk.ts'
 import {
-  selectAllArchivedServices,
+  selectAllArchivedServices, selectLoadingFetchArchiveService,
 } from '@/store/slices/serviceSlice.ts'
-import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 
 const useArchivedServiceActions = () => {
   const dispatch = useAppDispatch()
@@ -14,13 +13,7 @@ const useArchivedServiceActions = () => {
   const [serviceToActionId, setServiceToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const services = useAppSelector(selectAllArchivedServices)
-  const loading = useAppSelector(selectUsersLoading)
-
-  useEffect(() => {
-    if (!services && !loading) {
-      dispatch(fetchArchivedServices())
-    }
-  }, [dispatch, services, loading])
+  const loading = useAppSelector(selectLoadingFetchArchiveService)
 
 
   const deleteOneService = async (id: string) => {
@@ -78,6 +71,7 @@ const useArchivedServiceActions = () => {
 
   return {
     services,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

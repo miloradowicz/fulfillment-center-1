@@ -6,10 +6,12 @@ import useArchivedServicesActions from '@/features/archive/hooks/useArchivedServ
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
+import { useSkeletonTableRows } from '@/features/archive/hooks/useTableSkeleton.ts'
 
 const ArchivedServices = () => {
   const {
     services,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
@@ -17,7 +19,18 @@ const ArchivedServices = () => {
     handleConfirmationAction,
   } = useArchivedServicesActions()
 
-  const columns: ColumnDef<PopulatedService>[] = [
+  const skeletonRows = useSkeletonTableRows<PopulatedService>(
+    {
+      _id: '',
+      name: '',
+      serviceCategory: { _id:'', name: '' },
+      price: 0,
+      type: '',
+    },
+    services?.length || 3,
+  )
+
+  const columns: ColumnDef<PopulatedService & { isSkeleton?: boolean }>[] = [
     {
       id: 'select',
       header: ({ table }) => SelectableColumn(table, 'header'),
@@ -28,48 +41,65 @@ const ArchivedServices = () => {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Имя" />,
-      enableColumnFilter: true,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-40 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.name ?? 'Неизвестное имя'
+        ),
       enableHiding: false,
-      cell: info => info.getValue(),
     },
     {
       accessorKey: 'serviceCategory.name',
       header: 'Категория',
-      cell: ({ row }) => <div>{row.original.serviceCategory.name}</div>,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-40 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.serviceCategory?.name ?? 'Неизвестная категория'
+        ),
     },
     {
       accessorKey: 'price',
       header: 'Цена',
-      cell: ({ row }) => <div>{row.original.price}</div>,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.price ?? 'Неизвестная цена'
+        ),
     },
     {
       accessorKey: 'type',
       header: 'Тип',
-      cell: ({ row }) => <div>{row.original.type}</div>,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.type ?? 'Неизвестный тип'
+        ),
     },
     {
       id: 'actions',
       header: 'Действия',
       enableGlobalFilter: false,
       enableHiding: false,
-      cell: ({ row }) => {
-        const tableService = row.original
-
-        return (
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-10 bg-muted rounded-md animate-pulse" />
+        ) : (
           <TableArchivedActionsMenu<PopulatedService>
-            row={tableService}
+            row={row.original}
             onDelete={id => handleConfirmationOpen(id, 'delete')}
             onRestore={id => handleConfirmationOpen(id, 'unarchive')}
           />
-        )
-      },
+        ),
     },
   ]
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      <DataTable columns={columns} data={services ?? []}/>
-
+      <DataTable columns={columns} data={loading ? skeletonRows : services ?? []} />
 
       <ConfirmationModal
         open={confirmationOpen}

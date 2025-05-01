@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { selectAllArchivedTasks, selectLoadingFetchArchivedTasks } from '@/store/slices/taskSlice.ts'
@@ -12,13 +12,7 @@ const useArchivedTasksActions = () => {
   const [taskToActionId, setTaskToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const tasks = useAppSelector(selectAllArchivedTasks)
-  const isLoading = useAppSelector(selectLoadingFetchArchivedTasks)
-
-  useEffect(() => {
-    if (!tasks && !isLoading) {
-      dispatch(fetchArchivedTasks())
-    }
-  }, [dispatch, tasks, isLoading])
+  const loading = useAppSelector(selectLoadingFetchArchivedTasks)
 
   const deleteOneTask = async (id: string) => {
     try {
@@ -75,6 +69,7 @@ const useArchivedTasksActions = () => {
 
   return {
     tasks,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

@@ -3,7 +3,6 @@ import { useAppDispatch } from '@/app/hooks.ts'
 import { setDraggingTask } from '@/store/slices/taskSlice.ts'
 import {
   archiveTask,
-  fetchArchivedTasks,
   fetchTasksByUserIdWithPopulate,
   fetchTasksWithPopulate,
 } from '@/store/thunks/tasksThunk.ts'
@@ -71,7 +70,6 @@ const UseTaskCard = (task: TaskWithPopulate, selectedUser: string | null) => {
         await dispatch(fetchTasksByUserIdWithPopulate(selectedUser))
       }
       toast.success('Задача перемещена в архив.')
-      await dispatch(fetchArchivedTasks())
     } catch (e) {
       console.error(e)
     }

@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { selectAllInvoices } from '@/store/slices/invoiceSlice'
 import { useCallback, useEffect, useState } from 'react'
-import { archiveInvoice, fetchArchivedInvoices, fetchInvoices } from '@/store/thunks/invoiceThunk'
+import { archiveInvoice, fetchInvoices } from '@/store/thunks/invoiceThunk'
 import { toast } from 'react-toastify'
 
 export const useInvoicesList = () => {
@@ -35,7 +35,6 @@ export const useInvoicesList = () => {
         await dispatch(archiveInvoice(selectedInvoiceId)).unwrap()
         toast.success('Счёт успешно архивирован.')
         await fetchAllInvoices()
-        await dispatch(fetchArchivedInvoices())
       }
     } catch (e) {
       toast.error('Ошибка при архивировании счёта.')

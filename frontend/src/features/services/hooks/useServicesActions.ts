@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import { Service } from '@/types'
-import { archiveService, fetchArchivedServices, fetchServiceById, fetchServices } from '@/store/thunks/serviceThunk.ts'
+import { archiveService, fetchServiceById, fetchServices } from '@/store/thunks/serviceThunk.ts'
 import {
   clearServiceError,
   selectAllServices,
@@ -73,7 +73,6 @@ export const useServiceActions = (fetchOnDelete: boolean) => {
         navigate('/services')
       }
       toast.success('Услуга успешно архивирована!')
-      await dispatch(fetchArchivedServices())
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
         toast.error(e.message)

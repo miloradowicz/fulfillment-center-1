@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { deleteOrder, unarchiveOrder, fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { selectAllArchivedOrders, selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
@@ -9,16 +9,10 @@ import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 export const useArchivedOrdersActions = () => {
   const dispatch = useAppDispatch()
   const orders = useAppSelector(selectAllArchivedOrders) as OrderWithClient[] | null
-  const isLoading = useAppSelector(selectLoadingFetchArchivedOrders)
+  const loading = useAppSelector(selectLoadingFetchArchivedOrders)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [orderToActionId, setOrderToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-
-  useEffect(() => {
-    if (!orders && !isLoading) {
-      dispatch(fetchArchivedOrders())
-    }
-  }, [dispatch, orders, isLoading])
 
   const deleteOneOrder = async (id: string) => {
     try {
@@ -75,6 +69,7 @@ export const useArchivedOrdersActions = () => {
 
   return {
     orders,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

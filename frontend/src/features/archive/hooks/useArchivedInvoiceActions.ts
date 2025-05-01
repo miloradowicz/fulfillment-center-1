@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import {  useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import {
@@ -15,11 +15,6 @@ const useArchivedInvoiceActions = () => {
   const invoices = useAppSelector(selectAllArchivedInvoices)
   const loading = useAppSelector(selectLoadingFetchArchiveInvoice)
 
-  useEffect(() => {
-    if (!invoices && !loading) {
-      dispatch(fetchArchivedInvoices())
-    }
-  }, [dispatch, invoices, loading])
 
   const deleteOneInvoice = async (id: string) => {
     try {
@@ -76,6 +71,7 @@ const useArchivedInvoiceActions = () => {
 
   return {
     invoices,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

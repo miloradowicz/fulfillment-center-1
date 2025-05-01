@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   deleteProduct,
   fetchArchivedProducts,
@@ -7,7 +7,7 @@ import {
 } from '@/store/thunks/productThunk.ts'
 import { toast } from 'react-toastify'
 import {
-  clearErrorProduct, selectAllArchivedProducts,
+  selectAllArchivedProducts, selectLoadingFetchAllArchivedProduct,
 } from '@/store/slices/productSlice.ts'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
@@ -16,23 +16,8 @@ const useArchivedProductActions = () => {
   const products = useAppSelector(selectAllArchivedProducts)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [productToActionId, setProductToActionId] = useState<string | null>(null)
+  const loading = useAppSelector(selectLoadingFetchAllArchivedProduct)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
-
-  const clearErrors = useCallback(() => {
-    dispatch(clearErrorProduct())
-  }, [dispatch])
-
-  const fetchAllProducts = useCallback(async () => {
-    await dispatch(fetchArchivedProducts())
-  }, [dispatch])
-
-  useEffect(() => {
-    void clearErrors()
-  }, [clearErrors])
-
-  useEffect(() => {
-    void fetchAllProducts()
-  }, [fetchAllProducts])
 
 
   const deleteOneProduct = async (id: string) => {
@@ -90,6 +75,7 @@ const useArchivedProductActions = () => {
 
   return {
     products,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

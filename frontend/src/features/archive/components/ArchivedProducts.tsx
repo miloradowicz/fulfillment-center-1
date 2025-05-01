@@ -1,15 +1,18 @@
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { ProductWithPopulate } from '@/types'
-import useArchivedProductActions from '../hooks/useArchivedProductsActions.ts'
-import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
-import DataTable from '@/components/DataTable/DataTable.tsx'
 import { ColumnDef } from '@tanstack/react-table'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+
+import { useSkeletonTableRows } from '@/features/archive/hooks/useTableSkeleton.ts'
+import useArchivedProductActions from '@/features/archive/hooks/useArchivedProductsActions.ts'
 
 const ArchivedProducts = () => {
   const {
     products,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
@@ -17,7 +20,18 @@ const ArchivedProducts = () => {
     handleConfirmationAction,
   } = useArchivedProductActions()
 
-  const columns: ColumnDef<ProductWithPopulate>[] = [
+  const skeletonRows = useSkeletonTableRows<ProductWithPopulate>(
+    {
+      _id: '',
+      title: '',
+      article: '',
+      barcode: '',
+      client: { name: '', _id: '', inn: '', address: '', ogrn: '', email: '', phone_number: '' },
+    },
+    products? products.length: 3,
+  )
+
+  const columns: ColumnDef<ProductWithPopulate & { isSkeleton?: boolean }>[] = [
     {
       id: 'select',
       header: ({ table }) => SelectableColumn(table, 'header'),
@@ -26,53 +40,67 @@ const ArchivedProducts = () => {
       enableHiding: false,
     },
     {
-      accessorKey: 'client',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Клиент" />,
-      enableColumnFilter: true,
-      enableHiding: false,
-      cell: info => (info.getValue() as ProductWithPopulate['client'])?.name || '—',
-
-    },
-    {
       accessorKey: 'title',
-      header: 'Название',
-      enableColumnFilter: true,
-      cell: info => info.getValue(),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Название" />,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-40 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.title ?? 'Неизвестное название'
+        ),
+      enableHiding: false,
     },
     {
       accessorKey: 'article',
       header: 'Артикул',
-      enableColumnFilter: true,
-      cell: info => info.getValue(),
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.article ?? 'Неизвестный артикул'
+        ),
     },
     {
       accessorKey: 'barcode',
       header: 'Баркод',
-      enableColumnFilter: true,
-      cell: info => info.getValue(),
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.barcode ?? 'Неизвестный баркод'
+        ),
+    },
+    {
+      accessorKey: 'client.name',
+      header: 'Клиент',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-26 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.client?.name ?? 'Неизвестный клиент'
+        ),
     },
     {
       id: 'actions',
       header: 'Действия',
       enableGlobalFilter: false,
       enableHiding: false,
-      cell: ({ row }) => {
-        const tableProducts = row.original
-
-        return (
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-10 bg-muted rounded-md animate-pulse" />
+        ) : (
           <TableArchivedActionsMenu<ProductWithPopulate>
-            row={tableProducts}
+            row={row.original}
             onDelete={id => handleConfirmationOpen(id, 'delete')}
             onRestore={id => handleConfirmationOpen(id, 'unarchive')}
           />
-        )
-      },
+        ),
     },
   ]
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      <DataTable columns={columns} data={products ?? []}/>
+      <DataTable columns={columns} data={loading ? skeletonRows : products ?? []} />
 
       <ConfirmationModal
         open={confirmationOpen}
@@ -84,6 +112,5 @@ const ArchivedProducts = () => {
     </div>
   )
 }
-
 
 export default ArchivedProducts

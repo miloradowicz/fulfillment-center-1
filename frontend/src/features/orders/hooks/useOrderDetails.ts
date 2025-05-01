@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectLoadingFetchOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
-import { archiveOrder, fetchArchivedOrders, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
+import { archiveOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -28,7 +28,6 @@ export const useOrderDetails = () => {
         await dispatch(archiveOrder(order._id))
         navigate('/orders')
         toast.success('Заказ успешно архивирован!')
-        dispatch(fetchArchivedOrders())
       }
     } catch (e) {
       console.error(e)

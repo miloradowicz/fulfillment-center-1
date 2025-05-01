@@ -2,7 +2,6 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import {
   archiveCounterparty,
-  fetchAllArchivedCounterparties,
   fetchAllCounterparties,
 } from '@/store/thunks/counterpartyThunk.ts'
 import { selectAllCounterparties, selectLoadingFetch } from '@/store/slices/counterpartySlices.ts'
@@ -31,7 +30,6 @@ export const useCounterpartiesList = () => {
     try {
       await dispatch(archiveCounterparty(id)).unwrap()
       await dispatch(fetchCounterparties)
-      await dispatch(fetchAllArchivedCounterparties())
       navigate('/counterparties')
       void fetchAllCounterparties()
       toast.success('Контрагент успешно архивирован!')

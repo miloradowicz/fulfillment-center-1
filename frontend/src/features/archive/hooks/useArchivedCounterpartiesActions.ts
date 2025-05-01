@@ -1,11 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useCallback, useEffect, useState } from 'react'
-import { clearClientError } from '@/store/slices/clientSlice.ts'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 import {
-  selectAllArchivedCounterparties,
+  selectAllArchivedCounterparties, selectLoadingFetchArchive,
 } from '@/store/slices/counterpartySlices.ts'
 import {
   deleteCounterparty,
@@ -20,28 +19,8 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [counterpartyToActionId, setCounterpartyToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
+  const loading = useAppSelector(selectLoadingFetchArchive)
 
-  const clearErrors = useCallback(() => {
-    dispatch(clearClientError())
-  }, [dispatch])
-
-  const fetchArchivedCounterparties = useCallback(async () => {
-    try {
-      if (!counterparties) {
-        await dispatch(fetchAllArchivedCounterparties()).unwrap()
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }, [dispatch, counterparties])
-
-  useEffect(() => {
-    void clearErrors()
-  }, [clearErrors])
-
-  useEffect(() => {
-    void fetchArchivedCounterparties()
-  }, [fetchArchivedCounterparties])
 
   const deleteOneCounterparty = async (id: string) => {
     try {
@@ -65,7 +44,7 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
   const unarchiveOneCounterparty = async (id: string) => {
     try {
       await dispatch(unarchiveCounterparty(id)).unwrap()
-      await fetchArchivedCounterparties()
+      await dispatch(fetchAllArchivedCounterparties())
       toast.success('Контрагент успешно восстановлен!')
     } catch (e) {
       if (isGlobalError(e) || hasMessage(e)) {
@@ -102,6 +81,7 @@ export const useArchivedCounterpartiesActions = (fetchOnDelete:boolean) => {
 
   return {
     counterparties,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,

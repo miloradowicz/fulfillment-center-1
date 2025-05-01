@@ -6,10 +6,12 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
 import { ColumnDef } from '@tanstack/react-table'
+import { useSkeletonTableRows } from '@/features/archive/hooks/useTableSkeleton.ts'
 
 const ArchivedStocks = () => {
   const {
     stocks,
+    loading,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
@@ -17,8 +19,16 @@ const ArchivedStocks = () => {
     handleConfirmationAction,
   } = useArchivedStocksActions()
 
+  const skeletonRows = useSkeletonTableRows<Stock>(
+    {
+      _id: '',
+      name: '',
+      address: '',
+    },
+    stocks?.length || 3,
+  )
 
-  const columns: ColumnDef<Stock>[] = [
+  const columns: ColumnDef<Stock & { isSkeleton?: boolean }>[] = [
     {
       id: 'select',
       header: ({ table }) => SelectableColumn(table, 'header'),
@@ -29,39 +39,45 @@ const ArchivedStocks = () => {
     {
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Название" />,
-      enableColumnFilter: true,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-6 w-40 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.name ?? 'Неизвестное название'
+        ),
       enableHiding: false,
-      cell: info => info.getValue(),
-
     },
     {
       accessorKey: 'address',
       header: 'Адрес',
-      enableColumnFilter: true,
-      cell: info => info.getValue(),
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-6 w-60 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.address ?? 'Неизвестный адрес'
+        ),
     },
     {
       id: 'actions',
       header: 'Действия',
       enableGlobalFilter: false,
       enableHiding: false,
-      cell: ({ row }) => {
-        const tableStock = row.original
-
-        return (
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-10 bg-muted rounded-md animate-pulse" />
+        ) : (
           <TableArchivedActionsMenu<Stock>
-            row={tableStock}
+            row={row.original}
             onDelete={id => handleConfirmationOpen(id, 'delete')}
             onRestore={id => handleConfirmationOpen(id, 'unarchive')}
           />
-        )
-      },
+        ),
     },
   ]
 
   return (
     <div className="max-w-[1000px] mx-auto w-full">
-      <DataTable columns={columns} data={stocks ?? []}/>
+      <DataTable columns={columns} data={loading ? skeletonRows : stocks ?? []} />
 
       <ConfirmationModal
         open={confirmationOpen}
