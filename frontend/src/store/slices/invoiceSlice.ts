@@ -50,7 +50,7 @@ export const selectInvoiceCreateError = (state: RootState) => state.invoices.cre
 export const selectInvoiceUpdateError = (state: RootState) => state.invoices.updateError
 
 export const selectLoadingFetch = (state: RootState) => state.invoices.loadingFetch
-export const selectLoadingFetchArchive = (state: RootState) => state.invoices.loadingFetchArchive
+export const selectLoadingFetchArchiveInvoice = (state: RootState) => state.invoices.loadingFetchArchive
 export const selectLoadingAdd = (state: RootState) => state.invoices.loadingAdd
 export const selectLoadingDelete = (state: RootState) => state.invoices.loadingDelete
 export const selectLoadingUpdate = (state: RootState) => state.invoices.loadingUpdate

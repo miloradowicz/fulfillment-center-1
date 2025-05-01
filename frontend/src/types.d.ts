@@ -152,6 +152,7 @@ export interface Arrival {
   logs?: Log[]
   arrivalNumber?: string
   documents?: { document: string }[]
+  comment?: string
 }
 
 export type ArrivalWithPopulate = Omit<Arrival, 'products' | 'defects' | 'received_amount' | 'client' | 'stock' | 'shipping_agent' | 'services'> & {
@@ -198,7 +199,7 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
 
 export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
   products: ProductForOrderForm[]
-  defects: DefectForOrderForm[]
+  defects: DefectWithPopulate[]
   client: Client
   stock: Stock
 }
@@ -322,7 +323,7 @@ export interface TaskMutation {
 export interface Service {
   _id: string
   name: string
-  serviceCategory: string
+  serviceCategory: { _id: string; name: string }
   price: number
   description: string
   type: string
@@ -335,6 +336,7 @@ export interface ServiceCategory {
 }
 
 export type ServiceMutation = Omit<Service, '_id' | 'logs'>
+
 
 export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
@@ -424,12 +426,11 @@ export interface ReportClientResponse {
   clientOrderReport: ClientOrderReport[];
 }
 export interface Invoice  {
-  _id: string
+    _id: string
     isArchived: boolean,
     invoiceNumber: string,
     client: Client,
-  services:
-    {
+    services: {
       service: Service,
       service_amount?: number,
       service_price?: number,
@@ -438,9 +439,39 @@ export interface Invoice  {
     totalAmount?: number,
     paid_amount?: number,
     discount?: number,
-    status?: 'в ожидании' | 'оплачено' | 'частично оплачено',
-    associatedOrder?: string,
-    associatedArrival?:string,
+    status: 'в ожидании' | 'оплачено' | 'частично оплачено',
+    associatedOrder?: {
+      _id: string
+      orderNumber: string
+      services: {
+        service: Service
+        service_amount?: number
+        service_price?: number
+        _id: string
+      }[]
+    }
+    associatedArrival?: {
+      _id: string
+      arrivalNumber: string
+      services: {
+        service: Service
+        service_amount?: number
+        service_price?: number
+        _id: string
+      }[]
+    }
+    associatedArrivalServices?: {
+      service: Service,
+      service_amount?: number,
+      service_price?: number,
+      _id: string
+    }[]
+    associatedOrderServices?: {
+      service: Service,
+      service_amount?: number,
+      service_price?: number,
+      _id: string
+    }[]
     logs: Log[],
     createdAt:string,
     updatedAt:string,

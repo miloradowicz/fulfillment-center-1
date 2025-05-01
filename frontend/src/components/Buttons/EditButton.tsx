@@ -1,27 +1,21 @@
+import { Edit } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import React from 'react'
-import { EditOutlined } from '@mui/icons-material'
-import { Button } from '@mui/material'
 
 interface Props {
-  onClick: () => void;
+  onClick: () => void
 }
 
 const EditButton: React.FC<Props> = ({ onClick }) => {
   return (
-    <>
-      <Button
-        variant="contained"
-        startIcon={<EditOutlined />}
-        onClick={onClick}
-        sx={{
-          px: 3,
-          borderRadius: 2,
-          textTransform: 'none',
-        }}
-      >
-        Править
-      </Button>
-    </>
+    <Button
+      onClick={onClick}
+      variant="ghost"
+      className="font-bold text-xs bg-muted hover:bg-primary text-primary hover:text-white transition-colors"
+    >
+      <Edit size={17} />
+      Править
+    </Button>
   )
 }
 

@@ -3,7 +3,7 @@ import { useClientForm } from '../hooks/useClientForm.ts'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 
 const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () => void }) => {
   const { form, loadingAdd, loadingUpdate, inputChangeHandler, onSubmit, getFieldError } = useClientForm(client?._id, onClose)
@@ -69,7 +69,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
 
       <Button type="submit" disabled={loadingAdd || loadingUpdate} className="w-full mt-3">
         {client ? 'Сохранить' : 'Создать'}
-        {loadingAdd || loadingUpdate ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {loadingAdd || loadingUpdate ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

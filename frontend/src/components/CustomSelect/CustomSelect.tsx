@@ -51,6 +51,7 @@ export const CustomSelect = <T extends { _id: string }>({
   label,
   disabled,
 }: CustomSelectProps<T>) => {
+
   const handleSelection = (id: string) => {
     onSelect(id)
     setActivePopover(null)
@@ -62,25 +63,24 @@ export const CustomSelect = <T extends { _id: string }>({
     }
   }
 
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (onBlur) {
-      const syntheticEvent = {
-        ...e,
-        target: {
-          ...e.target,
-          value: value || '',
-        },
-      } as React.FocusEvent<HTMLInputElement>
-      onBlur(syntheticEvent)
-    }
-  }
-
   return (
     <div className="space-y-2">
       {label && <Label className="text-sm font-medium leading-none">{label}</Label>}
 
-      <Popover open={activePopover === popoverKey} onOpenChange={open => setActivePopover(open ? popoverKey : null)}>
-        <PopoverTrigger asChild disabled={disabled}>
+      <Popover open={activePopover === popoverKey}
+        onOpenChange={open => {
+          setActivePopover(open ? popoverKey : null)
+
+          if (!open && !value && onBlur) {
+            const syntheticEvent = {
+              target: {
+                value: '',
+              },
+            } as React.FocusEvent<HTMLInputElement>
+            onBlur(syntheticEvent)
+          }
+        }}>
+        <PopoverTrigger asChild asChild disabled={disabled}>
           <Button variant="outline" className={cn('w-full justify-between', error && 'border-destructive')}>
             {value || placeholder}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -88,7 +88,7 @@ export const CustomSelect = <T extends { _id: string }>({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder={searchPlaceholder} onBlur={handleInputBlur} />
+            <CommandInput placeholder={searchPlaceholder} />
             <CommandEmpty>Ничего не найдено.</CommandEmpty>
             <CommandList>
               {options?.map(item => (

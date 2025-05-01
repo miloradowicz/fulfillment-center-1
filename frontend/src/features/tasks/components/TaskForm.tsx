@@ -6,8 +6,9 @@ import { TaskWithPopulate } from '@/types'
 import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
+import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 
 interface Props {
   onSuccess?: () => void
@@ -24,7 +25,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
     errors,
     addLoading,
     updateLoading,
-    handleInputChange,
     handleSubmit,
     handleBlur,
     setForm,
@@ -58,7 +58,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
         name="title"
         placeholder="Название"
         value={form.title}
-        onChange={handleInputChange}
+        onChange={e => inputChangeHandler(e, setForm)}
         error={errors.title || getFieldError('title', error)}
         onBlur={e => handleBlur('title', e.target.value)}
       />
@@ -67,7 +67,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
         name="description"
         placeholder="Описание задачи"
         value={form.description}
-        onChange={handleInputChange}
+        onChange={e => inputChangeHandler(e, setForm)}
         className="resize-y min-h-[40px] max-h-[200px]"
       />
 
@@ -116,7 +116,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialData }) => {
 
       <Button type="submit" disabled={addLoading || updateLoading} className="w-full mt-3">
         {initialData ? 'Сохранить' : 'Создать'}
-        {addLoading || updateLoading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+        {addLoading || updateLoading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
       </Button>
     </form>
   )

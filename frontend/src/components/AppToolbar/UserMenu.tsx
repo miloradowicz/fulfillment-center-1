@@ -2,7 +2,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '../ui/button.tsx'
 import { User } from '@/types'
 import { NavLink, useNavigate } from 'react-router-dom'
-
 import { logoutUser } from '@/store/thunks/userThunk.ts'
 import { unsetUser } from '@/store/slices/authSlice.ts'
 import { useAppDispatch } from '@/app/hooks.ts'
@@ -10,6 +9,7 @@ import { toast } from 'react-toastify'
 import React from 'react'
 import { Separator } from '../ui/separator.tsx'
 import { LogOut, Settings } from 'lucide-react'
+import { getUsersInitials } from '@/utils/getUsersInitials.ts'
 
 interface Props {
   user: User
@@ -30,7 +30,7 @@ const UserMenu: React.FC<Props> = ({ user }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" className="h-11 w-11 p-0 rounded-full transition-colors">
-          <span className="text-xl font-bold uppercase">{user.displayName?.[0]}</span>
+          <span className="text-xl font-bold uppercase">{getUsersInitials(user.displayName)}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

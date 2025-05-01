@@ -27,6 +27,9 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { ArchiveRestore } from 'lucide-react'
 import ArchivedUsers from '@/features/archive/components/ArchivedUsers.tsx'
 import { selectUsersLoading } from '@/store/slices/userSlice.ts'
+import ArchivedServices from '@/features/archive/components/ArchivedServices.tsx'
+import ArchivedInvoices from '@/features/archive/components/ArchivedInvoices.tsx'
+
 
 const ArchivePage = () =>  {
   const [value, setValue] = React.useState(0)
@@ -41,7 +44,7 @@ const ArchivePage = () =>  {
   const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
   const loadingUsers = useAppSelector(selectUsersLoading)
 
-  const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users'], [])
+  const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users', 'services', 'invoices'], [])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     event.stopPropagation()
@@ -74,9 +77,9 @@ const ArchivePage = () =>  {
           scrollButtons="auto"
           sx={{
             '.MuiTabs-flexContainer': {
-              display: 'flex',
-              flexWrap: 'nowrap',
-              scrollBehavior: 'smooth',
+              'display': 'flex',
+              'flexWrap': 'nowrap',
+              'scrollBehavior': 'smooth',
               '@media (max-width: 870px)': {
                 overflowX: 'auto',
                 justifyContent: 'flex-start',
@@ -106,6 +109,8 @@ const ArchivePage = () =>  {
           <Tab label="Склады" {...TabProps(5)} />
           <Tab label="Контрагенты" {...TabProps(6)} />
           <Tab label="Пользователи" {...TabProps(7)} />
+          <Tab label="Услуги" {...TabProps(8)} />
+          <Tab label="Счета" {...TabProps(9)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -115,7 +120,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedClients/>
+            <ArchivedClients />
           </>
         )}
       </CustomTabPanel>
@@ -126,7 +131,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedProducts/>
+            <ArchivedProducts />
           </>
         )}
       </CustomTabPanel>
@@ -137,7 +142,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedArrivals/>
+            <ArchivedArrivals />
           </>
         )}
       </CustomTabPanel>
@@ -148,7 +153,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedOrders/>
+            <ArchivedOrders />
           </>
         )}
       </CustomTabPanel>
@@ -170,7 +175,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedStocks/>
+            <ArchivedStocks />
           </>
         )}
       </CustomTabPanel>
@@ -181,7 +186,7 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedCounterparties/>
+            <ArchivedCounterparties />
           </>
         )}
       </CustomTabPanel>
@@ -192,9 +197,19 @@ const ArchivePage = () =>  {
           </Grid>
         ) : (
           <>
-            <ArchivedUsers/>
+            <ArchivedUsers />
           </>
         )}
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={8}>
+        <>
+          <ArchivedServices />
+        </>
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={9}>
+        <>
+          <ArchivedInvoices />
+        </>
       </CustomTabPanel>
     </Box>
   )

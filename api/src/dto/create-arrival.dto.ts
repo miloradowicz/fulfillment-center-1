@@ -133,4 +133,7 @@ export class CreateArrivalDto {
   @ValidateNested({ each: true })
   @Type(() => ServiceDto)
   services?: ServiceDto[]
+
+  @IsOptional()
+  comment: string
 }
