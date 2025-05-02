@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils'
 import { ArrowUpRight, File, Phone, Truck } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import CopyText from '@/components/CopyText/CopyText.tsx'
+import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
+import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 
 const ArrivalDetails = () => {
   const {
@@ -28,8 +30,6 @@ const ArrivalDetails = () => {
     setConfirmArchiveModalOpen,
     tabs,
     setTabs,
-    arrivalStatusStyles,
-    tabStyles,
   } = useArrivalDetails()
 
   return (
@@ -49,54 +49,70 @@ const ArrivalDetails = () => {
             onCancel={() => setConfirmArchiveModalOpen(false)}
           />
 
-          <div className="w-full max-w-[700px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
+          <div className="w-full max-w-[600px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
             <BackButton />
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge
-                  className={cn(
-                    arrivalStatusStyles[arrival.arrival_status] || arrivalStatusStyles.default,
-                    'p-1.5 font-bold',
-                  )}
-                >
-                  {arrival.arrival_status}
+                <Badge className={cn(arrivalStatusStyles[arrival.arrival_status] || arrivalStatusStyles.default, 'py-2 px-2.5 font-bold mb-4')}>
+                  {capitalize(arrival.arrival_status)}
                 </Badge>
 
-                <div className="space-y-1">
-                  <h3 className="text-xl font-bold mt-4 flex gap-1 items-center">
-                    <Truck />
-                    {arrival.arrivalNumber}
+                <div className="space-y-5">
+                  <h3 className="text-xl font-bold flex gap-1 items-center mb-3">
+                    <Truck /> {arrival.arrivalNumber}
                   </h3>
-                  <p className="text-md">
-                    <span className="font-bold">Склад: </span>
-                    {arrival.stock.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Дата прибытия: {dayjs(arrival.arrival_date).format('D MMMM YYYY')}
-                  </p>
+
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground font-bold">Склад</p>
+                    <Link
+                      to={`/stocks/${ arrival.stock._id }`}
+                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
+                    >
+                      {arrival.stock.name}
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground font-bold">Дата прибытия</p>
+                    <p className="font-bold">{dayjs(arrival.arrival_date).format('D MMMM YYYY')}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:items-start justify-between">
+                <div className="flex gap-2 mt-4 md:mt-0 md:mb-4 order-last md:order-none items-start">
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <EditButton onClick={() => setEditModalOpen(true)} />
+                  </ProtectedElement>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
+                  </ProtectedElement>
                 </div>
 
-                <div className="mt-5 space-y-1">
+                <div className="space-y-1 mb-4">
                   <p className="text-sm text-muted-foreground font-bold">Заказчик</p>
+
                   <Link
                     to={`/clients/${ arrival.client._id }`}
-                    className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors"
+                    className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
                   >
                     {arrival.client.name}
                     <ArrowUpRight className="h-4 w-4" />
                   </Link>
+
                   <div className="flex gap-2 items-center">
                     <CopyText text={arrival.client.phone_number} children={<Phone className="h-4 w-4" />} />
                   </div>
                 </div>
 
                 {arrival.shipping_agent && (
-                  <div className="mt-5 space-y-1">
+                  <div className="space-y-1">
                     <p className="text-sm text-muted-foreground font-bold">Контрагент</p>
                     <Link
                       to="/counterparties"
-                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors"
+                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors  m-0 p-0"
                     >
                       {arrival.shipping_agent.name}
                       <ArrowUpRight className="h-4 w-4" />
@@ -107,37 +123,26 @@ const ArrivalDetails = () => {
                   </div>
                 )}
               </div>
-
-              <div className="flex flex-col items-center justify-between">
-                <div className="flex gap-2">
-                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <EditButton onClick={() => setEditModalOpen(true)} />
-                  </ProtectedElement>
-                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
-                  </ProtectedElement>
-                </div>
-              </div>
             </div>
 
             <div className="rounded-2xl shadow p-6 mb-6">
-              <h3 className="font-bold uppercase mb-3 text-muted-foreground">Дополнительно</h3>
+              <h3 className="font-bold uppercase mb-3 text-muted-foreground text-center">Дополнительно</h3>
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={tabStyles}>
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       Отправленные
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={tabStyles}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       Полученные
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={tabStyles}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={tabStyles}>
+                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       Документы
                     </TabsTrigger>
-                    <TabsTrigger value="4" className={tabStyles}>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>

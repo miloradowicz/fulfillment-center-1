@@ -53,7 +53,7 @@ export const selectAllArrivals = (state: RootState) => state.arrivals.arrivals
 export const selectAllArchivedArrivals = (state: RootState) => state.arrivals.archivedArrivals
 export const selectPopulatedArrivals = (state: RootState) => state.arrivals.arrivalsPopulate
 export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.loadingFetch
-export const selectLoadingFetchArchivedArrivals = (state: RootState) => state.arrivals.loadingFetch
+export const selectLoadingFetchArchivedArrivals = (state: RootState) => state.arrivals.loadingFetchArchive
 export const selectLoadingAddArrival = (state: RootState) => state.arrivals.loadingAdd
 export const selectLoadingArchiveArrival = (state: RootState) => state.arrivals.loadingArchive
 export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
@@ -91,7 +91,7 @@ const arrivalSlice = createSlice({
         state.archivedArrivals = action.payload
       })
       .addCase(fetchArchivedArrivals.rejected, state => {
-        state.loadingFetch = false
+        state.loadingFetchArchive = false
       })
       .addCase(fetchArrivalById.pending, state => {
         state.loadingFetch = true
