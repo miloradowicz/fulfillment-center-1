@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { Product, StockWriteOffMutation, WriteOff } from '@/types'
+import { Client, Product, StockWriteOffMutation, WriteOff } from '@/types'
 import { toast } from 'react-toastify'
 import { fetchClients } from '@/store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
@@ -11,7 +11,7 @@ import { addWriteOff, fetchStockById, fetchStocks } from '@/store/thunks/stocksT
 import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
-import { ErrorMessages, StockWriteOffData } from '../utils/writeOffTypes'
+import { ErrorMessages, FormType, StockWriteOffData } from '../utils/writeOffTypes'
 import { initialErrorState, initialItemState, initialState } from '../state/writeOffState'
 
 export const useWriteOffForm = (initialData?: Partial<StockWriteOffData>, onSuccess?: () => void) => {
@@ -35,6 +35,7 @@ export const useWriteOffForm = (initialData?: Partial<StockWriteOffData>, onSucc
 
   const [newItem, setNewItem] = useState<WriteOff>({ ...initialItemState })
   const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
+  const [availableClients, setAvailableClients] = useState<Client[]>([])
   const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
@@ -50,12 +51,20 @@ export const useWriteOffForm = (initialData?: Partial<StockWriteOffData>, onSucc
   }, [dispatch, form.client])
 
   useEffect(() => {
+    if (clients) {
+      setAvailableClients(clients.filter(x => stock?.products?.some(y => y.product.client._id === x._id)))
+    }
+  }, [clients, stock])
+
+  useEffect(() => {
     if (clientProducts && stock?.products) {
       const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
       const availableProducts = clientProducts.filter(x => stockProducts.some(y => x._id === y.product._id))
       setAvailableProducts(availableProducts)
     }
   }, [clientProducts, stock])
+
+  const formType = initialData && Object.entries(initialData).some(([k, v]) => k !== 'stock' && v !== null && v !== undefined) ?  FormType.Edit : FormType.Create
 
   const openModal = () => {
     setWriteOffsModalOpen(true)
@@ -159,8 +168,10 @@ export const useWriteOffForm = (initialData?: Partial<StockWriteOffData>, onSucc
     submitFormHandler,
     clients,
     stocks,
+    availableClients,
     availableItem: availableProducts,
     activePopover,
     setActivePopover,
+    formType,
   }
 }

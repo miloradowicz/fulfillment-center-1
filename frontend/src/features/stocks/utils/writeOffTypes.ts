@@ -23,3 +23,8 @@ export type ErrorMessages = Pick<
 export type ItemInitialStateMap = {
   [ItemType.WRITEOFFS]: WriteOff,
 }
+
+export enum FormType {
+  Edit,
+  Create,
+}

@@ -10,7 +10,7 @@ import { InputWithError } from '@/components/ui/input-with-error.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { cn } from '@/lib/utils.ts'
 import FormAccordion from '@/components/FormAccordion/FormAccordion.tsx'
-import { StockWriteOffData } from '../utils/writeOffTypes'
+import { FormType, StockWriteOffData } from '../utils/writeOffTypes'
 import { useWriteOffForm } from '../hooks/useWriteOffForm'
 
 interface Props {
@@ -37,44 +37,46 @@ const WriteOffForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     handleBlur,
     error,
     submitFormHandler,
-    clients,
+    availableClients,
     stocks,
     availableItem,
     activePopover,
     setActivePopover,
+    formType,
   } = useWriteOffForm(initialData, onSuccess)
 
   return (
     <>
       <form onSubmit={submitFormHandler} className="space-y-4">
         <h3 className="text-md sm:text-2xl font-semibold text-center">
-          {initialData ? 'Редактировать данные поставки' : 'Добавить новую поставку'}
+          {formType === FormType.Edit ? 'Редактировать данные списания' : 'Добавить новое списание'}
         </h3>
 
-        <CustomSelect
-          disabled
-          label="Склад"
-          value={stocks?.find(s => s._id === form.stock)?.name}
-          placeholder="Выберите склад"
-          options={stocks || []}
-          onSelect={stockId => {
-            setForm(prev => ({ ...prev, stock: stockId }))
-            handleBlur('stock', stockId)
-          }}
-          popoverKey="stock"
-          searchPlaceholder="Поиск склада..."
-          activePopover={activePopover}
-          setActivePopover={setActivePopover}
-          error={errors.stock || getFieldError('stock', error)}
-          onBlur={e => handleBlur('stock', e.target.value)}
-          renderValue={stock => stock.name}
-        />
+        {formType === FormType.Edit && (
+          <CustomSelect
+            label="Склад"
+            value={stocks?.find(s => s._id === form.stock)?.name}
+            placeholder="Выберите склад"
+            options={stocks || []}
+            onSelect={stockId => {
+              setForm(prev => ({ ...prev, stock: stockId }))
+              handleBlur('stock', stockId)
+            }}
+            popoverKey="stock"
+            searchPlaceholder="Поиск склада..."
+            activePopover={activePopover}
+            setActivePopover={setActivePopover}
+            error={errors.stock || getFieldError('stock', error)}
+            onBlur={e => handleBlur('stock', e.target.value)}
+            renderValue={stock => stock.name}
+          />
+        )}
 
         <CustomSelect
           label="Клиент"
-          value={clients?.find(c => c._id === form.client)?.name}
+          value={availableClients?.find(c => c._id === form.client)?.name}
           placeholder="Выберите клиента"
-          options={clients || []}
+          options={availableClients || []}
           onSelect={clientId => {
             setForm(prev => ({ ...prev, client: clientId }))
             handleBlur('client', clientId)
