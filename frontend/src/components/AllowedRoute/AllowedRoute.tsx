@@ -13,7 +13,7 @@ const AllowedRoute: FC<Props> = ({ allowedRoles, children }) => {
   const user = useAppSelector(selectUser)
 
   useEffect(() => {
-    if (user && !allowedRoles.includes(user.role)) {
+    if (featureProtection && user && !allowedRoles.includes(user.role)) {
       navigate(-1)
     }
   }, [user, allowedRoles, navigate])

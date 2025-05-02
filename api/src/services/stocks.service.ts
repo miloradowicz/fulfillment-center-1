@@ -77,9 +77,13 @@ export class StocksService {
 
     this.stockManipulationService.init()
 
+
     await this.doStocking(stock._id, writeOffDto.write_offs)
 
     await this.stockManipulationService.saveStock(stock._id)
+
+    stock.write_offs.push(...writeOffDto.write_offs)
+    await stock.save()
 
     return writeOffDto
   }
