@@ -114,6 +114,28 @@ export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
   service: Service
 }
 
+export interface StockWriteOff {
+  _id: string
+  stock: string
+  client: string
+  write_offs: WriteOff[]
+}
+
+export interface StockWriteOffWithPopulate {
+  _id: string
+  stock: Stock
+  client: Client
+  write_offs: WriteOff[]
+}
+
+export interface WriteOff {
+  product: string
+  reason: string
+  amount: number
+}
+
+export type StockWriteOffMutation = Omit<StockWriteOff, '_id'>
+
 export interface Arrival {
   _id: string
   client: string

@@ -15,6 +15,7 @@ export const useStockDetails = () => {
 
   const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const [writeOffModalOpen, setWriteOffModalOpen] = useState(false)
   const [currentTab, setCurrentTab] = useState('products')
 
   const tabs = [
@@ -78,6 +79,9 @@ export const useStockDetails = () => {
     setArchiveModalOpen(false)
   }
 
+  const openWriteOffModal = () => setWriteOffModalOpen(true)
+  const closeWriteOffModal = () => setWriteOffModalOpen(false)
+
   return {
     stock,
     stockId,
@@ -89,6 +93,9 @@ export const useStockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    writeOffModalOpen,
+    openWriteOffModal,
+    closeWriteOffModal,
     tabs,
     currentTab,
     handleTabChange,

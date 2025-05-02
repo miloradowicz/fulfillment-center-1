@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
@@ -10,6 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StockProductsPage from './StockProductsPage.tsx'
 import StockDefectsPage from './StockDefectsPage.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import WriteOffForm from '../components/WriteOffForm.tsx'
+import { BoxIcon, MapPinIcon } from 'lucide-react'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 
 const StockDetails = () => {
   const {
@@ -20,6 +24,9 @@ const StockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    writeOffModalOpen,
+    openWriteOffModal,
+    closeWriteOffModal,
     tabs,
     currentTab,
     handleTabChange,
@@ -36,6 +43,15 @@ const StockDetails = () => {
         />
       </Modal>
 
+      <Modal open={writeOffModalOpen} handleClose={closeWriteOffModal}>
+        <WriteOffForm
+          initialData={(stock && { stock: stock }) ?? undefined}
+          onSuccess={() => {
+            closeWriteOffModal()
+          }}
+        />
+      </Modal>
+
       <ConfirmationModal
         open={archiveModalOpen}
         entityName="этот склад"
@@ -46,20 +62,23 @@ const StockDetails = () => {
 
       <div className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8 mb-8">
         <BackButton />
-        <Box className="text-center mt-4 mb-8 p-4 bg-gray-100 rounded-lg shadow-md">
-          <Typography
-            sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937' }}
-            className="whitespace-normal break-words"
-          >
-            📦 Склад: {stock?.name}
-          </Typography>
+        <Box
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent="space-between"
+          className="max-w-[1000px] mx-auto mb-5 mt-7 w-full gap-4"
+        >
+          <Box>
+            <CustomTitle text={`Склад: ${ stock?.name }`} icon={<BoxIcon size={25} />} />
+            <CustomTitle text={`Адрес: ${ stock?.address }`} icon={<MapPinIcon size={25} />} />
+          </Box>
 
-          <Typography
-            sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937', marginTop: '8px' }}
-            className="whitespace-normal break-words"
-          >
-            📍 Адрес: {stock?.address}
-          </Typography>
+          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={1} width={{ sm: 'auto' }}>
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <CustomButton text="Добавить списание" onClick={openWriteOffModal} />
+            </ProtectedElement>
+          </Box>
         </Box>
 
         <Tabs value={currentTab} onValueChange={handleTabChange}>
