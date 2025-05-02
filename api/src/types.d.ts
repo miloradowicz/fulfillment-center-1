@@ -1,6 +1,8 @@
 import { Request } from 'express'
 import { User } from './schemas/user.schema'
 import { HydratedDocument, Types } from 'mongoose'
+import { ArrayElement, PropType } from './utils/type-helpers'
+import { StockDocument } from './schemas/stock.schema'
 
 export type HydratedUser = HydratedDocument<User>
 
@@ -22,6 +24,7 @@ export interface UserTaskReport {
   }[]
 }
 
+export type WriteOff = ArrayElement<PropType<StockDocument, 'write_offs'>>
 
 export interface TaskInterface {
   _id: Types.ObjectId

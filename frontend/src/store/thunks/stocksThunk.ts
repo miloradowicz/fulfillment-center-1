@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { GlobalError, Stock, StockMutation, StockPopulate, ValidationError } from '@/types'
+import { GlobalError, Stock, StockMutation, StockPopulate, StockWriteOffMutation, ValidationError, WriteOff } from '@/types'
 import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
@@ -91,5 +91,21 @@ export const updateStock = createAsyncThunk<
       return rejectWithValue(e.response.data as ValidationError)
     }
     throw e
+  }
+})
+
+export const addWriteOff = createAsyncThunk<
+  WriteOff,
+  StockWriteOffMutation,
+  { rejectValue: ValidationError }
+>('stocks/addWriteOff', async (data, { rejectWithValue }) => {
+  try {
+    const response = await axiosAPI.patch(`/stocks/${ data.stock }/write-offs`, { write_offs: data.write_offs })
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 400) {
+      return rejectWithValue(error.response.data as ValidationError)
+    }
+    throw error
   }
 })

@@ -11,5 +11,7 @@ export enum ErrorMessagesList {
   Default = '',
   SentAtDate = 'Укажите дату отправки',
   DeliveredAtDate = 'Укажите дату доставки',
-  OrderPrice = 'Цена заказа должна быть больше 0'
+  OrderPrice = 'Цена заказа должна быть больше 0',
+  WriteOffReason = 'Заполните причину списания',
+
 }

@@ -1,154 +1,134 @@
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import UnarchiveIcon from '@mui/icons-material/Unarchive'
-import { NavLink } from 'react-router-dom'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
-import { ruRU } from '@mui/x-data-grid/locales'
 import { useArchivedArrivalsActions } from '../hooks/useArchivedArrivalsActions.ts'
 import { ArrivalWithClient } from '@/types'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge.tsx'
+import { NumberBadge } from '@/components/NumberBadge/NumberBadge.tsx'
+import { useSkeletonTableRows } from '@/features/archive/hooks/useTableSkeleton.ts'
 
 const ArchivedArrivals = () => {
-  const { arrivals, handleDeleteClick, handleConfirmDelete, handleUnarchiveClick, handleConfirmUnarchive, handleClose, deleteModalOpen, unarchiveModalOpen } = useArchivedArrivalsActions()
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const {
+    arrivals,
+    loading,
+    confirmationOpen,
+    actionType,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationAction,
+  } = useArchivedArrivalsActions()
 
-  const columns: GridColDef<ArrivalWithClient>[] = [
+  const skeletonRows = useSkeletonTableRows<ArrivalWithClient>(
     {
-      field: 'arrivalNumber',
-      headerName: 'Номер поставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      renderCell: ({ row }) => (
-        <NavLink to={`/arrivals/${ row._id }`} className="py-2 px-3 bg-blue-50 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-100 transition-colors duration-150 border border-blue-200 hover:border-blue-300 whitespace-nowrap">
-          {row.arrivalNumber}
-        </NavLink>
-      ),
+      arrivalNumber: '',
+      client: { name: '', _id: '', inn: '', address: '', ogrn: '', email: '', phone_number: '' },
+      stock: { name: '', _id: '', address: '' },
+      arrival_date: '',
+      arrival_status: '',
+      documents: [],
+      products: [],
+    },
+    arrivals ? arrivals.length : 3,
+  )
+
+  const arrivalStatusStyles = {
+    'ожидается доставка': 'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
+    'получена': 'bg-emerald-100 text-emerald-700 rounded-lg font-bold px-4 py-2',
+    'отсортирована': 'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
+  }
+
+  const columns: ColumnDef<ArrivalWithClient & { isSkeleton?: boolean }>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'client',
-      headerName: 'Клиент',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value, row) => row.client?.name ?? 'Неизвестный клиент',
+      accessorKey: 'arrivalNumber',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Номер поставки" />,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-10 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          <NumberBadge number={row.original.arrivalNumber} />
+        ),
+      enableHiding: false,
     },
     {
-      field: 'stock',
-      headerName: 'Склад',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value, row) => row.stock?.name ?? 'Неизвестный склад',
+      accessorKey: 'client.name',
+      header: 'Клиент',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.client?.name ?? 'Неизвестный клиент'
+        ),
     },
     {
-      field: 'arrival_date',
-      headerName: 'Дата поставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 140 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      type: 'date',
-      valueGetter: (_value, row) => new Date(row.arrival_date),
-      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
+      accessorKey: 'stock.name',
+      header: 'Склад',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-6 w-30 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.stock?.name ?? 'Неизвестный склад'
+        ),
     },
     {
-      field: 'arrival_price',
-      headerName: 'Цена доставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 170 : 140,
-      align: 'left',
-      headerAlign: 'left',
-      type: 'number',
+      accessorKey: 'arrival_date',
+      header: 'Дата поставки',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-6 w-24 bg-muted rounded-md animate-pulse" />
+        ) : (
+          dayjs(row.original.arrival_date).format('DD.MM.YYYY')
+        ),
     },
     {
-      field: 'arrival_status',
-      headerName: 'Статус',
-      flex: 1,
-      minWidth: isMediumScreen ? 160 : 140,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value, row) => row.arrival_status,
+      accessorKey: 'arrival_status',
+      header: 'Статус',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-10 w-32 bg-muted rounded-lg animate-pulse" />
+        ) : (
+          <StatusBadge status={row.original.arrival_status} stylesMap={arrivalStatusStyles} />
+        ),
     },
     {
-      field: 'Actions',
-      headerName: '',
-      minWidth: isMediumScreen ? 80 : 80,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => handleDeleteClick(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <IconButton onClick={() => handleUnarchiveClick(row._id)}>
-            <UnarchiveIcon />
-          </IconButton>
-        </Box>
-      ),
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-10 bg-muted rounded-md animate-pulse" />
+        ) : (
+          <TableArchivedActionsMenu<ArrivalWithClient>
+            row={row.original}
+            onDelete={id => handleConfirmationOpen(id, 'delete')}
+            onRestore={id => handleConfirmationOpen(id, 'unarchive')}
+          />
+        ),
     },
   ]
 
   return (
-    <Box className="max-w-[1000px] mx-auto w-full">
-      {arrivals ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={arrivals}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={{
-            '& .center-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 !important',
-            },
-            '& .MuiDataGrid-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              padding: '8px 16px',
-            },
-          }}
-        />
-      ) : (
-        <Typography className="text-center mt-5">Поставки не найдены.</Typography>
-      )}
-
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={loading ? skeletonRows : arrivals ?? []} />
       <ConfirmationModal
-        open={deleteModalOpen}
+        open={confirmationOpen}
         entityName="эту поставку"
-        actionType="delete"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleClose}
+        actionType={actionType}
+        onConfirm={handleConfirmationAction}
+        onCancel={handleConfirmationClose}
       />
-
-      <ConfirmationModal
-        open={unarchiveModalOpen}
-        entityName="эту поставку"
-        actionType="unarchive"
-        onConfirm={handleConfirmUnarchive}
-        onCancel={handleClose}
-      />
-    </Box>
+    </div>
   )
 }
 

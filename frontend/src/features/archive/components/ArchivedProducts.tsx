@@ -1,152 +1,115 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import UnarchiveIcon from '@mui/icons-material/Unarchive'
-import { ruRU } from '@mui/x-data-grid/locales'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
 import { ProductWithPopulate } from '@/types'
-import useArchivedProductActions from '../hooks/useArchivedProductsActions.ts'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableArchivedActionsMenu from '@/components/DataTable/TableArchivedActionsMenu/TableArchivedActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+
+import { useSkeletonTableRows } from '@/features/archive/hooks/useTableSkeleton.ts'
+import useArchivedProductActions from '@/features/archive/hooks/useArchivedProductsActions.ts'
 
 const ArchivedProducts = () => {
   const {
     products,
     loading,
     confirmationOpen,
-    unarchiveConfirmationOpen,
+    actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
-    handleConfirmationDelete,
-    handleUnarchiveConfirmationOpen,
-    handleUnarchiveConfirmationClose,
-    handleUnarchiveConfirm,
+    handleConfirmationAction,
   } = useArchivedProductActions()
 
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const skeletonRows = useSkeletonTableRows<ProductWithPopulate>(
+    {
+      _id: '',
+      title: '',
+      article: '',
+      barcode: '',
+      client: { name: '', _id: '', inn: '', address: '', ogrn: '', email: '', phone_number: '' },
+    },
+    products? products.length: 3,
+  )
 
-  const columns: GridColDef<ProductWithPopulate>[] = [
+  const columns: ColumnDef<ProductWithPopulate & { isSkeleton?: boolean }>[] = [
     {
-      field: 'title',
-      headerName: 'Название',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value, row) => row.title ?? 'Неизвестный товар',
-      sortable: true,
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'client',
-      headerName: 'Клиент',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 140,
-      align: 'left',
-      headerAlign: 'left',
-      valueGetter: (_value, row) => row.client?.name ?? 'Неизвестный клиент',
-      sortable: true,
+      accessorKey: 'title',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Название" />,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-40 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.title ?? 'Неизвестное название'
+        ),
+      enableHiding: false,
     },
     {
-      field: 'article',
-      headerName: 'Артикул',
-      flex: 0.7,
-      minWidth: isMediumScreen ? 160 : 100,
-      valueGetter: (_value, row) => row.article ?? '-',
-      align: 'left',
-      headerAlign: 'left',
-      sortable: true,
+      accessorKey: 'article',
+      header: 'Артикул',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.article ?? 'Неизвестный артикул'
+        ),
     },
     {
-      field: 'barcode',
-      headerName: 'Баркод',
-      flex: 0.7,
-      minWidth: isMediumScreen ? 160 : 100,
-      valueGetter: (_value, row) => row.barcode ?? '-',
-      align: 'left',
-      headerAlign: 'left',
-      sortable: true,
+      accessorKey: 'barcode',
+      header: 'Баркод',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-20 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.barcode ?? 'Неизвестный баркод'
+        ),
     },
     {
-      field: 'Actions',
-      headerName: '',
-      minWidth: isMediumScreen ? 80 : 80,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => handleConfirmationOpen(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <IconButton onClick={() => handleUnarchiveConfirmationOpen(row._id)}>
-            <UnarchiveIcon />
-          </IconButton>
-        </Box>
-      ),
+      accessorKey: 'client.name',
+      header: 'Клиент',
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-4 w-26 bg-muted rounded-md animate-pulse" />
+        ) : (
+          row.original.client?.name ?? 'Неизвестный клиент'
+        ),
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) =>
+        row.original.isSkeleton ? (
+          <div className="h-8 w-10 bg-muted rounded-md animate-pulse" />
+        ) : (
+          <TableArchivedActionsMenu<ProductWithPopulate>
+            row={row.original}
+            onDelete={id => handleConfirmationOpen(id, 'delete')}
+            onRestore={id => handleConfirmationOpen(id, 'unarchive')}
+          />
+        ),
     },
   ]
 
   return (
-    <Box className="max-w-[1100px] mx-auto w-full">
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={products || []}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          sx={{
-            '& .MuiDataGrid-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              padding: '8px 16px',
-            },
-            '& .center-cell': {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 !important',
-            },
-          }}
-        />
-      )}
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={loading ? skeletonRows : products ?? []} />
 
       <ConfirmationModal
         open={confirmationOpen}
-        entityName="этот продукт"
-        actionType="delete"
-        onConfirm={handleConfirmationDelete}
+        entityName="этот товар"
+        actionType={actionType}
+        onConfirm={handleConfirmationAction}
         onCancel={handleConfirmationClose}
       />
-
-      <ConfirmationModal
-        open={unarchiveConfirmationOpen}
-        entityName="этот продукт"
-        actionType="unarchive"
-        onConfirm={handleUnarchiveConfirm}
-        onCancel={handleUnarchiveConfirmationClose}
-      />
-    </Box>
+    </div>
   )
 }
 
