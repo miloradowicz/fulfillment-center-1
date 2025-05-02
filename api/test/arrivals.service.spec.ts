@@ -191,20 +191,40 @@ describe('ArrivalsService', () => {
     })
 
     it('should return one arrival with populating', async () => {
-      // Создаем правильный мок для findById с populate
-      const mockPopulate2 = jest.fn().mockResolvedValue(mockArrival)
-      const mockPopulate1 = jest.fn().mockReturnValue({ populate: mockPopulate2 })
-      const mockFindByIdResult = { populate: mockPopulate1 }
 
-      jest.spyOn(arrivalModel, 'findById').mockReturnValue(mockFindByIdResult as any)
+      const finalPopulateMock = jest.fn().mockResolvedValue(mockArrival)
+
+      const logsUserPopulateMock = {
+        populate: finalPopulateMock,
+      }
+
+      const servicesPopulateMock = {
+        populate: jest.fn().mockReturnValue(logsUserPopulateMock),
+      }
+
+      const initialPopulateMock = {
+        populate: jest.fn().mockReturnValue(servicesPopulateMock),
+      }
+
+      jest.spyOn(arrivalModel, 'findById').mockReturnValue(initialPopulateMock as any)
 
       const result = await service.getOne(mockArrival._id, true)
 
       expect(arrivalModel.findById).toHaveBeenCalledWith(mockArrival._id)
-      expect(mockPopulate1).toHaveBeenCalledWith(
-        'client products.product defects.product received_amount.product stock shipping_agent services.service',
+
+      expect(initialPopulateMock.populate).toHaveBeenCalledWith(
+        'client products.product defects.product received_amount.product stock shipping_agent'
       )
-      expect(mockPopulate2).toHaveBeenCalledWith({
+
+      expect(servicesPopulateMock.populate).toHaveBeenCalledWith({
+        path: 'services.service',
+        populate: {
+          path: 'serviceCategory',
+          model: 'ServiceCategory',
+        },
+      })
+
+      expect(logsUserPopulateMock.populate).toHaveBeenCalledWith({
         path: 'logs.user',
         select: '-password -token',
       })
