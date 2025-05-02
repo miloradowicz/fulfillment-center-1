@@ -1,10 +1,16 @@
+import { pathRegex } from '@/constants'
+
 function sanitizeString(str: string): string {
-  return str
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
+  if (pathRegex.test(str)) {
+    return str
+  } else {
+    return str
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;')
+  }
 }
 
 export function sanitizeData<T>(data: T): T {
