@@ -1,217 +1,158 @@
 import * as React from 'react'
-import { useEffect } from 'react'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import Box from '@mui/material/Box'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { TabProps } from '../../reports/utils/TabProps.ts'
-import { CustomTabPanel } from '../../reports/utils/CustomTabPanel.tsx'
-import Grid from '@mui/material/Grid2'
-import { CircularProgress } from '@mui/material'
-import { selectLoadingArchiveClient } from '@/store/slices/clientSlice.ts'
-import { useAppSelector } from '@/app/hooks.ts'
+import { useAppDispatch } from '@/app/hooks.ts'
 import ArchivedClients from '../components/ArchivedClients.tsx'
 import ArchivedArrivals from '../components/ArchivedArrivals.tsx'
-import { selectLoadingFetchArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
 import ArchivedProducts from '../components/ArchivedProducts.tsx'
-import { selectLoadingFetchArchivedProduct } from '@/store/slices/productSlice.ts'
 import ArchivedStocks from '../components/ArchivedStocks.tsx'
-import { selectLoadingFetchArchivedStocks } from '@/store/slices/stocksSlice.ts'
 import ArchivedCounterparties from '../components/ArchivedCounterparties.tsx'
-import { selectLoadingFetchArchive } from '@/store/slices/counterpartySlices.ts'
-import { selectLoadingFetchArchivedTasks } from '@/store/slices/taskSlice.ts'
-import ArchivedTasksPage from '../components/ArchivedTasksPage.tsx'
+import ArchivedTasks from '../components/ArchivedTasks.tsx'
 import ArchivedOrders from '../components/ArchivedOrders.tsx'
-import { selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { ArchiveRestore } from 'lucide-react'
 import ArchivedUsers from '@/features/archive/components/ArchivedUsers.tsx'
-import { selectUsersLoading } from '@/store/slices/userSlice.ts'
 import ArchivedServices from '@/features/archive/components/ArchivedServices.tsx'
 import ArchivedInvoices from '@/features/archive/components/ArchivedInvoices.tsx'
-
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { tabTriggerStyles } from '@/utils/commonStyles.ts'
+import { fetchArchivedArrivals } from '@/store/thunks/arrivalThunk.ts'
+import { fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
+import { fetchArchivedTasks } from '@/store/thunks/tasksThunk.ts'
+import { fetchArchivedStocks } from '@/store/thunks/stocksThunk.ts'
+import { fetchArchivedClients } from '@/store/thunks/clientThunk.ts'
+import { fetchArchivedProducts } from '@/store/thunks/productThunk.ts'
+import { fetchArchivedUsers } from '@/store/thunks/userThunk.ts'
+import { fetchArchivedServices } from '@/store/thunks/serviceThunk.ts'
+import { fetchArchivedInvoices } from '@/store/thunks/invoiceThunk.ts'
+import { fetchAllArchivedCounterparties } from '@/store/thunks/counterpartyThunk.ts'
 
 const ArchivePage = () =>  {
-  const [value, setValue] = React.useState(0)
+  const [value, setValue] = useState('clients')
   const location = useLocation()
   const navigate = useNavigate()
-  const loadingClients = useAppSelector(selectLoadingArchiveClient)
-  const loadingArrivals = useAppSelector(selectLoadingFetchArchivedArrivals)
-  const loadingProducts = useAppSelector(selectLoadingFetchArchivedProduct)
-  const loadingStocks = useAppSelector(selectLoadingFetchArchivedStocks)
-  const loadingCounterparties = useAppSelector(selectLoadingFetchArchive)
-  const loadingTasks = useAppSelector(selectLoadingFetchArchivedTasks)
-  const loadingOrders = useAppSelector(selectLoadingFetchArchivedOrders)
-  const loadingUsers = useAppSelector(selectUsersLoading)
 
   const tabNames = React.useMemo(() => ['clients', 'products','arrivals', 'orders', 'tasks', 'stocks', 'counterparties', 'users', 'services', 'invoices'], [])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    event.stopPropagation()
-    const tabName = tabNames[newValue]
-    navigate(`?tab=${ tabName }`, { replace: true })
-    setValue(newValue)
+  const handleChange = (newTab: string) => {
+    navigate({
+      pathname: '/archives',
+      search: `?tab=${ newTab }`,
+    })
+    setValue(newTab)
   }
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const tab = queryParams.get('tab')
-    if (tab) {
-      const tabIndex = tabNames.indexOf(tab)
-      if (tabIndex !== -1) {
-        setValue(tabIndex)
-      }
+    if (tab && tabNames.includes(tab)) {
+      setValue(tab)
     }
   }, [location, tabNames])
 
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    switch (value) {
+    case 'clients':
+      dispatch(fetchArchivedClients())
+      break
+    case 'products':
+      dispatch(fetchArchivedProducts())
+      break
+    case 'arrivals':
+      dispatch(fetchArchivedArrivals())
+      break
+    case 'orders':
+      dispatch(fetchArchivedOrders())
+      break
+    case 'tasks':
+      dispatch(fetchArchivedTasks())
+      break
+    case 'stocks':
+      dispatch(fetchArchivedStocks())
+      break
+    case 'counterparties':
+      dispatch(fetchAllArchivedCounterparties())
+      break
+    case 'users':
+      dispatch(fetchArchivedUsers())
+      break
+    case 'services':
+      dispatch(fetchArchivedServices())
+      break
+    case 'invoices':
+      dispatch(fetchArchivedInvoices())
+      break
+    default:
+      break
+    }
+  }, [value, dispatch])
+
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box style={{ textAlign: 'center', margin: '10px 0 15px' }}>
-        <CustomTitle text={'Архив'} icon={<ArchiveRestore size={25} />} />
-      </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-          scrollButtons="auto"
-          sx={{
-            '.MuiTabs-flexContainer': {
-              'display': 'flex',
-              'flexWrap': 'nowrap',
-              'scrollBehavior': 'smooth',
-              '@media (max-width: 870px)': {
-                overflowX: 'auto',
-                justifyContent: 'flex-start',
-              },
-              '@media (min-width: 871px)': {
-                justifyContent: 'center',
-              },
-            },
-            '.MuiTab-root': {
-              fontSize: '1rem',
-              padding: '4px 16px',
-              width: 'auto',
-            },
-            '@media (max-width: 630px)': {
-              '.MuiTab-root': {
-                fontSize: '0.8rem',
-                padding: '2px 4px',
-              },
-            },
-          }}
-        >
-          <Tab label="Клиенты" {...TabProps(0)} />
-          <Tab label="Товары" {...TabProps(1)} />
-          <Tab label="Поставки" {...TabProps(2)} />
-          <Tab label="Заказы" {...TabProps(3)} />
-          <Tab label="Задачи" {...TabProps(4)} />
-          <Tab label="Склады" {...TabProps(5)} />
-          <Tab label="Контрагенты" {...TabProps(6)} />
-          <Tab label="Пользователи" {...TabProps(7)} />
-          <Tab label="Услуги" {...TabProps(8)} />
-          <Tab label="Счета" {...TabProps(9)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        {loadingClients ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedClients />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        {loadingProducts ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedProducts />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        {loadingArrivals ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedArrivals />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={3}>
-        {loadingOrders ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedOrders />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={4}>
-        {loadingTasks ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedTasksPage />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={5}>
-        {loadingStocks ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedStocks />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={6}>
-        {loadingCounterparties ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedCounterparties />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={7}>
-        {loadingUsers ? (
-          <Grid sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-          </Grid>
-        ) : (
-          <>
-            <ArchivedUsers />
-          </>
-        )}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={8}>
-        <>
-          <ArchivedServices />
-        </>
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={9}>
-        <>
-          <ArchivedInvoices />
-        </>
-      </CustomTabPanel>
-    </Box>
+    <div className="max-w-[1300px] mx-auto">
+      <div className="text-center ml-5 my-4">
+        <CustomTitle text="Архив" icon={<ArchiveRestore size={25} />} />
+      </div>
+      <Tabs value={value} onValueChange={handleChange} className="w-full">
+        <TabsList className="mb-5 w-full h-auto">
+          <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
+            <TabsTrigger className={tabTriggerStyles} value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="products">Товары</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles}  value="arrivals">Поставки</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="orders">Заказы</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="tasks">Задачи</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="stocks">Склады</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="counterparties">Контрагенты</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="users">Сотрудники</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="services">Услуги</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="invoices">Счета</TabsTrigger>
+          </div>
+        </TabsList>
+
+        <TabsContent value="clients">
+          < ArchivedClients/>
+        </TabsContent>
+
+        <TabsContent value="products">
+          < ArchivedProducts/>
+        </TabsContent>
+
+        <TabsContent value="arrivals">
+          < ArchivedArrivals/>
+        </TabsContent>
+
+        <TabsContent value="orders">
+          < ArchivedOrders/>
+        </TabsContent>
+
+        <TabsContent value="tasks">
+          < ArchivedTasks/>
+        </TabsContent>
+
+        <TabsContent value="stocks">
+          < ArchivedStocks/>
+        </TabsContent>
+
+        <TabsContent value="counterparties">
+          < ArchivedCounterparties/>
+        </TabsContent>
+
+        <TabsContent value="users">
+          < ArchivedUsers/>
+        </TabsContent>
+
+        <TabsContent value="services">
+          < ArchivedServices/>
+        </TabsContent>
+
+        <TabsContent value="invoices">
+          < ArchivedInvoices/>
+        </TabsContent>
+
+      </Tabs>
+
+    </div>
   )
 }
 

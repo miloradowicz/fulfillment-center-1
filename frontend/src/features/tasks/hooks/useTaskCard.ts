@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { useAppDispatch } from '@/app/hooks.ts'
 import { setDraggingTask } from '@/store/slices/taskSlice.ts'
-import { archiveTask, fetchTasksByUserIdWithPopulate, fetchTasksWithPopulate } from '@/store/thunks/tasksThunk.ts'
+import {
+  archiveTask,
+  fetchTasksByUserIdWithPopulate,
+  fetchTasksWithPopulate,
+} from '@/store/thunks/tasksThunk.ts'
 import { toast } from 'react-toastify'
 import { TaskWithPopulate } from '@/types'
 
