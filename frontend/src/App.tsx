@@ -12,7 +12,6 @@ import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ProductPage from './features/products/containers/ProductPage.tsx'
-import ProductDetails from './features/products/containers/ProductDetails.tsx'
 import OrderPage from './features/orders/containers/OrderPage.tsx'
 import OrderDetails from './features/orders/containers/OrderDetails.tsx'
 import ReportPage from './features/reports/containers/ReportPage.tsx'
@@ -80,12 +79,6 @@ const App = () => {
             <Route path="/products" element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
                 <ProductPage />
-              </AllowedRoute>
-            }/>
-
-            <Route path="/products/:id" element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ProductDetails />
               </AllowedRoute>
             }/>
 
