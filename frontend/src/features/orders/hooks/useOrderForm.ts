@@ -1,15 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import {
-  Defect,
-  OrderMutation,
-  Product,
-  ProductOrder,
-  ServiceArrival,
-  ServiceOrder,
-} from '@/types'
+import { Defect, OrderMutation, Product, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { selectCreateOrderError, selectLoadingAddOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
-import { selectAllClients, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
+import { selectCreateOrderError, selectLoadingAddOrder } from '@/store/slices/orderSlice.ts'
+import { selectAllClients } from '@/store/slices/clientSlice.ts'
 import { selectAllProducts } from '@/store/slices/productSlice.ts'
 import { toast } from 'react-toastify'
 import { fetchClients } from '@/store/thunks/clientThunk.ts'
@@ -30,13 +23,15 @@ import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
 import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
 import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 import { initialErrorState, initialItemState, initialServiceState, initialState } from '../state/orderState.ts'
-import { ErrorMessages, ItemInitialStateMap, ItemType, ProductField, ServiceField } from '../utils/orderTypes.ts'
+import { ErrorMessages, ItemInitialStateMap, OrderData } from '../utils/orderTypes.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { fetchServices } from '@/store/thunks/serviceThunk.ts'
+import { normalizeField } from '@/utils/normalizeField.ts'
+import { ItemType } from '@/constants.ts'
+import { getAvailableItems } from '@/utils/getAvailableItems.ts'
+import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 
-export const useOrderForm = (onSuccess?: () => void) => {
-  const initialData = useAppSelector(selectPopulateOrder)
-  const [files, setFiles] = useState<File[]>([])
+export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) => {
   const [form, setForm] = useState<OrderMutation>(
     initialData
       ? {
@@ -55,35 +50,10 @@ export const useOrderForm = (onSuccess?: () => void) => {
       : { ...initialState },
   )
 
+  const [files, setFiles] = useState<File[]>([])
   const [modalOpen, setModalOpen] = useState(false)
-  const dispatch = useAppDispatch()
-  const loading = useAppSelector(selectLoadingAddOrder)
-  const createError = useAppSelector(selectCreateOrderError)
-  const clients = useAppSelector(selectAllClients)
-  const clientProducts = useAppSelector(selectAllProducts)
-  const loadingFetchClient = useAppSelector(selectLoadingFetchClient)
-  const [isButtonVisible, setButtonVisible] = useState(true)
-  const params = useParams()
-  const stocks = useAppSelector(selectAllStocks)
-  const stock = useAppSelector(selectOneStock)
-
-  const [availableProducts, setAvailableProducts] = useState<Product[]>([])
-  const [availableDefects, setAvailableDefects] = useState<Product[]>([])
-  const handleRemoveFile = (indexToRemove:number) => {
-    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
-  }
-
-  const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
-    items?.map(item => ({
-      ...item,
-      ...(item.product !== undefined && {
-        product: typeof item.product === 'string' ? item.product : item.product._id,
-      }),
-      ...(item.service !== undefined && {
-        service: typeof item.service === 'string' ? item.service : item.service._id,
-      }),
-    })) || []
-
+  const [activePopover, setActivePopover] = useState<PopoverType>(null)
+  const [availableItems, setAvailableItems] = useState<Product[]>([])
   const [productsForm, setProductsForm] = useState<ProductOrder[]>(
     normalizeField((initialData?.products as ProductOrder[]) || []),
   )
@@ -91,9 +61,6 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [servicesForm, setServicesForm] = useState<ServiceOrder[]>(
     normalizeField((initialData?.services as ServiceOrder[]) || []),
   )
-
-  const error = useAppSelector(selectCreateOrderError)
-  const services = useAppSelector(selectAllServices)
   const [newItem, setNewItem] = useState<ProductOrder | Defect>({ ...initialItemState })
   const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
   const [errors, setErrors] = useState<ErrorMessages>({ ...initialErrorState })
@@ -102,51 +69,37 @@ export const useOrderForm = (onSuccess?: () => void) => {
   const [defectsModalOpen, setDefectsModalOpen] = useState(false)
   const [servicesModalOpen, setServicesModalOpen] = useState(false)
 
-  const {
-    existingFiles,
-    openDeleteModal,
-    handleRemoveExistingFile,
-    handleModalConfirm,
-    handleModalCancel,
-  } = useFileDeleteWithModal(initialData?.documents || [], deleteFile)
+  const dispatch = useAppDispatch()
+  const loading = useAppSelector(selectLoadingAddOrder)
+  const clients = useAppSelector(selectAllClients)
+  const clientProducts = useAppSelector(selectAllProducts)
+  const [isButtonVisible, setButtonVisible] = useState(true)
+  const params = useParams()
+  const stocks = useAppSelector(selectAllStocks)
+  const stock = useAppSelector(selectOneStock)
+  const error = useAppSelector(selectCreateOrderError)
+  const services = useAppSelector(selectAllServices)
 
   useEffect(() => {
-    if (availableProducts.length > 0) {
-      const availableDefects = availableProducts.filter(x => productsForm.some(y => x._id === y.product))
-      setAvailableDefects(availableDefects)
-    }
-  }, [availableProducts, productsForm])
+    dispatch(fetchClients())
+    dispatch(fetchStocks())
+    dispatch(fetchServices())
 
-  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
-    const errorMessages: ErrorMessages = {
-      product: !value ? ErrorMessagesList.ProductErr : ErrorMessagesList.Default,
-      amount: Number(value) <= 0 ? ErrorMessagesList.Amount : ErrorMessagesList.Default,
-      defect_description: !value ? ErrorMessagesList.DefectDescription : ErrorMessagesList.Default,
-      client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
-      sent_at: !value ? ErrorMessagesList.SentAtDate : ErrorMessagesList.Default,
-      delivered_at: !value ? ErrorMessagesList.DeliveredAtDate : ErrorMessagesList.Default,
-      stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
-      price: Number(value) <= 0 ? ErrorMessagesList.OrderPrice : ErrorMessagesList.Default,
-      service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
-      service_amount: Number(value) <= 0 ? ErrorMessagesList.ServiceAmount : ErrorMessagesList.Default,
+    if (form.client) {
+      dispatch(fetchProductsByClientId(form.client))
     }
 
-    setErrors(prev => ({
-      ...prev,
-      [field]: errorMessages[field] || '',
-    }))
+    if (form.stock) {
+      dispatch(fetchStockById(form.stock))
+    }
+  }, [dispatch, form.client,  form.stock])
+
+  const handleRemoveFile = (indexToRemove: number) => {
+    setFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove))
   }
 
-  const handleButtonClick = () => {
-    if (!form.client) {
-      toast.warn('Выберите клиента')
-    } else if (!form.stock) {
-      toast.warn('Выберите склад')
-    } else {
-      setModalOpen(true)
-      setButtonVisible(false)
-    }
-  }
+  const { existingFiles, openDeleteModal, handleRemoveExistingFile, handleModalConfirm, handleModalCancel } =
+    useFileDeleteWithModal(initialData?.documents || [], deleteFile)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -166,103 +119,43 @@ export const useOrderForm = (onSuccess?: () => void) => {
   }
 
   useEffect(() => {
-    dispatch(fetchClients())
-    dispatch(fetchStocks())
-    dispatch(fetchServices())
-  }, [dispatch])
+    if (productsForm.length !== 0 && clientProducts) {
+      const availableProducts = productsForm
+        .map(item => clientProducts.find(p => p._id === item.product))
+        .filter((p): p is Product => p !== undefined)
 
-  useEffect(() => {
-    if (form.client) {
-      dispatch(fetchProductsByClientId(form.client))
+      getAvailableItems(
+        clientProducts,
+        availableProducts.map(product => ({ product })),
+        availableItems,
+        setAvailableItems,
+        '_id',
+      )
     }
-  }, [dispatch, form.client])
-
-  useEffect(() => {
-    if (form.stock) {
-      dispatch(fetchStockById(form.stock))
-    }
-  }, [dispatch, form.stock])
+  }, [productsForm, clientProducts, availableItems])
 
   useEffect(() => {
     if (clientProducts && stock?.products) {
       const stockProducts = stock.products.map(x => ({ ...x, product: { ...x.product, client: x.product._id } }))
       const availableProducts = clientProducts.filter(x => stockProducts.some(y => x._id === y.product._id))
-      setAvailableProducts(availableProducts)
+      setAvailableItems(availableProducts)
     }
   }, [clientProducts, stock])
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (Object.values(errors).filter(Boolean).length) {
-      toast.error('Заполните все обязательные поля.')
-      return
-    }
-
-    if (productsForm.length === 0) {
-      toast.error('Добавьте товары в заказ.')
-      return
-    }
-
-    try {
-      let updated_delivered_at: string = ''
-
-      if (form.delivered_at) {
-        updated_delivered_at = form.delivered_at
-      } else if (form.delivered_at === '') {
-        updated_delivered_at = ''
-      }
-
-      const updatedForm = {
-        ...form,
-        delivered_at: updated_delivered_at,
-        documents: [...existingFiles],
-        files,
-        products: productsForm,
-        defects: defectsForm,
-        services: servicesForm,
-      }
-
-      if (initialData) {
-
-        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm } })).unwrap()
-        if (params.id) {
-          onSuccess?.()
-          await dispatch(fetchOrderById(params.id))
-          await dispatch(fetchOrderByIdWithPopulate(params.id))
-        } else {
-          onSuccess?.()
-          await dispatch(fetchOrdersWithClient())
-        }
-        toast.success('Заказ успешно обновлен!')
-        return
-      } else {
-        await dispatch(addOrder(updatedForm)).unwrap()
-        onSuccess?.()
-        toast.success('Заказ успешно создан!')
-        setForm({ ...initialState })
-        setProductsForm([])
-        setDefectForm([])
-        await dispatch(fetchOrdersWithClient())
-      }
-    } catch (e) {
-      if (isGlobalError(e)) {
-        toast.error(e.message)
-      } else if (hasMessage(e)) {
-        toast.error(e.message)
-      }
-      console.error(e)
-    }
-  }
-
-  const openModal = <T extends ItemType>(type: T, initialState: ItemInitialStateMap[T]) => {
+  const openModal = <T extends Extract<ItemType, ItemType.PRODUCTS | ItemType.DEFECTS | ItemType.SERVICES>>(
+    type: T,
+    initialState: ItemInitialStateMap[T],
+  ) => {
     if (type === ItemType.SERVICES) {
       setNewService(initialState as ServiceOrder)
     } else {
       setNewItem(initialState as ProductOrder | Defect)
     }
 
-    const modalSetters: Record<ItemType, React.Dispatch<React.SetStateAction<boolean>>> = {
+    const modalSetters: Record<
+      Extract<ItemType, ItemType.PRODUCTS | ItemType.DEFECTS | ItemType.SERVICES>,
+      React.Dispatch<React.SetStateAction<boolean>>
+    > = {
       [ItemType.PRODUCTS]: setProductsModalOpen,
       [ItemType.DEFECTS]: setDefectsModalOpen,
       [ItemType.SERVICES]: setServicesModalOpen,
@@ -326,6 +219,98 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setter(prev => prev.filter((_, i) => i !== index))
   }
 
+  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
+    const errorMessages: ErrorMessages = {
+      product: !value ? ErrorMessagesList.ProductErr : ErrorMessagesList.Default,
+      amount: Number(value) <= 0 ? ErrorMessagesList.Amount : ErrorMessagesList.Default,
+      defect_description: !value ? ErrorMessagesList.DefectDescription : ErrorMessagesList.Default,
+      client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
+      sent_at: !value ? ErrorMessagesList.SentAtDate : ErrorMessagesList.Default,
+      stock: !value ? ErrorMessagesList.StockErr : ErrorMessagesList.Default,
+      price: Number(value) <= 0 ? ErrorMessagesList.OrderPrice : ErrorMessagesList.Default,
+      service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
+      service_amount: Number(value) <= 0 ? ErrorMessagesList.ServiceAmount : ErrorMessagesList.Default,
+    }
+
+    setErrors(prev => ({
+      ...prev,
+      [field]: errorMessages[field] || '',
+    }))
+  }
+
+  const handleButtonClick = () => {
+    if (!form.client) {
+      toast.warn('Выберите клиента')
+    } else if (!form.stock) {
+      toast.warn('Выберите склад')
+    } else {
+      setModalOpen(true)
+      setButtonVisible(false)
+    }
+  }
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (Object.values(errors).filter(Boolean).length) {
+      toast.error('Заполните все обязательные поля.')
+      return
+    }
+
+    if (productsForm.length === 0) {
+      toast.error('Добавьте товары в заказ.')
+      return
+    }
+
+    try {
+      let updated_delivered_at: string = ''
+
+      if (form.delivered_at) {
+        updated_delivered_at = form.delivered_at
+      } else if (form.delivered_at === '') {
+        updated_delivered_at = ''
+      }
+
+      const updatedForm = {
+        ...form,
+        delivered_at: updated_delivered_at,
+        documents: [...existingFiles],
+        files,
+        products: productsForm,
+        defects: defectsForm,
+        services: servicesForm,
+      }
+
+      if (initialData) {
+        await dispatch(updateOrder({ orderId: initialData._id, data: { ...updatedForm } })).unwrap()
+        onSuccess?.()
+
+        if (params.id) {
+          await dispatch(fetchOrderById(params.id))
+          await dispatch(fetchOrderByIdWithPopulate(params.id))
+        } else {
+          await dispatch(fetchOrdersWithClient())
+        }
+        toast.success('Заказ успешно обновлен!')
+      } else {
+        await dispatch(addOrder(updatedForm)).unwrap()
+        toast.success('Заказ успешно создан!')
+        await dispatch(fetchOrdersWithClient())
+      }
+
+      setForm({ ...initialState })
+      setProductsForm([])
+      setDefectForm([])
+      onSuccess?.()
+    } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
+      }
+      console.error(e)
+    }
+  }
 
   return {
     form,
@@ -343,17 +328,13 @@ export const useOrderForm = (onSuccess?: () => void) => {
     isButtonVisible,
     setButtonVisible,
     loading,
-    createError,
     clients,
     clientProducts,
-    availableProducts,
-    loadingFetchClient,
     handleBlur,
     handleButtonClick,
     onSubmit,
-    initialData,
-    availableDefects,
     files,
+    availableItems,
     handleFileChange,
     stocks,
     handleRemoveFile,
@@ -377,5 +358,7 @@ export const useOrderForm = (onSuccess?: () => void) => {
     setNewItem,
     error,
     newItem,
+    activePopover,
+    setActivePopover,
   }
 }

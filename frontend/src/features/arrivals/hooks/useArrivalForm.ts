@@ -23,12 +23,14 @@ import { fetchAllCounterparties } from '@/store/thunks/counterpartyThunk.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { ItemType } from '@/constants.ts'
 import { fetchServices } from '@/store/thunks/serviceThunk.ts'
-import { ArrivalData, ErrorMessages, ItemInitialStateMap, ProductField, ServiceField } from '../utils/arrivalTypes.ts'
+import { ArrivalData, ErrorMessages, ItemInitialStateMap } from '../utils/arrivalTypes.ts'
 import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 import { useLocation } from 'react-router-dom'
 import { deleteFile } from '@/store/thunks/deleteFileThunk.ts'
 import { useFileDeleteWithModal } from '@/hooks/UseFileRemoval.ts'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
+import { normalizeField } from '@/utils/normalizeField.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -38,7 +40,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   const counterparties = useAppSelector(selectAllCounterparties)
   const error = useAppSelector(selectCreateError)
   const isLoading = useAppSelector(selectLoadingAddArrival)
-  const status = ['ожидается доставка', 'получена', 'отсортирована']
   const services = useAppSelector(selectAllServices)
   const location = useLocation()
 
@@ -67,17 +68,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
   }
   const { existingFiles, handleRemoveExistingFile, handleModalConfirm, handleModalCancel, openDeleteModal } =
     useFileDeleteWithModal(initialData?.documents || [], deleteFile)
-
-  const normalizeField = <T extends Partial<ProductField & ServiceField>>(items?: T[]): T[] =>
-    items?.map(item => ({
-      ...item,
-      ...(item.product !== undefined && {
-        product: typeof item.product === 'string' ? item.product : item.product._id,
-      }),
-      ...(item.service !== undefined && {
-        service: typeof item.service === 'string' ? item.service : item.service._id,
-      }),
-    })) || []
 
   const [productsForm, setProductsForm] = useState<ProductArrival[]>(
     normalizeField((initialData?.products as ProductArrival[]) || []),
@@ -129,7 +119,12 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     }
   }, [productsForm, products, availableItem])
 
-  const openModal = <T extends Extract<ItemType, ItemType.PRODUCTS | ItemType.RECEIVED_AMOUNT | ItemType.DEFECTS | ItemType.SERVICES>>(type: T, initialState: ItemInitialStateMap[T]) => {
+  const openModal = <
+    T extends Extract<ItemType, ItemType.PRODUCTS | ItemType.RECEIVED_AMOUNT | ItemType.DEFECTS | ItemType.SERVICES>,
+  >(
+      type: T,
+      initialState: ItemInitialStateMap[T],
+    ) => {
     if (type === ItemType.SERVICES) {
       setNewService(initialState as ServiceArrival)
     } else {
@@ -299,17 +294,14 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       setReceivedForm([])
       setDefectsForm([])
 
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error(error)
-
-      if (error instanceof Error) {
-        return error.message
-      } else if (typeof error === 'object' && error !== null && 'message' in error) {
-        toast.error((error as { message: string }).message)
-      } else if (typeof error === 'string') {
-        toast.error(error)
+      onSuccess?.()
+    } catch (e) {
+      if (isGlobalError(e)) {
+        toast.error(e.message)
+      } else if (hasMessage(e)) {
+        toast.error(e.message)
       }
+      console.error(e)
     }
   }
 
@@ -346,7 +338,6 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     handleBlur,
     error,
     submitFormHandler,
-    status,
     clients,
     stocks,
     counterparties,
