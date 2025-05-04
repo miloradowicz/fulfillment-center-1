@@ -13,7 +13,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import Loader from '@/components/Loader/Loader.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
 import { cn } from '@/lib/utils.ts'
-import { ArrowUpRight, ClipboardList, File, Phone } from 'lucide-react'
+import { ArrowUpRight, ClipboardList, File, Minus, Phone } from 'lucide-react'
 import CopyText from '@/components/CopyText/CopyText.tsx'
 import { orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
@@ -27,10 +27,11 @@ const OrderDetails = () => {
   return (
     <>
       {loading && <Loader />}
+
       {order ? (
         <>
           <Modal handleClose={() => setOpen(false)} open={open}>
-            <OrderForm onSuccess={() => setOpen(false)} />
+            <OrderForm initialData={order} onSuccess={() => setOpen(false)} />
           </Modal>
 
           <ConfirmationModal
@@ -46,7 +47,12 @@ const OrderDetails = () => {
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge className={cn(orderStatusStyles[order.status] || orderStatusStyles.default, 'py-2 px-2.5 font-bold mb-4')}>
+                <Badge
+                  className={cn(
+                    orderStatusStyles[order.status] || orderStatusStyles.default,
+                    'py-2 px-2.5 font-bold mb-4',
+                  )}
+                >
                   {capitalize(order.status)}
                 </Badge>
 
@@ -63,7 +69,13 @@ const OrderDetails = () => {
 
                   <div>
                     <p className="text-sm font-bold text-muted-foreground">Дата доставки</p>
-                    <p className="font-bold">{dayjs(order.delivered_at).format('D MMMM YYYY')}</p>
+                    <p className="font-bold">
+                      {order.delivered_at ? (
+                        dayjs(order.delivered_at).format('D MMMM YYYY')
+                      ) : (
+                        <Minus className="w-6 h-6" />
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -113,19 +125,19 @@ const OrderDetails = () => {
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Товары
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Услуги
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Документы
                     </TabsTrigger>
-                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>
