@@ -7,7 +7,6 @@ import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import AllowedRoute from '@/components/AllowedRoute/AllowedRoute.tsx'
 import LoginPage from './features/users/containers/LoginPage.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
-import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ProductPage from './features/products/containers/ProductPage.tsx'
@@ -51,15 +50,6 @@ const App = () => {
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
                 <ClientPage />
-              </AllowedRoute>
-            }
-          />
-
-          <Route
-            path="/clients/:id"
-            element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ClientDetail />
               </AllowedRoute>
             }
           />
