@@ -26,7 +26,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async getAllOrders(@Query('client') clientId: string, @Query('populate') populate?: string) {
+  async getAllOrders(@Query('client') clientId?: string, @Query('populate') populate?: string) {
     if (clientId) {
       return await this.ordersService.getAllByClient(clientId, populate === '1')
     } else {
