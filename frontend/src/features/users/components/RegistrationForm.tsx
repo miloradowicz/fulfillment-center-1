@@ -47,6 +47,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           value={form.email}
           onChange={handleChange}
           onBlur={() => validateFields('email')}
+          className="text-sm"
         />
         {getFieldError('email') && (
           <p className="text-sm text-destructive mt-1">{getFieldError('email')}</p>
@@ -60,6 +61,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           placeholder="Отображаемое имя"
           value={form.displayName}
           onChange={handleChange}
+          className="text-sm"
         />
         {getFieldError('displayName') && (
           <p className="text-sm text-destructive mt-1">{getFieldError('displayName')}</p>
@@ -74,6 +76,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           placeholder={isEditMode ? 'Новый пароль (необязательно)' : 'Пароль'}
           value={form.password}
           onChange={handleChange}
+          className="text-sm"
         />
         {getFieldError('password') && (
           <p className="text-sm text-destructive mt-1">{getFieldError('password')}</p>
@@ -89,6 +92,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
           onBlur={() => validateFields('confirmPassword')}
+          className="text-sm"
         />
         {getFieldError('confirmPassword') && (
           <p className="text-sm text-destructive mt-1">{getFieldError('confirmPassword')}</p>
@@ -102,7 +106,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
             handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Выберите роль" />
           </SelectTrigger>
           <SelectContent>

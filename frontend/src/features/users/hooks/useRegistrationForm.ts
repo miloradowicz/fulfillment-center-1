@@ -1,4 +1,3 @@
-import { SelectChangeEvent } from '@mui/material'
 import { passwordStrength, DiversityType } from 'check-password-strength'
 import React, { useEffect, useState, ChangeEvent } from 'react'
 import { toast } from 'react-toastify'
@@ -115,7 +114,7 @@ export const useRegistrationForm = (
   }
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<unknown>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     dispatch(clearCreateError(e.target.name))
     let value = e.target.value as string
