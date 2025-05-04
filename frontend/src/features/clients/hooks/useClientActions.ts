@@ -12,6 +12,9 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [clientToArchiveId, setClientToArchiveId] = useState<string | null>(null)
+  const [openDetailsModal, setOpenDetailsModal] = useState(false)
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
+
   const clients = useAppSelector(selectAllClients)
   const { id } = useParams()
   const client = useAppSelector(selectClient)
@@ -92,7 +95,18 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     handleConfirmationClose()
   }
 
+  const handleOpenDetailsModal = (clientId: string) => {
+    setSelectedClientId(clientId)
+    setOpenDetailsModal(true)
+  }
+
+  const handleCloseDetailsModal = () => {
+    setOpenDetailsModal(false)
+    navigate('/clients', { replace: true })
+  }
+
   return {
+    dispatch,
     clients,
     client,
     selectedClient,
@@ -108,5 +122,9 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
+    selectedClientId,
+    openDetailsModal,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
   }
 }
