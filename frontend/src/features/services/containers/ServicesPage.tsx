@@ -9,21 +9,25 @@ import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 
 const ServicesPage = () => {
-
   const { open, handleOpen, handleClose, loading } = useServiceActions(true)
 
   return (
     <>
-      {loading ? <Loader/> : null}
+      {loading && <Loader />}
 
-      <Modal handleClose={handleClose} open={open}><ServiceForm onClose={handleClose}/></Modal>
-      <div className="max-w-[1000px] mx-auto mb-5 mt-2 w-full flex items-center justify-between gap-4">
-        <CustomTitle text={'Услуги'} icon={<Handshake size={25} />}/>
-        <ProtectedElement allowedRoles={['super-admin', 'admin']} >
-          <CustomButton text={'Добавить услугу'} onClick={handleOpen}/>
+      <Modal handleClose={handleClose} open={open}>
+        <ServiceForm onClose={handleClose} />
+      </Modal>
+
+      <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between gap-4">
+        <CustomTitle text={'Услуги'} icon={<Handshake size={25} />} />
+
+        <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+          <CustomButton text={'Добавить услугу'} onClick={handleOpen} />
         </ProtectedElement>
       </div>
-      <div className="px-4">
+
+      <div className="my-8">
         <ServicesDataList />
       </div>
     </>
