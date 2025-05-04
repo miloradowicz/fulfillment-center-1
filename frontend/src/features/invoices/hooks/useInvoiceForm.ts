@@ -10,7 +10,6 @@ import {
   fetchPopulatedArrivals,
 } from '@/store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '@/store/slices/clientSlice.ts'
-import { selectAllArrivals, selectCreateError, selectLoadingAddArrival } from '@/store/slices/arrivalSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { fetchServices } from '@/store/thunks/serviceThunk.ts'
 import { ErrorMessages, InvoiceData, ServiceField } from '../types/invoiceTypes.ts'
@@ -21,13 +20,14 @@ import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
 import { createInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
 import { selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
-import { X } from 'lucide-react'
+import { selectInvoiceCreateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
+import { selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
-  const error = useAppSelector(selectCreateError)
-  const isLoading = useAppSelector(selectLoadingAddArrival)
+  const error = useAppSelector(selectInvoiceCreateError)
+  const isLoading = useAppSelector(selectLoadingAdd)
   const services = useAppSelector(selectAllServices)
   const location = useLocation()
   const [invoiceStatus, setInvoiceStatus] = useState<'в ожидании' | 'частично оплачено' | 'оплачено'>('в ожидании')
@@ -44,6 +44,9 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       }
       : { ...initialState },
   )
+
+  const [lockArrival, setLockArrival] = useState(true)
+  const [lockOrder, setLockOrder] = useState(true)
 
   const normalizeField = <T extends Partial<ServiceField>>(items?: T[]): T[] =>
     items?.map(item => ({
@@ -98,6 +101,14 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }, [dispatch, form.client])
 
   useEffect(() => {
+    setLockArrival(false)
+  }, [form.associatedArrival])
+
+  useEffect(() => {
+    setLockOrder(false)
+  }, [form.associatedOrder])
+
+  useEffect(() => {
     if (form.associatedArrival && availableArrivals?.length) {
       setAvailableArrivalsWithDummy(addDummyOption(availableArrivals, { _id: '', arrivalNumber: 'Убрать поставку' }))
     } else {
@@ -112,7 +123,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }, [availableArrivals, availableOrders, form.associatedArrival, form.associatedOrder])
 
   useEffect(() => {
-    if (availableArrivals?.length) {
+    if (!lockArrival && availableArrivals?.length) {
       const arrival = availableArrivals.find(x => x._id === form.associatedArrival)
       setArrivalServicesForm(arrival?.services?.map(x => {
         const service = services.find(y => y._id === x.service)
@@ -126,23 +137,24 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       }) ?? [])
     }
 
-    if (availableOrders?.length) {
+    if (!lockOrder && availableOrders?.length) {
       const order = availableOrders.find(x => x._id === form.associatedOrder)
-      setOrderServicesForm(
-        order?.services?.map(x => {
-          const service = services.find(y => y._id === x.service)
+      setOrderServicesForm(order?.services?.map(x => {
+        const service = services.find(y => y._id === x.service)
 
-          return {
-            ...x,
-            service_amount: x.service_amount ?? 1,
-            service_price: x.service_price ?? service?.price,
-            service_type: x.service_type ?? service?.type,
-          }
-        }) ?? [],
+        return {
+          ...x,
+          service_amount: x.service_amount ?? 1,
+          service_price: x.service_price ?? service?.price,
+          service_type: x.service_type ?? service?.type,
+        }
+      }) ?? [],
       )
     }
   },
   [
+    lockArrival,
+    lockOrder,
     form.associatedArrival,
     form.associatedOrder,
     availableArrivals,
