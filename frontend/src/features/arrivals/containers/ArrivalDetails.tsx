@@ -131,22 +131,22 @@ const ArrivalDetails = () => {
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Отправленные
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Полученные
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Услуги
                     </TabsTrigger>
-                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Документы
                     </TabsTrigger>
-                    <TabsTrigger value="5" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="5" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>

@@ -33,7 +33,6 @@ export const initialErrorState = {
   defect_description: '',
   client: '',
   sent_at: '',
-  delivered_at: '',
   stock: '',
   price: '',
   service: '',

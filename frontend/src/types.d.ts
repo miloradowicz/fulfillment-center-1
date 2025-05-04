@@ -73,10 +73,6 @@ export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
 }
 
-export interface DefectMutation extends Defect {
-  productName: string
-}
-
 export interface ProductOrder {
   product: string
   description: string
@@ -103,6 +99,10 @@ export interface ProductArrival {
 export type ProductArrivalWithPopulate = Omit<ProductArrival, 'product'> & {
   product: Product
 }
+
+export type ProductField = { product: string | { _id: string } }
+
+export type ServiceField = { service: string | { _id: string } }
 
 export interface ServiceArrival {
   service: string

@@ -24,9 +24,6 @@ export type ErrorMessages = Pick<
   | 'service_price'
 >
 
-export type ProductField = { product: string | { _id: string } }
-export type ServiceField = { service: string | { _id: string } }
-
 export type ItemInitialStateMap = {
   [ItemType.PRODUCTS]: ProductArrival,
   [ItemType.RECEIVED_AMOUNT]: ProductArrival,

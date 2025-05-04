@@ -20,6 +20,7 @@ const UseOrderPage = () => {
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [open, setOpen] = useState(false)
   const [counterpartyToDelete, setCounterpartyToDelete] = useState<OrderWithClient | null>(null)
+  const [orderToEdit, setOrderToEdit] = useState<OrderWithClient | undefined>(undefined)
 
   useEffect(() => {
     dispatch(fetchOrdersWithClient())
@@ -42,11 +43,13 @@ const UseOrderPage = () => {
   const handleClose = () => {
     setOpen(false)
     dispatch(clearPopulateOrder())
+    setOrderToEdit(undefined)
     dispatch(clearErrorOrder())
   }
 
   const handleOpenEdit = async (order: OrderWithClient) => {
     await dispatch(fetchOrderByIdWithPopulate(order._id))
+    setOrderToEdit(order)
     setOpen(true)
   }
 
@@ -68,6 +71,7 @@ const UseOrderPage = () => {
     handleOpenEdit,
     setCounterpartyToDelete,
     handleConfirmArchive,
+    orderToEdit,
   }
 }
 

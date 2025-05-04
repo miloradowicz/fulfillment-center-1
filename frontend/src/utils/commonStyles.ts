@@ -1,5 +1,5 @@
 export const tabTriggerStyles =
-'data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-xl transition-all cursor-pointer'
+'data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-3 py-1 my-1 text-sm sm:text-base rounded-2xl transition-all cursor-pointer'
 
 export const arrivalStatusStyles: Record<string, string> = {
   'ожидается доставка': 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800 transition-colors font-bold',
