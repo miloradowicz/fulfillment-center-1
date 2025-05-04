@@ -20,10 +20,7 @@ export class Invoice {
         service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
         service_amount: { type: Number, required: true, default: 1 },
         service_price: { type: Number, required: false },
-        service_type: { type: String,
-          enum: ['внутренняя', 'внешняя'],
-          required: true,
-          default: 'внутренняя' },
+        service_type: { type: String, enum: ['внутренняя', 'внешняя'], required: true, default: 'внутренняя' },
       },
     ],
     required: true,
@@ -63,6 +60,7 @@ export class Invoice {
         service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
         service_amount: { type: Number, required: true, default: 1 },
         service_price: { type: Number, required: false },
+        service_type: { type: String, enum: ['внутренняя', 'внешняя'], required: true, default: 'внутренняя' },
       },
     ],
     default: [],
@@ -71,6 +69,7 @@ export class Invoice {
     service: mongoose.Types.ObjectId
     service_amount: number
     service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
   }[]
 
   @Prop({
@@ -79,6 +78,7 @@ export class Invoice {
         service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
         service_amount: { type: Number, required: true, default: 1 },
         service_price: { type: Number, required: false },
+        service_type: { type: String, enum: ['внутренняя', 'внешняя'], required: true, default: 'внутренняя' },
       },
     ],
     default: [],
@@ -87,6 +87,7 @@ export class Invoice {
     service: mongoose.Types.ObjectId
     service_amount: number
     service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
   }[]
 
   @Prop({

@@ -450,8 +450,8 @@ export interface Invoice {
   client: Client
   services: {
     service: Service
-    service_amount?: number
-    service_price?: number
+    service_amount: number
+    service_price: number
     service_type?: 'внутренняя' | 'внешняя'
     _id: string
   }[]
@@ -483,15 +483,15 @@ export interface Invoice {
   }
   associatedArrivalServices?: {
     service: Service
-    service_amount?: number
-    service_price?: number
+    service_amount: number
+    service_price: number
     service_type?: 'внутренняя' | 'внешняя'
     _id: string
   }[]
   associatedOrderServices?: {
     service: Service
-    service_amount?: number
-    service_price?: number
+    service_amount: number
+    service_price: number
     service_type?: 'внутренняя' | 'внешняя'
     _id: string
   }[]
@@ -504,7 +504,7 @@ export type InvoiceMutation = Pick<
   Invoice,'paid_amount' | 'discount'
   > & {
   client: string
-  associatedArrival?: string
-  associatedOrder?: string
+  associatedArrival?: string | null
+  associatedOrder?: string | null
   services: ServiceArrival[]
 }

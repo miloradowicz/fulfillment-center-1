@@ -3,7 +3,10 @@ import {
   Invoice,
 } from '@/types'
 
-export type InvoiceData = Invoice
+export type InvoiceData = Omit<Invoice, 'associatedArrival' | 'associatedOrder'> & {
+  associatedArrival?: string,
+  associatedOrder?: string,
+}
 
 export type ErrorMessages = Pick<ErrorsFields,
   'client'

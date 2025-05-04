@@ -15,17 +15,23 @@ export class InvoicesService {
     private readonly counterService: CounterService,
   ) {}
 
-  private calculateTotalAmount(
+  private async calculateTotalAmount(
     services: (InvoiceServiceDto & { type: 'внутренняя' | 'внешняя' })[],
     discount?: number,
-  ): number {
-    return services.reduce((total, { service_price = 0, service_amount = 1, type }) => {
-      let finalPrice = service_price
-      if (type === 'внутренняя' && discount && discount > 0) {
-        finalPrice = service_price * (1 - discount / 100)
-      }
-      return total + (finalPrice * service_amount)
-    }, 0)
+  ) {
+    return (
+      await Promise.all(
+        services.map(async x => {
+          const service = await this.serviceModel.findById(x.service)
+
+          return (
+            x.service_amount *
+            (x.service_price ?? service?.price ?? 0) *
+            ((x.service_type ?? service?.type) === 'внутренняя' ? 1 - (discount ?? 0) / 100 : 1)
+          )
+        }),
+      )
+    ).reduce((a, x) => a + x, 0)
   }
 
   private determineStatus(
@@ -158,8 +164,14 @@ export class InvoicesService {
     const sequenceNumber = await this.counterService.getNextSequence('invoice')
     const invoiceNumber = `INV-${ sequenceNumber }`
 
+    const servicesToUse = ([] as InvoiceServiceDto[]).concat(
+      createInvoiceDto.services ?? [],
+      createInvoiceDto.associatedArrivalServices ?? [],
+      createInvoiceDto.associatedOrderServices ?? [],
+    )
+
     const populatedServices = await Promise.all(
-      createInvoiceDto.services.map(async item => {
+      servicesToUse.map(async item => {
         const serviceDoc = await this.serviceModel.findById(item.service).lean()
         if (!serviceDoc) {
           throw new Error(`Услуга с ID  ${ item.service.toString() } не найдена`)
@@ -171,7 +183,7 @@ export class InvoicesService {
       })
     )
 
-    const totalAmount  = this.calculateTotalAmount(
+    const totalAmount  = await this.calculateTotalAmount(
       populatedServices,
       createInvoiceDto.discount,
     )
@@ -193,7 +205,7 @@ export class InvoicesService {
 
     if (!existing) throw new NotFoundException('Счёт не найден.')
 
-    const servicesToUse = (updateDto.services ?? existing.services) as InvoiceServiceDto[]
+    const servicesToUse = ([] as InvoiceServiceDto[]).concat(updateDto.services ?? [], updateDto.associatedArrivalServices ?? [], updateDto.associatedOrderServices ?? [])
 
     const populatedServices = await Promise.all(
       servicesToUse.map(async item => {
@@ -212,11 +224,12 @@ export class InvoicesService {
 
     const paid_amount = updateDto.paid_amount ?? existing.paid_amount
 
-    const totalAmount = this.calculateTotalAmount(
+    const totalAmount = await this.calculateTotalAmount(
       populatedServices,
       discountToUse,
     )
 
+    updateDto.totalAmount = totalAmount
     updateDto.status = this.determineStatus(paid_amount, totalAmount)
 
     return this.invoiceModel.findByIdAndUpdate(id, updateDto, { new: true }).populate('client services.service')

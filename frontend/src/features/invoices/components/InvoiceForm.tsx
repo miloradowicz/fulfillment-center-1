@@ -87,6 +87,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           searchPlaceholder="Поиск поставки..."
           activePopover={activePopover}
           setActivePopover={setActivePopover}
+          error={getFieldError('associatedArrival', error)}
           renderValue={x => x.arrivalNumber ?? x._id}
         />
 
@@ -100,6 +101,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           searchPlaceholder="Поиск заказа..."
           activePopover={activePopover}
           setActivePopover={setActivePopover}
+          error={getFieldError('associatedOrder', error)}
           renderValue={x => x.orderNumber ?? x._id}
         />
 
@@ -131,7 +133,11 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
               placeholder="Выберите услугу"
               options={services || []}
               onSelect={serviceId => {
-                setNewService(prev => ({ ...prev, service: serviceId }))
+                setNewService(prev => ({
+                  ...prev,
+                  service: serviceId,
+                  service_type: prev.service_type ?? services.find(s => s._id === serviceId)?.type,
+                }))
                 handleBlur('service', serviceId)
               }}
               popoverKey="service"

@@ -160,6 +160,20 @@ const SidebarContent: React.FC<Props> = ({ onLinkClick }) => {
           <span>Архив</span>
         </NavLink>
       </ProtectedElement>
+
+      <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+        <NavLink
+          to="/invoices"
+          onClick={onLinkClick}
+          className={({ isActive }) =>
+            `w-full flex items-center gap-2 p-2 rounded-md transition-colors
+            ${ isActive ? 'bg-ring/50 text-primary' : 'text-primary hover:bg-primary hover:text-card' }`
+          }
+        >
+          <BookUser size={25} />
+          <span>Счета</span>
+        </NavLink>
+      </ProtectedElement>
     </nav>
   )
 }

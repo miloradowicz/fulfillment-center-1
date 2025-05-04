@@ -4,11 +4,7 @@ import { Arrival, InvoiceMutation, Order, ServiceArrival } from '@/types'
 import { initialErrorState, initialServiceState, initialState } from '../state/invoiceState.ts'
 import { toast } from 'react-toastify'
 import { fetchClients } from '@/store/thunks/clientThunk.ts'
-import {
-  fetchArrivalByIdWithPopulate,
-  fetchArrivalsByClientId,
-  fetchPopulatedArrivals,
-} from '@/store/thunks/arrivalThunk.ts'
+import { fetchArrivalsByClientId } from '@/store/thunks/arrivalThunk.ts'
 import { selectAllClients } from '@/store/slices/clientSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { fetchServices } from '@/store/thunks/serviceThunk.ts'
@@ -17,16 +13,16 @@ import { selectAllServices } from '@/store/slices/serviceSlice.ts'
 import { useLocation } from 'react-router-dom'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
-import { createInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
+import { createInvoices, fetchInvoiceById, fetchInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
 import { selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
-import { selectInvoiceCreateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
+import { selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
 import { selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
-  const error = useAppSelector(selectInvoiceCreateError)
+  const error = useAppSelector(selectInvoiceCreateAndUpdateError)
   const isLoading = useAppSelector(selectLoadingAdd)
   const services = useAppSelector(selectAllServices)
   const location = useLocation()
@@ -37,44 +33,33 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       ? {
         client: initialData.client._id,
         services: [],
-        associatedArrival: initialData.associatedArrival?._id,
-        associatedOrder: initialData.associatedOrder?._id,
+        associatedArrival: initialData.associatedArrival,
+        associatedOrder: initialData.associatedOrder,
         paid_amount: initialData.paid_amount,
         discount: initialData.discount,
       }
       : { ...initialState },
   )
 
-  const [lockArrival, setLockArrival] = useState(true)
-  const [lockOrder, setLockOrder] = useState(true)
+  const [lockArrival, setLockArrival] = useState(!!initialData?.associatedArrival)
+  const [lockOrder, setLockOrder] = useState(!!initialData?.associatedOrder)
 
-  const normalizeField = <T extends Partial<ServiceField>>(items?: T[]): T[] =>
+  const normalizeField = <T extends ServiceField>(items?: T[]): (Omit<T, 'service'> & { service: string })[] =>
     items?.map(item => ({
       ...item,
-      ...(item.service !== undefined && {
-        service: typeof item.service === 'string' ? item.service : item.service._id,
-      }),
+      ...({ service: typeof item.service === 'string' ? item.service : item.service._id }),
     })) || []
 
   const [arrivalServicesForm, setArrivalServicesForm] = useState<ServiceArrival[]>(
-    normalizeField((initialData?.services.map(x => {
-      const { _id: _, ...rest } = { ...x, service: x.service._id }
-      return rest
-    }) as ServiceArrival[]) || []),
+    normalizeField((initialData?.associatedArrivalServices) || []),
   )
 
   const [orderServicesForm, setOrderServicesForm] = useState<ServiceArrival[]>(
-    normalizeField((initialData?.services.map(x => {
-      const { _id: _, ...rest } = { ...x, service: x.service._id }
-      return rest
-    }) as ServiceArrival[]) || []),
+    normalizeField((initialData?.associatedOrderServices) || []),
   )
 
   const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
-    normalizeField((initialData?.services.map(x => {
-      const { _id: _, ...rest } = { ...x, service: x.service._id }
-      return rest
-    }) as ServiceArrival[]) || []),
+    normalizeField((initialData?.services) || []),
   )
 
   const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
@@ -101,12 +86,16 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }, [dispatch, form.client])
 
   useEffect(() => {
-    setLockArrival(false)
-  }, [form.associatedArrival])
+    if (lockArrival && form.associatedArrival !== initialData?.associatedArrival) {
+      setLockArrival(false)
+    }
+  }, [form.associatedArrival, initialData?.associatedArrival, lockArrival])
 
   useEffect(() => {
-    setLockOrder(false)
-  }, [form.associatedOrder])
+    if (lockOrder && form.associatedOrder !== initialData?.associatedOrder){
+      setLockOrder(false)
+    }
+  }, [form.associatedOrder, initialData?.associatedOrder, lockOrder])
 
   useEffect(() => {
     if (form.associatedArrival && availableArrivals?.length) {
@@ -257,32 +246,33 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       const updatedForm = {
         client: form.client,
         services: servicesForm,
-        ...(form.associatedArrival && { associateArrival: form.associatedArrival }),
-        ...(form.associatedOrder && { associateOrder: form.associatedOrder }),
+        associatedArrival: form.associatedArrival || null,
+        associatedOrder: form.associatedOrder || null,
         associatedArrivalServices: arrivalServicesForm,
         associatedOrderServices: orderServicesForm,
-        paid_amount: form.paid_amount ?? 0,
-        discount: form.discount ?? 0,
+        paid_amount: form.paid_amount || 0,
+        discount: form.discount || 0,
       }
 
       if (initialData) {
         await dispatch(updateInvoice({ id: initialData._id, data: { ...updatedForm } })).unwrap()
-        onSuccess?.()
 
         if (location.pathname === `/invoices/${ initialData._id }`) {
-          await dispatch(fetchArrivalByIdWithPopulate(initialData._id))
+          await dispatch(fetchInvoiceById(initialData._id))
         } else {
-          await dispatch(fetchPopulatedArrivals())
+          await dispatch(fetchInvoices())
         }
 
         toast.success('Счет успешно обновлен!')
       } else {
         await dispatch(createInvoices(updatedForm)).unwrap()
         toast.success('Счет успешно создан!')
-        await dispatch(fetchPopulatedArrivals())
+        await dispatch(fetchInvoices())
       }
 
       setForm({ ...initialState })
+      setArrivalServicesForm([])
+      setOrderServicesForm([])
       setServicesForm([])
 
       if (onSuccess) onSuccess()
