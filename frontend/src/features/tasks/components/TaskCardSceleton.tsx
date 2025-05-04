@@ -1,24 +1,14 @@
-import { Card, CardContent, Skeleton } from '@mui/material'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const TaskCardSkeleton = () => {
   return (
-    <Card
-      sx={{
-        borderRadius: '12px',
-        border: 'none',
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        marginBottom: 2,
-        position: 'relative',
-      }}
-    >
-      <CardContent>
-        <Skeleton variant="text" animation="wave" width="50%" height={24} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="text" animation="wave" width="40%" height={20} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="text" animation="wave" width="70%" height={25} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="text" animation="wave" width="40%" height={20} sx={{ marginBottom: 1 }} />
-        <Skeleton variant="rectangular" animation="wave" width="80%" height={40} sx={{ borderRadius: 2 }} />
-      </CardContent>
-    </Card>
+    <div className="rounded-xl shadow-md bg-white p-6 mb-4 space-y-3">
+      <Skeleton className="h-6 w-1/2" />
+      <Skeleton className="h-5 w-2/5" />
+      <Skeleton className="h-6 w-4/5" />
+      <Skeleton className="h-5 w-2/5" />
+      <Skeleton className="h-10 w-4/5 rounded-md" />
+    </div>
   )
 }
 

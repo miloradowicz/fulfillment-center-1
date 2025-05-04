@@ -1,4 +1,3 @@
-import { Box, Typography } from '@mui/material'
 import { useStockDetails } from '../hooks/useStockDetails.ts'
 import Modal from '@/components/Modal/Modal.tsx'
 import StockForm from '../components/StockForm.tsx'
@@ -10,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StockProductsPage from './StockProductsPage.tsx'
 import StockDefectsPage from './StockDefectsPage.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import WriteOffForm from '../components/WriteOffForm.tsx'
+import { MapPinIcon, Warehouse } from 'lucide-react'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 
 const StockDetails = () => {
   const {
@@ -20,6 +22,9 @@ const StockDetails = () => {
     handleArchive,
     editModalOpen,
     setEditModalOpen,
+    writeOffModalOpen,
+    openWriteOffModal,
+    closeWriteOffModal,
     tabs,
     currentTab,
     handleTabChange,
@@ -36,6 +41,15 @@ const StockDetails = () => {
         />
       </Modal>
 
+      <Modal open={writeOffModalOpen} handleClose={closeWriteOffModal}>
+        <WriteOffForm
+          initialData={(stock && { stock: stock }) ?? undefined}
+          onSuccess={() => {
+            closeWriteOffModal()
+          }}
+        />
+      </Modal>
+
       <ConfirmationModal
         open={archiveModalOpen}
         entityName="этот склад"
@@ -44,40 +58,54 @@ const StockDetails = () => {
         onCancel={hideArchiveModal}
       />
 
-      <div className="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-8 mb-8">
-        <BackButton />
-        <Box className="text-center mt-4 mb-8 p-4 bg-gray-100 rounded-lg shadow-md">
-          <Typography
-            sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937' }}
-            className="whitespace-normal break-words"
-          >
-            📦 Склад: {stock?.name}
-          </Typography>
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-md p-7 my-6">
+        <div className="flex sm:flex-row flex-col sm:items-center justify-between items-start gap-4">
+          <BackButton />
 
-          <Typography
-            sx={{ fontSize: '20px', fontWeight: 700, color: '#1F2937', marginTop: '8px' }}
-            className="whitespace-normal break-words"
-          >
-            📍 Адрес: {stock?.address}
-          </Typography>
-        </Box>
+          <div className="text-center flex items-center justify-center gap-3 sm:mt-5">
+            <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+              <EditButton onClick={() => setEditModalOpen(true)} />
+            </ProtectedElement>
+            <ProtectedElement allowedRoles={['super-admin', 'admin']}>
+              <ArchiveButton onClick={showArchiveModal} />
+            </ProtectedElement>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 w-full max-w-[1000px] mx-auto sm:my-7 my-5">
+          <div className="space-y-1 text-primary">
+            <h3 className="font-bold sm:text-lg text-sm flex items-center gap-2">
+              <Warehouse className="h-5 w-5" />
+              Склад: {stock?.name}
+            </h3>
+
+            <h3 className="font-bold sm:text-lg text-sm flex items-center gap-2">
+              <MapPinIcon className="h-5 w-5" />
+              Адрес: {stock?.address}
+            </h3>
+          </div>
+
+          <div className="w-full sm:w-auto">
+            <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+              <CustomButton text="Добавить списание" onClick={openWriteOffModal} />
+            </ProtectedElement>
+          </div>
+        </div>
 
         <Tabs value={currentTab} onValueChange={handleTabChange}>
           <div className="flex justify-center">
-            <TabsList className="mb-10 flex flex-wrap justify-center gap-3 sm:gap-4 sm:mb-10">
+            <TabsList className="flex flex-wrap justify-center gap-3 my-3 rounded-2xl">
               {tabs.map(tab => (
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white px-4 py-2 text-sm sm:text-base rounded-xl transition-all"
+                  className="font-bold data-[state=active]:bg-primary data-[state=active]:text-white px-4 py-2 text-sm rounded-xl transition-all"
                 >
                   {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </div>
-
-          <div className="h-px bg-muted mb-3 w-full" />
 
           <TabsContent value="products" className="mt-0">
             <StockProductsPage />
@@ -86,15 +114,6 @@ const StockDetails = () => {
             <StockDefectsPage />
           </TabsContent>
         </Tabs>
-
-        <Box className="text-center mt-8 p-4 flex items-center justify-center gap-3">
-          <ProtectedElement allowedRoles={['super-admin', 'admin']}>
-            <EditButton onClick={() => setEditModalOpen(true)} />
-          </ProtectedElement>
-          <ProtectedElement allowedRoles={['super-admin', 'admin']}>
-            <ArchiveButton onClick={showArchiveModal} />
-          </ProtectedElement>
-        </Box>
       </div>
     </>
   )

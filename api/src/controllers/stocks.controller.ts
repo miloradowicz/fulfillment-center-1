@@ -4,6 +4,7 @@ import { CreateStockDto } from '../dto/create-stock.dto'
 import { UpdateStockDto } from '../dto/update-stock.dto'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
+import { CreateWriteOffDto } from 'src/dto/create-write-off.dto'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
@@ -43,6 +44,12 @@ export class StocksController {
   @Put(':id')
   async updateStock(@Param('id') id: string, @Body() stockDto: UpdateStockDto) {
     return await this.stocksService.update(id, stockDto)
+  }
+
+  @Roles('super-admin', 'admin')
+  @Patch(':id/write-offs')
+  async createWriteOff(@Param('id') id: string, @Body() writeOffDto: CreateWriteOffDto) {
+    return await this.stocksService.createWriteOff(id, writeOffDto)
   }
 
   @Patch(':id/archive')

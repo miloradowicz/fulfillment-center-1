@@ -67,6 +67,7 @@ export const selectLoadingUpdateProduct = (state: RootState) => state.products.l
 export const selectProductError = (state: RootState) => state.products.error
 export const selectCreateProductError = (state: RootState) => state.products.createAndUpdateError
 export const selectDeleteProductError = (state: RootState) => state.products.deleteError
+export const selectLoadingFetchAllArchivedProduct = (state: RootState) => state.products.loadingFetchArchive
 
 const productSlice = createSlice({
   name: 'products',

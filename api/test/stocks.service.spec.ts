@@ -9,6 +9,7 @@ import * as mongoose from 'mongoose'
 import { Model } from 'mongoose'
 import { CreateStockDto } from '../src/dto/create-stock.dto'
 import { UpdateStockDto } from '../src/dto/update-stock.dto'
+import { StockManipulationService } from 'src/services/stock-manipulation.service'
 
 describe('StocksService', () => {
   let service: StocksService
@@ -57,6 +58,7 @@ describe('StocksService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StocksService,
+        StockManipulationService,
         {
           provide: getModelToken(Stock.name),
           useValue: {

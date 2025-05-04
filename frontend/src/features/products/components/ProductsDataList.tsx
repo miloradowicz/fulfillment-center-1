@@ -8,6 +8,8 @@ import SelectableColumn from '@/components/DataTable/SelectableColumn/Selectable
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
 import DataTable from '@/components/DataTable/DataTable.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import ProductDetails from './ProductDetails.tsx'
 
 const ProductsDataList = () => {
   const {
@@ -21,6 +23,10 @@ const ProductsDataList = () => {
     handleClose,
     handleOpen,
     fetchAllProducts,
+    openDetailsModal,
+    selectedProductId,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
   } = useProductActions(true)
 
   const columns: ColumnDef<ProductWithPopulate>[] = [
@@ -70,8 +76,10 @@ const ProductsDataList = () => {
             row={tableProduct}
             handleOpen={handleOpen}
             handleConfirmationOpen={handleConfirmationOpen}
-            showDetailsLink={true}
             detailsPathPrefix="products"
+            showDetailsLink={true}
+            useModalForDetails={true}
+            handleOpenDetailsModal={() => handleOpenDetailsModal(tableProduct._id)}
           />
         )
       },
@@ -81,6 +89,10 @@ const ProductsDataList = () => {
   return (
     <div className="max-w-[1000px] mx-auto w-full">
       <DataTable columns={columns} data={products ?? []} />
+
+      <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
+        <ProductDetails productId={selectedProductId ?? undefined} />
+      </RightPanel>
 
       <Modal handleClose={handleClose} open={open}>
         <ProductForm

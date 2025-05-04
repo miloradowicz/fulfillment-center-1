@@ -1,8 +1,8 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import ItemsList from '@/features/arrivals/components/ItemsList'
-import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
+import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder, WriteOff } from '@/types'
 
-type Item = ProductArrival | Defect | ServiceArrival | ProductOrder | ServiceOrder
+type Item = ProductArrival | Defect | ServiceArrival | ProductOrder | ServiceOrder | WriteOff
 
 interface TypedAccordionProps<T extends Item> {
   title: string

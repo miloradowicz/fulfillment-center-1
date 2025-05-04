@@ -18,6 +18,7 @@ import CopyText from '@/components/CopyText/CopyText.tsx'
 import { orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
@@ -119,9 +120,12 @@ const OrderDetails = () => {
                       Дефекты
                     </TabsTrigger>
                     <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
-                      Документы
+                      Услуги
                     </TabsTrigger>
                     <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                      Документы
+                    </TabsTrigger>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>
@@ -132,6 +136,9 @@ const OrderDetails = () => {
                 </TabsContent>
                 <TabsContent value="1">{order.defects && <ProductsTable defects={order.defects} />}</TabsContent>
                 <TabsContent value="2">
+                  <ServicesTable services={order.services} />
+                </TabsContent>
+                <TabsContent value="3">
                   <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !order.documents && 'flex-col items-center')}>
                     {order.documents ? (
                       order.documents.map((doc, idx) => (
@@ -151,7 +158,7 @@ const OrderDetails = () => {
                     )}
                   </div>
                 </TabsContent>
-                <TabsContent value="3">
+                <TabsContent value="4">
                   <p className="px-2">История</p>
                 </TabsContent>
               </Tabs>

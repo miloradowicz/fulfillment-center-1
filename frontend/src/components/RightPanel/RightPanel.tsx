@@ -34,7 +34,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
           Детальный просмотр для разных сущностей
         </SheetDescription>
         <SheetClose asChild className={'absolute left-1/2 -translate-x-1/2 bottom-6'} onClick={ () => handleOpenChange(false)}>
-          <Button variant="default">Закрыть</Button>
+          <Button variant="default" className="font-bold">Закрыть</Button>
         </SheetClose>
         {children}
       </SheetContent>

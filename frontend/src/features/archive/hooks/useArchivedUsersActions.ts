@@ -1,36 +1,20 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   selectAllArchivedUsers,
-  selectSelectedUser,
-  selectUsersError,
   selectUsersLoading,
 } from '@/store/slices/userSlice.ts'
-import { UserWithPopulate } from '@/types'
-import { useNavigate, useParams } from 'react-router-dom'
 import { deleteUser, fetchArchivedUsers, unarchiveUser } from '@/store/thunks/userThunk.ts'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 const useArchivedUsersActions = () => {
   const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
   const [confirmationOpen, setConfirmationOpen] = useState(false)
   const [userToActionId, setUserToActionId] = useState<string | null>(null)
   const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
   const users = useAppSelector(selectAllArchivedUsers)
-  const [selectedUser, setSelectedUser] = useState<UserWithPopulate | null>(null)
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const user = useAppSelector(selectSelectedUser)
   const loading = useAppSelector(selectUsersLoading)
-  const error = useAppSelector(selectUsersError)
-
-  useEffect(() => {
-    if (!users && !loading) {
-      dispatch(fetchArchivedUsers())
-    }
-  }, [dispatch, users, loading])
 
   const deleteOneUser = async (id: string) => {
     try {
@@ -62,17 +46,6 @@ const useArchivedUsersActions = () => {
     }
   }
 
-  const handleOpen = (user?: UserWithPopulate) => {
-    if (user) {
-      setSelectedUser(user)
-    }
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
     setUserToActionId(id)
     setActionType(type)
@@ -98,21 +71,12 @@ const useArchivedUsersActions = () => {
 
   return {
     users,
-    user,
-    selectedUser,
-    open,
-    handleOpen,
-    handleClose,
-    id,
-    navigate,
     loading,
-    error,
     confirmationOpen,
     actionType,
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationAction,
-    userToActionId,
   }
 }
 

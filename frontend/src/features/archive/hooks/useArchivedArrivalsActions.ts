@@ -1,80 +1,80 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { selectAllArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { selectAllArchivedArrivals, selectLoadingFetchArchivedArrivals } from '@/store/slices/arrivalSlice.ts'
+import { useState } from 'react'
 import { deleteArrival, fetchArchivedArrivals, unarchiveArrival } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArchivedArrivalsActions = () => {
   const dispatch = useAppDispatch()
   const arrivals = useAppSelector(selectAllArchivedArrivals)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [unarchiveModalOpen, setUnarchiveModalOpen] = useState(false)
-  const [selectedArrivalId, setSelectedArrivalId] = useState<string | null>(null)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [arrivalToActionId, setArrivalToActionId] = useState<string | null>(null)
+  const [actionType, setActionType] = useState<'delete' | 'unarchive'>('delete')
+  const loading = useAppSelector(selectLoadingFetchArchivedArrivals)
 
-  const fetchAllArchivedArrivals = useCallback(async () => {
-    await dispatch(fetchArchivedArrivals())
-  }, [dispatch])
 
-  useEffect(() => {
-    void dispatch(fetchArchivedArrivals())
-  }, [dispatch])
-
-  const handleClose = () => {
-    setIsOpen(false)
-    setDeleteModalOpen(false)
-    setUnarchiveModalOpen(false)
-  }
-
-  const handleDeleteClick = (arrivalId: string) => {
-    setSelectedArrivalId(arrivalId)
-    setDeleteModalOpen(true)
-  }
-
-  const handleUnarchiveClick = (arrivalId: string) => {
-    setSelectedArrivalId(arrivalId)
-    setUnarchiveModalOpen(true)
-  }
-
-  const handleConfirmDelete = async () => {
+  const deleteOneArrival = async (id: string) => {
     try {
-      if (selectedArrivalId) {
-        await dispatch(deleteArrival(selectedArrivalId))
-        await fetchAllArchivedArrivals()
-        toast.success('Поставка успешно удалена.')
-      }
+      await dispatch(deleteArrival(id)).unwrap()
+      await dispatch(fetchArchivedArrivals())
+      toast.success('Поставка успешно удалена!')
     } catch (e) {
-      toast.error('Ошибка при удалении поставки.')
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось удалить поставку')
+      }
       console.error(e)
-    } finally {
-      handleClose()
     }
   }
 
-  const handleConfirmUnarchive = async () => {
+  const unarchiveOneArrival = async (id: string) => {
     try {
-      if (selectedArrivalId) {
-        await dispatch(unarchiveArrival(selectedArrivalId))
-        await fetchAllArchivedArrivals()
-        toast.success('Поставка успешно восстановлена!')
-      }
+      await dispatch(unarchiveArrival(id)).unwrap()
+      await dispatch(fetchArchivedArrivals())
+      toast.success('Поставка успешно восстановлена!')
     } catch (e) {
-      toast.error('Ошибка при восстановлении поставки.')
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось восстановить поставку')
+      }
       console.error(e)
-    } finally {
-      handleClose()
     }
   }
+
+  const handleConfirmationOpen = (id: string, type: 'delete' | 'unarchive') => {
+    setArrivalToActionId(id)
+    setActionType(type)
+    setConfirmationOpen(true)
+  }
+
+  const handleConfirmationClose = () => {
+    setConfirmationOpen(false)
+    setArrivalToActionId(null)
+  }
+
+  const handleConfirmationAction = async () => {
+    if (!arrivalToActionId) return
+
+    if (actionType === 'delete') {
+      await deleteOneArrival(arrivalToActionId)
+    } else {
+      await unarchiveOneArrival(arrivalToActionId)
+    }
+
+    handleConfirmationClose()
+  }
+
 
   return {
     arrivals,
-    handleDeleteClick,
-    handleConfirmDelete,
-    handleUnarchiveClick,
-    handleConfirmUnarchive,
-    isOpen,
-    deleteModalOpen,
-    unarchiveModalOpen,
-    handleClose,
+    loading,
+    confirmationOpen,
+    actionType,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationAction,
   }
 }

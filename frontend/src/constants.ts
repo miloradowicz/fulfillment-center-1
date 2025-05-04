@@ -5,6 +5,7 @@ export const featureProtection = import.meta.env.VITE_FEATURE_PROTECTION_DISABLE
 export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/
 export const phoneNumberRegex = /^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4})$/
 export const positiveDecimalNumber = /^(0|[1-9]\d*)(\.\d+)?$/
+export const pathRegex = /^(\/?[^/><|:&]+)+\.(pdf|doc|docx|xlsx)$/
 
 export const roles = [
   { name: 'super-admin', title: 'Супер-пользователь' },
@@ -47,5 +48,5 @@ export enum ItemType {
   RECEIVED_AMOUNT = 'received_amount',
   DEFECTS = 'defects',
   SERVICES = 'services',
+  WRITEOFFS = 'write_offs'
 }
-

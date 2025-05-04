@@ -18,17 +18,20 @@ import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 
 const useProductActions = (fetchOnDelete: boolean) => {
-  const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
-  const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const [productToArchiveId, setProductToArchiveId] = useState<string | null>(null)
-  const products = useAppSelector(selectProductsWithPopulate)
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
   const { id } = useParams()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+  const products = useAppSelector(selectProductsWithPopulate)
   const product = useAppSelector(selectProductWithPopulate)
   const loading = useAppSelector(selectLoadingFetchProduct)
   const error = useAppSelector(selectProductError)
+
+  const [open, setOpen] = useState(false)
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+  const [productToArchiveId, setProductToArchiveId] = useState<string | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithPopulate | null>(null)
+  const [openDetailsModal, setOpenDetailsModal] = useState(false)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
   const clearErrors = useCallback(() => {
     dispatch(clearErrorProduct())
@@ -55,6 +58,14 @@ const useProductActions = (fetchOnDelete: boolean) => {
       void fetchProduct(id)
     }
   }, [id, fetchProduct])
+
+  useEffect(() => {
+    if (id) {
+      setOpenDetailsModal(true)
+    } else {
+      setOpenDetailsModal(false)
+    }
+  }, [id])
 
   const archiveOneProduct = async (id: string) => {
     try {
@@ -102,6 +113,16 @@ const useProductActions = (fetchOnDelete: boolean) => {
     handleConfirmationClose()
   }
 
+  const handleOpenDetailsModal = (productId: string) => {
+    setSelectedProductId(productId)
+    setOpenDetailsModal(true)
+  }
+
+  const handleCloseDetailsModal = () => {
+    setOpenDetailsModal(false)
+    navigate('/products', { replace: true })
+  }
+
   return {
     products,
     product,
@@ -121,6 +142,11 @@ const useProductActions = (fetchOnDelete: boolean) => {
     handleConfirmationClose,
     handleConfirmationArchive,
     productToArchiveId,
+    openDetailsModal,
+    selectedProductId,
+    setOpenDetailsModal,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
   }
 }
 

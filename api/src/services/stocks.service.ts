@@ -1,13 +1,19 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { Stock, StockDocument } from '../schemas/stock.schema'
 import { CreateStockDto } from '../dto/create-stock.dto'
 import { UpdateStockDto } from '../dto/update-stock.dto'
+import { CreateWriteOffDto } from 'src/dto/create-write-off.dto'
+import { StockManipulationService } from './stock-manipulation.service'
+import { WriteOff } from 'src/types'
 
 @Injectable()
 export class StocksService {
-  constructor(@InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>) {}
+  constructor(
+    @InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>,
+    private readonly stockManipulationService: StockManipulationService,
+  ) {}
 
   async getAll() {
     return (await this.stockModel.find({ isArchived: false })).reverse()
@@ -51,6 +57,35 @@ export class StocksService {
     const stock = await this.stockModel.findByIdAndUpdate(id, stockDto, { new: true })
     if (!stock) throw new NotFoundException('Склад не найден.')
     return stock
+  }
+
+  async doStocking(stockId: Types.ObjectId, writeOffs: WriteOff[]) {
+    if (writeOffs?.length) {
+      await this.stockManipulationService.decreaseProductStock(stockId, writeOffs)
+    }
+  }
+
+  async undoStocking(stockId: Types.ObjectId, writeOffs: WriteOff[]) {
+    if (writeOffs?.length) {
+      await this.stockManipulationService.increaseProductStock(stockId, writeOffs)
+    }
+  }
+
+  async createWriteOff(id: string, writeOffDto: CreateWriteOffDto) {
+    const stock = await this.stockModel.findById(id)
+    if (!stock) throw new NotFoundException('Склад не найден.')
+
+    this.stockManipulationService.init()
+
+
+    await this.doStocking(stock._id, writeOffDto.write_offs)
+
+    await this.stockManipulationService.saveStock(stock._id)
+
+    stock.write_offs.push(...writeOffDto.write_offs)
+    await stock.save()
+
+    return writeOffDto
   }
 
   async archive(id: string) {

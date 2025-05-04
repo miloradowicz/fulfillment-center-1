@@ -2,6 +2,7 @@ import { GlobalError, Stock, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import {
   addStock,
+  addWriteOff,
   archiveStock,
   deleteStock,
   fetchArchivedStocks,
@@ -22,9 +23,11 @@ interface StockState {
   loadingUpdate: boolean
   loadingDelete: boolean
   loadingArchive: boolean
+  loadingWriteOff: boolean
   error: GlobalError | null
   createAndUpdateError: ValidationError | null
   deletionError: GlobalError | null
+  createWriteOffError: ValidationError | null
 }
 
 const initialState: StockState = {
@@ -38,9 +41,11 @@ const initialState: StockState = {
   loadingUpdate: false,
   loadingDelete: false,
   loadingArchive: false,
+  loadingWriteOff: false,
   error: null,
   createAndUpdateError: null,
   deletionError: null,
+  createWriteOffError: null,
 }
 
 export const selectAllStocks = (state: RootState) => state.stocks.stocks
@@ -53,6 +58,8 @@ export const selectIsStockArchiving = (state: RootState) => state.stocks.loading
 export const selectIsStockCreating = (state: RootState) => state.stocks.loadingCreate
 export const selectStockCreateError = (state: RootState) => state.stocks.createAndUpdateError
 export const selectStockError = (state: RootState) => state.stocks.error
+export const selectLoadingWriteOff = (state: RootState) => state.stocks.loadingWriteOff
+export const selectCreateWriteOffError = (state: RootState) => state.stocks.createWriteOffError
 
 const stocksSlice = createSlice({
   name: 'stocks',
@@ -86,7 +93,7 @@ const stocksSlice = createSlice({
       })
       .addCase(fetchArchivedStocks.rejected, (state, action) => {
         state.loadingFetchArchive = false
-        state.error = action.payload as GlobalError || { message: 'Ошибка загрузки архивных складов' }
+        state.error = (action.payload as GlobalError) || { message: 'Ошибка загрузки архивных складов' }
       })
 
       .addCase(fetchStockById.pending, state => {
@@ -147,6 +154,18 @@ const stocksSlice = createSlice({
       .addCase(updateStock.rejected, (state, { payload: error }) => {
         state.loadingUpdate = false
         state.createAndUpdateError = error || null
+      })
+
+      .addCase(addWriteOff.pending, state => {
+        state.loadingWriteOff = true
+        state.createWriteOffError = null
+      })
+      .addCase(addWriteOff.fulfilled, state => {
+        state.loadingWriteOff = false
+      })
+      .addCase(addWriteOff.rejected, (state, { payload: error }) => {
+        state.loadingWriteOff = false
+        state.createWriteOffError = error || null
       })
   },
 })

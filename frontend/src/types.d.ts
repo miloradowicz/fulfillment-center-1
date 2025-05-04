@@ -115,6 +115,28 @@ export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
   service: Service
 }
 
+export interface StockWriteOff {
+  _id: string
+  stock: string
+  client: string
+  write_offs: WriteOff[]
+}
+
+export interface StockWriteOffWithPopulate {
+  _id: string
+  stock: Stock
+  client: Client
+  write_offs: WriteOff[]
+}
+
+export interface WriteOff {
+  product: string
+  reason: string
+  amount: number
+}
+
+export type StockWriteOffMutation = Omit<StockWriteOff, '_id'>
+
 export interface Arrival {
   _id: string
   client: string
@@ -176,12 +198,13 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
   products: ProductOrderMutation[]
 }
 
-export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
-  products: ProductForOrderForm[]
-  defects: DefectWithPopulate[]
-  client: Client
-  stock: Stock
-}
+export type OrderWithProductsAndClients = Omit<Order, 'products' | 'defects' | 'client' | 'stock' | 'services'> & {
+  client: Client;
+  products: ProductOrderMutation[];
+  defects: DefectWithPopulate[];
+  stock: Stock;
+  services: ServiceOrderWithPopulate[];
+};
 
 export type OrderWithClient = Omit<Order, 'client' | 'stock'> & {
   client: Client
@@ -323,6 +346,20 @@ export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
 export interface PopulatedService extends Omit<Service, 'serviceCategory'> {
   serviceCategory: ServiceCategory
+}
+
+export type ServiceInTable = {
+  service: string | Service
+  service_amount?: number
+  service_price?: number
+  _id?: string
+}
+
+export type ServiceOrderWithPopulate = {
+  service: PopulatedService
+  service_amount: number
+  service_price?: number
+  _id?: string
 }
 
 export interface ProductStockPopulate {

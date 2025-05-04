@@ -1,8 +1,8 @@
-import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
+import { Defect, ProductArrival, ProductOrder, ServiceArrival, ServiceOrder, WriteOff } from '@/types'
 import { Button } from '@/components/ui/button.tsx'
 import { Trash2 } from 'lucide-react'
 
-type Item = ProductArrival | Defect | ServiceArrival | ProductOrder | ServiceOrder
+type Item = ProductArrival | Defect | ServiceArrival | ProductOrder | ServiceOrder | WriteOff
 
 interface Props<T extends Item> {
   items: T[]
@@ -12,6 +12,10 @@ interface Props<T extends Item> {
 
 function isDefect(item: Item): item is Defect {
   return 'product' in item && 'defect_description' in item
+}
+
+function isWriteOff(item: Item): item is WriteOff {
+  return 'reason' in item
 }
 
 function isProduct(item: Item): item is ProductArrival | ProductOrder {
@@ -28,7 +32,7 @@ const ItemsList = <T extends Item>({ items, onDelete, getNameById }: Props<T>) =
     let amountText = ''
     let servicePrice = ''
 
-    if (isDefect(item) || isProduct(item)) {
+    if (isDefect(item) || isProduct(item) || isWriteOff(item)) {
       mainText = getNameById?.(item.product) || ''
       amountText = `x ${ item.amount }`
     } else if (isService(item)) {

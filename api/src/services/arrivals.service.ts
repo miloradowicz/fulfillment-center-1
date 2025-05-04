@@ -60,14 +60,20 @@ export class ArrivalsService {
     if (populate) {
       arrival = await this.arrivalModel
         .findById(id)
-        .populate('client products.product defects.product received_amount.product stock shipping_agent services.service')
+        .populate('client products.product defects.product received_amount.product stock shipping_agent')
+        .populate({
+          path: 'services.service',
+          populate: {
+            path: 'serviceCategory',
+            model: 'ServiceCategory',
+          },
+        })
         .populate({ path: 'logs.user', select: '-password -token' })
     } else {
       arrival = await this.arrivalModel.findById(id)
     }
 
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
-
     if (arrival.isArchived) throw new ForbiddenException('Поставка в архиве.')
 
     return arrival

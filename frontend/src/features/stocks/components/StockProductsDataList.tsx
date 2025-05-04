@@ -4,7 +4,7 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import DataTable from '@/components/DataTable/DataTable'
 import { useStockDetails } from '../hooks/useStockDetails'
 import { FC } from 'react'
-import { Box, CircularProgress } from '@mui/material'
+import Loader from '@/components/Loader/Loader.tsx'
 
 interface Props {
   selector: (stock: Stock) => ProductStockPopulate[]
@@ -61,17 +61,11 @@ const StockProductsDataList: FC<Props> = ({ selector }) => {
 
   return (
     <>
-      {
-        isLoading
-          ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-              <CircularProgress />
-            </Box>
-          )
-          : <div className="max-w-[1000px] mx-auto w-full">
-            <DataTable columns={columns} data={stock ? selector(stock) : []} />
-          </div>
-      }
+      {isLoading && <Loader />}
+
+      <div className="max-w-[1000px] mx-auto w-full">
+        <DataTable columns={columns} data={stock ? selector(stock) : []} />
+      </div>
     </>
   )
 }
