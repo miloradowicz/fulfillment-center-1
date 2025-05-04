@@ -48,26 +48,28 @@ export default function ReportTabs() {
           icon={<FileText size={25} />} />
       </div>
 
-      <Tabs value={value} onValueChange={handleChange} className="w-full">
-        <TabsList className="mb-5 w-full h-auto">
-          <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-            <TabsTrigger className={tabTriggerStyles} value="tasks">
-              Задачи
-            </TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="clients">
-              Клиенты
-            </TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="orders">
-              Заказы
-            </TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="arrivals">
-              Поставки
-            </TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="stocks">
-              Склады
-            </TabsTrigger>
-          </div>
-        </TabsList>
+      <Tabs value={value} onValueChange={handleChange}>
+        <div className="flex justify-center">
+          <TabsList className="mb-5 sm:w-auto w-full rounded-2xl">
+            <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
+              <TabsTrigger className={tabTriggerStyles} value="tasks">
+                Задачи
+              </TabsTrigger>
+              <TabsTrigger className={tabTriggerStyles} value="clients">
+                Клиенты
+              </TabsTrigger>
+              <TabsTrigger className={tabTriggerStyles} value="orders">
+                Заказы
+              </TabsTrigger>
+              <TabsTrigger className={tabTriggerStyles} value="arrivals">
+                Поставки
+              </TabsTrigger>
+              <TabsTrigger className={tabTriggerStyles} value="stocks">
+                Склады
+              </TabsTrigger>
+            </div>
+          </TabsList>
+        </div>
 
         <TabsContent value="tasks">
           {loadingTask ? (
