@@ -111,7 +111,7 @@ const FileAttachments: React.FC<FileAttachmentsProps> = ({
           className="flex items-center gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground cursor-pointer hover:bg-accent/50"
         >
           <File className="h-4 w-4" />
-          <span>Выберите файл для загрузки</span>
+          <span className="text-sm">Выберите файл для загрузки</span>
         </Label>
         <p className="text-xs text-muted-foreground">Поддерживаемые форматы: .pdf, .doc, .docx, .xlsx</p>
       </div>

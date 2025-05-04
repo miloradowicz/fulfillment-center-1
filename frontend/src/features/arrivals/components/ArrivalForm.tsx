@@ -538,7 +538,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             placeholder="Ваш комментарий..."
             value={form.comment}
             onChange={e => inputChangeHandler(e, setForm)}
-            className="resize-y min-h-[40px] max-h-[250px]"
+            className="resize-y min-h-[40px] max-h-[250px] text-sm"
           />
         </div>
 
