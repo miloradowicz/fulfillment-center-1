@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { selectLoadingFetchTask } from '@/store/slices/taskSlice'
 import { fetchTasksWithPopulate } from '@/store/thunks/tasksThunk'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FileText } from 'lucide-react'
 import CustomTitle from '@/components/CustomTitle/CustomTitle'
 import TaskReport from '../taskPeport/components/TaskReport'
 import ClientReport from '../clientReport/components/ClientReport'
 import Loader from '@/components/Loader/Loader.tsx'
 import { tabTriggerStyles } from '@/utils/commonStyles.ts'
-
 
 export default function ReportTabs() {
   const [value, setValue] = useState('tasks')
@@ -33,7 +32,6 @@ export default function ReportTabs() {
     }
   }, [location, tabNames])
 
-
   const handleChange = (newTab: string) => {
     navigate({
       pathname: '/reports',
@@ -42,25 +40,39 @@ export default function ReportTabs() {
   }
 
   return (
-    <div className="max-w-[1300px] mx-auto">
-      <div className="text-center ml-5 my-4">
-        <CustomTitle text="Отчеты" icon={<FileText size={25} />} />
+    <div className="max-w-[1000px] mx-auto">
+      <div className="my-7">
+        <CustomTitle
+          className="flex justify-center"
+          text="Отчеты"
+          icon={<FileText size={25} />} />
       </div>
+
       <Tabs value={value} onValueChange={handleChange} className="w-full">
         <TabsList className="mb-5 w-full h-auto">
           <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-            <TabsTrigger className={tabTriggerStyles} value="tasks">Задачи</TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="clients">Клиенты</TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="orders">Заказы</TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles}  value="arrivals">Поставки</TabsTrigger>
-            <TabsTrigger className={tabTriggerStyles} value="stocks">Склады</TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="tasks">
+              Задачи
+            </TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="clients">
+              Клиенты
+            </TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="orders">
+              Заказы
+            </TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="arrivals">
+              Поставки
+            </TabsTrigger>
+            <TabsTrigger className={tabTriggerStyles} value="stocks">
+              Склады
+            </TabsTrigger>
           </div>
         </TabsList>
 
         <TabsContent value="tasks">
           {loadingTask ? (
             <div className="mt-8 mb-7 flex justify-center">
-              <Loader/>
+              <Loader />
             </div>
           ) : (
             <TaskReport />
@@ -77,7 +89,6 @@ export default function ReportTabs() {
         <TabsContent value="arrivals">Поставки</TabsContent>
         <TabsContent value="stocks">Склады</TabsContent>
       </Tabs>
-
     </div>
   )
 }

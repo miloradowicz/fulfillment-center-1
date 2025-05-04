@@ -16,6 +16,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement'
 import useInvoiceDetails from '../hooks/useInvoiceDetails'
 import InvoiceServicesTable from '@/components/Tables/InvoiceServicesTable.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { capitalize } from '@/utils/capitalizeFirstLetter'
 
 const InvoiceDetails = () => {
   const {
@@ -36,6 +37,7 @@ const InvoiceDetails = () => {
   return (
     <>
       {loading && <Loader />}
+
       {invoice ? (
         <>
           {/*<Modal open={editModalOpen} handleClose={() => setEditModalOpen(false)}>*/}
@@ -55,13 +57,8 @@ const InvoiceDetails = () => {
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge
-                  className={cn(
-                    invoiceStatusStyles[invoice.status],
-                    'p-1.5 font-bold',
-                  )}
-                >
-                  {invoice.status}
+                <Badge className={cn(invoiceStatusStyles[invoice.status], 'p-1.5 font-bold')}>
+                  {capitalize(invoice.status)}
                 </Badge>
 
                 <div className="space-y-1">
@@ -69,8 +66,12 @@ const InvoiceDetails = () => {
                     <Receipt />
                     {invoice.invoiceNumber}
                   </h3>
+
                   <p className="text-md">
-                    <p className="text-sm text-muted-foreground font-bold">Клиент: <br /></p>
+                    <p className="text-sm text-muted-foreground font-bold">
+                      Клиент: <br />
+                    </p>
+
                     <Link
                       to={`/clients/${ invoice.client._id }`}
                       className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors"
@@ -79,32 +80,43 @@ const InvoiceDetails = () => {
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   </p>
+
                   <div className="flex gap-2 items-center">
                     <CopyText text={invoice.client.phone_number} children={<Phone className="h-4 w-4" />} />
                   </div>
+
                   <p className="text-xs text-muted-foreground">
                     Дата создания: <br />
                     {dayjs(invoice.createdAt).format('D MMMM YYYY')}
                   </p>
+
                   {invoice.associatedArrival && (
                     <p>
                       <span className="font-bold">Поставка: </span>
-                      <Link to={`/arrivals/${ invoice.associatedArrival._id }`} className="hover:text-blue-500 inline-flex items-center gap-1">
+
+                      <Link
+                        to={`/arrivals/${ invoice.associatedArrival._id }`}
+                        className="hover:text-blue-500 inline-flex items-center gap-1"
+                      >
                         {invoice.associatedArrival.arrivalNumber}
                         <ArrowUpRight className="h-4 w-4" />
                       </Link>
                     </p>
                   )}
+
                   {invoice.associatedOrder && (
                     <p>
                       <span className="font-bold">Заказ: </span>
-                      <Link to={`/orders/${ invoice.associatedOrder._id }`} className="hover:text-blue-500 inline-flex items-center gap-1">
+
+                      <Link
+                        to={`/orders/${ invoice.associatedOrder._id }`}
+                        className="hover:text-blue-500 inline-flex items-center gap-1"
+                      >
                         {invoice.associatedOrder.orderNumber}
                         <ArrowUpRight className="h-4 w-4" />
                       </Link>
                     </p>
                   )}
-
                 </div>
               </div>
 
@@ -113,39 +125,46 @@ const InvoiceDetails = () => {
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                     <EditButton onClick={() => setEditModalOpen(true)} />
                   </ProtectedElement>
+
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                     <ArchiveButton onClick={() => setConfirmArchiveModalOpen(true)} />
                   </ProtectedElement>
                 </div>
+
                 <Button
                   onClick={handleExport}
-                  className="w-full shadow-sm font-bold sm:text-sm bg-muted hover:bg-primary text-primary hover:text-white transition-colors"
+                  className="w-full font-bold text-xs bg-muted hover:bg-primary text-primary hover:text-white transition-colors"
                 >
-                    Экспортировать в Excel
+                  Экспортировать в Excel
                 </Button>
               </div>
             </div>
 
             <div className="rounded-2xl shadow p-6 mb-6">
               <h3 className="font-bold uppercase mb-3 text-muted-foreground">Детали счёта</h3>
+
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    {Array.isArray(invoice?.associatedArrivalServices) && invoice?.associatedArrivalServices.length > 0 && (
+                    {Array.isArray(invoice?.associatedArrivalServices) &&
+                      invoice?.associatedArrivalServices.length > 0 && (
                       <TabsTrigger value="0" className={tabStyles}>
-                        Поставка
+                          Поставка
                       </TabsTrigger>
                     )}
+
                     {Array.isArray(invoice?.associatedOrderServices) && invoice?.associatedOrderServices.length > 0 && (
                       <TabsTrigger value="1" className={tabStyles}>
                         Заказ
                       </TabsTrigger>
                     )}
+
                     {invoice.services?.length > 0 && (
                       <TabsTrigger value="3" className={tabStyles}>
                         Доп. услуги
                       </TabsTrigger>
                     )}
+
                     <TabsTrigger value="2" className={tabStyles}>
                       История
                     </TabsTrigger>
@@ -166,11 +185,7 @@ const InvoiceDetails = () => {
 
                 {invoice.services?.length > 0 && (
                   <TabsContent value="3">
-                    <InvoiceServicesTable
-                      services={invoice.services}
-                      showType
-                      discount={invoice.discount}
-                    />
+                    <InvoiceServicesTable services={invoice.services} showType discount={invoice.discount} />
                   </TabsContent>
                 )}
 
@@ -185,17 +200,13 @@ const InvoiceDetails = () => {
                     </div>
                   ) : null}
 
-                  <div className="text-right font-bold">
-                    Итого: {invoice.totalAmount} сом
-                  </div>
+                  <div className="text-right font-bold">Итого: {invoice.totalAmount} сом</div>
 
                   {invoice.paid_amount !== undefined && (
                     <div
                       className={cn(
                         'text-right font-bold',
-                        invoice.paid_amount < (invoice.totalAmount ?? 0)
-                          ? 'text-red-600'
-                          : 'text-emerald-600',
+                        invoice.paid_amount < (invoice.totalAmount ?? 0) ? 'text-red-600' : 'text-emerald-600',
                       )}
                     >
                       Оплачено: {invoice.paid_amount} сом
