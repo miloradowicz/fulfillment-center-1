@@ -1,8 +1,9 @@
 import {
-  Defect,
+  Defect, OrderWithClient, OrderWithProductsAndClients,
   ProductOrder,
   ServiceOrder,
 } from '@/types'
+import { ItemType } from '@/constants.ts'
 
 export interface ErrorsFields {
   client: string
@@ -20,6 +21,8 @@ export interface ErrorsFields {
   service_price?: string
 }
 
+export type OrderData = OrderWithClient | OrderWithProductsAndClients
+
 export type ErrorMessages = Pick<
   ErrorsFields,
   'client'
@@ -29,21 +32,11 @@ export type ErrorMessages = Pick<
   | 'amount'
   | 'defect_description'
   | 'sent_at'
-  | 'delivered_at'
   | 'status'
   | 'service'
   | 'service_amount'
   | 'service_price'
 >
-
-export type ProductField = { product: string | { _id: string } }
-export type ServiceField = { service: string | { _id: string } }
-
-export enum ItemType {
-  PRODUCTS = 'products',
-  DEFECTS = 'defects',
-  SERVICES = 'services',
-}
 
 export type ItemInitialStateMap = {
   [ItemType.PRODUCTS]: ProductOrder,
