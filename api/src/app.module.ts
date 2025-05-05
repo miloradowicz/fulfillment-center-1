@@ -6,7 +6,6 @@ import { ArrivalsModule } from './modules/arrivals.module'
 import { OrdersModule } from './modules/orders.module'
 import { CsrfModule } from './modules/csrf.module'
 import { UsersModule } from './modules/users.module'
-import { LogsModule } from './modules/logs.module'
 import { ValidatorsModule } from './modules/validators.module'
 import { TasksModule } from './modules/tasks.module'
 import { ServicesModule } from './modules/services.module'
@@ -28,7 +27,6 @@ import { InvoicesModule } from './modules/invoices.module'
     OrdersModule,
     TasksModule,
     UsersModule,
-    LogsModule,
     ValidatorsModule,
     ServicesModule,
     StocksModule,

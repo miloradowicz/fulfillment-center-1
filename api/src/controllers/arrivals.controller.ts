@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -18,6 +19,7 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 import { FileUploadInterceptor } from '../utils/uploadFiles'
 import { RolesGuard } from 'src/guards/roles.guard'
 import { Roles } from 'src/decorators/roles.decorator'
+import { RequestWithUser } from '../types'
 
 @UseGuards(RolesGuard)
 @Roles('super-admin', 'admin', 'manager', 'stock-worker')
@@ -54,8 +56,9 @@ export class ArrivalsController {
   @Roles('super-admin', 'admin', 'manager')
   @Post()
   @UseInterceptors(FileUploadInterceptor())
-  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Array<Express.Multer.File>) {
-    return this.arrivalsService.create(arrivalDto, files)
+  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Array<Express.Multer.File>, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.arrivalsService.create(arrivalDto, files, userId)
   }
 
   @Roles('super-admin', 'admin', 'manager')
