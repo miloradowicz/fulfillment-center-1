@@ -94,7 +94,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <CustomSelect<Pick<Order, '_id' | 'orderNumber'>>
           label="Заказ"
           value={availableOrders?.find(c => c._id === form.associatedOrder)?.orderNumber}
-          placeholder="Выберите заказа"
+          placeholder="Выберите заказ"
           options={availableOrdersWithDummy}
           onSelect={id => setForm(prev => ({ ...prev, associatedOrder: id }))}
           popoverKey="order"
@@ -233,7 +233,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </div>
 
         <div className="space-y-2.5">
-          <Label htmlFor="discount">Скидка</Label>
+          <Label htmlFor="discount">Скидка (%)</Label>
           <InputWithError
             id="discount"
             type="number"

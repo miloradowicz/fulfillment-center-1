@@ -183,15 +183,6 @@ const App = () => {
           />
 
           <Route
-            path="/invoices"
-            element={
-              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <InvoicesPage />
-              </AllowedRoute>
-            }
-          />
-
-          <Route
             path="/invoices/:invoiceId"
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
