@@ -20,6 +20,14 @@ export const fetchOrders = createAsyncThunk<Order[]>(
   },
 )
 
+export const fetchOrdersByClientId = createAsyncThunk<Order[], string>(
+  'arrivals/fetchOrdersByClientId',
+  async (clientId: string) => {
+    const response = await axiosAPI.get(`/orders?client=${ clientId }`)
+    return response.data
+  },
+)
+
 export const fetchArchivedOrders = createAsyncThunk<OrderWithClient[]>(
   'orders/fetchArchivedOrders',
   async () => {
@@ -31,7 +39,7 @@ export const fetchArchivedOrders = createAsyncThunk<OrderWithClient[]>(
 export const fetchOrdersWithClient = createAsyncThunk<OrderWithClient[]>(
   'orders/fetchOrdersWithClient',
   async () => {
-    const response = await axiosAPI.get('/orders?client=1')
+    const response = await axiosAPI.get('/orders?populate=1')
     return response.data
   },
 )
