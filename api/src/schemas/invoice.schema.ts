@@ -108,7 +108,3 @@ export class Invoice {
 }
 
 export const InvoiceSchema = SchemaFactory.createForClass(Invoice)
-
-InvoiceSchema.path('associatedArrival').validate(function(this: Invoice, value: mongoose.Types.ObjectId | undefined) {
-  return value || this.associatedOrder
-}, 'Для счета необходимо указать либо поставку, либо заказ. Оба поля могут быть указаны одновременно.')

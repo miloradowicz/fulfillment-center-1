@@ -68,6 +68,22 @@ const arrivalSlice = createSlice({
     clearErrorArrival: state => {
       state.createAndUpdateError = null
     },
+    clearAll: state => {
+      state.arrival = null
+      state.arrivalWithPopulate = null
+      state.arrivalsPopulate = null
+      state.arrivals = null
+      state.archivedArrivals = null
+      state.loadingFetch = false
+      state.loadingFetchArchive = false
+      state.loadingAdd = false
+      state.loadingArchive = false
+      state.loadingUnarchive = false
+      state.loadingDelete = false
+      state.loadingUpdate = false
+      state.error = false
+      state.createAndUpdateError = null
+    }
   },
   extraReducers: builder => {
     builder
@@ -203,4 +219,4 @@ const arrivalSlice = createSlice({
 })
 
 export const arrivalReducer = arrivalSlice.reducer
-export const { clearErrorArrival } = arrivalSlice.actions
+export const { clearErrorArrival, clearAll } = arrivalSlice.actions

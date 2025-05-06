@@ -14,10 +14,10 @@ import { useLocation } from 'react-router-dom'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
 import { createInvoices, fetchInvoiceById, fetchInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
-import { selectAllOrders } from '@/store/slices/orderSlice.ts'
+import { clearAll as clearOrderAll, selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
-import { selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
-import { selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
+import { clearErrors, selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
+import { clearAll as clearArrivalAll, selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -76,12 +76,20 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   const [availableOrdersWithDummy, setAvailableOrdersWithDummy] = useState<Pick<Order, '_id' | 'orderNumber'>[]>([])
 
   useEffect(() => {
+    dispatch(clearErrors())
+    setErrors({ ...initialErrorState })
+  }, [dispatch])
+
+  useEffect(() => {
     dispatch(fetchClients())
     dispatch(fetchServices())
 
     if (form.client) {
       dispatch(fetchArrivalsByClientId(form.client))
       dispatch(fetchOrdersByClientId(form.client))
+    } else {
+      dispatch(clearArrivalAll())
+      dispatch(clearOrderAll())
     }
   }, [dispatch, form.client])
 
@@ -92,7 +100,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }, [form.associatedArrival, initialData?.associatedArrival, lockArrival])
 
   useEffect(() => {
-    if (lockOrder && form.associatedOrder !== initialData?.associatedOrder){
+    if (lockOrder && form.associatedOrder !== initialData?.associatedOrder) {
       setLockOrder(false)
     }
   }, [form.associatedOrder, initialData?.associatedOrder, lockOrder])
@@ -141,15 +149,15 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       )
     }
   },
-  [
-    lockArrival,
-    lockOrder,
-    form.associatedArrival,
-    form.associatedOrder,
-    availableArrivals,
-    availableOrders,
-    services,
-  ])
+    [
+      lockArrival,
+      lockOrder,
+      form.associatedArrival,
+      form.associatedOrder,
+      availableArrivals,
+      availableOrders,
+      services,
+    ])
 
   useEffect(() => {
     const totalAmount = servicesForm.concat(arrivalServicesForm, orderServicesForm)
@@ -166,13 +174,13 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
 
     setTotalAmount(totalAmount)
   },
-  [
-    arrivalServicesForm,
-    orderServicesForm,
-    servicesForm,
-    form.discount,
-    services,
-  ])
+    [
+      arrivalServicesForm,
+      orderServicesForm,
+      servicesForm,
+      form.discount,
+      services,
+    ])
 
   useEffect(() => {
     if (form.paid_amount === undefined || form.paid_amount === 0) {
@@ -183,10 +191,10 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       setInvoiceStatus('оплачено')
     }
   },
-  [
-    totalAmount,
-    form.paid_amount,
-  ])
+    [
+      totalAmount,
+      form.paid_amount,
+    ])
 
   const openModal = () => {
     setNewService(initialServiceState)
@@ -257,7 +265,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       if (initialData) {
         await dispatch(updateInvoice({ id: initialData._id, data: { ...updatedForm } })).unwrap()
 
-        if (location.pathname === `/invoices/${ initialData._id }`) {
+        if (location.pathname === `/invoices/${initialData._id}`) {
           await dispatch(fetchInvoiceById(initialData._id))
         } else {
           await dispatch(fetchInvoices())

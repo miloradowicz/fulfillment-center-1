@@ -6,6 +6,8 @@ import { CreateInvoiceDto, InvoiceServiceDto } from '../dto/create-invoice.dto'
 import { UpdateInvoiceDto } from '../dto/update-invoice.dto'
 import { CounterService } from './counter.service'
 import { Service, ServiceDocument } from '../schemas/service.schema'
+import { ValidationError } from 'class-validator'
+import { DtoValidationError } from 'src/exception-filters/dto-validation-error.filter'
 
 @Injectable()
 export class InvoicesService {
@@ -13,7 +15,7 @@ export class InvoicesService {
     @InjectModel(Invoice.name) private readonly invoiceModel: Model<InvoiceDocument>,
     @InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>,
     private readonly counterService: CounterService,
-  ) {}
+  ) { }
 
   private async calculateTotalAmount(
     services: (InvoiceServiceDto & { type: 'внутренняя' | 'внешняя' })[],
@@ -160,9 +162,20 @@ export class InvoicesService {
     return invoice
   }
 
+  validate(dto: Partial<CreateInvoiceDto>) {
+    if (!dto.associatedArrival && !dto.associatedOrder) {
+      const error = new ValidationError
+      error.property = 'associatedArrival'
+      error.constraints = { ArrivalOrOrder: 'Для счета необходимо указать либо поставку, либо заказ. Оба поля могут быть указаны одновременно.' }
+      throw new DtoValidationError([error])
+    }
+  }
+
   async create(createInvoiceDto: CreateInvoiceDto) {
+    this.validate(createInvoiceDto)
+
     const sequenceNumber = await this.counterService.getNextSequence('invoice')
-    const invoiceNumber = `INV-${ sequenceNumber }`
+    const invoiceNumber = `INV-${sequenceNumber}`
 
     const servicesToUse = ([] as InvoiceServiceDto[]).concat(
       createInvoiceDto.services ?? [],
@@ -174,7 +187,7 @@ export class InvoicesService {
       servicesToUse.map(async item => {
         const serviceDoc = await this.serviceModel.findById(item.service).lean()
         if (!serviceDoc) {
-          throw new Error(`Услуга с ID  ${ item.service.toString() } не найдена`)
+          throw new Error(`Услуга с ID  ${item.service.toString()} не найдена`)
         }
         return {
           ...item,
@@ -183,7 +196,7 @@ export class InvoicesService {
       })
     )
 
-    const totalAmount  = await this.calculateTotalAmount(
+    const totalAmount = await this.calculateTotalAmount(
       populatedServices,
       createInvoiceDto.discount,
     )
@@ -205,13 +218,15 @@ export class InvoicesService {
 
     if (!existing) throw new NotFoundException('Счёт не найден.')
 
+    this.validate(updateDto)
+
     const servicesToUse = ([] as InvoiceServiceDto[]).concat(updateDto.services ?? [], updateDto.associatedArrivalServices ?? [], updateDto.associatedOrderServices ?? [])
 
     const populatedServices = await Promise.all(
       servicesToUse.map(async item => {
         const serviceDoc = await this.serviceModel.findById(item.service).lean()
         if (!serviceDoc) {
-          throw new Error(`Услуга с ID ${ item.service.toString() } не найдена`)
+          throw new Error(`Услуга с ID ${item.service.toString()} не найдена`)
         }
         return {
           ...item,

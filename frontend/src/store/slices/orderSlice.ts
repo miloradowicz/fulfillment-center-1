@@ -27,8 +27,8 @@ interface OrderState {
   archivedOrders: OrderWithClient[] | null
   populateOrder: OrderWithProductsAndClients | null
   ordersWithClient: OrderWithClient[] | null
-  loadingFetch : boolean
-  loadingFetchArchive : boolean
+  loadingFetch: boolean
+  loadingFetchArchive: boolean
   loadingFetchPopulate: boolean
   loadingAdd: boolean
   loadingArchive: boolean
@@ -48,14 +48,14 @@ const initialState: OrderState = {
   ordersWithClient: null,
   loadingFetch: false,
   loadingFetchArchive: false,
-  loadingFetchPopulate:false,
+  loadingFetchPopulate: false,
   loadingAdd: false,
   loadingArchive: false,
   loadingUnarchive: false,
   loadingDelete: false,
   loadingUpdate: false,
   error: null,
-  createAndUpdateError:null,
+  createAndUpdateError: null,
 }
 
 export const selectOrder = (state: RootState) => state.orders.order
@@ -86,6 +86,24 @@ const orderSlice = createSlice({
     clearArchivedOrders: state => {
       state.archivedOrders = null
     },
+    clearAll: state => {
+      state.order = null
+      state.archivedOrder = null
+      state.orders = null
+      state.archivedOrders = null
+      state.populateOrder = null
+      state.ordersWithClient = null
+      state.loadingFetch = false
+      state.loadingFetchArchive = false
+      state.loadingFetchPopulate = false
+      state.loadingAdd = false
+      state.loadingArchive = false
+      state.loadingUnarchive = false
+      state.loadingDelete = false
+      state.loadingUpdate = false
+      state.error = null
+      state.createAndUpdateError = null
+    }
   },
   extraReducers: builder => {
     builder.addCase(fetchOrders.pending, state => {
@@ -148,14 +166,14 @@ const orderSlice = createSlice({
     })
     builder.addCase(fetchOrderByIdWithPopulate.fulfilled, (state, action) => {
       state.loadingFetchPopulate = false
-      state.populateOrder= action.payload
+      state.populateOrder = action.payload
     })
     builder.addCase(fetchOrderByIdWithPopulate.rejected, state => {
       state.loadingFetchPopulate = false
     })
     builder.addCase(addOrder.pending, state => {
       state.loadingAdd = true
-      state.createAndUpdateError=null
+      state.createAndUpdateError = null
     })
     builder.addCase(addOrder.fulfilled, state => {
       state.loadingAdd = false
@@ -221,4 +239,4 @@ const orderSlice = createSlice({
 
 export const orderReducer = orderSlice.reducer
 export const { clearPopulateOrder } = orderSlice.actions
-export const { clearErrorOrder } = orderSlice.actions
+export const { clearErrorOrder, clearAll } = orderSlice.actions
