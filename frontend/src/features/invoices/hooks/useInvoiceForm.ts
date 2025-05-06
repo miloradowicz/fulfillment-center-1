@@ -244,7 +244,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   }
 
   const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
-    let message = validate(field, value)
+    const message = validate(field, value)
 
     if (field === 'associatedArrival' || field === 'associatedOrder') {
       field = 'associatedArrival'
@@ -260,7 +260,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (["client", "associatedArrival", "associatedOrder"].map(key => {
+    if (['client', 'associatedArrival', 'associatedOrder'].map(key => {
       try {
         return validate(key as keyof ErrorMessages, form[key as keyof Pick<InvoiceMutation, 'client' | 'associatedArrival' | 'associatedOrder'>] ?? '')
       } catch {
@@ -291,7 +291,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       if (initialData) {
         await dispatch(updateInvoice({ id: initialData._id, data: { ...updatedForm } })).unwrap()
 
-        if (location.pathname === `/invoices/${initialData._id}`) {
+        if (location.pathname === `/invoices/${ initialData._id }`) {
           await dispatch(fetchInvoiceById(initialData._id))
         } else {
           await dispatch(fetchInvoices())

@@ -60,7 +60,7 @@ const invoicesSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
-    clearCreateAndUpdateError: (state, {payload}: PayloadAction<string>) => {
+    clearCreateAndUpdateError: (state, { payload }: PayloadAction<string>) => {
       if (state.createAndUpdateError){
         delete state.createAndUpdateError.errors[payload]
       }

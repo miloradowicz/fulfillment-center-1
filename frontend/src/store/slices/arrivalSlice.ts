@@ -83,7 +83,7 @@ const arrivalSlice = createSlice({
       state.loadingUpdate = false
       state.error = false
       state.createAndUpdateError = null
-    }
+    },
   },
   extraReducers: builder => {
     builder

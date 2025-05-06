@@ -103,7 +103,7 @@ const orderSlice = createSlice({
       state.loadingUpdate = false
       state.error = null
       state.createAndUpdateError = null
-    }
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchOrders.pending, state => {
