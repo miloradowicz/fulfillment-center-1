@@ -10,8 +10,6 @@ import { Model } from 'mongoose'
 import { CreateStockDto } from '../src/dto/create-stock.dto'
 import { UpdateStockDto } from '../src/dto/update-stock.dto'
 import { StockManipulationService } from 'src/services/stock-manipulation.service'
-import {ArrivalDocument} from "../src/schemas/arrival.schema";
-import {OrderDocument} from "../src/schemas/order.schema";
 
 describe('StocksService', () => {
   let service: StocksService
