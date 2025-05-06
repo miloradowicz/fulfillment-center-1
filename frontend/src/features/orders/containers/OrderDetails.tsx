@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge.tsx'
 import { cn } from '@/lib/utils.ts'
 import { ArrowUpRight, ClipboardList, File, Minus, Phone } from 'lucide-react'
 import CopyText from '@/components/CopyText/CopyText.tsx'
-import { orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
+import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
@@ -47,21 +47,39 @@ const OrderDetails = () => {
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge
-                  className={cn(
-                    orderStatusStyles[order.status] || orderStatusStyles.default,
-                    'py-2 px-2.5 font-bold mb-4',
-                  )}
-                >
-                  {capitalize(order.status)}
-                </Badge>
+                <h3 className="text-xl font-bold flex gap-1 items-center mb-4">
+                  <ClipboardList/>
+                  {order.orderNumber}
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="flex flex-col">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Доставка</p>
+                    <Badge
+                      className={cn(
+                        orderStatusStyles[order.status] || orderStatusStyles.default,
+                        'py-1.5 px-3 font-bold text-center',
+                      )}
+                    >
+                      {capitalize(order.status)}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Оплата</p>
+                    {order.paymentStatus !== undefined && (
+                      <Badge
+                        className={cn(
+                          invoiceStatusStyles[order.paymentStatus as 'в ожидании' | 'оплачено' | 'частично оплачено'] || invoiceStatusStyles['в ожидании'],
+                          'py-1.5 px-3 font-bold text-center',
+                        )}
+                      >
+                        {capitalize(order.paymentStatus ?? 'в ожидании')}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
 
                 <div className="space-y-5">
-                  <h3 className="text-xl font-bold flex gap-1 items-center mb-3">
-                    <ClipboardList />
-                    {order.orderNumber}
-                  </h3>
-
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-muted-foreground">Дата отправки</p>
                     <p className="font-bold">{dayjs(order.sent_at).format('D MMMM YYYY')}</p>
@@ -73,7 +91,7 @@ const OrderDetails = () => {
                       {order.delivered_at ? (
                         dayjs(order.delivered_at).format('D MMMM YYYY')
                       ) : (
-                        <Minus className="w-6 h-6" />
+                        <Minus className="w-6 h-6"/>
                       )}
                     </p>
                   </div>
