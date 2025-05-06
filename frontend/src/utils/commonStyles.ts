@@ -18,11 +18,12 @@ export const orderStatusStyles: Record<string, string> = {
   default: 'bg-primary/10 text-primary/80 border font-bold hover:bg-primary/20 hover:text-primary transition-colors',
 }
 
-export const invoiceStatusStyles: Record<'в ожидании' | 'оплачено' | 'частично оплачено', string> = {
+export const invoiceStatusStyles: Record<string, string> = {
   'в ожидании':
-    'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
-  'оплачено':
-    'bg-emerald-100 text-emerald-700 transition-colors rounded-lg font-bold px-4 py-2',
+    'bg-yellow-100 text-yellow-600 rounded-lg font-bold',
   'частично оплачено':
-    'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
+    'bg-indigo-100 text-indigo-700 rounded-lg font-bold',
+  'оплачено':
+    'bg-emerald-100 text-emerald-700 rounded-lg font-bold',
+  'default': 'bg-primary/10 text-primary/80 border font-bold',
 }

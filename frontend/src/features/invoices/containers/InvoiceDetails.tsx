@@ -17,12 +17,14 @@ import useInvoiceDetails from '../hooks/useInvoiceDetails'
 import InvoiceServicesTable from '@/components/Tables/InvoiceServicesTable.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter'
+import Modal from '@/components/Modal/Modal'
+import InvoiceForm from '../components/InvoiceForm'
 
 const InvoiceDetails = () => {
   const {
     invoice,
     loading,
-    // editModalOpen,
+    editModalOpen,
     setEditModalOpen,
     confirmArchiveModalOpen,
     setConfirmArchiveModalOpen,
@@ -40,9 +42,9 @@ const InvoiceDetails = () => {
 
       {invoice ? (
         <>
-          {/*<Modal open={editModalOpen} handleClose={() => setEditModalOpen(false)}>*/}
-          {/*  <InvoiceForm initialData={invoice} onSuccess={() => setEditModalOpen(false)} />* <-- добавить после реализации формы/}
-          {/*</Modal>*/}
+          <Modal open={editModalOpen} handleClose={() => setEditModalOpen(false)}>
+            <InvoiceForm initialData={{ ...invoice, associatedArrival: invoice.associatedArrival?._id, associatedOrder: invoice.associatedOrder?._id }} onSuccess={() => setEditModalOpen(false)} />
+          </Modal>
 
           <ConfirmationModal
             open={confirmArchiveModalOpen}

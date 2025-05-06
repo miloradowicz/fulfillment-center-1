@@ -6,28 +6,29 @@ import InvoicesDataList from '@/features/invoices/components/InvoicesDataList.ts
 import { useInvoicesPage } from '@/features/invoices/hooks/useInvoicesPage.ts'
 import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import InvoiceForm from '../components/InvoiceForm'
 
 const InvoicesPage = () => {
-  const { open, handleOpen, handleClose, loading } = useInvoicesPage()
+  const { open, handleOpenCreate, handleClose, loading, handleOpenEdit, invoiceToEdit } = useInvoicesPage()
 
   return (
     <>
       {loading && <Loader />}
 
-      <Modal handleClose={handleClose} open={open}>
-        Форма создания
+      <Modal open={open} handleClose={handleClose}>
+        <InvoiceForm initialData={invoiceToEdit} onSuccess={handleClose} />
       </Modal>
 
       <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between gap-4">
         <CustomTitle text={'Счета'} icon={<Receipt size={25} />} />
 
         <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-          <CustomButton text={'Добавить счет'} onClick={handleOpen} />
+          <CustomButton text={'Добавить счет'} onClick={handleOpenCreate} />
         </ProtectedElement>
       </div>
 
       <div className="my-8">
-        <InvoicesDataList onEdit={() => console.log('Редактирование')} />
+        <InvoicesDataList onEdit={handleOpenEdit} />
       </div>
     </>
   )

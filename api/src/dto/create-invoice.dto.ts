@@ -7,6 +7,8 @@ import {
   ValidateNested,
   ValidateIf,
   IsNumber,
+  Min,
+  Max,
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import mongoose from 'mongoose'
@@ -66,11 +68,12 @@ export class CreateInvoiceDto {
   totalAmount: number
 
   @IsOptional()
-  @IsPositive({ message: 'Сумма должна быть больше 0.' })
+  @Min(0, { message: 'Сумма должна быть не меньше 0.' })
   paid_amount: number
 
   @IsOptional()
-  @IsPositive({ message: 'Скидка должна быть больше 0.' })
+  @Min(0, { message: 'Скидка должна быть не меньше 0.' })
+  @Max(100, { message: 'Скидка должна быть не больше 0.' })
   discount: number
 
   @IsOptional()

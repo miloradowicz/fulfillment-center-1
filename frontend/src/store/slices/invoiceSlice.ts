@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GlobalError, Invoice, ValidationError } from '@/types'
 import { RootState } from '@/app/store'
 import {
@@ -22,14 +22,14 @@ interface InvoiceState {
   loadingArchive: boolean
   loadingUnarchive: boolean
   error: GlobalError | null
-  createError: ValidationError | null
+  createAndUpdateError: ValidationError | null
   updateError: ValidationError | null
 }
 
 const initialState: InvoiceState = {
-  invoices:  null,
+  invoices: null,
   archivedInvoices: null,
-  invoice:  null,
+  invoice: null,
   loadingFetch: false,
   loadingFetchArchive: false,
   loadingAdd: false,
@@ -38,7 +38,7 @@ const initialState: InvoiceState = {
   loadingArchive: false,
   loadingUnarchive: false,
   error: null,
-  createError: null,
+  createAndUpdateError: null,
   updateError: null,
 }
 
@@ -46,7 +46,7 @@ export const selectAllInvoices = (state: RootState) => state.invoices.invoices
 export const selectAllArchivedInvoices = (state: RootState) => state.invoices.archivedInvoices
 export const selectOneInvoice = (state: RootState) => state.invoices.invoice
 export const selectInvoiceError = (state: RootState) => state.invoices.error
-export const selectInvoiceCreateError = (state: RootState) => state.invoices.createError
+export const selectInvoiceCreateAndUpdateError = (state: RootState) => state.invoices.createAndUpdateError
 export const selectInvoiceUpdateError = (state: RootState) => state.invoices.updateError
 
 export const selectLoadingFetch = (state: RootState) => state.invoices.loadingFetch
@@ -60,8 +60,13 @@ const invoicesSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
+    clearCreateAndUpdateError: (state, { payload }: PayloadAction<string>) => {
+      if (state.createAndUpdateError){
+        delete state.createAndUpdateError.errors[payload]
+      }
+    },
     clearErrors: state => {
-      state.createError = null
+      state.createAndUpdateError = null
       state.updateError = null
       state.error = null
     },
@@ -106,28 +111,28 @@ const invoicesSlice = createSlice({
 
       .addCase(createInvoices.pending, state => {
         state.loadingAdd = true
-        state.createError = null
+        state.createAndUpdateError = null
       })
       .addCase(createInvoices.fulfilled, state => {
         state.loadingAdd = false
-        state.createError = null
+        state.createAndUpdateError = null
       })
       .addCase(createInvoices.rejected, (state, { payload: error }) => {
         state.loadingAdd = false
-        state.createError = error || null
+        state.createAndUpdateError = error || null
       })
 
       .addCase(updateInvoice.pending, state => {
         state.loadingUpdate = true
-        state.updateError = null
+        state.createAndUpdateError = null
       })
       .addCase(updateInvoice.fulfilled, state => {
         state.loadingUpdate = false
-        state.updateError = null
+        state.createAndUpdateError = null
       })
       .addCase(updateInvoice.rejected, (state, { payload: error }) => {
         state.loadingUpdate = false
-        state.updateError = error || null
+        state.createAndUpdateError = error || null
       })
 
       .addCase(archiveInvoice.pending, state => {
@@ -174,5 +179,5 @@ const invoicesSlice = createSlice({
   },
 })
 
-export const { clearErrors } = invoicesSlice.actions
+export const { clearErrors, clearCreateAndUpdateError } = invoicesSlice.actions
 export const invoicesReducer = invoicesSlice.reducer

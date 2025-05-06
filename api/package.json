@@ -9,6 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "seed": "nest start --config src/seeder/nest-cli.json",
+    "seed:debug": "node --inspect-wait node_modules/.bin/nest start --config src/seeder/nest-cli.json",
     "start": "dotenvx run -- nest start",
     "start:dev": "dotenvx run -f .env.development -- nest start --watch",
     "dev": "dotenvx run -f .env.development -- nest start --watch",
