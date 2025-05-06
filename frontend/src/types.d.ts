@@ -268,6 +268,8 @@ export interface ErrorsFields {
   service_price?: string
   paid_amount?: string
   discount?: string
+  associatedArrival?: string
+  associatedOrder?: string
 }
 
 export interface Task {

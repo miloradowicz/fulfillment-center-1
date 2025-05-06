@@ -15,15 +15,13 @@ export const initialServiceState = {
 
 export const initialErrorState = {
   client: '',
-  product: '',
-  arrival_price: '',
-  arrival_date: '',
-  amount: '',
-  stock: '',
   service: '',
   service_amount: '',
-  defect_description: '',
-  arrival_status: '',
+  service_price: '',
+  associatedArrival: '',
+  associatedOrder: '',
+  paid_amount: '',
+  discount: '',
 }
 
 export type FormType = 'arrival' | 'product'

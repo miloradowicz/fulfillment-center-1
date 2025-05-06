@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GlobalError, Invoice, ValidationError } from '@/types'
 import { RootState } from '@/app/store'
 import {
@@ -60,6 +60,11 @@ const invoicesSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
+    clearCreateAndUpdateError: (state, {payload}: PayloadAction<string>) => {
+      if (state.createAndUpdateError){
+        delete state.createAndUpdateError.errors[payload]
+      }
+    },
     clearErrors: state => {
       state.createAndUpdateError = null
       state.updateError = null
@@ -174,5 +179,5 @@ const invoicesSlice = createSlice({
   },
 })
 
-export const { clearErrors } = invoicesSlice.actions
+export const { clearErrors, clearCreateAndUpdateError } = invoicesSlice.actions
 export const invoicesReducer = invoicesSlice.reducer

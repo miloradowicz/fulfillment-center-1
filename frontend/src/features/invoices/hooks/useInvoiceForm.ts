@@ -16,7 +16,7 @@ import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
 import { createInvoices, fetchInvoiceById, fetchInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
 import { clearAll as clearOrderAll, selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
-import { clearErrors, selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
+import { clearCreateAndUpdateError, clearErrors, selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
 import { clearAll as clearArrivalAll, selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
@@ -149,15 +149,15 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       )
     }
   },
-    [
-      lockArrival,
-      lockOrder,
-      form.associatedArrival,
-      form.associatedOrder,
-      availableArrivals,
-      availableOrders,
-      services,
-    ])
+  [
+    lockArrival,
+    lockOrder,
+    form.associatedArrival,
+    form.associatedOrder,
+    availableArrivals,
+    availableOrders,
+    services,
+  ])
 
   useEffect(() => {
     const totalAmount = servicesForm.concat(arrivalServicesForm, orderServicesForm)
@@ -174,13 +174,13 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
 
     setTotalAmount(totalAmount)
   },
-    [
-      arrivalServicesForm,
-      orderServicesForm,
-      servicesForm,
-      form.discount,
-      services,
-    ])
+  [
+    arrivalServicesForm,
+    orderServicesForm,
+    servicesForm,
+    form.discount,
+    services,
+  ])
 
   useEffect(() => {
     if (form.paid_amount === undefined || form.paid_amount === 0) {
@@ -190,11 +190,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
     } else {
       setInvoiceStatus('оплачено')
     }
-  },
-    [
-      totalAmount,
-      form.paid_amount,
-    ])
+  }, [totalAmount, form.paid_amount])
 
   const openModal = () => {
     setNewService(initialServiceState)
@@ -227,7 +223,7 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
     setter(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
+  const validate = (field: keyof ErrorMessages, value: string | number) => {
     const errorMessages: ErrorMessages = {
       client: !value ? ErrorMessagesList.ClientErr : ErrorMessagesList.Default,
       service: !value ? ErrorMessagesList.ServiceName : ErrorMessagesList.Default,
@@ -236,14 +232,44 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
       paid_amount: value !== '' && (Number(value) < 0 || Number(value) > totalAmount) ? ErrorMessagesList.PaidAmount : '',
     }
 
+    if (field === 'associatedArrival') {
+      errorMessages.associatedArrival = !form.associatedOrder && !value ? ErrorMessagesList.AssociatedArrival : ErrorMessagesList.Default
+      errorMessages.associatedOrder = !form.associatedOrder && !value ? ErrorMessagesList.AssociatedArrival : ErrorMessagesList.Default
+    } else if (field === 'associatedOrder') {
+      errorMessages.associatedArrival = !form.associatedArrival && !value ? ErrorMessagesList.AssociatedArrival : ErrorMessagesList.Default
+      errorMessages.associatedOrder = !form.associatedArrival && !value ? ErrorMessagesList.AssociatedArrival : ErrorMessagesList.Default
+    }
+
+    return errorMessages[field]
+  }
+
+  const handleBlur = (field: keyof ErrorMessages, value: string | number) => {
+    let message = validate(field, value)
+
+    if (field === 'associatedArrival' || field === 'associatedOrder') {
+      field = 'associatedArrival'
+      dispatch(clearCreateAndUpdateError(field))
+    }
+
     setErrors(prev => ({
       ...prev,
-      [field]: errorMessages[field] || '',
+      [field]: message || '',
     }))
   }
 
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (["client", "associatedArrival", "associatedOrder"].map(key => {
+      try {
+        return validate(key as keyof ErrorMessages, form[key as keyof Pick<InvoiceMutation, 'client' | 'associatedArrival' | 'associatedOrder'>] ?? '')
+      } catch {
+        return ''
+      }
+    }).some(x => x !== '')) {
+      toast.error('Заполните все обязательные поля.')
+      return
+    }
 
     if (Object.values(errors).filter(Boolean).length) {
       toast.error('Заполните все обязательные поля.')

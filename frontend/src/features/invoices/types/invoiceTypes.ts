@@ -10,6 +10,8 @@ export type InvoiceData = Omit<Invoice, 'associatedArrival' | 'associatedOrder'>
 
 export type ErrorMessages = Pick<ErrorsFields,
   'client'
+  | 'associatedArrival'
+  | 'associatedOrder'
   | 'service'
   | 'service_amount'
   | 'service_price'

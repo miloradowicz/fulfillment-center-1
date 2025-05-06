@@ -87,7 +87,8 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           searchPlaceholder="Поиск поставки..."
           activePopover={activePopover}
           setActivePopover={setActivePopover}
-          error={getFieldError('associatedArrival', error)}
+          error={errors.associatedArrival || getFieldError('associatedArrival', error)}
+          onBlur={e => handleBlur('associatedArrival', e.target.value)}
           renderValue={x => x.arrivalNumber ?? x._id}
         />
 
@@ -101,7 +102,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           searchPlaceholder="Поиск заказа..."
           activePopover={activePopover}
           setActivePopover={setActivePopover}
-          error={getFieldError('associatedOrder', error)}
+          onBlur={e => handleBlur('associatedOrder', e.target.value)}
           renderValue={x => x.orderNumber ?? x._id}
         />
 
