@@ -7,8 +7,6 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal'
-// import Modal from '@/components/Modal/Modal'
-// import InvoiceForm from './InvoiceForm'
 import { ColumnDef } from '@tanstack/react-table'
 
 interface Props {
@@ -21,7 +19,6 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
     handleArchiveClick,
     handleConfirmArchive,
     handleClose,
-    // isOpen,
     archiveModalOpen,
   } = useInvoicesList()
 
@@ -118,12 +115,6 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
         onConfirm={handleConfirmArchive}
         onCancel={handleClose}
       />
-
-      {/*<div className="my-8">*/}
-      {/*/!*  <Modal handleClose={handleClose} open={isOpen}>*!/  <--- подключить, когда будет готова форма*/}
-      {/*    <InvoiceForm />*/}
-      {/*  </Modal>*/}
-      {/*</div>*/}
     </div>
   )
 }
