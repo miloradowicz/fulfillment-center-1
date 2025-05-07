@@ -20,7 +20,6 @@ import CounterpartiesPage from './features/counterparties/containers/Counterpart
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 import AdminPage from '@/features/admin/containers/AdminPage.tsx'
 import InvoiceDetails from './features/invoices/containers/InvoiceDetails.tsx'
-import InvoicesPage from './features/invoices/containers/InvoicesPage.tsx'
 
 const App = () => {
   const user = useAppSelector(selectUser)
