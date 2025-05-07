@@ -5,7 +5,6 @@ import { Task, TaskDocument } from '../schemas/task.schema'
 import {
   ArrivalWithClient,
   clientFullReport,
-  clientOrderReport,
   DailyTaskCount, InvoiceWithClient,
   OrderWithClient,
   TaskInterface,
