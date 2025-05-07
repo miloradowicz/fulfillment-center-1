@@ -166,8 +166,8 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
 
         return (
           x.service_amount *
-          (x.service_price ?? service?.price) *
-          ((x.service_type ?? service?.type) === 'внутренняя' ? 1 - (form.discount ?? 0) / 100 : 1)
+                  (x.service_price ?? service?.price) *
+                  ((x.service_type ?? service?.type) === 'внутренняя' ? 1 - (form.discount ?? 0) / 100 : 1)
         )
       })
       .reduce((a, x) => a + x, 0)
@@ -183,9 +183,11 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   ])
 
   useEffect(() => {
-    if (form.paid_amount === undefined || form.paid_amount === 0) {
+    const paid = Number(form.paid_amount) || 0
+
+    if (!paid) {
       setInvoiceStatus('в ожидании')
-    } else if (form.paid_amount < totalAmount) {
+    } else if (paid < totalAmount) {
       setInvoiceStatus('частично оплачено')
     } else {
       setInvoiceStatus('оплачено')

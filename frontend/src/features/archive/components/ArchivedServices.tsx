@@ -25,7 +25,7 @@ const ArchivedServices = () => {
       name: '',
       serviceCategory: { _id:'', name: '' },
       price: 0,
-      type: '',
+      type: undefined,
     },
     services?.length || 3,
   )
