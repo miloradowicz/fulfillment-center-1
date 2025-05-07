@@ -187,6 +187,7 @@ export interface Order {
   delivered_at?: string
   comment?: string
   status: string
+  paymentStatus: string
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
