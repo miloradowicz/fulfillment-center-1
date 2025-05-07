@@ -213,7 +213,7 @@ const InvoiceDetails = () => {
                           Оплачено: {invoice.paid_amount} сом
                         </div>
                         {invoice.paid_amount < (invoice.totalAmount ?? 0) && (
-                          <div className="text-lg font-bold text-destructive">
+                          <div className="font-bold text-destructive">
                             Долг: {(invoice.totalAmount ?? 0) - invoice.paid_amount} сом
                           </div>
                         )}
