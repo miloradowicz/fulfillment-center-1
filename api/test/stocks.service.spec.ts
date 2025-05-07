@@ -60,6 +60,14 @@ describe('StocksService', () => {
         StocksService,
         StockManipulationService,
         {
+          provide: getModelToken('Arrival'),
+          useValue: {},
+        },
+        {
+          provide: getModelToken('Order'),
+          useValue: {},
+        },
+        {
           provide: getModelToken(Stock.name),
           useValue: {
             find: jest.fn().mockImplementation(() => ({
@@ -80,7 +88,6 @@ describe('StocksService', () => {
 
     service = module.get<StocksService>(StocksService)
     stockModel = module.get<Model<StockDocument>>(getModelToken(Stock.name))
-
     // Сбросим моки перед каждым тестом
     jest.clearAllMocks()
   })
@@ -214,26 +221,61 @@ describe('StocksService', () => {
   })
 
   describe('archive', () => {
-    it('should archive a stock', async () => {
-      const result = await service.archive(mockStock._id)
+    it('should throw ForbiddenException if stock contains active products', async () => {
+      const stockWithActiveProducts = {
+        ...mockStock,
+        products: [{ product: new mongoose.Types.ObjectId(), amount: 5 }],
+      }
+      const mockQuery = { exec: jest.fn().mockResolvedValue(stockWithActiveProducts) }
+      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any);
+      await expect(service.archive(stockWithActiveProducts._id)).rejects.toThrow(
+        new ForbiddenException('На складе ещё есть товары. Архивация невозможна.')
+      )
+    })
 
-      expect(stockModel.findByIdAndUpdate).toHaveBeenCalledWith(mockStock._id, { isArchived: true })
+    it('should archive a stock if no active products and not archived and not locked', async () => {
+      const stockId = new mongoose.Types.ObjectId('681a49b9d769618a17d85eb1')
+
+      const stockWithoutActiveProducts = {
+        _id: stockId,
+        products: [],
+        defects: [],
+        isArchived: false,
+        save: jest.fn().mockResolvedValue(true),
+      }
+
+      const mockQuery = { exec: jest.fn().mockResolvedValue(stockWithoutActiveProducts) }
+      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any)
+
+      const isLockedSpy = jest.spyOn(service, 'isLockedForArchive').mockResolvedValue(false)
+
+      const saveMock = jest.spyOn(stockWithoutActiveProducts, 'save').mockResolvedValue(stockWithoutActiveProducts)
+
+      const result = await service.archive(stockId.toString());
+
+      expect(isLockedSpy).toHaveBeenCalledWith(stockId.toString())
+      expect(saveMock).toHaveBeenCalled();
       expect(result).toEqual({ message: 'Склад перемещен в архив.' })
     })
 
     it('should throw NotFoundException if stock not found', async () => {
-      jest.spyOn(stockModel, 'findByIdAndUpdate').mockResolvedValue(null)
+      const mockQuery = { exec: jest.fn().mockResolvedValue(null) };
+      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any);
 
-      await expect(service.archive('nonexistent-id')).rejects.toThrow(NotFoundException)
-    })
+      await expect(service.archive('nonexistent-id')).rejects.toThrow(
+        new NotFoundException('Склад не найден.')
+      );
+    });
 
     it('should throw ForbiddenException if stock already archived', async () => {
-      jest.spyOn(stockModel, 'findByIdAndUpdate').mockResolvedValue(mockArchivedStock)
-
-      await expect(service.archive(mockArchivedStock._id)).rejects.toThrow(ForbiddenException)
-    })
-  })
-
+      const archivedStock = { ...mockStock, isArchived: true };
+      const mockQuery = { exec: jest.fn().mockResolvedValue(archivedStock) };
+      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any);
+      await expect(service.archive(archivedStock._id)).rejects.toThrow(
+        new ForbiddenException('Склад уже в архиве.')
+      );
+    });
+  });
   describe('unarchive', () => {
     it('should unarchive a stock', async () => {
       jest.spyOn(stockModel, 'findById').mockImplementation(
@@ -270,17 +312,59 @@ describe('StocksService', () => {
   })
 
   describe('delete', () => {
-    it('should delete a stock', async () => {
-      const result = await service.delete(mockStock._id)
-
-      expect(stockModel.findByIdAndDelete).toHaveBeenCalledWith(mockStock._id)
+    it('should delete a stock if no active products and not locked', async () => {
+      const stockWithoutProducts = {
+        ...mockStock,
+        products: [],
+      }
+      jest.spyOn(stockModel, 'findById').mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(stockWithoutProducts),
+      }) as any)
+      jest.spyOn(service, 'isLocked').mockResolvedValue(false)
+      const deleteSpy = jest.spyOn(stockModel, 'findByIdAndDelete').mockResolvedValue(stockWithoutProducts as any)
+      const result = await service.delete(stockWithoutProducts._id)
+      expect(deleteSpy).toHaveBeenCalledWith(stockWithoutProducts._id)
       expect(result).toEqual({ message: 'Склад успешно удален.' })
     })
 
     it('should throw NotFoundException if stock not found', async () => {
-      jest.spyOn(stockModel, 'findByIdAndDelete').mockResolvedValue(null)
+      jest.spyOn(stockModel, 'findById').mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }) as any)
 
       await expect(service.delete('nonexistent-id')).rejects.toThrow(NotFoundException)
+    })
+
+    it('should throw ForbiddenException if stock has active products', async () => {
+      const stockWithProducts = {
+        ...mockStock,
+        products: [{ product: new mongoose.Types.ObjectId(), amount: 5 }],
+      }
+
+      jest.spyOn(stockModel, 'findById').mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(stockWithProducts),
+      }) as any)
+
+      await expect(service.delete(stockWithProducts._id)).rejects.toThrow(
+        new ForbiddenException('На складе есть товары. Удаление невозможно.')
+      )
+    })
+
+    it('should throw ForbiddenException if stock is locked', async () => {
+      const stockWithoutProducts = {
+        ...mockStock,
+        products: [],
+      }
+
+      jest.spyOn(stockModel, 'findById').mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(stockWithoutProducts),
+      }) as any)
+
+      jest.spyOn(service, 'isLocked').mockResolvedValue(true)
+
+      await expect(service.delete(stockWithoutProducts._id)).rejects.toThrow(
+        new ForbiddenException('Склад участвует в архивироавнных поставках или заказах. Удаление невозможно.')
+      )
     })
   })
 })
