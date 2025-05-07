@@ -25,7 +25,7 @@ const ProductDetails: React.FC<Props> = ({ productId }) => {
     <>
       {product && (
         <div className="py-10 space-y-3 text-sm sm:text-md text-primary">
-          <div className="flex justify-center items-center gap-2 mb-4 ps-4 rounded-md bg-blue-100 text-blue-600 sm:py-2">
+          <div className="flex justify-center items-center gap-2 mb-4 ps-4 rounded-md bg-blue-100 text-blue-600 py-2">
             <Package className="w-6 h-6" />
             <h5 className="font-bold">{product.title}</h5>
           </div>

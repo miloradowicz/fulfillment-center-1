@@ -101,7 +101,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
           validateFields('role')
         }}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Выберите роль" />
         </SelectTrigger>
         <SelectContent>
