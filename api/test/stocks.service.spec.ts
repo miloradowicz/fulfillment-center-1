@@ -230,26 +230,33 @@ describe('StocksService', () => {
       jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any);
       await expect(service.archive(stockWithActiveProducts._id)).rejects.toThrow(
         new ForbiddenException('На складе ещё есть товары. Архивация невозможна.')
-      );
-    });
+      )
+    })
 
-    it('should archive a stock if no active products and not archived', async () => {
+    it('should archive a stock if no active products and not archived and not locked', async () => {
+      const stockId = new mongoose.Types.ObjectId('681a49b9d769618a17d85eb1')
+
       const stockWithoutActiveProducts = {
-        _id: new mongoose.Types.ObjectId('681a49b9d769618a17d85eb1'),
+        _id: stockId,
         products: [],
         defects: [],
         isArchived: false,
         save: jest.fn().mockResolvedValue(true),
-      };
+      }
 
-      const mockQuery = { exec: jest.fn().mockResolvedValue(stockWithoutActiveProducts) };
-      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any);
-      const saveMock = jest.spyOn(stockWithoutActiveProducts, 'save').mockResolvedValue(stockWithoutActiveProducts);
-      const result = await service.archive(stockWithoutActiveProducts._id.toString());
+      const mockQuery = { exec: jest.fn().mockResolvedValue(stockWithoutActiveProducts) }
+      jest.spyOn(stockModel, 'findById').mockReturnValue(mockQuery as any)
+
+      const isLockedSpy = jest.spyOn(service, 'isLockedForArchive').mockResolvedValue(false)
+
+      const saveMock = jest.spyOn(stockWithoutActiveProducts, 'save').mockResolvedValue(stockWithoutActiveProducts)
+
+      const result = await service.archive(stockId.toString());
+
+      expect(isLockedSpy).toHaveBeenCalledWith(stockId.toString())
       expect(saveMock).toHaveBeenCalled();
-      expect(result).toEqual({ message: 'Склад перемещен в архив.' });
-    });
-
+      expect(result).toEqual({ message: 'Склад перемещен в архив.' })
+    })
 
     it('should throw NotFoundException if stock not found', async () => {
       const mockQuery = { exec: jest.fn().mockResolvedValue(null) };
@@ -356,7 +363,7 @@ describe('StocksService', () => {
       jest.spyOn(service, 'isLocked').mockResolvedValue(true)
 
       await expect(service.delete(stockWithoutProducts._id)).rejects.toThrow(
-        new ForbiddenException('Склад участвует в поставках или заказах. Удаление невозможно.')
+        new ForbiddenException('Склад участвует в архивироавнных поставках или заказах. Удаление невозможно.')
       )
     })
   })

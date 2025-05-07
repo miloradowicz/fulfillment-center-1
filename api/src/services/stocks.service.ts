@@ -43,19 +43,6 @@ export class StocksService {
     return stock
   }
 
-  async isLocked(id: string) {
-    const stock = await this.stockModel.findById(id)
-    if (!stock) throw new NotFoundException('Склад не найден')
-    const arrivals = await this.arrivalModel.find({
-      stock: stock._id,
-    })
-    if (arrivals.length) return true
-    const orders = await this.orderModel.find({
-      stock: stock._id,
-    })
-    return !!orders.length
-  }
-
   async getArchivedById(id: string) {
     const stock = await this.stockModel.findById(id).exec()
 
@@ -105,6 +92,25 @@ export class StocksService {
     return writeOffDto
   }
 
+  async isLockedForArchive(id: string): Promise<boolean> {
+    const stock = await this.stockModel.findById(id)
+    if (!stock) throw new NotFoundException('Склад не найден')
+
+    const activeArrivals = await this.arrivalModel.find({
+      stock: stock._id,
+      $or: [{ isArchived: false }, { isArchived: { $exists: false } }],
+    })
+
+    if (activeArrivals.length > 0) return true
+
+    const activeOrders = await this.orderModel.find({
+      stock: stock._id,
+      $or: [{ isArchived: false }, { isArchived: { $exists: false } }],
+    })
+
+    return activeOrders.length > 0
+  }
+
   async archive(id: string) {
     const stock = await this.stockModel.findById(id).exec()
 
@@ -116,6 +122,10 @@ export class StocksService {
 
     if (hasActiveProducts) {
       throw new ForbiddenException('На складе ещё есть товары. Архивация невозможна.')
+    }
+    const isLockedForArchive = await this.isLockedForArchive(id)
+    if (isLockedForArchive) {
+      throw new ForbiddenException('Склад участвует в неархивированных поставках или заказах. Архивация невозможна.')
     }
 
     stock.isArchived = true
@@ -136,6 +146,19 @@ export class StocksService {
     return { message: 'Склад восстановлен из архива' }
   }
 
+  async isLocked(id: string) {
+    const stock = await this.stockModel.findById(id)
+    if (!stock) throw new NotFoundException('Склад не найден')
+    const arrivals = await this.arrivalModel.find({
+      stock: stock._id,
+    })
+    if (arrivals.length) return true
+    const orders = await this.orderModel.find({
+      stock: stock._id,
+    })
+    return !!orders.length
+  }
+
   async delete(id: string) {
     const stock = await this.stockModel.findById(id).exec()
     if (!stock) throw new NotFoundException('Склад не найден.')
@@ -147,7 +170,7 @@ export class StocksService {
 
     const isLocked = await this.isLocked(id)
     if (isLocked) {
-      throw new ForbiddenException('Склад участвует в поставках или заказах. Удаление невозможно.')
+      throw new ForbiddenException('Склад участвует в архивироавнных поставках или заказах. Удаление невозможно.')
     }
 
     await this.stockModel.findByIdAndDelete(id)
