@@ -8,28 +8,43 @@ import { CounterService } from './counter.service'
 import { DocumentObject } from './arrivals.service'
 import { FilesService } from './files.service'
 import { StockManipulationService } from './stock-manipulation.service'
+import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(Invoice.name) private readonly invoiceModel: Model<InvoiceDocument>,
     private readonly counterService: CounterService,
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
-  ) { }
+  ) {}
 
-  async getAll() {
-    const orders = await this.orderModel.find({ isArchived: false }).populate('stock').exec()
-    return orders.reverse()
+  async getAllByClient(clientId: string, populate: boolean) {
+    const unarchived = this.orderModel.find({ isArchived: false }).populate('stock')
+
+    if (populate) {
+      return (await unarchived.find({ client: clientId }).populate('client')).reverse()
+    }
+
+    return (await unarchived.find({ client: clientId })).reverse()
+  }
+
+  async getAll(populate: boolean) {
+    const unarchived = this.orderModel.find({ isArchived: false }).populate('stock')
+
+    if (populate) {
+      return (await unarchived.populate('client')).reverse()
+    }
+
+    return (await unarchived).reverse()
   }
 
   async getAllArchived() {
-    const orders = await this.orderModel
-      .find({ isArchived: true })
-      .populate('client stock')
-      .exec()
+    const orders = await this.orderModel.find({ isArchived: true }).populate('client stock').exec()
     return orders.reverse()
   }
+
   async getAllWithClient() {
     const orders = await this.orderModel.find({ isArchived: false }).populate('client stock').exec()
     return orders.reverse()
@@ -48,7 +63,7 @@ export class OrdersService {
   async getByIdWithPopulate(id: string) {
     const order = await this.orderModel
       .findById(id)
-      .populate('client products.product defects.product stock')
+      .populate('client products.product defects.product stock invoice')
       .populate({
         path: 'services.service',
         populate: {
@@ -56,12 +71,18 @@ export class OrdersService {
           model: 'ServiceCategory',
         },
       })
+      .lean()
       .exec()
 
     if (!order) throw new NotFoundException('Заказ не найден')
     if (order.isArchived) throw new ForbiddenException('Заказ в архиве')
 
-    return order
+    const invoice = await this.invoiceModel.findOne({ associatedOrder: order._id }).lean().exec()
+
+    return {
+      ...order,
+      paymentStatus: invoice?.status ?? null,
+    }
   }
 
   async getArchivedById(id: string) {

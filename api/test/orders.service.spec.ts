@@ -151,7 +151,7 @@ describe('OrdersService', () => {
         reverse: jest.fn().mockReturnValue(orders)
       })
 
-      const result = await service.getAll()
+      const result = await service.getAll(true)
 
       expect(orderModel.find).toHaveBeenCalledWith({ isArchived: false })
       expect(result).toEqual(orders)
