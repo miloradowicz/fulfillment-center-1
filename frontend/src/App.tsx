@@ -55,6 +55,15 @@ const App = () => {
           />
 
           <Route
+            path="/clients/:clientId"
+            element={
+              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                <ClientPage />
+              </AllowedRoute>
+            }
+          />
+
+          <Route
             path="/arrivals"
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager', 'stock-worker']}>
@@ -74,6 +83,15 @@ const App = () => {
 
           <Route
             path="/products"
+            element={
+              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                <ProductPage />
+              </AllowedRoute>
+            }
+          />
+
+          <Route
+            path="/products/:productId"
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
                 <ProductPage />
