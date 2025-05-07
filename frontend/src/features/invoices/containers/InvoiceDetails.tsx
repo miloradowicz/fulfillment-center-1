@@ -67,7 +67,7 @@ const InvoiceDetails = () => {
                     {invoice.invoiceNumber}
                   </h3>
 
-                  <p className="text-md">
+                  <div className="text-md">
                     <p className="text-sm text-muted-foreground font-bold">
                       Клиент: <br />
                     </p>
@@ -79,7 +79,7 @@ const InvoiceDetails = () => {
                       {invoice.client.name}
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
-                  </p>
+                  </div>
 
                   <div className="flex gap-2 items-center">
                     <CopyText text={invoice.client.phone_number} children={<Phone className="h-4 w-4" />} />
@@ -193,25 +193,33 @@ const InvoiceDetails = () => {
                   <p className="px-2">История</p>
                 </TabsContent>
 
-                <div className="mt-6 space-y-2 border-t pt-4">
-                  {invoice.discount ? (
-                    <div className="text-right text-sm font-semibold text-orange-600">
-                      Скидка на внутренние услуги: {invoice.discount}%
-                    </div>
-                  ) : null}
+                <div className="mt-6 border-t pt-4">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1 text-left">
+                      {invoice.discount ? (
+                        <div className="text-sm font-semibold text-blue-400">
+                          Скидка на внутренние услуги: {invoice.discount}%
+                        </div>
+                      ) : null}
 
-                  <div className="text-right font-bold">Итого: {invoice.totalAmount} сом</div>
-
-                  {invoice.paid_amount !== undefined && (
-                    <div
-                      className={cn(
-                        'text-right font-bold',
-                        invoice.paid_amount < (invoice.totalAmount ?? 0) ? 'text-red-600' : 'text-emerald-600',
-                      )}
-                    >
-                      Оплачено: {invoice.paid_amount} сом
+                      <div className="text-base font-bold text-primary">
+                        Итого: {invoice.totalAmount} сом
+                      </div>
                     </div>
-                  )}
+
+                    {invoice.paid_amount !== undefined && (
+                      <div className="space-y-1 text-right">
+                        <div className="font-bold text-emerald-600">
+                          Оплачено: {invoice.paid_amount} сом
+                        </div>
+                        {invoice.paid_amount < (invoice.totalAmount ?? 0) && (
+                          <div className="font-bold text-destructive">
+                            Долг: {(invoice.totalAmount ?? 0) - invoice.paid_amount} сом
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Tabs>
             </div>
