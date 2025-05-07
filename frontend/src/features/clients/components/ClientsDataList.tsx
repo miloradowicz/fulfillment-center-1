@@ -9,7 +9,7 @@ import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActio
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
 import RightPanel from '@/components/RightPanel/RightPanel.tsx'
-import ClientDetails from '@/features/clients/containers/ClientDetails.tsx'
+import ClientDetails from '@/features/clients/components/ClientDetails.tsx'
 
 const ClientsDataList = () => {
   const {
