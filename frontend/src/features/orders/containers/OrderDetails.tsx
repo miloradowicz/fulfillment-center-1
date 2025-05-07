@@ -52,7 +52,7 @@ const OrderDetails = () => {
                   {order.orderNumber}
                 </h3>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex flex-col gap-4 mb-6">
                   <div className="flex flex-col">
                     <p className="text-sm font-bold text-muted-foreground mb-2">Доставка</p>
                     <Badge
@@ -101,10 +101,10 @@ const OrderDetails = () => {
               <div className="flex flex-col md:items-start justify-between">
                 <div className="flex gap-2 mt-4 md:mt-0 md:mb-4 order-last md:order-none items-start">
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <EditButton onClick={() => setOpen(true)} />
+                    <EditButton onClick={() => setOpen(true)}/>
                   </ProtectedElement>
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
+                    <ArchiveButton onClick={() => setOpenArchiveModal(true)}/>
                   </ProtectedElement>
                 </div>
 
