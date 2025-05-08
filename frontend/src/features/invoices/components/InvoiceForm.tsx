@@ -211,8 +211,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         <div className="flex justify-between">
           <Label>Статус</Label>
           <Badge
-            className={`justify-between gap-2 px-3 py-1 rounded-md text-sm font-medium ${ invoiceStatusStyles[String(invoiceStatus)] }`}
-          >
+            className={`justify-between gap-2 px-3 py-1 rounded-md text-sm font-medium ${ invoiceStatusStyles[invoiceStatus] }`}          >
             {invoiceStatus as string}
           </Badge>
         </div>
