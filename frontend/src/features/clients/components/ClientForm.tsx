@@ -6,7 +6,15 @@ import { Button } from '@/components/ui/button.tsx'
 import { LoaderCircle } from 'lucide-react'
 
 const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () => void }) => {
-  const { form, loadingAdd, loadingUpdate, inputChangeHandler, onSubmit, getFieldError } = useClientForm(client?._id, onClose)
+  const {
+    form,
+    loadingAdd,
+    loadingUpdate,
+    inputChangeHandler,
+    onSubmit,
+    getFieldError,
+    handleBlur,
+  } = useClientForm(client?._id, onClose)
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -20,6 +28,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
         value={form.name}
         onChange={inputChangeHandler}
         error={getFieldError('name')}
+        onBlur={e => handleBlur('name', e.target.value)}
       />
 
       <InputWithError
@@ -28,6 +37,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
         value={form.phone_number}
         onChange={inputChangeHandler}
         error={getFieldError('phone_number')}
+        onBlur={e => handleBlur('phone_number', e.target.value)}
       />
 
       <InputWithError
@@ -36,6 +46,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
         value={form.email}
         onChange={inputChangeHandler}
         error={getFieldError('email')}
+        onBlur={e => handleBlur('email', e.target.value)}
       />
 
       <InputWithError
@@ -44,6 +55,7 @@ const ClientForm = ({ client, onClose }: { client?: Client | null; onClose?: () 
         value={form.inn}
         onChange={inputChangeHandler}
         error={getFieldError('inn')}
+        onBlur={e => handleBlur('inn', e.target.value)}
       />
 
       <Input
