@@ -35,10 +35,10 @@ const OrderPage = () => {
         )}
       </Modal>
 
-      <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between gap-4">
-        <CustomTitle text={'Заказы'} icon={<ClipboardList size={25} />} />
+      <div className="max-w-[1000px] mx-auto my-7 w-full gap-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center">
+        <CustomTitle text={'Заказы'} icon={<ClipboardList size={25}/>}/>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row sm:gap-2 space-y-2 sm:space-y-0 sm:w-auto w-full">
           <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
             <CustomButton text={'Выставить счет'} onClick={() => handleOpen('invoice')}/>
           </ProtectedElement>
