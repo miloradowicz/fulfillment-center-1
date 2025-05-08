@@ -14,10 +14,10 @@ import { useLocation } from 'react-router-dom'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 import { fetchOrdersByClientId } from '@/store/thunks/orderThunk.ts'
 import { createInvoices, fetchInvoiceById, fetchInvoices, updateInvoice } from '@/store/thunks/invoiceThunk.ts'
-import { clearAll as clearOrderAll, selectAllOrders } from '@/store/slices/orderSlice.ts'
+import { selectAllOrders } from '@/store/slices/orderSlice.ts'
 import { addDummyOption } from '@/utils/addDummuOption.ts'
 import { clearCreateAndUpdateError, clearErrors, selectInvoiceCreateAndUpdateError, selectLoadingAdd } from '@/store/slices/invoiceSlice.ts'
-import { clearAll as clearArrivalAll, selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
+import { selectAllArrivals } from '@/store/slices/arrivalSlice.ts'
 
 export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void) => {
   const dispatch = useAppDispatch()
@@ -87,9 +87,6 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
     if (form.client) {
       dispatch(fetchArrivalsByClientId(form.client))
       dispatch(fetchOrdersByClientId(form.client))
-    } else {
-      dispatch(clearArrivalAll())
-      dispatch(clearOrderAll())
     }
   }, [dispatch, form.client])
 

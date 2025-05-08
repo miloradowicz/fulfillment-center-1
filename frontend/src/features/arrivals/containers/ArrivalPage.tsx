@@ -8,6 +8,7 @@ import { Truck } from 'lucide-react'
 import ProductForm from '@/features/products/components/ProductForm.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
+import InvoiceForm from '@/features/invoices/components/InvoiceForm'
 
 const ArrivalPage = () => {
   const { open, formType, handleOpen, handleClose, isLoading, arrivalToEdit, handleOpenEdit } = useArrivalPage()
@@ -19,8 +20,10 @@ const ArrivalPage = () => {
       <Modal handleClose={handleClose} open={open} aria-modal="true">
         {formType === 'arrival' ? (
           <ArrivalForm initialData={arrivalToEdit} onSuccess={handleClose} />
-        ) : (
+        ) : formType === 'product' ? (
           <ProductForm onSuccess={handleClose} />
+        ) : (
+          <InvoiceForm onSuccess={handleClose} />
         )}
       </Modal>
 
@@ -28,6 +31,10 @@ const ArrivalPage = () => {
         <CustomTitle text="Поставки" icon={<Truck className="h-[25px] w-[25px]" />} />
 
         <div className="flex flex-col sm:flex-row sm:gap-2 space-y-2 sm:w-auto w-full">
+          <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+            <CustomButton text="Выставить счет" onClick={() => handleOpen('invoice')}/>
+          </ProtectedElement>
+
           <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
             <CustomButton text="Добавить товар" onClick={() => handleOpen('product')} />
           </ProtectedElement>
