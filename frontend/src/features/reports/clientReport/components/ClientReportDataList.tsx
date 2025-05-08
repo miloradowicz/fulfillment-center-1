@@ -23,7 +23,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       enableHiding: false,
     },
     {
-      id: 'client',
+      id: 'Клиент',
       accessorFn: row => row.client.name,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Клиент"/>,
       cell: ({ row }) => (
@@ -35,9 +35,10 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
         </div>
       ),
       enableColumnFilter: true,
+      enableHiding: false,
     },
     {
-      accessorKey: 'orderCount',
+      accessorKey: 'Всего заказов',
       header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего заказов"/>,
       cell: ({ row }) => (
         <div className="text-center">
@@ -47,7 +48,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       enableSorting: true,
     },
     {
-      id: 'orders',
+      id: 'Заказы',
       header: () => (
         <div className="text-center">
           Заказы
@@ -70,7 +71,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       ),
     },
     {
-      accessorKey: 'arrivalCount',
+      accessorKey: 'Всего поставок',
       header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего поставок"/>,
       cell: ({ row }) => (
         <div className="text-center">
@@ -80,7 +81,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       enableSorting: true,
     },
     {
-      id: 'arrivals',
+      id: 'поставки',
       header: () => (
         <div className="text-center">
           Поставки
@@ -103,7 +104,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       ),
     },
     {
-      accessorKey: 'invoicesCount',
+      accessorKey: 'всего счетов',
       header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего счетов"/>,
       cell: ({ row }) => (
         <div className="text-center">
@@ -113,7 +114,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) 
       enableSorting: true,
     },
     {
-      id: 'invoices',
+      id: 'Счета',
       header: () => (
         <div className="text-center">
           Счета
