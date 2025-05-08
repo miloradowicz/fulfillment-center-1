@@ -6,15 +6,15 @@ import DataTable from '@/components/DataTable/DataTable'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader'
 import { PropsClientTable } from '../../utils/TypesProps.ts'
-import { ClientOrderReport } from '@/types'
+import { ClientFullReport } from '@/types'
 import Dropdown from '@/features/reports/components/DropDown.tsx'
 
-const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport }) => {
+const ClientReportDataList: React.FC<PropsClientTable> = ({ ClientFullReport }) => {
   const [searchParams] = useSearchParams()
   const startDate = formatDate(searchParams.get('startDate'))
   const endDate = formatDate(searchParams.get('endDate'))
 
-  const columns: ColumnDef<ClientOrderReport>[] = [
+  const columns: ColumnDef<ClientFullReport>[] = [
     {
       id: 'select',
       header: ({ table }) => SelectableColumn(table, 'header'),
@@ -23,7 +23,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport })
       enableHiding: false,
     },
     {
-      id: 'client',
+      id: 'Клиент',
       accessorFn: row => row.client.name,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Клиент"/>,
       cell: ({ row }) => (
@@ -35,9 +35,20 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport })
         </div>
       ),
       enableColumnFilter: true,
+      enableHiding: false,
     },
     {
-      id: 'orders',
+      accessorKey: 'Всего заказов',
+      header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего заказов"/>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {row.original.orders.length}
+        </div>
+      ),
+      enableSorting: true,
+    },
+    {
+      id: 'Заказы',
       header: () => (
         <div className="text-center">
           Заказы
@@ -45,7 +56,7 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport })
       ),
       cell: ({ row }) => (
         <div className="flex justify-center">
-          {row.original.orderCount === 0 ? (
+          {row.original.orders.length === 0 ? (
             <div className="h-[38px] flex items-center justify-center">-</div>
           ) : (
             <Dropdown
@@ -60,23 +71,79 @@ const ClientReportDataList: React.FC<PropsClientTable> = ({ clientOrderReport })
       ),
     },
     {
-      accessorKey: 'orderCount',
-      header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Количество заказов"/>,
+      accessorKey: 'Всего поставок',
+      header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего поставок"/>,
       cell: ({ row }) => (
         <div className="text-center">
-          {row.original.orderCount}
+          {row.original.arrivals.length}
         </div>
       ),
       enableSorting: true,
     },
+    {
+      id: 'поставки',
+      header: () => (
+        <div className="text-center">
+          Поставки
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          {row.original.arrivals.length === 0 ? (
+            <div className="h-[38px] flex items-center justify-center">-</div>
+          ) : (
+            <Dropdown
+              items={row.original.arrivals}
+              getLabel={arrival => `${ arrival.arrivalNumber }${ arrival.isArchived ? ' (в архиве)' : '' }`}
+              getLink={arrival => `/arrivals/${ arrival._id }`}
+              getStatus={arrival => arrival.arrival_status}
+              statusFilterOptions={['ожидается доставка', 'получена', 'отсортирована']}
+            />
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'всего счетов',
+      header: ({ column }) => <DataTableColumnHeader column={column} className={'w-40'} title="Всего счетов"/>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {row.original.invoices.length}
+        </div>
+      ),
+      enableSorting: true,
+    },
+    {
+      id: 'Счета',
+      header: () => (
+        <div className="text-center">
+          Счета
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          {row.original.invoices.length === 0 ? (
+            <div className="h-[38px] flex items-center justify-center">-</div>
+          ) : (
+            <Dropdown
+              items={row.original.invoices}
+              getLabel={invoice => `${ invoice.invoiceNumber }${ invoice.isArchived ? ' (в архиве)' : '' }`}
+              getLink={invoice => `/invoices/${ invoice._id }`}
+              getStatus={invoice => invoice.status}
+              statusFilterOptions={['в ожидании', 'частично оплачено', 'оплачено']}
+            />
+          )}
+        </div>
+      ),
+    },
   ]
 
   return (
-    <div className="max-w-full overflow-x-auto">
-      <h6 className="text-center text-base sm:text-xl mx-auto mb-2 break-words w-[80%]">
+    <div className="max-w-full overflow-x-auto mt-3 ">
+      <h6 className="text-center text-base sm:text-xl mx-auto mb-3 break-words w-[80%]">
         Количество заказов каждого клиента за период с {startDate} по {endDate}
       </h6>
-      <DataTable columns={columns} data={clientOrderReport ?? []} />
+      <DataTable columns={columns} data={ClientFullReport ?? []} />
     </div>
   )
 }

@@ -428,23 +428,58 @@ export interface ReportTaskResponse {
   dailyTaskCounts: DailyTaskCount[];
 }
 
-export interface ClientOrderReport {
+// export interface ClientOrderReport {
+//   client: {
+//     _id: string;
+//     name: string;
+//     isArchived: boolean
+//   };
+//   orders: {
+//     _id: string
+//     orderNumber: string
+//     status:string
+//     isArchived: boolean
+//   }[],
+//   orderCount: number;
+// }
+//
+// export interface ReportClientResponse {
+//   clientOrderReport: ClientOrderReport[];
+// }
+
+export interface ClientFullReport {
   client: {
-    _id: string;
-    name: string;
+    _id: string
+    name: string
     isArchived: boolean
-  };
+  }
+
   orders: {
     _id: string
     orderNumber: string
-    status:string
+    status: string
     isArchived: boolean
-  }[],
-  orderCount: number;
+  }[]
+
+  arrivals: {
+    _id: string
+    arrivalNumber: string
+    arrival_status: string
+    isArchived: boolean
+  }[]
+
+  invoices: {
+    _id: string
+    invoiceNumber: string
+    status: string
+    totalAmount: number
+    paidAmount: number
+    isArchived: boolean
+  }[]
 }
 
 export interface ReportClientResponse {
-  clientOrderReport: ClientOrderReport[];
+  clientReport: ClientFullReport[]
 }
 export interface Invoice {
   _id: string

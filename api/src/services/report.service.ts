@@ -2,17 +2,28 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Task, TaskDocument } from '../schemas/task.schema'
-import { clientOrderReport, DailyTaskCount, OrderWithClient, TaskInterface, UserTaskReport } from '../types'
+import {
+  ArrivalWithClient,
+  clientFullReport,
+  DailyTaskCount, InvoiceWithClient,
+  OrderWithClient,
+  TaskInterface,
+  UserTaskReport,
+} from '../types'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { normalizeDates } from '../utils/normalazeDates'
 import { Client, ClientDocument } from '../schemas/client.schema'
+import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
+import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Client.name) private readonly clientModel: Model<ClientDocument>,) {
+    @InjectModel(Client.name) private readonly clientModel: Model<ClientDocument>,
+    @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
+    @InjectModel(Invoice.name) private readonly invoiceModel: Model<InvoiceDocument>) {
   }
 
   async getReportTaskForPeriod(
@@ -40,10 +51,16 @@ export class ReportService {
       const userId = task.user._id.toString()
 
       if (!acc[userId]) {
-        acc[userId] = { user:{ _id:task.user._id.toString(), displayName:task.user.displayName, isArchived: task.user.isArchived }, taskCount: 0, tasks: [] }
+        acc[userId] = {
+          user: {
+            _id: task.user._id.toString(),
+            displayName: task.user.displayName,
+            isArchived: task.user.isArchived,
+          }, taskCount: 0, tasks: [],
+        }
       }
       acc[userId].taskCount += 1
-      acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber, isArchived:task.isArchived })
+      acc[userId].tasks.push({ _id: String(task._id), taskNumber: task.taskNumber, isArchived: task.isArchived })
 
       return acc
     }, {} as Record<string, UserTaskReport>)
@@ -71,7 +88,7 @@ export class ReportService {
   async getReportClientForPeriod(
     startDate: Date,
     endDate: Date
-  ): Promise<{ clientOrderReport: clientOrderReport[] }> {
+  ): Promise<{  clientReport: clientFullReport[]  }> {
     const [normalizedStart, normalizedEnd] = normalizeDates(startDate, endDate)
     return this.getClientReport(normalizedStart, normalizedEnd)
   }
@@ -79,55 +96,94 @@ export class ReportService {
   async getClientReport(
     startDate: Date,
     endDate: Date
-  ): Promise<{ clientOrderReport: clientOrderReport[] }> {
-    const orders = await this.orderModel
-      .find({
-        createdAt: {
-          $gte: startDate.toISOString(),
-          $lte: endDate.toISOString(),
-        },
-      })
-      .populate('client', 'name isArchived') as unknown as OrderWithClient[]
-    const clientOrderCount = orders.reduce((acc, order): Record<string, clientOrderReport> => {
-      const clientId = String(order.client._id)
+  ): Promise<{ clientReport: clientFullReport[] }> {
+    const [orders, arrivals, invoices] = await Promise.all([
+      this.orderModel
+        .find({
+          createdAt: {
+            $gte: startDate.toISOString(),
+            $lte: endDate.toISOString(),
+          },
+        })
+        .populate('client', 'name isArchived') as unknown as OrderWithClient[],
 
-      if (!acc[clientId]) {
-        acc[clientId] = {
-          client: { _id: clientId, name: order.client.name, isArchived: order.isArchived },
-          orderCount: 0,
+      this.arrivalModel
+        .find({
+          createdAt: {
+            $gte: startDate.toISOString(),
+            $lte: endDate.toISOString(),
+          },
+        })
+        .populate('client', 'name isArchived') as unknown as ArrivalWithClient[],
+
+      this.invoiceModel
+        .find({
+          createdAt: {
+            $gte: startDate.toISOString(),
+            $lte: endDate.toISOString(),
+          },
+        })
+        .populate('client', 'name isArchived') as unknown as InvoiceWithClient[],
+    ])
+
+    const clientReportMap = new Map<string, clientFullReport>()
+
+    const upsertClient = (client: { _id: any; name: string; isArchived: boolean }) => {
+      const id = String(client._id)
+      if (!clientReportMap.has(id)) {
+        clientReportMap.set(id, {
+          client: { _id: id, name: client.name, isArchived: client.isArchived },
           orders: [],
-        }
+          arrivals: [],
+          invoices: [],
+        })
       }
+      return clientReportMap.get(id)!
+    }
 
-      acc[clientId].orderCount += 1
-      acc[clientId].orders.push({
+    for (const order of orders) {
+      const clientEntry = upsertClient(order.client)
+      clientEntry.orders.push({
         _id: String(order._id),
         orderNumber: order.orderNumber ?? '',
         status: order.status,
         isArchived: order.isArchived,
       })
-
-      return acc
-    }, {} as Record<string, clientOrderReport>)
-
-    const clients = await this.clientModel.find()
-
-    for (const client of clients) {
-      const clientId = String(client._id)
-      if (!clientOrderCount[clientId]) {
-        clientOrderCount[clientId] = {
-          client: { _id: clientId, name: client.name, isArchived: client.isArchived },
-          orderCount: 0,
-          orders: [],
-        }
-      }
     }
 
-    const clientOrderReport = Object.values(clientOrderCount).sort(
-      (a, b) => b.orderCount - a.orderCount
+    for (const arrival of arrivals) {
+      const clientEntry = upsertClient(arrival.client)
+      clientEntry.arrivals.push({
+        _id: String(arrival._id),
+        arrivalNumber: arrival.arrivalNumber,
+        arrival_status: arrival.arrival_status,
+        isArchived: arrival.isArchived,
+      })
+    }
+
+    for (const invoice of invoices) {
+      const clientEntry = upsertClient(invoice.client)
+      clientEntry.invoices.push({
+        _id: String(invoice._id),
+        invoiceNumber: invoice.invoiceNumber,
+        status: invoice.status,
+        totalAmount: invoice.totalAmount,
+        isArchived: invoice.isArchived,
+        paidAmount: invoice.paid_amount,
+      })
+    }
+
+    const clients = await this.clientModel.find()
+    for (const client of clients) {
+      upsertClient(client)
+    }
+
+    const clientReport = Array.from(clientReportMap.values()).sort(
+      (a, b) => b.orders.length - a.orders.length
     )
 
-    return { clientOrderReport }
+    return { clientReport }
   }
+
 }
 

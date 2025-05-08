@@ -80,11 +80,105 @@ export interface Order {
   documents?: { document: string }[]
 }
 
+interface OrderWithClient extends Order {
+  client: PopulatedClient
+}
+
+type clientFullReport = {
+  client: { _id: string; name: string; isArchived: boolean }
+  orders: { _id: string; orderNumber: string; status: string; isArchived: boolean }[]
+  arrivals: { _id: string; arrivalNumber: string; arrival_status: string; isArchived: boolean }[]
+  invoices: { _id: string; invoiceNumber: string; status: string; totalAmount: number; paidAmount:number; isArchived: boolean }[]
+}
+
 interface PopulatedClient {
   _id: Types.ObjectId
   name: string
+  isArchived: boolean
 }
 
-interface OrderWithClient extends Order {
+// ArrivalWithClient
+export interface Arrival {
+  _id: string
+  isArchived: boolean
+  arrivalNumber: string
+  client: string
+  products: {
+    product: string
+    description: string
+    amount: number
+  }[]
+  arrival_status: 'ожидается доставка' | 'получена' | 'отсортирована'
+  arrival_date: string
+  sent_amount?: string
+  pickup_location?: string
+  documents?: { document: string }[]
+  shipping_agent?: string | null
+  stock: string
+  logs: {
+    user: string
+    change: string
+    date: string
+  }[]
+  defects: {
+    product: string
+    defect_description: string
+    amount: number
+  }[]
+  received_amount: {
+    product: string
+    description: string
+    amount: number
+  }[]
+  services: {
+    service: string
+    service_amount: number
+    service_price?: number
+  }[]
+  comment?: string
+}
+
+export interface ArrivalWithClient extends Arrival {
+  client: PopulatedClient
+}
+
+// InvoiceWithClient
+export interface Invoice {
+  _id: string
+  isArchived: boolean
+  invoiceNumber: string
+  client: string
+  services: {
+    service: string
+    service_amount: number
+    service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
+  }[]
+  totalAmount: number
+  paid_amount: number
+  discount?: number
+  status: 'в ожидании' | 'оплачено' | 'частично оплачено'
+  associatedArrival?: string
+  associatedOrder?: string
+  associatedArrivalServices: {
+    service: string
+    service_amount: number
+    service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
+  }[]
+  associatedOrderServices: {
+    service: string
+    service_amount: number
+    service_price?: number
+    service_type: 'внутренняя' | 'внешняя'
+  }[]
+  logs: {
+    user: string
+    change: string
+    date: string
+  }[]
+}
+
+export interface InvoiceWithClient extends Invoice {
   client: PopulatedClient
 }
