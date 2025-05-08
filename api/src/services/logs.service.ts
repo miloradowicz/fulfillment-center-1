@@ -45,6 +45,7 @@ export class LogsService {
     const changes = this.getDiffs(oldObj, newObj)
     if (!changes) return null
     const meaningfulChanges = this.filterMeaningfulDiffs(changes)
+    console.log('meaningfulChanges', meaningfulChanges)
     if (meaningfulChanges.length === 0) return null
 
     const combinedMessage = meaningfulChanges
@@ -79,7 +80,7 @@ export class LogsService {
     return (result || []) as Diff[]
   }
 
-  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber']
+  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber', 'orderNumber']
 
   private filterMeaningfulDiffs<T>(diffs: Diff<T>[]): Diff<T>[] {
     return diffs.filter(diff => {
@@ -96,7 +97,13 @@ export class LogsService {
 
       if (diff.kind === 'A') {
         const item = diff.item
-        if (item.kind === 'N' || item.kind === 'D') return true
+        if (item.kind === 'N') {
+          return typeof item.rhs !== 'object' || JSON.stringify(item.rhs) !== '{}'
+        }
+
+        if (item.kind === 'D') {
+          return typeof item.lhs !== 'object' || JSON.stringify(item.lhs) !== '{}'
+        }
 
         if (item.kind === 'E') {
           const lhs = (item.lhs && typeof item.lhs === 'object') ? item.lhs.toString() : String(item.lhs)

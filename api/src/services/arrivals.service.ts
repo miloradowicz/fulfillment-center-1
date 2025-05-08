@@ -177,12 +177,11 @@ export class ArrivalsService {
   async update(id: string, arrivalDto: UpdateArrivalDto, files: Array<Express.Multer.File> = [], userId: mongoose.Types.ObjectId) {
     const existingArrival = await this.arrivalModel.findById(id)
     if (!existingArrival) throw new NotFoundException('Поставка не найдена')
-    const existingArrivalObj = existingArrival.toObject()
 
     const arrivalDtoObj = { ...arrivalDto }
 
     const log = this.logsService.trackChanges(
-      existingArrivalObj,
+      existingArrival.toObject(),
       arrivalDtoObj,
       userId,
     )

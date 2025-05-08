@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -18,6 +19,7 @@ import { UpdateOrderDto } from '../dto/update-order.dto'
 import { FileUploadInterceptor } from '../utils/uploadFiles'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
+import { RequestWithUser } from 'src/types'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
@@ -56,8 +58,9 @@ export class OrdersController {
   @Roles('super-admin', 'admin', 'manager')
   @Post()
   @UseInterceptors(FileUploadInterceptor())
-  async createOrder(@Body() orderDto: CreateOrderDto, @UploadedFiles() files: Array<Express.Multer.File>) {
-    return this.ordersService.create(orderDto, files)
+  async createOrder(@Body() orderDto: CreateOrderDto, @UploadedFiles() files: Array<Express.Multer.File>, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.ordersService.create(orderDto, files, userId)
   }
 
   @Roles('super-admin', 'admin', 'manager')
@@ -67,20 +70,24 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() orderDto: UpdateOrderDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @Req() req: RequestWithUser
   ) {
-    return this.ordersService.update(id, orderDto, files)
+    const userId = req.user._id
+    return this.ordersService.update(id, orderDto, files, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/archive')
-  async archiveOrder(@Param('id') id: string) {
-    return this.ordersService.archive(id)
+  async archiveOrder(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.ordersService.archive(id, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
-  async unarchiveOrder(@Param('id') id: string) {
-    return this.ordersService.unarchive(id)
+  async unarchiveOrder(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.ordersService.unarchive(id, userId)
   }
 
   @Roles('super-admin')
