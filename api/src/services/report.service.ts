@@ -175,7 +175,7 @@ export class ReportService {
 
     const clients = await this.clientModel.find()
     for (const client of clients) {
-      upsertClient(client) // обеспечиваем всех клиентов даже без данных
+      upsertClient(client)
     }
 
     const clientReport = Array.from(clientReportMap.values()).sort(
