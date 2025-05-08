@@ -6,20 +6,20 @@ import useProductActions from '@/features/products/hooks/useProductActions.ts'
 import { Link } from 'react-router-dom'
 
 interface Props {
-  productId?: string
+  id?: string
 }
 
-const ProductDetails: React.FC<Props> = ({ productId }) => {
+const ProductDetails: React.FC<Props> = ({ id }) => {
   const product = useAppSelector(selectProductWithPopulate)
   const {
     fetchProduct,
   } = useProductActions(true)
 
   useEffect(() => {
-    if (productId) {
-      void fetchProduct(productId)
+    if (id) {
+      void fetchProduct(id)
     }
-  }, [fetchProduct, productId])
+  }, [fetchProduct, id])
 
   return (
     <>
