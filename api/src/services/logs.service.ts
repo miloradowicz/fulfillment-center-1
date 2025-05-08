@@ -1,124 +1,146 @@
 import { Injectable } from '@nestjs/common'
-import mongoose from 'mongoose'
+import { Types } from 'mongoose'
+import { diff } from 'deep-diff'
 
-interface EntityLog {
-  user: mongoose.Types.ObjectId
-  date: Date
-  change: string
+export type DiffKind = 'N' | 'D' | 'E' | 'A';
+
+interface BaseDiff {
+  kind: DiffKind;
+  path: (string | number)[];
+}
+
+interface DiffEdit<T = unknown> extends BaseDiff {
+  kind: 'E';
+  lhs?: T;
+  rhs?: T;
+}
+
+interface DiffNew<T = unknown> extends BaseDiff {
+  kind: 'N';
+  rhs: T;
+}
+
+interface DiffDeleted<T = unknown> extends BaseDiff {
+  kind: 'D';
+  lhs: T;
+}
+
+interface DiffArray<T = unknown> extends BaseDiff {
+  kind: 'A';
+  index: number;
+  item: Diff<T>;
+}
+
+type Diff<T = unknown> = DiffEdit<T> | DiffNew<T> | DiffDeleted<T> | DiffArray<T>;
+
+export interface Log {
+  user: Types.ObjectId;
+  change: string;
+  date: Date;
 }
 
 @Injectable()
 export class LogsService {
-  compareArrays(oldArr: unknown[], newArr: unknown[], idKey = 'product'): string[] {
-    const change: string[] = []
+  trackChanges(oldObj: Record<string, any>, newObj: Record<string, any>, userId: Types.ObjectId): Log | null {
+    const changes = this.getDiffs(oldObj, newObj)
+    if (!changes) return null
+    const meaningfulChanges = this.filterMeaningfulDiffs(changes)
+    if (meaningfulChanges.length === 0) return null
 
-    const getId = (item: unknown): string | number | undefined => {
-      if (typeof item === 'object' && item !== null && idKey in item) {
-        return (item as Record<string, unknown>)[idKey] as string | number
-      }
-      return undefined
+    const combinedMessage = meaningfulChanges
+      .map(diff => this.formatDiffMessage(diff))
+      .join('; ')
+
+    return {
+      user: userId,
+      change: combinedMessage,
+      date: new Date(),
     }
+  }
 
-    const oldMap = new Map<string | number, Record<string, unknown>>()
-    const newMap = new Map<string | number, Record<string, unknown>>()
-
-    for (const item of oldArr) {
-      const id = getId(item)
-      if (id !== undefined && typeof item === 'object' && item !== null) {
-        oldMap.set(id, item as Record<string, unknown>)
-      }
+  generateLogForCreate(userId: Types.ObjectId): Log {
+    return {
+      user: userId,
+      change: 'Создан объект',
+      date: new Date(),
     }
+  }
 
-    for (const item of newArr) {
-      const id = getId(item)
-      if (id !== undefined && typeof item === 'object' && item !== null) {
-        newMap.set(id, item as Record<string, unknown>)
-      }
+  generateLogForArchive(userId: Types.ObjectId, archived: boolean): Log {
+    return {
+      user: userId,
+      change: archived ? 'Архивирован объект' : 'Восстановлен объект',
+      date: new Date(),
     }
+  }
 
-    for (const [id, newItem] of newMap.entries()) {
-      const oldItem = oldMap.get(id)
+  private getDiffs(oldObj: Record<string, any>, newObj: Record<string, any>): Diff[] | undefined{
+    const result = diff(oldObj, newObj)
+    return (result || []) as Diff[]
+  }
 
-      if (!oldItem) {
-        change.push(`Добавлен элемент с ${ idKey }=${ id }`)
-        continue
+  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber']
+
+  private filterMeaningfulDiffs<T>(diffs: Diff<T>[]): Diff<T>[] {
+    return diffs.filter(diff => {
+      const path = diff.path?.[0]
+      if (this.IGNORED_PATHS.includes(String(path))) return false
+
+      if (diff.kind === 'D' || diff.kind === 'N') return true
+
+      if (diff.kind === 'E') {
+        const lhs = (diff.lhs && typeof diff.lhs === 'object') ? diff.lhs.toString() : String(diff.lhs)
+        const rhs = (diff.rhs && typeof diff.rhs === 'object') ? diff.rhs.toString() : String(diff.rhs)
+        return lhs !== rhs
       }
 
-      for (const key of Object.keys(newItem)) {
-        const newVal = newItem[key]
-        const oldVal = oldItem[key]
-        if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-          change.push(
-            `${ idKey }=${ id }: поле '${ key }' изменено с '${ this.formatValue(oldVal) }' на '${ this.formatValue(newVal) }'`
-          )
+      if (diff.kind === 'A') {
+        const item = diff.item
+        if (item.kind === 'N' || item.kind === 'D') return true
+
+        if (item.kind === 'E') {
+          const lhs = (item.lhs && typeof item.lhs === 'object') ? item.lhs.toString() : String(item.lhs)
+          const rhs = (item.rhs && typeof item.rhs === 'object') ? item.rhs.toString() : String(item.rhs)
+          return lhs !== rhs
         }
       }
-    }
 
-    for (const id of oldMap.keys()) {
-      if (!newMap.has(id)) {
-        change.push(`Удалён элемент с ${ idKey }=${ id }`)
+      return false
+    })
+  }
+
+  private formatDiffMessage(diff: Diff): string {
+    const path = diff.path.join('.')
+
+    switch (diff.kind) {
+    case 'N':
+      return `Добавлено: ${ path } = ${ JSON.stringify(diff.rhs) }`
+
+    case 'D':
+      return `Удалено: ${ path } = ${ JSON.stringify(diff.lhs) }`
+
+    case 'E':
+      return `Изменено: ${ path } с ${ JSON.stringify(diff.lhs) } на ${ JSON.stringify(diff.rhs) }`
+
+    case 'A': {
+      const item = diff.item
+      const indexPath = `${ path }[${ diff.index }]`
+
+      switch (item.kind) {
+      case 'N':
+        return `Добавлено в массив ${ indexPath }: ${ JSON.stringify(item.rhs) }`
+      case 'D':
+        return `Удалено из массива ${ indexPath }: ${ JSON.stringify(item.lhs) }`
+      case 'E':
+        return `Изменено в массиве ${ indexPath }: с ${ JSON.stringify(item.lhs) } на ${ JSON.stringify(item.rhs) }`
+      default:
+        return `Изменение в массиве ${ indexPath }`
       }
     }
 
-    return change
-  }
-
-  formatValue(value: unknown): string {
-    if (typeof value === 'object' && value !== null) {
-      try {
-        return JSON.stringify(value)
-      } catch {
-        return '[не удаётся преобразовать объект]'
-      }
-    }
-    return String(value)
-  }
-
-  createLog(userId: mongoose.Types.ObjectId): EntityLog {
-    return {
-      user: userId,
-      date: new Date(),
-      change: 'Создано',
+    default:
+      return 'Неизвестное изменение'
     }
   }
 
-  updateLog(
-    userId: mongoose.Types.ObjectId,
-    oldData: Record<string, unknown>,
-    newData: Record<string, unknown>,
-  ): EntityLog {
-    const change: string[] = []
-
-    for (const [key, newVal] of Object.entries(newData)) {
-      const oldVal = oldData?.[key]
-
-      if (Array.isArray(newVal) && Array.isArray(oldVal)) {
-        const arrayChanges = this.compareArrays(oldVal, newVal)
-        if (arrayChanges.length) change.push(...arrayChanges)
-        continue
-      }
-
-      const safeOldVal = oldVal ? this.formatValue(oldVal) : 'не указано'
-      const safeNewVal = newVal ? this.formatValue(newVal) : 'не указано'
-
-      if (safeOldVal !== safeNewVal) {
-        change.push(`${ key } изменено с '${ safeOldVal }' на '${ safeNewVal }'`)
-      }
-    }
-
-    return {
-      user: userId,
-      date: new Date(),
-      change: change.length ? change.join('; ') : 'Без изменений',
-    }
-  }
-
-  archiveLog(userId: mongoose.Types.ObjectId, archived: boolean): EntityLog {
-    return {
-      user: userId,
-      date: new Date(),
-      change: archived ? 'Перемещено в архив' : 'Восстановлено из архива',
-    }
-  }
 }

@@ -150,7 +150,7 @@ export class ArrivalsService {
 
     const sequenceNumber = await this.counterService.getNextSequence('arrival')
 
-    const log = this.logsService.createLog(userId)
+    const log = this.logsService.generateLogForCreate(userId)
 
     const newArrival = await this.arrivalModel.create({
       ...arrivalDto,
@@ -174,9 +174,18 @@ export class ArrivalsService {
     return newArrival
   }
 
-  async update(id: string, arrivalDto: UpdateArrivalDto, files: Array<Express.Multer.File> = []) {
-    const existingArrival = await this.arrivalModel.findById(id).lean()
+  async update(id: string, arrivalDto: UpdateArrivalDto, files: Array<Express.Multer.File> = [], userId: mongoose.Types.ObjectId) {
+    const existingArrival = await this.arrivalModel.findById(id)
     if (!existingArrival) throw new NotFoundException('Поставка не найдена')
+    const existingArrivalObj = existingArrival.toObject()
+
+    const arrivalDtoObj = { ...arrivalDto }
+
+    const log = this.logsService.trackChanges(
+      existingArrivalObj,
+      arrivalDtoObj,
+      userId,
+    )
 
     if (files.length > 0) {
       const documentPaths = files.map(file => ({
@@ -216,21 +225,32 @@ export class ArrivalsService {
     await this.stockManipulationService.saveStock(previousStock)
     await this.stockManipulationService.saveStock(newStock)
 
+    if (log) {
+      updatedArrival.logs.push(log)
+    }
+
     await updatedArrival.save()
     return await updatedArrival.populate('received_amount.product')
   }
 
-  async archive(id: string) {
-    const arrival = await this.arrivalModel.findByIdAndUpdate(id, { isArchived: true })
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
+    const arrival = await this.arrivalModel.findById(id)
 
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
 
     if (arrival.isArchived) throw new ForbiddenException('Поставка уже в архиве.')
 
+    arrival.isArchived = true
+
+    const log = this.logsService.generateLogForArchive(userId, arrival.isArchived)
+    arrival.logs.push(log)
+
+    await arrival.save()
+
     return { message: 'Поставка перемещена в архив.' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const arrival = await this.arrivalModel.findById(id)
 
     if (!arrival) throw new NotFoundException('Поставка не найден')
@@ -238,6 +258,10 @@ export class ArrivalsService {
     if (!arrival.isArchived) throw new ForbiddenException('Поставка не находится в архиве')
 
     arrival.isArchived = false
+
+    const log = this.logsService.generateLogForArchive(userId, arrival.isArchived)
+    arrival.logs.push(log)
+
     await arrival.save()
 
     return { message: 'Клиент восстановлен из архива' }

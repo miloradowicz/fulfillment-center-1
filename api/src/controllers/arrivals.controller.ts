@@ -68,20 +68,24 @@ export class ArrivalsController {
     @Param('id') id: string,
     @Body() arrivalDto: UpdateArrivalDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @Req() req: RequestWithUser
   ) {
-    return await this.arrivalsService.update(id, arrivalDto, files)
+    const userId = req.user._id
+    return await this.arrivalsService.update(id, arrivalDto, files, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/archive')
-  async archiveArrival(@Param('id') id: string) {
-    return await this.arrivalsService.archive(id)
+  async archiveArrival(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.arrivalsService.archive(id, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
-  async unarchiveArrival(@Param('id') id: string) {
-    return this.arrivalsService.unarchive(id)
+  async unarchiveArrival(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.arrivalsService.unarchive(id, userId)
   }
 
   @Roles('super-admin')
