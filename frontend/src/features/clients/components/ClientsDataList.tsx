@@ -8,6 +8,8 @@ import DataTable from '@/components/DataTable/DataTable.tsx'
 import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import ClientDetails from '@/features/clients/components/ClientDetails.tsx'
 
 const ClientsDataList = () => {
   const {
@@ -20,6 +22,10 @@ const ClientsDataList = () => {
     handleConfirmationOpen,
     handleConfirmationClose,
     handleConfirmationArchive,
+    selectedClientId,
+    openDetailsModal,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
   } = useClientActions(true)
 
   const columns: ColumnDef<Client>[] = [
@@ -76,6 +82,8 @@ const ClientsDataList = () => {
             handleConfirmationOpen={handleConfirmationOpen}
             showDetailsLink={true}
             detailsPathPrefix="clients"
+            useModalForDetails={true}
+            handleOpenDetailsModal={() => handleOpenDetailsModal(tableClient._id)}
           />
         )
       },
@@ -85,6 +93,10 @@ const ClientsDataList = () => {
   return (
     <div className="max-w-[1000px] w-full mx-auto space-y-4">
       <DataTable columns={columns} data={clients ?? []} />
+
+      <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal}>
+        <ClientDetails clientId={selectedClientId ?? undefined} />
+      </RightPanel>
 
       <ConfirmationModal
         open={confirmationOpen}

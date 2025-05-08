@@ -72,7 +72,10 @@ const ServicesDataList = () => {
         const tableService = row.original
         const service: Service = {
           ...tableService,
-          serviceCategory: tableService.serviceCategory._id,
+          serviceCategory: {
+            _id: tableService.serviceCategory._id,
+            name: tableService.serviceCategory.name,
+          },
         }
 
         return (

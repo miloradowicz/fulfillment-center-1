@@ -7,7 +7,6 @@ import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.tsx'
 import AllowedRoute from '@/components/AllowedRoute/AllowedRoute.tsx'
 import LoginPage from './features/users/containers/LoginPage.tsx'
 import ClientPage from './features/clients/containers/ClientPage.tsx'
-import ClientDetail from './features/clients/containers/ClientDetail.tsx'
 import ArrivalPage from './features/arrivals/containers/ArrivalPage.tsx'
 import ArrivalDetails from './features/arrivals/containers/ArrivalDetails.tsx'
 import ProductPage from './features/products/containers/ProductPage.tsx'
@@ -21,7 +20,6 @@ import CounterpartiesPage from './features/counterparties/containers/Counterpart
 import ArchivePage from './features/archive/containers/ArchivePage.tsx'
 import AdminPage from '@/features/admin/containers/AdminPage.tsx'
 import InvoiceDetails from './features/invoices/containers/InvoiceDetails.tsx'
-import InvoicesPage from './features/invoices/containers/InvoicesPage.tsx'
 
 const App = () => {
   const user = useAppSelector(selectUser)
@@ -57,10 +55,10 @@ const App = () => {
           />
 
           <Route
-            path="/clients/:id"
+            path="/clients/:clientId"
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
-                <ClientDetail />
+                <ClientPage />
               </AllowedRoute>
             }
           />
@@ -85,6 +83,15 @@ const App = () => {
 
           <Route
             path="/products"
+            element={
+              <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
+                <ProductPage />
+              </AllowedRoute>
+            }
+          />
+
+          <Route
+            path="/products/:productId"
             element={
               <AllowedRoute allowedRoles={['super-admin', 'admin', 'manager']}>
                 <ProductPage />
