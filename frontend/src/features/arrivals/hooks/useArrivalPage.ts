@@ -1,8 +1,7 @@
-import { useAppSelector } from '@/app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useState } from 'react'
 import { clearErrorArrival, selectLoadingFetchArrival } from '@/store/slices/arrivalSlice.ts'
 import { ArrivalWithClient } from '@/types'
-import { useDispatch } from 'react-redux'
 import { FormType } from '@/features/arrivals/state/arrivalState.ts'
 
 export const useArrivalPage = () => {
@@ -10,7 +9,7 @@ export const useArrivalPage = () => {
   const [formType, setFormType] = useState<FormType>('arrival')
   const isLoading = useAppSelector(selectLoadingFetchArrival)
   const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined>(undefined)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleOpen = (type: FormType = 'arrival') => {
     setFormType(type)

@@ -41,4 +41,4 @@ export const initialErrorState = {
   arrival_status: '',
 }
 
-export type FormType = 'arrival' | 'product'
+export type FormType = 'arrival' | 'product' | 'invoice'
