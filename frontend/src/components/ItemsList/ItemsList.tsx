@@ -61,6 +61,7 @@ const ItemsList = <T extends Item>({ items, onDelete, getNameById }: Props<T>) =
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={e => {
                 e.stopPropagation()
+                e.preventDefault()
                 onDelete(i)
               }}
             >
