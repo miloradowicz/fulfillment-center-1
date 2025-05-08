@@ -18,7 +18,7 @@ import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 
 const useProductActions = (fetchOnDelete: boolean) => {
-  const { id } = useParams()
+  const { productId } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const products = useAppSelector(selectProductsWithPopulate)
@@ -54,18 +54,13 @@ const useProductActions = (fetchOnDelete: boolean) => {
   }, [fetchAllProducts])
 
   useEffect(() => {
-    if (id) {
-      void fetchProduct(id)
-    }
-  }, [id, fetchProduct])
-
-  useEffect(() => {
-    if (id) {
+    if (productId) {
       setOpenDetailsModal(true)
+      void fetchProduct(productId)
     } else {
       setOpenDetailsModal(false)
     }
-  }, [id])
+  }, [productId, fetchProduct])
 
   const archiveOneProduct = async (id: string) => {
     try {
@@ -133,7 +128,7 @@ const useProductActions = (fetchOnDelete: boolean) => {
     open,
     handleOpen,
     handleClose,
-    id,
+    productId,
     navigate,
     loading,
     error,

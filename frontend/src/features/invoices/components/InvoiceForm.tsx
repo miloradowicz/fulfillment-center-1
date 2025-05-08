@@ -56,7 +56,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     <>
       <form onSubmit={submitFormHandler} className="space-y-4">
         <h3 className="text-md sm:text-2xl font-semibold text-center">
-          {initialData ? 'Редактировать данные поставки' : 'Добавить новую поставку'}
+          {initialData ? 'Редактировать данные счёта' : 'Добавить новый счет'}
         </h3>
 
         <CustomSelect

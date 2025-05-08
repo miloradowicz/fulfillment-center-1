@@ -91,7 +91,7 @@ const ProductsDataList = () => {
       <DataTable columns={columns} data={products ?? []} />
 
       <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
-        <ProductDetails productId={selectedProductId ?? undefined} />
+        <ProductDetails id={selectedProductId ?? undefined} />
       </RightPanel>
 
       <Modal handleClose={handleClose} open={open}>

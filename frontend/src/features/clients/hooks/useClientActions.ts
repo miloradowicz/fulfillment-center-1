@@ -1,7 +1,13 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect, useState } from 'react'
 import { archiveClient, fetchClientById, fetchClients } from '@/store/thunks/clientThunk.ts'
-import { clearClientError, selectAllClients, selectClient, selectClientError, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
+import {
+  clearClientError,
+  selectAllClients,
+  selectClient,
+  selectClientError,
+  selectLoadingFetchClient,
+} from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
@@ -16,7 +22,7 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
 
   const clients = useAppSelector(selectAllClients)
-  const { id } = useParams()
+  const { clientId } = useParams()
   const client = useAppSelector(selectClient)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const error = useAppSelector(selectClientError)
@@ -31,9 +37,12 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     await dispatch(fetchClients())
   }, [dispatch])
 
-  const fetchClient = useCallback(async (id: string) => {
-    await dispatch(fetchClientById(id))
-  }, [dispatch])
+  const fetchClient = useCallback(
+    async (id: string) => {
+      await dispatch(fetchClientById(id))
+    },
+    [dispatch],
+  )
 
   useEffect(() => {
     void clearErrors()
@@ -44,10 +53,13 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   }, [fetchAllClients])
 
   useEffect(() => {
-    if (id) {
-      void fetchClient(id)
+    if (clientId) {
+      void fetchClient(clientId)
+      setOpenDetailsModal(true)
+    } else {
+      setOpenDetailsModal(false)
     }
-  }, [id, fetchClient])
+  }, [clientId, fetchClient, setOpenDetailsModal])
 
   const archiveOneClient = async (id: string) => {
     try {
@@ -91,7 +103,7 @@ export const useClientActions = (fetchOnDelete: boolean) => {
   }
 
   const handleConfirmationArchive = () => {
-    if (clientToArchiveId) archiveOneClient(clientToArchiveId)
+    if (clientToArchiveId) void archiveOneClient(clientToArchiveId)
     handleConfirmationClose()
   }
 
@@ -114,7 +126,7 @@ export const useClientActions = (fetchOnDelete: boolean) => {
     confirmationOpen,
     error,
     loading,
-    id,
+    clientId,
     navigate,
     archiveOneClient,
     handleOpen,

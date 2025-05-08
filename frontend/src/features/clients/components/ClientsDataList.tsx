@@ -95,7 +95,7 @@ const ClientsDataList = () => {
       <DataTable columns={columns} data={clients ?? []} />
 
       <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal}>
-        <ClientDetails clientId={selectedClientId ?? undefined} />
+        <ClientDetails id={selectedClientId ?? undefined} />
       </RightPanel>
 
       <ConfirmationModal

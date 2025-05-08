@@ -5,20 +5,20 @@ import CopyText from '@/components/CopyText/CopyText.tsx'
 import { fetchClientById } from '@/store/thunks/clientThunk.ts'
 
 interface Props {
-  clientId?: string
+  id?: string
 }
 
-const ClientDetails: React.FC<Props> = ({ clientId }) => {
+const ClientDetails: React.FC<Props> = ({ id }) => {
   const {
     client,
     dispatch,
   } = useClientActions(false)
 
   useEffect(() => {
-    if (clientId) {
-      dispatch(fetchClientById(clientId))
+    if (id) {
+      dispatch(fetchClientById(id))
     }
-  }, [dispatch, clientId])
+  }, [dispatch, id])
 
   return (
     <>
