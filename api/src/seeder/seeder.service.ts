@@ -328,7 +328,7 @@ export class SeederService {
       },
     ])
 
-    const [_order1, _order2, _order3, _order4] = await this.orderModel.create([
+    const [_order1, _order2, _order3, _order4, _order5, _order6] = await this.orderModel.create([
       {
         orderNumber: 'ORD-1',
         client: _client1._id,
@@ -885,9 +885,36 @@ export class SeederService {
           { service: _service2._id, service_amount: 5, service_price: 1000 },
         ],
       },
+      {
+        invoiceNumber: 'INV-6',
+        associatedOrder: _order6._id,
+        client: _client2._id,
+        totalAmount: 66000,
+        paid_amount: 10000,
+        discount: 20,
+        status: 'частично оплачено',
+        services: [
+          {
+            service: _service3._id,
+            service_price: 2000,
+            service_amount: 3,
+            service_type: 'внешняя',
+          },
+          {
+            service: _service2._id,
+            service_price: _service2.price,
+            service_amount: 2,
+            service_type: 'внутренняя',
+          },
+        ],
+        associatedOrderServices: [
+          { service: _service1._id, service_amount: 10 },
+          { service: _service2._id, service_price: 1000 },
+        ],
+      },
     ])
 
     await this.counterModel.findOneAndUpdate({ name: 'task' }, { $set: { seq: 13 } }, { upsert: true })
-    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 5 } }, { upsert: true })
+    await this.counterModel.findOneAndUpdate({ name: 'invoice' }, { $set: { seq: 6 } }, { upsert: true })
   }
 }

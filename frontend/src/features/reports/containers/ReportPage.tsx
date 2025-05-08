@@ -18,7 +18,7 @@ export default function ReportTabs() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const tabNames = useMemo(() => ['tasks', 'clients', 'orders', 'arrivals', 'stocks'], [])
+  const tabNames = useMemo(() => ['tasks', 'clients'], [])
 
   useEffect(() => {
     dispatch(fetchTasksWithPopulate())
@@ -58,15 +58,6 @@ export default function ReportTabs() {
               <TabsTrigger className={tabTriggerStyles} value="clients">
                 Клиенты
               </TabsTrigger>
-              <TabsTrigger className={tabTriggerStyles} value="orders">
-                Заказы
-              </TabsTrigger>
-              <TabsTrigger className={tabTriggerStyles} value="arrivals">
-                Поставки
-              </TabsTrigger>
-              <TabsTrigger className={tabTriggerStyles} value="stocks">
-                Склады
-              </TabsTrigger>
             </div>
           </TabsList>
         </div>
@@ -86,10 +77,6 @@ export default function ReportTabs() {
             <ClientReport />
           </TabsContent>
         )}
-
-        <TabsContent value="orders">Заказы</TabsContent>
-        <TabsContent value="arrivals">Поставки</TabsContent>
-        <TabsContent value="stocks">Склады</TabsContent>
       </Tabs>
     </div>
   )

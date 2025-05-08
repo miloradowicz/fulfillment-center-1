@@ -1,18 +1,45 @@
-
-
 import { getModelToken } from '@nestjs/mongoose'
 import { Test, TestingModule } from '@nestjs/testing'
 import { Order } from '../src/schemas/order.schema'
 import { Client } from '../src/schemas/client.schema'
 import { Task } from '../src/schemas/task.schema'
-import { Model, Query } from 'mongoose'
+import { Model } from 'mongoose'
 import { ReportService } from '../src/services/report.service'
+import { Arrival } from '../src/schemas/arrival.schema'
+import { Invoice } from '../src/schemas/invoice.schema'
 
 describe('ReportService', () => {
   let service: ReportService
-  let orderModel: jest.Mocked<Model<Order>>
+  let _orderModel: jest.Mocked<Model<Order>>
   let _clientModel: jest.Mocked<Model<Client>>
   let _taskModel: jest.Mocked<Model<Task>>
+  let _arrivalModel: jest.Mocked<Model<Arrival>>
+  let _invoiceModel: jest.Mocked<Model<Invoice>>
+
+
+  const mockArrivals = [
+    {
+      _id: 'arrival1',
+      arrivalNumber: 'A001',
+      arrival_status: 'получено',
+      isArchived: false,
+      client: { _id: 'client1', name: 'Client One', isArchived: false },
+      createdAt: '2025-04-10T10:00:00Z',
+    },
+  ]
+
+  const mockInvoices = [
+    {
+      _id: 'invoice1',
+      invoiceNumber: 'I001',
+      status: 'оплачен',
+      totalAmount: 5000,
+      paid_amount: 5000,
+      isArchived: false,
+      client: { _id: 'client2', name: 'Client Two', isArchived: false },
+      createdAt: '2025-04-10T10:00:00Z',
+    },
+  ]
 
   const mockOrders = [
     {
@@ -109,48 +136,82 @@ describe('ReportService', () => {
             })),
           },
         },
+        {
+          provide: getModelToken('Arrival'),
+          useValue: {
+            find: jest.fn().mockImplementation(() => ({
+              populate: jest.fn().mockResolvedValue(mockArrivals),
+            })),
+          },
+        },
+        {
+          provide: getModelToken('Invoice'),
+          useValue: {
+            find: jest.fn().mockImplementation(() => ({
+              populate: jest.fn().mockResolvedValue(mockInvoices),
+            })),
+          },
+        },
       ],
     }).compile()
 
     service = module.get<ReportService>(ReportService)
-    orderModel = module.get(getModelToken('Order'))
+    _orderModel = module.get(getModelToken('Order'))
     _clientModel = module.get(getModelToken('Client'))
     _taskModel = module.get(getModelToken('Task'))
+    _arrivalModel = module.get(getModelToken('Arrival'))
+    _invoiceModel = module.get(getModelToken('Invoice'))
+
   })
 
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
 
-  it('should return clientOrderReport sorted by orderCount', async () => {
+  it('should return clientReport including orders, arrivals, and invoices', async () => {
     const startDate = new Date('2025-04-09')
     const endDate = new Date('2025-04-10')
 
     const result = await service.getClientReport(startDate, endDate)
 
-    expect(result.clientOrderReport.length).toBe(2)
-    expect(result.clientOrderReport[0].orderCount).toBe(2)
-    expect(result.clientOrderReport[1].orderCount).toBe(1)
-    expect(result.clientOrderReport[0].client.name).toBe('Client One')
+    expect(result.clientReport.length).toBe(2)
+
+    const clientOne = result.clientReport.find(r => r.client.name === 'Client One')
+    const clientTwo = result.clientReport.find(r => r.client.name === 'Client Two')
+
+    expect(clientOne).toBeDefined()
+    expect(clientOne!.orders.length).toBe(2)
+    expect(clientOne!.arrivals.length).toBe(1)
+    expect(clientOne!.invoices.length).toBe(0)
+
+    expect(clientTwo).toBeDefined()
+    expect(clientTwo!.orders.length).toBe(1)
+    expect(clientTwo!.arrivals.length).toBe(0)
+    expect(clientTwo!.invoices.length).toBe(1)
   })
 
-  it('should handle no orders case for a client', async () => {
-    orderModel.find.mockImplementation(
-      () =>
-        ({
-          populate: jest.fn().mockResolvedValue([]),
-        }) as unknown as Query<Order[], Order>,
-    )
+
+  it('should handle no data case for a client', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    _orderModel.find.mockImplementation(() => ({ populate: jest.fn().mockResolvedValue([]) }) as any)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    _arrivalModel.find.mockImplementation(() => ({ populate: jest.fn().mockResolvedValue([]) }) as any)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    _invoiceModel.find.mockImplementation(() => ({ populate: jest.fn().mockResolvedValue([]) }) as any)
 
     const startDate = new Date('2025-04-09')
     const endDate = new Date('2025-04-10')
 
     const result = await service.getClientReport(startDate, endDate)
 
-    expect(result.clientOrderReport.length).toBe(2)
-    expect(result.clientOrderReport[0].orderCount).toBe(0)
-    expect(result.clientOrderReport[1].orderCount).toBe(0)
+    expect(result.clientReport.length).toBe(2)
+    for (const report of result.clientReport) {
+      expect(report.orders.length).toBe(0)
+      expect(report.arrivals.length).toBe(0)
+      expect(report.invoices.length).toBe(0)
+    }
   })
+
   it('should return taskReport with correct userTaskReports and dailyTaskCounts', async () => {
     const startDate = new Date('2025-04-09')
     const endDate = new Date('2025-04-10')
