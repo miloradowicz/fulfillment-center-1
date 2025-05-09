@@ -4,6 +4,7 @@ import { ServicesService } from '../services/services.service'
 import { DbModule } from './db.module'
 import { FilesModule } from './file-upload.module'
 import { AuthModule } from './auth.module'
+import { LogsService } from '../services/logs.service'
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { AuthModule } from './auth.module'
     FilesModule,
   ],
   controllers: [ServicesController],
-  providers: [ServicesService],
+  providers: [ServicesService, LogsService],
 })
 export class ServicesModule { }

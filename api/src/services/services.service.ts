@@ -1,13 +1,17 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import { Service, ServiceDocument } from '../schemas/service.schema'
 import { CreateServiceDto } from '../dto/create-service.dto'
 import { UpdateServiceDto } from '../dto/update-service.dto'
+import { LogsService } from './logs.service'
 
 @Injectable()
 export class ServicesService {
-  constructor(@InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>) {}
+  constructor(
+    @InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>,
+    private readonly logsService: LogsService,
+  ) {}
 
   async getAll() {
     return this.serviceModel.find({ isArchived: false }).populate('serviceCategory').exec()
@@ -53,18 +57,38 @@ export class ServicesService {
     return service
   }
 
-  async create(serviceDto: CreateServiceDto) {
-    return (await this.serviceModel.create(serviceDto)).populate('serviceCategory')
+  async create(serviceDto: CreateServiceDto, userId: mongoose.Types.ObjectId) {
+    const log = this.logsService.generateLogForCreate(userId)
+
+    const serviceToCreate = {
+      ...serviceDto,
+      logs: [log],
+    }
+
+    return (await this.serviceModel.create(serviceToCreate)).populate('serviceCategory')
   }
 
-  async update(id: string, serviceDto: UpdateServiceDto, force: boolean = false) {
+  async update(id: string, serviceDto: UpdateServiceDto, force: boolean = false, userId: mongoose.Types.ObjectId) {
     const service = await this.serviceModel.findById(id)
 
     if (!service) throw new NotFoundException('Услуга не найдена')
 
     if (!force && service.isArchived) throw new ForbiddenException('Услуга в архиве')
 
+    const serviceDtoObj = { ...serviceDto }
+
+    const log = this.logsService.trackChanges(
+      service.toObject(),
+      serviceDtoObj,
+      userId,
+    )
+
     service.set(serviceDto)
+
+    if (log) {
+      service.logs.push(log)
+    }
+
     await service.save()
 
     return service.populate('serviceCategory')
@@ -78,7 +102,7 @@ export class ServicesService {
     return true
   }
 
-  async archive(id: string) {
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
     const service = await this.serviceModel.findById(id)
 
     if (!service) throw new NotFoundException('Услуга не найдена')
@@ -86,12 +110,15 @@ export class ServicesService {
     if (service.isArchived) throw new ForbiddenException('Услуга уже в архиве')
 
     service.isArchived = true
+    const log = this.logsService.generateLogForArchive(userId, service.isArchived)
+    service.logs.push(log)
+
     await service.save()
 
     return { message: 'Услуга перемещена в архив' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const service = await this.serviceModel.findById(id)
 
     if (!service) throw new NotFoundException('Услуга не найдена')
@@ -99,6 +126,9 @@ export class ServicesService {
     if (!service.isArchived) throw new ForbiddenException('Услуга не находится в архиве')
 
     service.isArchived = false
+    const log = this.logsService.generateLogForArchive(userId, service.isArchived)
+    service.logs.push(log)
+
     await service.save()
 
     return { message: 'Услуга восстановлена из архива' }
