@@ -44,8 +44,9 @@ export class LogsService {
   trackChanges(oldObj: Record<string, any>, newObj: Record<string, any>, userId: Types.ObjectId): Log | null {
     const changes = this.getDiffs(oldObj, newObj)
     if (!changes) return null
+    
     const meaningfulChanges = this.filterMeaningfulDiffs(changes)
-    console.log('meaningfulChanges', meaningfulChanges)
+
     if (meaningfulChanges.length === 0) return null
 
     const combinedMessage = meaningfulChanges
