@@ -3,6 +3,7 @@ import { ProductsController } from 'src/controllers/products.controller'
 import { ProductsService } from 'src/services/products.service'
 import { DbModule } from './db.module'
 import { AuthModule } from './auth.module'
+import { LogsService } from '../services/logs.service'
 
 @Module({
   imports: [
@@ -10,6 +11,6 @@ import { AuthModule } from './auth.module'
     AuthModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, LogsService],
 })
 export class ProductsModule {}

@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { ProductsService } from '../services/products.service'
 import { UpdateProductDto } from '../dto/update-product.dto'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
+import { RequestWithUser } from '../types'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
@@ -13,8 +14,9 @@ export class ProductsController {
 
   @Roles('super-admin', 'admin', 'manager')
   @Post()
-  async createProduct(@Body() productDto: CreateProductDto) {
-    return await this.productsService.create(productDto)
+  async createProduct(@Body() productDto: CreateProductDto, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.productsService.create(productDto, userId)
   }
 
   @Get()
@@ -45,14 +47,16 @@ export class ProductsController {
 
   @Roles('super-admin', 'admin')
   @Patch(':id/archive')
-  async archiveProduct(@Param('id') id: string) {
-    return await this.productsService.archive(id)
+  async archiveProduct(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.productsService.archive(id, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
-  async unarchiveProduct(@Param('id') id: string) {
-    return this.productsService.unarchive(id)
+  async unarchiveProduct(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.productsService.unarchive(id, userId)
   }
 
   @Roles('super-admin')
@@ -63,7 +67,8 @@ export class ProductsController {
 
   @Roles('super-admin', 'admin', 'manager')
   @Put(':id')
-  async updateProduct(@Param('id') id: string, @Body() productDto: UpdateProductDto) {
-    return await this.productsService.update(id, productDto)
+  async updateProduct(@Param('id') id: string, @Body() productDto: UpdateProductDto, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.productsService.update(id, productDto, userId)
   }
 }
