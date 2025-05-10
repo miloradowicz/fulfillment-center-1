@@ -80,6 +80,34 @@ export class ClientsService {
     return await Promise.any(products.map(x => this.productsService.isLocked(String(x._id))))
   }
 
+  async isLockedArchived(id: string) {
+    const client = await this.clientModel.findById(id)
+    if (!client) throw new NotFoundException('Клиент не найден')
+
+    const products = await this.productModel.find({ client: client._id }, { _id: 1 })
+    if (!products.length) return false
+
+    const productIds = products.map(p => p._id)
+
+    const hasActiveArrivals = await this.arrivalModel.exists({
+      isArchived: { $ne: true },
+      $or: [
+        { products: { $elemMatch: { product: { $in: productIds } } } },
+        { received_amount: { $elemMatch: { product: { $in: productIds } } } },
+        { defects: { $elemMatch: { product: { $in: productIds } } } },
+      ],
+    })
+
+    if (hasActiveArrivals) return true
+
+    const hasActiveOrders = await this.orderModel.exists({
+      isArchived: { $ne: true },
+      products: { $elemMatch: { product: { $in: productIds } } },
+    })
+
+    return Boolean(hasActiveOrders)
+  }
+
   async archive(id: string) {
     const client = await this.clientModel.findById(id)
 
@@ -87,9 +115,9 @@ export class ClientsService {
 
     if (client.isArchived) throw new ForbiddenException('Клиент уже в архиве')
 
-    if (await this.isLocked(id))
+    if (await this.isLockedArchived(id))
       throw new ForbiddenException(
-        'Клиент не может быть перемещен в архив, поскольку его товары уже используются в поставках и/или заказах.',
+        'Клиент не может быть перемещен в архив, поскольку его товары используются в неархивированных поставках и/или заказах.',
       )
 
     const hasUnpaidInvoices = await this.invoiceModel.exists({
@@ -143,7 +171,7 @@ export class ClientsService {
 
     if (await this.isLocked(id))
       throw new ForbiddenException(
-        'Клиент не может быть удален, поскольку его товары уже используются в поставках и/или заказах.',
+        'Клиент не может быть удален, поскольку его товары используются в архивированных поставках и/или заказах.',
       )
 
     const hasUnpaidInvoices = await this.invoiceModel.exists({
