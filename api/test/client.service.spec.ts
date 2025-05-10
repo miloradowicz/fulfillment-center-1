@@ -7,28 +7,50 @@ import { Arrival } from 'src/schemas/arrival.schema'
 import { ProductsService } from '../src/services/products.service'
 import { NotFoundException, ForbiddenException } from '@nestjs/common'
 import { CreateClientDto } from '../src/dto/create-client.dto'
+import { Order } from '../src/schemas/order.schema'
+import { Invoice } from '../src/schemas/invoice.schema'
 
 let mockClientModel: {
   findById: jest.Mock,
   find: jest.Mock,
   create: jest.Mock,
   deleteOne: jest.Mock,
+  isLockedArchived:  jest.Mock,
+  save?: jest.Mock
 }
 
 let mockArrivalModel: {
   findById: jest.Mock,
   find: jest.Mock,
   create: jest.Mock,
+  updateMany: jest.Mock,
+  exists: jest.Mock,
 }
 
 let mockProductModel: {
   find: jest.Mock,
   create: jest.Mock,
+  updateMany: jest.Mock,
 }
 
 let mockProductsService: {
   isLocked: jest.Mock,
   getById: jest.Mock,
+}
+
+let mockOrderModel: {
+  findById: jest.Mock,
+  find: jest.Mock,
+  create: jest.Mock,
+  exists: jest.Mock,
+  updateMany: jest.Mock,
+  deleteMany: jest.Mock,
+}
+
+let mockInvoiceModel: {
+  exists: jest.Mock,
+  updateMany: jest.Mock,
+  deleteMany: jest.Mock,
 }
 
 describe('ClientsService', () => {
@@ -40,22 +62,42 @@ describe('ClientsService', () => {
       find: jest.fn(),
       create: jest.fn(),
       deleteOne: jest.fn(),
+      isLockedArchived: jest.fn(),
+      save: jest.fn(),
     }
 
-    mockArrivalModel = {
+    mockArrivalModel= {
       findById: jest.fn(),
       find: jest.fn(),
       create: jest.fn(),
+      updateMany: jest.fn(),
+      exists: jest.fn(),
     }
 
     mockProductModel = {
       find: jest.fn(),
       create: jest.fn(),
+      updateMany: jest.fn(),
     }
 
     mockProductsService = {
       isLocked: jest.fn(),
       getById: jest.fn(),
+    }
+
+    mockOrderModel = {
+      findById: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      exists: jest.fn(),
+      updateMany: jest.fn(),
+      deleteMany: jest.fn(),
+    }
+
+    mockInvoiceModel = {
+      exists: jest.fn(),
+      updateMany: jest.fn(),
+      deleteMany: jest.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -76,6 +118,14 @@ describe('ClientsService', () => {
         {
           provide: ProductsService,
           useValue: mockProductsService,
+        },
+        {
+          provide: getModelToken(Order.name),
+          useValue: mockOrderModel,
+        },
+        {
+          provide: getModelToken(Invoice.name),
+          useValue: mockInvoiceModel,
         },
       ],
     }).compile()
@@ -140,18 +190,58 @@ describe('ClientsService', () => {
     await expect(service.getById(clientId)).rejects.toThrow(ForbiddenException)
   })
 
-  it('should throw ForbiddenException if trying to archive a locked client', async () => {
-    const clientId = '12345'
-    const client: ClientDocument = {
-      _id: clientId,
-      isArchived: false,
-    } as ClientDocument
+  describe('archive', () => {
+    it('should throw ForbiddenException for active products', async () => {
+      const clientId = '12345'
+      mockClientModel.findById.mockResolvedValue({
+        _id: clientId,
+        isArchived: false,
+      })
+      mockProductModel.find.mockResolvedValue([{ _id: 'prod1' }])
+      mockArrivalModel.exists.mockResolvedValue(true)
 
-    mockClientModel.findById.mockResolvedValue(client)
-    mockProductModel.find.mockResolvedValue([{ _id: 'prod1' }])
-    mockProductsService.isLocked.mockResolvedValue(true)
+      await expect(service.archive(clientId)).rejects.toThrow(
+        new ForbiddenException(
+          'Клиент не может быть перемещен в архив, поскольку его товары используются в неархивированных поставках и/или заказах.'
+        )
+      )
+    })
 
-    await expect(service.archive(clientId)).rejects.toThrow(ForbiddenException)
+    it('should throw ForbiddenException for unpaid invoices', async () => {
+      const clientId = '12345'
+      mockClientModel.findById.mockResolvedValue({
+        _id: clientId,
+        isArchived: false,
+      })
+      mockProductModel.find.mockResolvedValue([])
+      mockInvoiceModel.exists.mockResolvedValue(true)
+
+      await expect(service.archive(clientId)).rejects.toThrow(
+        new ForbiddenException(
+          'Клиент не может быть перемещен в архив, так как у него есть неоплаченные счета.'
+        )
+      )
+    })
+
+    it('should successfully archive client', async () => {
+      const clientId = '12345'
+      const client = {
+        _id: clientId,
+        isArchived: false,
+        save: mockClientModel.save,
+      }
+
+      mockClientModel.findById.mockResolvedValue(client)
+      mockProductModel.find.mockResolvedValue([])
+      mockInvoiceModel.exists.mockResolvedValue(false)
+
+      const result = await service.archive(clientId)
+
+      expect(result).toEqual({
+        message: 'Клиент и все его товары, поставки, заказы и счета перемещены в архив',
+      })
+      expect(mockClientModel.save).toHaveBeenCalled()
+    })
   })
 
   it('should throw ForbiddenException if trying to delete a locked client', async () => {
