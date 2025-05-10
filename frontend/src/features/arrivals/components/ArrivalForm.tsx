@@ -5,7 +5,7 @@ import { getFieldError } from '@/utils/getFieldError.ts'
 import { inputChangeHandler } from '@/utils/inputChangeHandler.ts'
 import React from 'react'
 import { getArrayItemNameById } from '@/utils/getArrayItemName.ts'
-import { ItemType } from '@/constants.ts'
+import { ArrivalStatus, ItemType } from '@/constants.ts'
 import { ArrivalData } from '../utils/arrivalTypes.ts'
 import { Button } from '@/components/ui/button.tsx'
 import { LoaderCircle, Plus } from 'lucide-react'
@@ -60,7 +60,6 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     handleBlur,
     error,
     submitFormHandler,
-    status,
     clients,
     stocks,
     availableItem,
@@ -147,16 +146,16 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         </div>
 
         <CustomSelect
-          label="Статус доставки"
-          value={form.arrival_status && status.includes(form.arrival_status) ? form.arrival_status : undefined}
-          placeholder="Статус доставки"
-          options={status.map(s => ({ _id: s }))}
+          label="Статус поставки"
+          value={form.arrival_status && ArrivalStatus.includes(form.arrival_status) ? form.arrival_status : undefined}
+          placeholder="Статус поставки"
+          options={ArrivalStatus.map(s => ({ _id: s }))}
           onSelect={value => {
             setForm(prev => ({ ...prev, arrival_status: value }))
             handleBlur('arrival_status', value)
           }}
           popoverKey="arrival_status"
-          searchPlaceholder="Поиск статуса доставки..."
+          searchPlaceholder="Поиск статуса поставки..."
           activePopover={activePopover}
           setActivePopover={setActivePopover}
           error={errors.arrival_status || getFieldError('arrival_status', error)}
@@ -528,7 +527,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
           onFileChange={handleFileChange}
         />
 
-        <Separator/>
+        <Separator />
 
         <div className="space-y-2.5">
           <Label htmlFor="comment">Комментарий к поставке</Label>
@@ -538,7 +537,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             placeholder="Ваш комментарий..."
             value={form.comment}
             onChange={e => inputChangeHandler(e, setForm)}
-            className="resize-y min-h-[40px] max-h-[250px]"
+            className="resize-y min-h-[40px] max-h-[250px] text-sm"
           />
         </div>
 

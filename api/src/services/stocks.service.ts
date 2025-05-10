@@ -8,11 +8,15 @@ import { CreateWriteOffDto } from 'src/dto/create-write-off.dto'
 import { StockManipulationService } from './stock-manipulation.service'
 import { WriteOff } from 'src/types'
 import { LogsService } from './logs.service'
+import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
+import { Order, OrderDocument } from '../schemas/order.schema'
 
 @Injectable()
 export class StocksService {
   constructor(
     @InjectModel(Stock.name) private readonly stockModel: Model<StockDocument>,
+    @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     private readonly stockManipulationService: StockManipulationService,
     private readonly logsService: LogsService,
   ) {}
@@ -121,18 +125,47 @@ export class StocksService {
     return writeOffDto
   }
 
-  async archive(id: string, userId: mongoose.Types.ObjectId) {
+  async isLockedForArchive(id: string): Promise<boolean> {
     const stock = await this.stockModel.findById(id)
+    if (!stock) throw new NotFoundException('Склад не найден')
+
+    const activeArrivals = await this.arrivalModel.find({
+      stock: stock._id,
+      $or: [{ isArchived: false }, { isArchived: { $exists: false } }],
+    })
+
+    if (activeArrivals.length > 0) return true
+
+    const activeOrders = await this.orderModel.find({
+      stock: stock._id,
+      $or: [{ isArchived: false }, { isArchived: { $exists: false } }],
+    })
+
+    return activeOrders.length > 0
+  }
+
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
+    const stock = await this.stockModel.findById(id).exec()
 
     if (!stock) throw new NotFoundException('Склад не найден.')
 
     if (stock.isArchived) throw new ForbiddenException('Склад уже в архиве.')
+
+    const hasActiveProducts = stock.products.some(p => p.amount > 0)
+
+    if (hasActiveProducts) {
+      throw new ForbiddenException('На складе ещё есть товары. Архивация невозможна.')
+    }
+    const isLockedForArchive = await this.isLockedForArchive(id)
+    if (isLockedForArchive) {
+      throw new ForbiddenException('Склад участвует в неархивированных поставках или заказах. Архивация невозможна.')
+    }
+
     stock.isArchived = true
     const log = this.logsService.generateLogForArchive(userId, stock.isArchived)
     stock.logs.push(log)
 
     await stock.save()
-
     return { message: 'Склад перемещен в архив.' }
   }
 
@@ -152,9 +185,34 @@ export class StocksService {
     return { message: 'Склад восстановлен из архива' }
   }
 
+  async isLocked(id: string) {
+    const stock = await this.stockModel.findById(id)
+    if (!stock) throw new NotFoundException('Склад не найден')
+    const arrivals = await this.arrivalModel.find({
+      stock: stock._id,
+    })
+    if (arrivals.length) return true
+    const orders = await this.orderModel.find({
+      stock: stock._id,
+    })
+    return !!orders.length
+  }
+
   async delete(id: string) {
-    const stock = await this.stockModel.findByIdAndDelete(id)
+    const stock = await this.stockModel.findById(id).exec()
     if (!stock) throw new NotFoundException('Склад не найден.')
+
+    const hasActiveProducts = stock.products.some(p => p.amount > 0)
+    if (hasActiveProducts) {
+      throw new ForbiddenException('На складе есть товары. Удаление невозможно.')
+    }
+
+    const isLocked = await this.isLocked(id)
+    if (isLocked) {
+      throw new ForbiddenException('Склад участвует в архивироавнных поставках или заказах. Удаление невозможно.')
+    }
+
+    await this.stockModel.findByIdAndDelete(id)
     return { message: 'Склад успешно удален.' }
   }
 }

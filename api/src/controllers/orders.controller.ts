@@ -28,11 +28,12 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async getAllOrders(@Query('client') client?: string) {
-    if (client === '1') {
-      return this.ordersService.getAllWithClient()
+  async getAllOrders(@Query('client') clientId?: string, @Query('populate') populate?: string) {
+    if (clientId) {
+      return await this.ordersService.getAllByClient(clientId, populate === '1')
+    } else {
+      return await this.ordersService.getAll(populate === '1')
     }
-    return this.ordersService.getAll()
   }
 
   @Roles('super-admin')

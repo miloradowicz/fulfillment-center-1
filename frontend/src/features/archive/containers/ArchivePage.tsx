@@ -90,10 +90,11 @@ const ArchivePage = () =>  {
   }, [value, dispatch])
 
   return (
-    <div className="max-w-[1300px] mx-auto">
-      <div className="text-center ml-5 my-4">
-        <CustomTitle text="Архив" icon={<ArchiveRestore size={25} />} />
+    <div className="max-w-[1000px] mx-auto">
+      <div className="my-7">
+        <CustomTitle className="flex justify-center" text="Архив" icon={<ArchiveRestore size={25} />} />
       </div>
+
       <Tabs value={value} onValueChange={handleChange} className="w-full">
         <TabsList className="mb-5 w-full h-auto">
           <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
@@ -149,9 +150,7 @@ const ArchivePage = () =>  {
         <TabsContent value="invoices">
           < ArchivedInvoices/>
         </TabsContent>
-
       </Tabs>
-
     </div>
   )
 }

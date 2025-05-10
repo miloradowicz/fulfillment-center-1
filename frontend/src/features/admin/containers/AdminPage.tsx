@@ -4,6 +4,8 @@ import UserPage from './UserPage'
 import { Settings } from 'lucide-react'
 import ServicesPage from '@/features/services/containers/ServicesPage.tsx'
 import InvoicesPage from '@/features/invoices/containers/InvoicesPage.tsx'
+import { Separator } from '@/components/ui/separator.tsx'
+import { tabTriggerStyles } from '@/utils/commonStyles.ts'
 
 const tabs = [
   { value: 'users', label: 'Сотрудники' },
@@ -20,27 +22,30 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto">
+    <div className="max-w-[1000px] mx-auto">
       <div className="w-full flex justify-center items-center gap-2 mt-6 mb-6">
         <Settings size={28} className="text-primary" />
         <h1 className="text-xl sm:text-2xl font-semibold">Админ-панель</h1>
       </div>
+
       <Tabs value={currentTab} onValueChange={handleTabChange}>
         <div className="flex justify-center">
-          <TabsList className="mb-10 flex flex-wrap justify-center gap-3 sm:gap-4 sm:mb-10">
-            {tabs.map(tab => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-primary/5 hover:text-primary px-4 py-2 text-sm sm:text-base rounded-xl transition-all cursor-pointer"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+          <TabsList className="mb-5 sm:w-auto w-full rounded-2xl">
+            <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
+              {tabs.map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={tabTriggerStyles}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </div>
           </TabsList>
         </div>
 
-        <div className="h-px bg-muted mb-3 w-full" />
+        <Separator />
 
         <TabsContent value="users" className="mt-0">
           <UserPage />
@@ -49,7 +54,7 @@ const AdminPage = () => {
           <ServicesPage />
         </TabsContent>
         <TabsContent value="invoices">
-          <InvoicesPage/>
+          <InvoicesPage />
         </TabsContent>
       </Tabs>
     </div>

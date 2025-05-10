@@ -7,9 +7,8 @@ import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/
 import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu'
 import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn'
 import ConfirmationModal from '@/components/Modal/ConfirmationModal'
-// import Modal from '@/components/Modal/Modal'
-// import InvoiceForm from './InvoiceForm'
 import { ColumnDef } from '@tanstack/react-table'
+import { invoiceStatusStyles } from '@/utils/commonStyles.ts'
 
 interface Props {
   onEdit: (data: Invoice) => void
@@ -21,7 +20,6 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
     handleArchiveClick,
     handleConfirmArchive,
     handleClose,
-    // isOpen,
     archiveModalOpen,
   } = useInvoicesList()
 
@@ -65,20 +63,11 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
       cell: ({ row }) => {
         const status = row.original.status
 
-        const statusStyles: Record<'в ожидании' | 'оплачено' | 'частично оплачено', string> = {
-          'в ожидании':
-            'bg-yellow-100 text-yellow-600 rounded-lg font-bold px-4 py-2',
-          'оплачено':
-            'bg-emerald-100 text-emerald-700 transition-colors rounded-lg font-bold px-4 py-2',
-          'частично оплачено':
-            'bg-indigo-100 text-indigo-700 rounded-lg font-bold px-4 py-2',
-        }
-
         const capitalizeFirstLetter = (str: string) => {
           return str.charAt(0).toUpperCase() + str.slice(1)
         }
 
-        const statusClass = statusStyles[status as keyof typeof statusStyles] || 'bg-primary/10 text-primary/80 border font-bold px-4 py-2'
+        const statusClass = invoiceStatusStyles[status as keyof typeof invoiceStatusStyles] || 'bg-primary/10 text-primary/80 border font-bold px-4 py-2'
 
         return (
           <span className={statusClass}>
@@ -118,12 +107,6 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
         onConfirm={handleConfirmArchive}
         onCancel={handleClose}
       />
-
-      {/*<div className="my-8">*/}
-      {/*/!*  <Modal handleClose={handleClose} open={isOpen}>*!/  <--- подключить, когда будет готова форма*/}
-      {/*    <InvoiceForm />*/}
-      {/*  </Modal>*/}
-      {/*</div>*/}
     </div>
   )
 }

@@ -13,13 +13,16 @@ import {
 } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { OrderWithClient } from '@/types'
+import { FormType } from '@/features/orders/state/orderState.ts'
 
 const UseOrderPage = () => {
   const dispatch = useAppDispatch()
   const orders = useAppSelector(selectAllOrdersWithClient)
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [open, setOpen] = useState(false)
+  const [formType, setFormType] = useState<FormType>('order')
   const [counterpartyToDelete, setCounterpartyToDelete] = useState<OrderWithClient | null>(null)
+  const [orderToEdit, setOrderToEdit] = useState<OrderWithClient | undefined>(undefined)
 
   useEffect(() => {
     dispatch(fetchOrdersWithClient())
@@ -37,17 +40,22 @@ const UseOrderPage = () => {
     }
   }
 
-  const handleOpen = () => setOpen(true)
+  const handleOpen = (type: FormType = 'order') => {
+    setFormType(type)
+    setOpen(true)
+  }
 
   const handleClose = () => {
     setOpen(false)
     dispatch(clearPopulateOrder())
+    setOrderToEdit(undefined)
     dispatch(clearErrorOrder())
   }
 
   const handleOpenEdit = async (order: OrderWithClient) => {
     await dispatch(fetchOrderByIdWithPopulate(order._id))
-    setOpen(true)
+    setOrderToEdit(order)
+    handleOpen('order')
   }
 
   const handleConfirmArchive = async () => {
@@ -61,6 +69,7 @@ const UseOrderPage = () => {
   return {
     orders,
     open,
+    formType,
     handleOpen,
     loading,
     handleClose,
@@ -68,6 +77,7 @@ const UseOrderPage = () => {
     handleOpenEdit,
     setCounterpartyToDelete,
     handleConfirmArchive,
+    orderToEdit,
   }
 }
 

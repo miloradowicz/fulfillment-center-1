@@ -6,9 +6,8 @@ import { fetchClients } from '@/store/thunks/clientThunk.ts'
 import { fetchProductsByClientId } from '@/store/thunks/productThunk.ts'
 import { selectAllClients } from '@/store/slices/clientSlice.ts'
 import { selectAllProducts } from '@/store/slices/productSlice.ts'
-import { selectCreateError, selectLoadingAddArrival } from '@/store/slices/arrivalSlice.ts'
 import { addWriteOff, fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
-import { selectAllStocks, selectOneStock } from '@/store/slices/stocksSlice.ts'
+import { selectAllStocks, selectCreateWriteOffError, selectLoadingWriteOff, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect.tsx'
 import { ErrorMessages, FormType, StockWriteOffData } from '../utils/writeOffTypes'
@@ -19,8 +18,8 @@ export const useWriteOffForm = (initialData?: Partial<StockWriteOffData>, onSucc
   const clients = useAppSelector(selectAllClients)
   const clientProducts = useAppSelector(selectAllProducts)
   const stocks = useAppSelector(selectAllStocks)
-  const error = useAppSelector(selectCreateError)
-  const isLoading = useAppSelector(selectLoadingAddArrival)
+  const error = useAppSelector(selectCreateWriteOffError)
+  const isLoading = useAppSelector(selectLoadingWriteOff)
   const stock = useAppSelector(selectOneStock)
 
   const [form, setForm] = useState<StockWriteOffMutation>(

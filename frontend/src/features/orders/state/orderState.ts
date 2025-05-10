@@ -11,6 +11,7 @@ export const initialState: OrderMutation = {
   defects: [],
   services: [],
   status: '',
+  paymentStatus: '',
   documents: [],
 }
 
@@ -33,9 +34,10 @@ export const initialErrorState = {
   defect_description: '',
   client: '',
   sent_at: '',
-  delivered_at: '',
   stock: '',
   price: '',
   service: '',
   service_amount: '',
 }
+
+export type FormType = 'order' | 'invoice'

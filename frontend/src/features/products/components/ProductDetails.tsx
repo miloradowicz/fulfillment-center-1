@@ -6,26 +6,26 @@ import useProductActions from '@/features/products/hooks/useProductActions.ts'
 import { Link } from 'react-router-dom'
 
 interface Props {
-  productId?: string
+  id?: string
 }
 
-const ProductDetails: React.FC<Props> = ({ productId }) => {
+const ProductDetails: React.FC<Props> = ({ id }) => {
   const product = useAppSelector(selectProductWithPopulate)
   const {
     fetchProduct,
   } = useProductActions(true)
 
   useEffect(() => {
-    if (productId) {
-      void fetchProduct(productId)
+    if (id) {
+      void fetchProduct(id)
     }
-  }, [fetchProduct, productId])
+  }, [fetchProduct, id])
 
   return (
     <>
       {product && (
         <div className="py-10 space-y-3 text-sm sm:text-md text-primary">
-          <div className="flex justify-center items-center gap-2 mb-4 ps-4 rounded-md bg-blue-100 text-blue-600 sm:py-2">
+          <div className="flex justify-center items-center gap-2 mb-4 ps-4 rounded-md bg-blue-100 text-blue-600 py-2">
             <Package className="w-6 h-6" />
             <h5 className="font-bold">{product.title}</h5>
           </div>

@@ -137,7 +137,7 @@ const WriteOffForm: React.FC<Props> = ({ initialData, onSuccess }) => {
             <InputWithError
               id="amount"
               type="number"
-              placeholder="Количество списывамого товара"
+              placeholder="Количество списываемого товара"
               name="amount"
               value={newItem.amount || ''}
               onChange={e => setNewItem(prev => ({ ...prev, amount: +e.target.value }))}

@@ -1,10 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip.tsx'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { copyToClipboard } from '@/utils/copyToClipboard.ts'
 import { cn } from '@/lib/utils'
@@ -20,12 +15,18 @@ const CopyText: React.FC<Props> = ({ text, children, className }) => {
   const [tooltipOpen, setTooltipOpen] = useState(false)
 
   const handleCopy = async () => {
+    if (!text) return
+
     try {
-      copyToClipboard(text)
+      await copyToClipboard(text)
       setTooltipText('Скопировано!')
       setTooltipOpen(true)
+
+      setTimeout(() => {
+        setTooltipOpen(false)
+      }, 2000)
     } catch (err) {
-      console.error(err)
+      console.error('Ошибка копирования:', err)
       setTooltipText('Ошибка')
       setTooltipOpen(true)
     }
@@ -46,11 +47,7 @@ const CopyText: React.FC<Props> = ({ text, children, className }) => {
             )}
             onClick={handleCopy}
           >
-            {children && (
-              <span className="group-hover:text-blue-500 transition-colors duration-200">
-                {children}
-              </span>
-            )}
+            {children && <span className="group-hover:text-blue-500 transition-colors duration-200">{children}</span>}
             {text}
           </Button>
         </TooltipTrigger>

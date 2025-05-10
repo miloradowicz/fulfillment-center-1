@@ -2,7 +2,6 @@ import React from 'react'
 import { useRegistrationForm } from '../hooks/useRegistrationForm'
 import { roles } from '@/constants'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -12,6 +11,7 @@ import {
 } from '@/components/ui/select'
 import { LoaderCircle } from 'lucide-react'
 import { UserUpdateMutation } from '@/types'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
 
 interface RegistrationFormProps {
   onSuccess: () => void
@@ -31,6 +31,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
     getFieldError,
     isFormValid,
     isEditMode,
+    handleBlur,
   } = useRegistrationForm(onSuccess, initialFormData)
 
   return (
@@ -39,84 +40,81 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialF
         {isEditMode ? 'Редактировать пользователя' : 'Добавить нового сотрудника'}
       </h3>
 
-      <div className="space-y-1">
-        <Input
-          id="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          onBlur={() => validateFields('email')}
-        />
-        {getFieldError('email') && (
-          <p className="text-sm text-destructive mt-1">{getFieldError('email')}</p>
-        )}
-      </div>
+      <InputWithError
+        id="email"
+        name="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={handleChange}
+        onBlur={e => {
+          handleBlur('email', e.target.value)
+          validateFields('email')
+        }}
+        error={getFieldError('email')}
+      />
 
-      <div className="space-y-1">
-        <Input
-          id="displayName"
-          name="displayName"
-          placeholder="Отображаемое имя"
-          value={form.displayName}
-          onChange={handleChange}
-        />
-        {getFieldError('displayName') && (
-          <p className="text-sm text-destructive mt-1">{getFieldError('displayName')}</p>
-        )}
-      </div>
+      <InputWithError
+        id="displayName"
+        name="displayName"
+        placeholder="Отображаемое имя"
+        value={form.displayName}
+        onChange={handleChange}
+        onBlur={e => handleBlur('displayName', e.target.value)}
+        error={getFieldError('displayName')}
+      />
 
-      <div className="space-y-1">
-        <Input
-          id="password"
-          type="password"
-          name="password"
-          placeholder={isEditMode ? 'Новый пароль (необязательно)' : 'Пароль'}
-          value={form.password}
-          onChange={handleChange}
-        />
-        {getFieldError('password') && (
-          <p className="text-sm text-destructive mt-1">{getFieldError('password')}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <Input
-          id="confirmPassword"
-          type="password"
-          name="confirmPassword"
-          placeholder="Подтвердите пароль"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          onBlur={() => validateFields('confirmPassword')}
-        />
-        {getFieldError('confirmPassword') && (
-          <p className="text-sm text-destructive mt-1">{getFieldError('confirmPassword')}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <Select
-          value={form.role}
-          onValueChange={(value: string) =>
-            handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)
+      <InputWithError
+        id="password"
+        name="password"
+        placeholder={isEditMode ? 'Новый пароль (необязательно)' : 'Пароль'}
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        onBlur={e => {
+          if (!isEditMode) {
+            handleBlur('password', e.target.value)
           }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Выберите роль" />
-          </SelectTrigger>
-          <SelectContent>
-            {roles.map((role, i) => (
-              <SelectItem key={i} value={role.name}>
-                {role.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {getFieldError('role') && (
-          <p className="text-sm text-destructive mt-1">{getFieldError('role')}</p>
-        )}
-      </div>
+        }}
+        error={getFieldError('password')}
+      />
+
+      <InputWithError
+        id="confirmPassword"
+        name="confirmPassword"
+        placeholder="Подтвердите пароль"
+        type="password"
+        value={confirmPassword}
+        onChange={handleConfirmPasswordChange}
+        onBlur={() => {
+          if (!isEditMode) {
+            handleBlur('confirmPassword', confirmPassword)
+          }
+          validateFields('confirmPassword')
+        }}
+        error={getFieldError('confirmPassword')}
+      />
+
+      <Select
+        value={form.role}
+        onValueChange={(value: string) => {
+          handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)
+          validateFields('role')
+        }}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Выберите роль" />
+        </SelectTrigger>
+        <SelectContent>
+          {roles.map((role, i) => (
+            <SelectItem key={i} value={role.name}>
+              {role.title}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {getFieldError('role') && (
+        <p className="text-sm text-destructive mt-1">{getFieldError('role')}</p>
+      )}
 
       <Button
         type="submit"

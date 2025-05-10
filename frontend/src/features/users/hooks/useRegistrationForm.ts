@@ -1,4 +1,3 @@
-import { SelectChangeEvent } from '@mui/material'
 import { passwordStrength, DiversityType } from 'check-password-strength'
 import React, { useEffect, useState, ChangeEvent } from 'react'
 import { toast } from 'react-toastify'
@@ -115,7 +114,7 @@ export const useRegistrationForm = (
   }
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<unknown>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     dispatch(clearCreateError(e.target.name))
     let value = e.target.value as string
@@ -126,33 +125,56 @@ export const useRegistrationForm = (
   }
 
   const validateFields = (...fieldNames: string[]) => {
-    const _error = { ...frontendError }
-    fieldNames.forEach(x => delete _error[x])
-    setFrontendError(_error)
-
     fieldNames.forEach(x => {
-      if (x !== 'confirmPassword' && !form[x as keyof typeof form]?.trim()) return
+      const value = x === 'confirmPassword' ? confirmPassword : form[x as keyof typeof form]
+
+      if (!value?.trim()) return
+
+      setFrontendError(prev => {
+        const updated = { ...prev }
+        delete updated[x]
+        return updated
+      })
 
       switch (x) {
       case 'email':
         if (!emailRegex.test(form.email)) {
-          setFrontendError(error => ({ ...error, [x]: 'Недействительная почта' }))
+          setFrontendError(error => ({ ...error, [x]: 'Недействительная почта.' }))
         }
         break
 
       case 'confirmPassword':
         if (form.password && confirmPassword && form.password !== confirmPassword) {
-          setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают' }))
+          setFrontendError(error => ({ ...error, [x]: 'Пароли не совпадают.' }))
         }
         break
 
       case 'role':
         if (!roles.map(x => x.name).includes(form.role)) {
-          setFrontendError(error => ({ ...error, [x]: 'Укажите роль' }))
+          setFrontendError(error => ({ ...error, [x]: 'Укажите роль.' }))
         }
         break
       }
     })
+  }
+
+  const handleBlur = (field: keyof FormType | 'confirmPassword', value: string) => {
+    type ErrorMessages = {
+      [key in keyof FormType | 'confirmPassword']: string
+    }
+
+    const errorMessages: ErrorMessages = {
+      email: !value.trim() ? 'Введите email.' : '',
+      displayName: !value.trim() ? 'Введите отображаемое имя.' : '',
+      password: !value.trim() ? 'Введите пароль.' : '',
+      role: !value.trim() ? 'Выберите роль.' : '',
+      confirmPassword: !value.trim() ? 'Повторите пароль.' : '',
+    }
+
+    setFrontendError(prev => ({
+      ...prev,
+      [field]: errorMessages[field],
+    }))
   }
 
   const getFieldError = (fieldName: string) => {
@@ -187,5 +209,6 @@ export const useRegistrationForm = (
     getFieldError,
     isFormValid,
     isEditMode,
+    handleBlur,
   }
 }

@@ -36,7 +36,7 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
       enableHiding: false,
     },
     {
-      id: 'tasks',
+      id: 'задачи',
       header: () => (
         <div className="text-center">
           Выполненные <br /> задачи
@@ -54,7 +54,7 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
       ),
     },
     {
-      accessorKey: 'taskCount',
+      accessorKey: 'количество выполненных задач',
       header: () => (
         <div className="text-center">
           Количество <br />выполненных задач
@@ -69,7 +69,7 @@ const TaskReportDataList: React.FC<PropsTaskTable> = ({ userTaskReports }) => {
   ]
 
   return (
-    <div className="overflow-x-auto flex-grow min-w-[340px] max-w-[570px] w-full md:w-full">
+    <div className="overflow-x-auto flex-grow min-w-[340px] max-w-[570px] w-full md:w-full ml-2">
       <h6
         className="mx-auto w-[90%] sm:w-[80%] md:w-[95%] lg:w-[95%] xl:w-[95%] mb-[15px] text-[1rem] sm:text-[1.25rem] text-center"
       >

@@ -8,6 +8,8 @@
  * полную аутентификацию и авторизацию.
  */
 
+import {log, debug} from 'console'
+
 import { Test, TestingModule } from '@nestjs/testing'
 import { OrdersController } from '../src/controllers/orders.controller'
 import { OrdersService } from '../src/services/orders.service'
@@ -49,6 +51,7 @@ describe('OrdersController', () => {
   const mockOrdersService = {
     getAll: jest.fn(),
     getAllWithClient: jest.fn(),
+    getAllByClient: jest.fn(),
     getAllArchived: jest.fn(),
     getById: jest.fn(),
     getByIdWithPopulate: jest.fn(),
@@ -109,24 +112,31 @@ describe('OrdersController', () => {
   })
 
   describe('getAllOrders', () => {
-    it('should return all orders when client query param is not 1', async () => {
+    it('should return all orders without populate when neither client nor populate is not provided', async () => {
       const orders = [mockOrder]
       mockOrdersService.getAll.mockResolvedValue(orders)
 
       const result = await controller.getAllOrders()
 
-      expect(service.getAll).toHaveBeenCalled()
+      expect(service.getAll).toHaveBeenCalledWith(false)
       expect(result).toEqual(orders)
     })
 
-    it('should return all orders with client when client query param is 1', async () => {
-      const orders = [mockOrder]
-      mockOrdersService.getAllWithClient.mockResolvedValue(orders)
+    it('should return all orders with client when called with client id', async () => {
+      const populatedOrders = [{
+        ...mockOrder,
+        client: { _id: mockOrder.client, name: 'Test Client' },
+        stock: { _id: mockOrder.stock, name: 'Test Stock' },
+      }]
+      mockOrdersService.getAllByClient.mockResolvedValue(populatedOrders)
 
-      const result = await controller.getAllOrders('1')
+      const result = await controller.getAllOrders('client-id', '1')
 
-      expect(service.getAllWithClient).toHaveBeenCalled()
-      expect(result).toEqual(orders)
+      expect(service.getAllByClient).toHaveBeenCalledWith('client-id', true)
+      debug(result)
+      expect(result[0].client).toBeDefined()
+      expect(result[0].stock).toBeDefined()
+      expect(result).toEqual(populatedOrders)
     })
   })
 

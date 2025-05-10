@@ -73,10 +73,6 @@ export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
 }
 
-export interface DefectMutation extends Defect {
-  productName: string
-}
-
 export interface ProductOrder {
   product: string
   description: string
@@ -104,10 +100,15 @@ export type ProductArrivalWithPopulate = Omit<ProductArrival, 'product'> & {
   product: Product
 }
 
+export type ProductField = { product: string | { _id: string } }
+
+export type ServiceField = { service: string | { _id: string } }
+
 export interface ServiceArrival {
   service: string
   service_amount: number
   service_price: number
+  service_type?: 'внутренняя' | 'внешняя'
 }
 
 export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
@@ -186,6 +187,7 @@ export interface Order {
   delivered_at?: string
   comment?: string
   status: string
+  paymentStatus: string
   orderNumber?: string
   logs?: Log[]
   defects: Defect[]
@@ -197,12 +199,13 @@ export type OrderWithProducts = Omit<Order, 'products'> & {
   products: ProductOrderMutation[]
 }
 
-export type OrderWithProductsAndClients = Omit<Order, 'products'> & {
-  products: ProductForOrderForm[]
-  defects: DefectWithPopulate[]
-  client: Client
-  stock: Stock
-}
+export type OrderWithProductsAndClients = Omit<Order, 'products' | 'defects' | 'client' | 'stock' | 'services'> & {
+  client: Client;
+  products: ProductOrderMutation[];
+  defects: DefectWithPopulate[];
+  stock: Stock;
+  services: ServiceOrderWithPopulate[];
+};
 
 export type OrderWithClient = Omit<Order, 'client' | 'stock'> & {
   client: Client
@@ -264,6 +267,10 @@ export interface ErrorsFields {
   service?: string
   service_amount?: string
   service_price?: string
+  paid_amount?: string
+  discount?: string
+  associatedArrival?: string
+  associatedOrder?: string
 }
 
 export interface Task {
@@ -326,7 +333,7 @@ export interface Service {
   serviceCategory: { _id: string; name: string }
   price: number
   description: string
-  type: string
+  type: 'внутренняя' | 'внешняя'
   logs?: Log[]
 }
 
@@ -342,6 +349,20 @@ export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
 export interface PopulatedService extends Omit<Service, 'serviceCategory'> {
   serviceCategory: ServiceCategory
+}
+
+export type ServiceInTable = {
+  service: string | Service
+  service_amount?: number
+  service_price?: number
+  _id?: string
+}
+
+export type ServiceOrderWithPopulate = {
+  service: PopulatedService
+  service_amount: number
+  service_price?: number
+  _id?: string
 }
 
 export interface ProductStockPopulate {
@@ -407,74 +428,121 @@ export interface ReportTaskResponse {
   dailyTaskCounts: DailyTaskCount[];
 }
 
-export interface ClientOrderReport {
+// export interface ClientOrderReport {
+//   client: {
+//     _id: string;
+//     name: string;
+//     isArchived: boolean
+//   };
+//   orders: {
+//     _id: string
+//     orderNumber: string
+//     status:string
+//     isArchived: boolean
+//   }[],
+//   orderCount: number;
+// }
+//
+// export interface ReportClientResponse {
+//   clientOrderReport: ClientOrderReport[];
+// }
+
+export interface ClientFullReport {
   client: {
-    _id: string;
-    name: string;
+    _id: string
+    name: string
     isArchived: boolean
-  };
+  }
+
   orders: {
     _id: string
     orderNumber: string
-    status:string
+    status: string
     isArchived: boolean
-  }[],
-  orderCount: number;
+  }[]
+
+  arrivals: {
+    _id: string
+    arrivalNumber: string
+    arrival_status: string
+    isArchived: boolean
+  }[]
+
+  invoices: {
+    _id: string
+    invoiceNumber: string
+    status: string
+    totalAmount: number
+    paidAmount: number
+    isArchived: boolean
+  }[]
 }
 
 export interface ReportClientResponse {
-  clientOrderReport: ClientOrderReport[];
+  clientReport: ClientFullReport[]
 }
-export interface Invoice  {
+export interface Invoice {
+  _id: string
+  isArchived: boolean
+  invoiceNumber: string
+  client: Client
+  services: {
+    service: Service
+    service_amount: number
+    service_price: number
+    service_type?: 'внутренняя' | 'внешняя'
     _id: string
-    isArchived: boolean,
-    invoiceNumber: string,
-    client: Client,
+  }[]
+  totalAmount?: number
+  paid_amount?: number
+  discount?: number
+  status: 'в ожидании' | 'оплачено' | 'частично оплачено'
+  associatedOrder?: {
+    _id: string
+    orderNumber: string
     services: {
-      service: Service,
-      service_amount?: number,
-      service_price?: number,
+      service: Service
+      service_amount?: number
+      service_price?: number
+      service_type?: 'внутренняя' | 'внешняя'
       _id: string
     }[]
-    totalAmount?: number,
-    paid_amount?: number,
-    discount?: number,
-    status: 'в ожидании' | 'оплачено' | 'частично оплачено',
-    associatedOrder?: {
-      _id: string
-      orderNumber: string
-      services: {
-        service: Service
-        service_amount?: number
-        service_price?: number
-        _id: string
-      }[]
-    }
-    associatedArrival?: {
-      _id: string
-      arrivalNumber: string
-      services: {
-        service: Service
-        service_amount?: number
-        service_price?: number
-        _id: string
-      }[]
-    }
-    associatedArrivalServices?: {
-      service: Service,
-      service_amount?: number,
-      service_price?: number,
+  }
+  associatedArrival?: {
+    _id: string
+    arrivalNumber: string
+    services: {
+      service: Service
+      service_amount?: number
+      service_price?: number
+      service_type?: 'внутренняя' | 'внешняя'
       _id: string
     }[]
-    associatedOrderServices?: {
-      service: Service,
-      service_amount?: number,
-      service_price?: number,
-      _id: string
-    }[]
-    logs: Log[],
-    createdAt:string,
-    updatedAt:string,
+  }
+  associatedArrivalServices?: {
+    service: Service
+    service_amount: number
+    service_price: number
+    service_type?: 'внутренняя' | 'внешняя'
+    _id: string
+  }[]
+  associatedOrderServices?: {
+    service: Service
+    service_amount: number
+    service_price: number
+    service_type?: 'внутренняя' | 'внешняя'
+    _id: string
+  }[]
+  logs: Log[]
+  createdAt: string
+  updatedAt: string
 }
 
-export type InvoiceMutation = Omit<Invoice, '_id, totalAmount, invoiceNumber, status, createdAt, updatedAt'>
+export type InvoiceMutation = Pick<
+  Invoice,'paid_amount' | 'discount'
+  > & {
+  client: string
+  associatedArrival?: string | null
+  associatedOrder?: string | null
+  services: ServiceArrival[]
+}

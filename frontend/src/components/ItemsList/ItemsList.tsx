@@ -59,7 +59,11 @@ const ItemsList = <T extends Item>({ items, onDelete, getNameById }: Props<T>) =
             <Button
               variant="ghost"
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => onDelete(i)}
+              onClick={e => {
+                e.stopPropagation()
+                e.preventDefault()
+                onDelete(i)
+              }}
             >
               <Trash2 size={15} />
             </Button>

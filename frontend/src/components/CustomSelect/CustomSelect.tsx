@@ -16,6 +16,7 @@ export type PopoverType =
   | 'shipping_agent'
   | 'services'
   | 'arrival_status'
+  | 'status'
   | 'product'
   | 'service'
   | null
@@ -80,7 +81,7 @@ export const CustomSelect = <T extends { _id: string }>({
             onBlur(syntheticEvent)
           }
         }}>
-        <PopoverTrigger asChild asChild disabled={disabled}>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button variant="outline" className={cn('w-full justify-between', error && 'border-destructive')}>
             {value || placeholder}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

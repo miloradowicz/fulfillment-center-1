@@ -122,6 +122,13 @@ export class Order {
 
 const OrderSchema = SchemaFactory.createForClass(Order)
 
+OrderSchema.virtual('invoice', {
+  ref: 'Invoice',
+  localField: '_id',
+  foreignField: 'associatedOrder',
+  justOne: true,
+})
+
 export const OrderSchemaFactory = (
   taskModel: Model<Task>,
 ) => {

@@ -18,6 +18,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import CopyText from '@/components/CopyText/CopyText.tsx'
 import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
 
 const ArrivalDetails = () => {
   const {
@@ -130,19 +131,22 @@ const ArrivalDetails = () => {
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Отправленные
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Полученные
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      Услуги
+                    </TabsTrigger>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Документы
                     </TabsTrigger>
-                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="5" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>
@@ -156,6 +160,9 @@ const ArrivalDetails = () => {
                 </TabsContent>
                 <TabsContent value="2">{arrival.defects && <ProductsTable defects={arrival.defects} />}</TabsContent>
                 <TabsContent value="3">
+                  <ServicesTable services={arrival.services} />
+                </TabsContent>
+                <TabsContent value="4">
                   <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !arrival.documents && 'flex-col items-center')}>
                     {arrival.documents ? (
                       arrival.documents.map((doc, idx) => (
@@ -175,7 +182,7 @@ const ArrivalDetails = () => {
                     )}
                   </div>
                 </TabsContent>
-                <TabsContent value="4">
+                <TabsContent value="5">
                   <p className="px-2">История</p>
                 </TabsContent>
               </Tabs>

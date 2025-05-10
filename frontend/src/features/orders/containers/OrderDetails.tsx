@@ -13,11 +13,12 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import Loader from '@/components/Loader/Loader.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
 import { cn } from '@/lib/utils.ts'
-import { ArrowUpRight, ClipboardList, File, Phone } from 'lucide-react'
+import { ArrowUpRight, ClipboardList, File, Minus, Phone } from 'lucide-react'
 import CopyText from '@/components/CopyText/CopyText.tsx'
-import { orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
+import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
@@ -26,10 +27,11 @@ const OrderDetails = () => {
   return (
     <>
       {loading && <Loader />}
+
       {order ? (
         <>
           <Modal handleClose={() => setOpen(false)} open={open}>
-            <OrderForm onSuccess={() => setOpen(false)} />
+            <OrderForm initialData={order} onSuccess={() => setOpen(false)} />
           </Modal>
 
           <ConfirmationModal
@@ -45,16 +47,39 @@ const OrderDetails = () => {
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge className={cn(orderStatusStyles[order.status] || orderStatusStyles.default, 'py-2 px-2.5 font-bold mb-4')}>
-                  {capitalize(order.status)}
-                </Badge>
+                <h3 className="text-xl font-bold flex gap-1 items-center mb-4">
+                  <ClipboardList/>
+                  {order.orderNumber}
+                </h3>
+
+                <div className="flex flex-col gap-4 mb-6">
+                  <div className="flex flex-col">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Доставка</p>
+                    <Badge
+                      className={cn(
+                        orderStatusStyles[order.status] || orderStatusStyles.default,
+                        'py-1.5 px-3 font-bold text-center',
+                      )}
+                    >
+                      {capitalize(order.status)}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Оплата</p>
+                    {order.paymentStatus !== undefined && (
+                      <Badge
+                        className={cn(
+                          invoiceStatusStyles[order.paymentStatus as 'в ожидании' | 'оплачено' | 'частично оплачено'] || invoiceStatusStyles['в ожидании'],
+                          'py-1.5 px-3 font-bold text-center',
+                        )}
+                      >
+                        {capitalize(order.paymentStatus ?? 'в ожидании')}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
 
                 <div className="space-y-5">
-                  <h3 className="text-xl font-bold flex gap-1 items-center mb-3">
-                    <ClipboardList />
-                    {order.orderNumber}
-                  </h3>
-
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-muted-foreground">Дата отправки</p>
                     <p className="font-bold">{dayjs(order.sent_at).format('D MMMM YYYY')}</p>
@@ -62,7 +87,13 @@ const OrderDetails = () => {
 
                   <div>
                     <p className="text-sm font-bold text-muted-foreground">Дата доставки</p>
-                    <p className="font-bold">{dayjs(order.delivered_at).format('D MMMM YYYY')}</p>
+                    <p className="font-bold">
+                      {order.delivered_at ? (
+                        dayjs(order.delivered_at).format('D MMMM YYYY')
+                      ) : (
+                        <Minus className="w-6 h-6"/>
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -70,10 +101,10 @@ const OrderDetails = () => {
               <div className="flex flex-col md:items-start justify-between">
                 <div className="flex gap-2 mt-4 md:mt-0 md:mb-4 order-last md:order-none items-start">
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <EditButton onClick={() => setOpen(true)} />
+                    <EditButton onClick={() => setOpen(true)}/>
                   </ProtectedElement>
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
+                    <ArchiveButton onClick={() => setOpenArchiveModal(true)}/>
                   </ProtectedElement>
                 </div>
 
@@ -112,16 +143,19 @@ const OrderDetails = () => {
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
                 <TabsList className="mb-5 w-full rounded-2xl">
                   <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Товары
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      Услуги
+                    </TabsTrigger>
+                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Документы
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'rounded-2xl font-bold sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
                   </div>
@@ -132,6 +166,9 @@ const OrderDetails = () => {
                 </TabsContent>
                 <TabsContent value="1">{order.defects && <ProductsTable defects={order.defects} />}</TabsContent>
                 <TabsContent value="2">
+                  <ServicesTable services={order.services} />
+                </TabsContent>
+                <TabsContent value="3">
                   <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !order.documents && 'flex-col items-center')}>
                     {order.documents ? (
                       order.documents.map((doc, idx) => (
@@ -151,7 +188,7 @@ const OrderDetails = () => {
                     )}
                   </div>
                 </TabsContent>
-                <TabsContent value="3">
+                <TabsContent value="4">
                   <p className="px-2">История</p>
                 </TabsContent>
               </Tabs>
