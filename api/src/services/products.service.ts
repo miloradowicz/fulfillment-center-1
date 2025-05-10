@@ -1,11 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { UpdateProductDto } from '../dto/update-product.dto'
 import { Product, ProductDocument } from '../schemas/product.schema'
 import { Arrival, ArrivalDocument } from 'src/schemas/arrival.schema'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
+import { LogsService } from './logs.service'
 
 interface DynamicFieldDto {
   key: string;
@@ -19,6 +20,7 @@ export class ProductsService {
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    private readonly logsService: LogsService,
   ) {}
 
   async getById(id: string, populate?: boolean) {
@@ -86,7 +88,7 @@ export class ProductsService {
     return product
   }
 
-  async create(productDto: CreateProductDto) {
+  async create(productDto: CreateProductDto, userId: mongoose.Types.ObjectId) {
 
     const barcode = await this.productModel.findOne({ barcode: productDto.barcode })
     if (barcode) {
@@ -118,7 +120,15 @@ export class ProductsService {
           throw new BadRequestException('Неверный формат dynamic_fields')
         }
       }
-      return await this.productModel.create(productDto)
+
+      const log = this.logsService.generateLogForCreate(userId)
+
+      const productToCreate = {
+        ...productDto,
+        logs: [log],
+      }
+
+      return await this.productModel.create(productToCreate)
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
@@ -153,20 +163,26 @@ export class ProductsService {
 
   }
 
-  async archive(id: string) {
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
     if (await this.isLocked(id))
       throw new ForbiddenException('Товар не может быть перемещен в архив, поскольку уже используется в поставках и/или заказах.')
 
-    const product = await this.productModel.findByIdAndUpdate(id, { isArchived: true })
+    const product = await this.productModel.findById(id)
 
     if (!product) throw new NotFoundException('Товар не найден')
 
     if (product.isArchived) throw new ForbiddenException('Товар уже в архиве')
 
+    product.isArchived = true
+    const log = this.logsService.generateLogForArchive(userId, product.isArchived)
+
+    product.logs.push(log)
+    await product.save()
+
     return { message: 'Товар перемещен в архив' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const product = await this.productModel.findById(id)
 
     if (!product) throw new NotFoundException('Продукт не найден')
@@ -174,6 +190,9 @@ export class ProductsService {
     if (!product.isArchived) throw new ForbiddenException('Продукт не находится в архиве')
 
     product.isArchived = false
+    const log = this.logsService.generateLogForArchive(userId, product.isArchived)
+
+    product.logs.push(log)
     await product.save()
 
     return { message: 'Продукт восстановлен из архива' }
@@ -200,11 +219,19 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, productDto: UpdateProductDto) {
-    const existingProduct = await this.getById(id)
+  async update(id: string, productDto: UpdateProductDto, userId: mongoose.Types.ObjectId) {
+    const existingProduct = await this.productModel.findById(id)
     if (!existingProduct){
       throw new NotFoundException('Товар не найден')
     }
+
+    const productDtoObj = { ...productDto }
+
+    const log = this.logsService.trackChanges(
+      existingProduct.toObject(),
+      productDtoObj,
+      userId,
+    )
 
     if (productDto.barcode !== existingProduct.barcode) {
       const barcodeExists = await this.productModel.findOne({ barcode: productDto.barcode })
@@ -237,11 +264,13 @@ export class ProductsService {
         }
       }
 
-      return this.productModel.findByIdAndUpdate(
-        id,
-        productDto,
-        { new: true }
-      )
+      existingProduct.set(productDto)
+
+      if (log) {
+        existingProduct.logs.push(log)
+      }
+
+      await existingProduct.save()
     } catch (error: unknown) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error

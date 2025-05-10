@@ -1,20 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common'
 import { CreateInvoiceDto } from '../dto/create-invoice.dto'
 import { UpdateInvoiceDto } from '../dto/update-invoice.dto'
 import { InvoicesService } from '../services/invoices.service'
 import { RolesGuard } from 'src/guards/roles.guard'
 import { Roles } from 'src/decorators/roles.decorator'
+import { RequestWithUser } from '../types'
 
 @UseGuards(RolesGuard)
 @Roles('super-admin', 'admin', 'manager')
@@ -46,26 +36,30 @@ export class InvoicesController {
 
   @Roles('super-admin', 'admin', 'manager')
   @Post()
-  async createInvoice(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoicesService.create(createInvoiceDto)
+  async createInvoice(@Body() createInvoiceDto: CreateInvoiceDto, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.invoicesService.create(createInvoiceDto, userId)
   }
 
   @Roles('super-admin', 'admin', 'manager')
   @Put(':id')
-  async updateInvoice(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceDto) {
-    return await this.invoicesService.update(id, updateInvoiceDto)
+  async updateInvoice(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceDto, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.invoicesService.update(id, updateInvoiceDto, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/archive')
-  async archiveInvoice(@Param('id') id: string) {
-    return await this.invoicesService.archive(id)
+  async archiveInvoice(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.invoicesService.archive(id, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
-  async unarchiveInvoice(@Param('id') id: string) {
-    return this.invoicesService.unarchive(id)
+  async unarchiveInvoice(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.invoicesService.unarchive(id, userId)
   }
 
   @Roles('super-admin')

@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import { Order, OrderDocument } from '../schemas/order.schema'
 import { CreateOrderDto } from '../dto/create-order.dto'
 import { UpdateOrderDto } from '../dto/update-order.dto'
@@ -9,6 +9,7 @@ import { DocumentObject } from './arrivals.service'
 import { FilesService } from './files.service'
 import { StockManipulationService } from './stock-manipulation.service'
 import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
+import { LogsService } from './logs.service'
 
 @Injectable()
 export class OrdersService {
@@ -18,6 +19,7 @@ export class OrdersService {
     private readonly counterService: CounterService,
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
+    private readonly logsService: LogsService,
   ) {}
 
   async getAllByClient(clientId: string, populate: boolean) {
@@ -114,7 +116,7 @@ export class OrdersService {
     }
   }
 
-  async create(orderDto: CreateOrderDto, files: Array<Express.Multer.File> = []) {
+  async create(orderDto: CreateOrderDto, files: Array<Express.Multer.File> = [], userId: mongoose.Types.ObjectId) {
     try {
       let documents: DocumentObject[] = []
       if (files.length > 0) {
@@ -141,10 +143,14 @@ export class OrdersService {
       }
 
       const sequenceNumber = await this.counterService.getNextSequence('order')
+
+      const log = this.logsService.generateLogForCreate(userId)
+
       const newOrder = new this.orderModel({
         ...orderDto,
         documents,
         orderNumber: `ORD-${ sequenceNumber }`,
+        logs: [log],
       })
 
       this.stockManipulationService.init()
@@ -169,11 +175,22 @@ export class OrdersService {
     }
   }
 
-  async update(id: string, orderDto: UpdateOrderDto, files: Array<Express.Multer.File> = []) {
+  async update(id: string, orderDto: UpdateOrderDto, files: Array<Express.Multer.File> = [], userId: mongoose.Types.ObjectId) {
     const existingOrder = await this.orderModel.findById(id)
     if (!existingOrder) {
       throw new NotFoundException('Заказ не найден')
     }
+
+    const orderDtoObj = { ...orderDto }
+    if (!orderDto.defects) {
+      orderDtoObj.defects = []
+    }
+
+    const log = this.logsService.trackChanges(
+      existingOrder.toObject(),
+      orderDtoObj,
+      userId,
+    )
 
     if (files.length > 0) {
       const documentPaths = files.map(file => ({
@@ -197,21 +214,33 @@ export class OrdersService {
 
     await this.stockManipulationService.saveStock(previousStock)
     await this.stockManipulationService.saveStock(newStock)
+
+    if (log) {
+      updatedOrder.logs.push(log)
+    }
+
     await updatedOrder.save()
     return updatedOrder
   }
 
-  async archive(id: string) {
-    const order = await this.orderModel.findByIdAndUpdate(id, { isArchived: true })
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
+    const order = await this.orderModel.findById(id)
 
     if (!order) throw new NotFoundException('Заказ не найден')
 
     if (order.isArchived) throw new ForbiddenException('Заказ уже в архиве')
 
+    order.isArchived = true
+
+    const log = this.logsService.generateLogForArchive(userId, order.isArchived)
+    order.logs.push(log)
+
+    await order.save()
+
     return { message: 'Заказ перемещен в архив' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const order = await this.orderModel.findById(id)
 
     if (!order) throw new NotFoundException('Заказ не найден')
@@ -219,6 +248,10 @@ export class OrdersService {
     if (!order.isArchived) throw new ForbiddenException('Заказ не находится в архиве')
 
     order.isArchived = false
+
+    const log = this.logsService.generateLogForArchive(userId, order.isArchived)
+    order.logs.push(log)
+
     await order.save()
 
     return { message: 'Заказ восстановлен из архива' }

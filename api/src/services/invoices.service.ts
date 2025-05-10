@@ -1,11 +1,12 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
 import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 import { CreateInvoiceDto, InvoiceServiceDto } from '../dto/create-invoice.dto'
 import { UpdateInvoiceDto } from '../dto/update-invoice.dto'
 import { CounterService } from './counter.service'
 import { Service, ServiceDocument } from '../schemas/service.schema'
+import mongoose, { Model } from 'mongoose'
+import { LogsService } from './logs.service'
 import { ValidationError } from 'class-validator'
 import { DtoValidationError } from 'src/exception-filters/dto-validation-error.filter'
 
@@ -15,7 +16,8 @@ export class InvoicesService {
     @InjectModel(Invoice.name) private readonly invoiceModel: Model<InvoiceDocument>,
     @InjectModel(Service.name) private readonly serviceModel: Model<ServiceDocument>,
     private readonly counterService: CounterService,
-  ) { }
+    private readonly logsService: LogsService,
+  ) {}
 
   private async calculateTotalAmount(
     services: (InvoiceServiceDto & { type: 'внутренняя' | 'внешняя' })[],
@@ -171,11 +173,11 @@ export class InvoicesService {
     }
   }
 
-  async create(createInvoiceDto: CreateInvoiceDto) {
+  async create(createInvoiceDto: CreateInvoiceDto, userId: mongoose.Types.ObjectId) {
     this.validate(createInvoiceDto)
 
     const sequenceNumber = await this.counterService.getNextSequence('invoice')
-    const invoiceNumber = `INV-${sequenceNumber}`
+    const invoiceNumber = `INV-${ sequenceNumber }`
 
     const servicesToUse = ([] as InvoiceServiceDto[]).concat(
       createInvoiceDto.services ?? [],
@@ -187,7 +189,7 @@ export class InvoicesService {
       servicesToUse.map(async item => {
         const serviceDoc = await this.serviceModel.findById(item.service).lean()
         if (!serviceDoc) {
-          throw new Error(`Услуга с ID  ${item.service.toString()} не найдена`)
+          throw new Error(`Услуга с ID  ${ item.service.toString() } не найдена`)
         }
         return {
           ...item,
@@ -203,17 +205,20 @@ export class InvoicesService {
 
     const status = this.determineStatus(createInvoiceDto.paid_amount, totalAmount)
 
+    const log = this.logsService.generateLogForCreate(userId)
+
     const newInvoice = new this.invoiceModel({
       ...createInvoiceDto,
       invoiceNumber,
       totalAmount: totalAmount,
       status: status,
+      logs: [log],
     })
 
     return await newInvoice.save()
   }
 
-  async update(id: string, updateDto: UpdateInvoiceDto) {
+  async update(id: string, updateDto: UpdateInvoiceDto, userId: mongoose.Types.ObjectId) {
     const existing = await this.invoiceModel.findById(id)
 
     if (!existing) throw new NotFoundException('Счёт не найден.')
@@ -226,7 +231,7 @@ export class InvoicesService {
       servicesToUse.map(async item => {
         const serviceDoc = await this.serviceModel.findById(item.service).lean()
         if (!serviceDoc) {
-          throw new Error(`Услуга с ID ${item.service.toString()} не найдена`)
+          throw new Error(`Услуга с ID ${ item.service.toString() } не найдена`)
         }
         return {
           ...item,
@@ -247,22 +252,47 @@ export class InvoicesService {
     updateDto.totalAmount = totalAmount
     updateDto.status = this.determineStatus(paid_amount, totalAmount)
 
-    return this.invoiceModel.findByIdAndUpdate(id, updateDto, { new: true }).populate('client services.service')
+    const invoiceDtoObj = { ...updateDto }
+
+    const log = this.logsService.trackChanges(
+      existing.toObject(),
+      invoiceDtoObj,
+      userId,
+    )
+
+    return this.invoiceModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            ...updateDto,
+            totalAmount,
+          },
+          $push: {
+            logs: log,
+          },
+        },
+        { new: true },
+      )
+      .populate('client services.service')
   }
 
-  async archive(id: string) {
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
     const invoice = await this.invoiceModel.findById(id)
 
     if (!invoice) throw new NotFoundException('Счёт не найден.')
     if (invoice.isArchived) throw new ForbiddenException('Счёт уже в архиве.')
 
     invoice.isArchived = true
+    const log = this.logsService.generateLogForArchive(userId, invoice.isArchived)
+    invoice.logs.push(log)
+
     await invoice.save()
 
     return { message: 'Счёт перемещён в архив.' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const invoice = await this.invoiceModel.findById(id)
 
     if (!invoice) throw new NotFoundException('Счёт не найден')
@@ -270,6 +300,9 @@ export class InvoicesService {
     if (!invoice.isArchived) throw new ForbiddenException('Счёт не находится в архиве')
 
     invoice.isArchived = false
+    const log = this.logsService.generateLogForArchive(userId, invoice.isArchived)
+    invoice.logs.push(log)
+
     await invoice.save()
 
     return { message: 'Счёт восстановлен из архива' }

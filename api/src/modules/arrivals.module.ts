@@ -8,10 +8,11 @@ import { CounterService } from '../services/counter.service'
 import { FilesModule } from './file-upload.module'
 import { StockManipulationService } from 'src/services/stock-manipulation.service'
 import { FilesService } from '../services/files.service'
+import { LogsService } from '../services/logs.service'
 
 @Module({
   imports: [DbModule, AuthModule, ValidatorsModule, FilesModule],
   controllers: [ArrivalsController],
-  providers: [ArrivalsService, CounterService, StockManipulationService, FilesService],
+  providers: [ArrivalsService, CounterService, StockManipulationService, FilesService, LogsService],
 })
 export class ArrivalsModule { }

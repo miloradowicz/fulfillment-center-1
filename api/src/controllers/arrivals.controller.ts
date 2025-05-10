@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -18,6 +19,7 @@ import { UpdateArrivalDto } from '../dto/update-arrival.dto'
 import { FileUploadInterceptor } from '../utils/uploadFiles'
 import { RolesGuard } from 'src/guards/roles.guard'
 import { Roles } from 'src/decorators/roles.decorator'
+import { RequestWithUser } from '../types'
 
 @UseGuards(RolesGuard)
 @Roles('super-admin', 'admin', 'manager', 'stock-worker')
@@ -54,8 +56,9 @@ export class ArrivalsController {
   @Roles('super-admin', 'admin', 'manager')
   @Post()
   @UseInterceptors(FileUploadInterceptor())
-  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Array<Express.Multer.File>) {
-    return this.arrivalsService.create(arrivalDto, files)
+  async createArrival(@Body() arrivalDto: CreateArrivalDto, @UploadedFiles() files: Array<Express.Multer.File>, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.arrivalsService.create(arrivalDto, files, userId)
   }
 
   @Roles('super-admin', 'admin', 'manager')
@@ -65,20 +68,24 @@ export class ArrivalsController {
     @Param('id') id: string,
     @Body() arrivalDto: UpdateArrivalDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @Req() req: RequestWithUser
   ) {
-    return await this.arrivalsService.update(id, arrivalDto, files)
+    const userId = req.user._id
+    return await this.arrivalsService.update(id, arrivalDto, files, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/archive')
-  async archiveArrival(@Param('id') id: string) {
-    return await this.arrivalsService.archive(id)
+  async archiveArrival(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return await this.arrivalsService.archive(id, userId)
   }
 
   @Roles('super-admin', 'admin')
   @Patch(':id/unarchive')
-  async unarchiveArrival(@Param('id') id: string) {
-    return this.arrivalsService.unarchive(id)
+  async unarchiveArrival(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user._id
+    return this.arrivalsService.unarchive(id, userId)
   }
 
   @Roles('super-admin')

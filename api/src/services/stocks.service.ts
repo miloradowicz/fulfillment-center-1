@@ -1,12 +1,13 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, Types } from 'mongoose'
+import mongoose, { Model, Types } from 'mongoose'
 import { Stock, StockDocument } from '../schemas/stock.schema'
 import { CreateStockDto } from '../dto/create-stock.dto'
 import { UpdateStockDto } from '../dto/update-stock.dto'
 import { CreateWriteOffDto } from 'src/dto/create-write-off.dto'
 import { StockManipulationService } from './stock-manipulation.service'
 import { WriteOff } from 'src/types'
+import { LogsService } from './logs.service'
 import { Arrival, ArrivalDocument } from '../schemas/arrival.schema'
 import { Order, OrderDocument } from '../schemas/order.schema'
 
@@ -17,6 +18,7 @@ export class StocksService {
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     private readonly stockManipulationService: StockManipulationService,
+    private readonly logsService: LogsService,
   ) {}
 
   async getAll() {
@@ -53,14 +55,33 @@ export class StocksService {
     return stock
   }
 
-  async create(stockDto: CreateStockDto) {
-    return await this.stockModel.create(stockDto)
+  async create(stockDto: CreateStockDto, userId: mongoose.Types.ObjectId) {
+    const log = this.logsService.generateLogForCreate(userId)
+
+    const stockToCreate = {
+      ...stockDto,
+      logs: [log],
+    }
+
+    return await this.stockModel.create(stockToCreate)
   }
 
-  async update(id: string, stockDto: UpdateStockDto) {
-    const stock = await this.stockModel.findByIdAndUpdate(id, stockDto, { new: true })
+  async update(id: string, stockDto: UpdateStockDto, userId: mongoose.Types.ObjectId) {
+    const stock = await this.stockModel.findById(id)
     if (!stock) throw new NotFoundException('Склад не найден.')
-    return stock
+
+    const stockDtoObj = { ...stockDto }
+    const log = this.logsService.trackChanges(
+      stock.toObject(),
+      stockDtoObj,
+      userId,
+    )
+
+    stock.set(stockDto)
+    if (log) {
+      stock.logs.push(log)
+    }
+    return await stock.save()
   }
 
   async doStocking(stockId: Types.ObjectId, writeOffs: WriteOff[]) {
@@ -75,18 +96,30 @@ export class StocksService {
     }
   }
 
-  async createWriteOff(id: string, writeOffDto: CreateWriteOffDto) {
+  async createWriteOff(id: string, writeOffDto: CreateWriteOffDto, userId: mongoose.Types.ObjectId) {
     const stock = await this.stockModel.findById(id)
     if (!stock) throw new NotFoundException('Склад не найден.')
 
     this.stockManipulationService.init()
 
-
     await this.doStocking(stock._id, writeOffDto.write_offs)
 
     await this.stockManipulationService.saveStock(stock._id)
 
+    const newStock = { ...stock.toObject() }
+    newStock.write_offs.push(...writeOffDto.write_offs)
+
+    const log = this.logsService.trackChanges(
+      stock.toObject(),
+      newStock,
+      userId,
+    )
     stock.write_offs.push(...writeOffDto.write_offs)
+
+    if (log) {
+      stock.logs.push(log)
+    }
+
     await stock.save()
 
     return writeOffDto
@@ -111,7 +144,7 @@ export class StocksService {
     return activeOrders.length > 0
   }
 
-  async archive(id: string) {
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
     const stock = await this.stockModel.findById(id).exec()
 
     if (!stock) throw new NotFoundException('Склад не найден.')
@@ -129,11 +162,14 @@ export class StocksService {
     }
 
     stock.isArchived = true
+    const log = this.logsService.generateLogForArchive(userId, stock.isArchived)
+    stock.logs.push(log)
+
     await stock.save()
     return { message: 'Склад перемещен в архив.' }
   }
 
-  async unarchive(id: string) {
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
     const stock = await this.stockModel.findById(id)
 
     if (!stock) throw new NotFoundException('Склад не найден')
@@ -141,6 +177,9 @@ export class StocksService {
     if (!stock.isArchived) throw new ForbiddenException('Склад не находится в архиве')
 
     stock.isArchived = false
+    const log = this.logsService.generateLogForArchive(userId, stock.isArchived)
+    stock.logs.push(log)
+
     await stock.save()
 
     return { message: 'Склад восстановлен из архива' }
