@@ -46,6 +46,7 @@ export class DefectDto {
   @IsPositive({ message: 'Количество дефектных товаров должно быть больше 0.' })
   amount: number
 }
+
 export class ServiceDto {
   @IsNotEmpty({ message: 'Заполните название услуги.' })
   service: mongoose.Types.ObjectId
@@ -59,6 +60,9 @@ export class ServiceDto {
   @IsNumber({}, { message: 'Цена должна быть числом.' })
   @IsPositive({ message: 'Цена должна быть больше 0.' })
   service_price?: number
+
+  @IsNotEmpty({ message: 'Заполните название услуги.' })
+  service_type: string
 }
 
 export class ReceivedProductDto {
