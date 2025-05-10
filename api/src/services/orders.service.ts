@@ -156,6 +156,9 @@ export class OrdersService {
     }
 
     const orderDtoObj = { ...orderDto }
+    if (!orderDto.defects) {
+      orderDtoObj.defects = []
+    }
 
     const log = this.logsService.trackChanges(
       existingOrder.toObject(),

@@ -44,7 +44,7 @@ export class LogsService {
   trackChanges(oldObj: Record<string, any>, newObj: Record<string, any>, userId: Types.ObjectId): Log | null {
     const changes = this.getDiffs(oldObj, newObj)
     if (!changes) return null
-    
+
     const meaningfulChanges = this.filterMeaningfulDiffs(changes)
 
     if (meaningfulChanges.length === 0) return null
@@ -81,14 +81,20 @@ export class LogsService {
     return (result || []) as Diff[]
   }
 
-  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber', 'orderNumber', 'taskNumber', 'date_ToDO', 'date_inProgress', 'date_Done' ]
+  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber', 'orderNumber', 'taskNumber', 'invoiceNumber','date_ToDO', 'date_inProgress', 'date_Done', 'totalAmount' ]
 
   private filterMeaningfulDiffs<T>(diffs: Diff<T>[]): Diff<T>[] {
     return diffs.filter(diff => {
       const path = diff.path?.[0]
       if (this.IGNORED_PATHS.includes(String(path))) return false
 
-      if (diff.kind === 'D' || diff.kind === 'N') return true
+      if (diff.kind === 'D') {
+        return diff.lhs !== null && diff.lhs !== undefined
+      }
+
+      if (diff.kind === 'N') {
+        return true
+      }
 
       if (diff.kind === 'E') {
         const lhs = (diff.lhs && typeof diff.lhs === 'object') ? diff.lhs.toString() : String(diff.lhs)

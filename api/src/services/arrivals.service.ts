@@ -180,6 +180,10 @@ export class ArrivalsService {
 
     const arrivalDtoObj = { ...arrivalDto }
 
+    if (!arrivalDto.defects) {
+      arrivalDtoObj.defects = []
+    }
+
     const log = this.logsService.trackChanges(
       existingArrival.toObject(),
       arrivalDtoObj,
