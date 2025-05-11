@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Defect, OrderMutation, Product, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
+import { Defect, OrderMutation, Product, ProductOrder, ServiceArrival } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectCreateOrderError, selectLoadingAddOrder } from '@/store/slices/orderSlice.ts'
 import { selectAllClients } from '@/store/slices/clientSlice.ts'
@@ -59,8 +59,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     normalizeField((initialData?.products as ProductOrder[]) || []),
   )
   const [defectsForm, setDefectForm] = useState<Defect[]>(normalizeField((initialData?.defects as Defect[]) || []))
-  const [servicesForm, setServicesForm] = useState<ServiceOrder[]>(
-    normalizeField((initialData?.services as ServiceOrder[]) || []),
+  const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
   const [newItem, setNewItem] = useState<ProductOrder | Defect>({ ...initialItemState })
   const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
@@ -148,7 +148,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     initialState: ItemInitialStateMap[T],
   ) => {
     if (type === ItemType.SERVICES) {
-      setNewService(initialState as ServiceOrder)
+      setNewService(initialState as ServiceArrival)
     } else {
       setNewItem(initialState as ProductOrder | Defect)
     }
@@ -180,6 +180,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
       service: newService.service,
       service_amount: Number(newService.service_amount),
       service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+      service_type: selectedService?.type,
     }
 
     if (

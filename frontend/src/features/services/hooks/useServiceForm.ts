@@ -220,12 +220,15 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
       return
     }
 
-    const serviceData: ServiceMutation = {
+    const serviceData = {
       name: form.name,
       price: Number.parseFloat(form.price),
       description: form.description,
       type: form.type,
-      serviceCategory: form.serviceCategory._id,
+      serviceCategory: {
+        _id: form.serviceCategory._id,
+        name: form.serviceCategory.name,
+      },
     }
 
     try {

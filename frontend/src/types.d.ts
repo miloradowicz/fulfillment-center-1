@@ -104,11 +104,13 @@ export type ProductField = { product: string | { _id: string } }
 
 export type ServiceField = { service: string | { _id: string } }
 
+export type ServiceType = 'внутренняя' | 'внешняя'
+
 export interface ServiceArrival {
   service: string
   service_amount: number
   service_price: number
-  service_type?: 'внутренняя' | 'внешняя'
+  service_type: ServiceType
 }
 
 export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
@@ -314,8 +316,8 @@ export interface TaskWithPopulate {
   createdAt: string,
   updatedAt: string,
   date_inProgress:string | null,
-  date_Done:string | null,
-  date_ToDO:string | null,
+  date_Done: string | null,
+  date_ToDO: string | null,
 }
 
 export interface TaskMutation {
@@ -333,7 +335,7 @@ export interface Service {
   serviceCategory: { _id: string; name: string }
   price: number
   description: string
-  type: 'внутренняя' | 'внешняя'
+  type: ServiceType
   logs?: Log[]
 }
 
@@ -355,6 +357,7 @@ export type ServiceInTable = {
   service: string | Service
   service_amount?: number
   service_price?: number
+  service_type: ServiceType
   _id?: string
 }
 
@@ -362,6 +365,7 @@ export type ServiceOrderWithPopulate = {
   service: PopulatedService
   service_amount: number
   service_price?: number
+  service_type: ServiceType
   _id?: string
 }
 
@@ -490,7 +494,7 @@ export interface Invoice {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?: ServiceType
     _id: string
   }[]
   totalAmount?: number
@@ -504,7 +508,7 @@ export interface Invoice {
       service: Service
       service_amount?: number
       service_price?: number
-      service_type?: 'внутренняя' | 'внешняя'
+      service_type?: ServiceType
       _id: string
     }[]
   }
@@ -515,7 +519,7 @@ export interface Invoice {
       service: Service
       service_amount?: number
       service_price?: number
-      service_type?: 'внутренняя' | 'внешняя'
+      service_type?: ServiceType
       _id: string
     }[]
   }
@@ -523,14 +527,14 @@ export interface Invoice {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?:ServiceType
     _id: string
   }[]
   associatedOrderServices?: {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?: ServiceType
     _id: string
   }[]
   logs: Log[]

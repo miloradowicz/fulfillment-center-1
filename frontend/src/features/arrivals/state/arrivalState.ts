@@ -1,3 +1,5 @@
+import { ServiceType } from '@/types'
+
 export const initialState = {
   client: '',
   arrival_price: 0,
@@ -26,6 +28,7 @@ export const initialServiceState = {
   service: '',
   service_amount: 1,
   service_price: 0,
+  service_type: 'внутренняя' as ServiceType,
 }
 
 export const initialErrorState = {
