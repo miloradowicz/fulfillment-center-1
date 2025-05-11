@@ -18,7 +18,7 @@ import CopyText from '@/components/CopyText/CopyText.tsx'
 import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
-import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
+import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
@@ -48,11 +48,11 @@ const OrderDetails = () => {
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
                 <h3 className="text-xl font-bold flex gap-1 items-center mb-4">
-                  <ClipboardList/>
+                  <ClipboardList />
                   {order.orderNumber}
                 </h3>
 
-                <div className="flex flex-col gap-4 mb-6">
+                <div className="flex flex-col gap-4 mb-4">
                   <div className="flex flex-col">
                     <p className="text-sm font-bold text-muted-foreground mb-2">Доставка</p>
                     <Badge
@@ -63,19 +63,6 @@ const OrderDetails = () => {
                     >
                       {capitalize(order.status)}
                     </Badge>
-                  </div>
-                  <div className="flex flex-col">
-                    <p className="text-sm font-bold text-muted-foreground mb-2">Оплата</p>
-                    {order.paymentStatus !== undefined && (
-                      <Badge
-                        className={cn(
-                          invoiceStatusStyles[order.paymentStatus as 'в ожидании' | 'оплачено' | 'частично оплачено'] || invoiceStatusStyles['в ожидании'],
-                          'py-1.5 px-3 font-bold text-center',
-                        )}
-                      >
-                        {capitalize(order.paymentStatus ?? 'в ожидании')}
-                      </Badge>
-                    )}
                   </div>
                 </div>
 
@@ -91,7 +78,7 @@ const OrderDetails = () => {
                       {order.delivered_at ? (
                         dayjs(order.delivered_at).format('D MMMM YYYY')
                       ) : (
-                        <Minus className="w-6 h-6"/>
+                        <Minus className="w-6 h-6" />
                       )}
                     </p>
                   </div>
@@ -99,16 +86,35 @@ const OrderDetails = () => {
               </div>
 
               <div className="flex flex-col md:items-start justify-between">
-                <div className="flex gap-2 mt-4 md:mt-0 md:mb-4 order-last md:order-none items-start">
+                <div className="flex gap-2 mt-4 md:mt-0 md:mb-3 order-last md:order-none items-start">
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <EditButton onClick={() => setOpen(true)}/>
+                    <EditButton onClick={() => setOpen(true)} />
                   </ProtectedElement>
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                    <ArchiveButton onClick={() => setOpenArchiveModal(true)}/>
+                    <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
                   </ProtectedElement>
                 </div>
 
-                <div>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <div className="flex flex-col mb-4">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Оплата</p>
+                    {order.paymentStatus !== undefined && (
+                      <Badge
+                        className={cn(
+                          invoiceStatusStyles[
+                            order.paymentStatus as 'в ожидании' | 'оплачено' | 'частично оплачено'
+                          ] || invoiceStatusStyles['в ожидании'],
+                          'py-1.5 px-3 font-bold text-center',
+                        )}
+                      >
+                        {capitalize(order.paymentStatus ?? 'в ожидании')}
+                      </Badge>
+                    )}
+                  </div>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                   <div className="space-y-1 mb-4">
                     <p className="text-sm text-muted-foreground font-bold">Склад</p>
                     <Link
@@ -119,7 +125,9 @@ const OrderDetails = () => {
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   </div>
+                </ProtectedElement>
 
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground font-bold">Заказчик</p>
                     <Link
@@ -134,7 +142,7 @@ const OrderDetails = () => {
                       <CopyText text={order.client.phone_number} children={<Phone className="h-4 w-4" />} />
                     </div>
                   </div>
-                </div>
+                </ProtectedElement>
               </div>
             </div>
 
@@ -149,12 +157,19 @@ const OrderDetails = () => {
                     <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
-                      Услуги
-                    </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
-                      Документы
-                    </TabsTrigger>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                        Услуги
+                      </TabsTrigger>
+                    </ProtectedElement>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                        Документы
+                      </TabsTrigger>
+                    </ProtectedElement>
+
                     <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
@@ -165,29 +180,34 @@ const OrderDetails = () => {
                   <ProductsTable products={order.products} />
                 </TabsContent>
                 <TabsContent value="1">{order.defects && <ProductsTable defects={order.defects} />}</TabsContent>
-                <TabsContent value="2">
-                  <ServicesTable services={order.services} />
-                </TabsContent>
-                <TabsContent value="3">
-                  <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !order.documents && 'flex-col items-center')}>
-                    {order.documents ? (
-                      order.documents.map((doc, idx) => (
-                        <Link
-                          key={idx}
-                          to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
-                        >
-                          <File className="h-6 w-6" />
-                          <span className="text-xs truncate w-40">{basename(doc.document)}</span>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground font-bold text-center text-sm">Документы отсутствуют.</p>
-                    )}
-                  </div>
-                </TabsContent>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="2">
+                    <ServicesTable services={order.services} />
+                  </TabsContent>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="3">
+                    <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !order.documents && 'flex-col items-center')}>
+                      {order.documents ? (
+                        order.documents.map((doc, idx) => (
+                          <Link
+                            key={idx}
+                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
+                          >
+                            <File className="h-6 w-6" />
+                            <span className="text-xs truncate w-40">{basename(doc.document)}</span>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground font-bold text-center text-sm">Документы отсутствуют.</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </ProtectedElement>
                 <TabsContent value="4">
                   <p className="px-2">История</p>
                 </TabsContent>

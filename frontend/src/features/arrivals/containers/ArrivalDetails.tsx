@@ -18,7 +18,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import CopyText from '@/components/CopyText/CopyText.tsx'
 import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
-import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
+import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 
 const ArrivalDetails = () => {
   const {
@@ -64,16 +64,18 @@ const ArrivalDetails = () => {
                     <Truck /> {arrival.arrivalNumber}
                   </h3>
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground font-bold">Склад</p>
-                    <Link
-                      to={`/stocks/${ arrival.stock._id }`}
-                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
-                    >
-                      {arrival.stock.name}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </Link>
-                  </div>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground font-bold">Склад</p>
+                      <Link
+                        to={`/stocks/${ arrival.stock._id }`}
+                        className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
+                      >
+                        {arrival.stock.name}
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </ProtectedElement>
 
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground font-bold">Дата прибытия</p>
@@ -92,37 +94,41 @@ const ArrivalDetails = () => {
                   </ProtectedElement>
                 </div>
 
-                <div className="space-y-1 mb-4">
-                  <p className="text-sm text-muted-foreground font-bold">Заказчик</p>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <div className="space-y-1 mb-4">
+                    <p className="text-sm text-muted-foreground font-bold">Заказчик</p>
 
-                  <Link
-                    to={`/clients/${ arrival.client._id }`}
-                    className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
-                  >
-                    {arrival.client.name}
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-
-                  <div className="flex gap-2 items-center">
-                    <CopyText text={arrival.client.phone_number} children={<Phone className="h-4 w-4" />} />
-                  </div>
-                </div>
-
-                {arrival.shipping_agent && (
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground font-bold">Контрагент</p>
                     <Link
-                      to="/counterparties"
-                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors  m-0 p-0"
+                      to={`/clients/${ arrival.client._id }`}
+                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
                     >
-                      {arrival.shipping_agent.name}
+                      {arrival.client.name}
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
+
                     <div className="flex gap-2 items-center">
-                      <CopyText text={arrival.shipping_agent.phone_number} children={<Phone className="h-4 w-4" />} />
+                      <CopyText text={arrival.client.phone_number} children={<Phone className="h-4 w-4" />} />
                     </div>
                   </div>
-                )}
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  {arrival.shipping_agent && (
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground font-bold">Контрагент</p>
+                      <Link
+                        to="/counterparties"
+                        className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors  m-0 p-0"
+                      >
+                        {arrival.shipping_agent.name}
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                      <div className="flex gap-2 items-center">
+                        <CopyText text={arrival.shipping_agent.phone_number} children={<Phone className="h-4 w-4" />} />
+                      </div>
+                    </div>
+                  )}
+                </ProtectedElement>
               </div>
             </div>
 
@@ -134,18 +140,27 @@ const ArrivalDetails = () => {
                     <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Отправленные
                     </TabsTrigger>
+
                     <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Полученные
                     </TabsTrigger>
+
                     <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       Дефекты
                     </TabsTrigger>
-                    <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
-                      Услуги
-                    </TabsTrigger>
-                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
-                      Документы
-                    </TabsTrigger>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                        Услуги
+                      </TabsTrigger>
+                    </ProtectedElement>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                        Документы
+                      </TabsTrigger>
+                    </ProtectedElement>
+
                     <TabsTrigger value="5" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
                       История
                     </TabsTrigger>
@@ -155,33 +170,42 @@ const ArrivalDetails = () => {
                 <TabsContent value="0">
                   <ProductsTable products={arrival.products} />
                 </TabsContent>
+
                 <TabsContent value="1">
                   <ProductsTable products={arrival.received_amount} />
                 </TabsContent>
+
                 <TabsContent value="2">{arrival.defects && <ProductsTable defects={arrival.defects} />}</TabsContent>
-                <TabsContent value="3">
-                  <ServicesTable services={arrival.services} />
-                </TabsContent>
-                <TabsContent value="4">
-                  <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !arrival.documents && 'flex-col items-center')}>
-                    {arrival.documents ? (
-                      arrival.documents.map((doc, idx) => (
-                        <Link
-                          key={idx}
-                          to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
-                        >
-                          <File className="h-6 w-6" />
-                          <span className="text-xs truncate w-40">{basename(doc.document)}</span>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground font-bold text-center text-sm">Документы отсутствуют.</p>
-                    )}
-                  </div>
-                </TabsContent>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="3">
+                    <ServicesTable services={arrival.services} />
+                  </TabsContent>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="4">
+                    <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !arrival.documents && 'flex-col items-center')}>
+                      {arrival.documents ? (
+                        arrival.documents.map((doc, idx) => (
+                          <Link
+                            key={idx}
+                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
+                          >
+                            <File className="h-6 w-6" />
+                            <span className="text-xs truncate w-40">{basename(doc.document)}</span>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground font-bold text-center text-sm">Документы отсутствуют.</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </ProtectedElement>
+
                 <TabsContent value="5">
                   <p className="px-2">История</p>
                 </TabsContent>
