@@ -21,6 +21,7 @@ export const useStockDetails = () => {
   const tabs = [
     { value: 'products', label: 'Товары' },
     { value: 'defects', label: 'Брак' },
+    { value: 'write-offs', label: 'Списания' },
   ]
 
   const stockColumns = [

@@ -5,7 +5,8 @@ import { UpdateStockDto } from '../dto/update-stock.dto'
 import { Roles } from 'src/decorators/roles.decorator'
 import { RolesGuard } from 'src/guards/roles.guard'
 import { CreateWriteOffDto } from 'src/dto/create-write-off.dto'
-import { RequestWithUser } from '../types'
+import { HydratedUser, RequestWithUser } from '../types'
+import { User } from 'src/decorators/user.param-decorator'
 
 @UseGuards(RolesGuard)
 @Roles('stock-worker', 'manager', 'admin', 'super-admin')
