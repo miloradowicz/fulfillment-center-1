@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/tooltip'
 import { handleErrorToast } from '@/utils/handleErrorToast.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter'
+import { useAppSelector } from '@/app/hooks'
+import { selectUser } from '@/store/slices/authSlice.ts'
 
 
 interface StatusCellProps<T, K extends keyof T> {
@@ -36,11 +38,14 @@ const CommonStatusCell = <T, K extends keyof T>({
 }: StatusCellProps<T, K>) => {
   const [loading, setLoading] = useState(false)
 
+  const user = useAppSelector(selectUser)
   const currentStatus = String(row[statusKey])
   const badgeClass = statusStyles[currentStatus] || statusStyles.default
 
+  const isStockWorker = user?.role === 'stock-worker'
+
   const handleChangeStatus = async (newStatus: string) => {
-    if (newStatus === currentStatus) return
+    if (isStockWorker || newStatus === currentStatus) return
     setLoading(true)
     try {
       await onChangeStatus(row, newStatus)
@@ -50,6 +55,18 @@ const CommonStatusCell = <T, K extends keyof T>({
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isStockWorker) {
+    return (
+      <div className="flex justify-center items-center w-full h-full">
+        <Badge
+          className={`w-full justify-start px-3 py-1 rounded-md text-sm font-medium ${ badgeClass }`}
+        >
+          {capitalize(currentStatus)}
+        </Badge>
+      </div>
+    )
   }
 
   const badgeContent = (
@@ -67,7 +84,7 @@ const CommonStatusCell = <T, K extends keyof T>({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className={user?.role === 'stock-worker' ? 'disabled' : ''}>
                 {badgeContent}
               </DropdownMenuTrigger>
             </TooltipTrigger>
