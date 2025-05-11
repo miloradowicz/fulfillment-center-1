@@ -3,17 +3,15 @@ import { Invoice } from '@/types'
 
 const InvoiceServicesTable = ({
   services,
-  showType = false,
 }: {
   services: Invoice['services']
-  showType?: boolean
   discount?: number
 }) => (
   <Table>
     <TableHeader>
       <TableRow>
         <TableHead className="font-bold">Услуга</TableHead>
-        {showType && <TableHead className="font-bold">Тип</TableHead>}
+        <TableHead className="font-bold">Тип</TableHead>
         <TableHead className="font-bold">Кол-во</TableHead>
         <TableHead className="font-bold">Цена</TableHead>
         <TableHead className="font-bold">Сумма</TableHead>
@@ -30,7 +28,7 @@ const InvoiceServicesTable = ({
             <TableCell className="font-medium whitespace-normal break-words max-w-[200px]">
               {item.service.name}
             </TableCell>
-            {showType && <TableCell>{item.service.type}</TableCell>}
+            <TableCell className="capitalize">{item.service.type}</TableCell>
             <TableCell>{amount}</TableCell>
             <TableCell>{unitPrice} сом</TableCell>
             <TableCell>{sum} сом</TableCell>
