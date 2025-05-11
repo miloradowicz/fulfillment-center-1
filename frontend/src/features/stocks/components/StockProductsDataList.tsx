@@ -5,6 +5,8 @@ import DataTable from '@/components/DataTable/DataTable'
 import { useStockDetails } from '../hooks/useStockDetails'
 import { FC } from 'react'
 import Loader from '@/components/Loader/Loader.tsx'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { AlertTriangle } from 'lucide-react'
 
 interface Props {
   selector: (stock: Stock) => ProductStockPopulate[]
@@ -39,7 +41,30 @@ const StockProductsDataList: FC<Props> = ({ selector }) => {
       meta: {
         title: 'Количество',
       },
-      cell: ({ row }) => <div>{row.original.amount}</div>,
+      cell: ({ row }) => {
+        const amount = row.original.amount
+        const isNegative = amount < 0
+
+        return (
+          <div className="flex items-center gap-2">
+            <span className={isNegative ? 'text-red-500 font-semibold'  : 'text-center ml-2'}>
+              {amount}
+            </span>
+            {isNegative && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertTriangle className="text-red-500 w-4 h-4 mb-auto ml-2" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Количество товара меньше нуля. Проверьте правильность внесения данных поставки и заказов!
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )
+      },
     },
     {
       accessorKey: 'article',
@@ -64,7 +89,10 @@ const StockProductsDataList: FC<Props> = ({ selector }) => {
       {isLoading && <Loader />}
 
       <div className="max-w-[1000px] mx-auto w-full">
-        <DataTable columns={columns} data={stock ? selector(stock) : []} />
+        <DataTable
+          columns={columns}
+          data={stock ? selector(stock).filter(item => item.amount !== 0) : []}
+        />
       </div>
     </>
   )
