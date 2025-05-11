@@ -185,7 +185,7 @@ const InvoiceDetails = () => {
 
                 {invoice.services?.length > 0 && (
                   <TabsContent value="3">
-                    <InvoiceServicesTable services={invoice.services} showType discount={invoice.discount} />
+                    <InvoiceServicesTable services={invoice.services} discount={invoice.discount} />
                   </TabsContent>
                 )}
 

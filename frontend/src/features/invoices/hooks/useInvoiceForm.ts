@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
-import { Arrival, InvoiceMutation, Order, ServiceArrival } from '@/types'
+import { Arrival, InvoiceMutation, Order, ServiceArrival, ServiceType } from '@/types'
 import { initialErrorState, initialServiceState, initialState } from '../state/invoiceState.ts'
 import { toast } from 'react-toastify'
 import { fetchClients } from '@/store/thunks/clientThunk.ts'
@@ -44,10 +44,13 @@ export const useInvoiceForm = (initialData?: InvoiceData, onSuccess?: () => void
   const [lockArrival, setLockArrival] = useState(!!initialData?.associatedArrival)
   const [lockOrder, setLockOrder] = useState(!!initialData?.associatedOrder)
 
-  const normalizeField = <T extends ServiceField>(items?: T[]): (Omit<T, 'service'> & { service: string })[] =>
+  const normalizeField = <T extends ServiceField>(items?: T[]): (Omit<T, 'service'> & { service: string, service_type: ServiceType })[] =>
     items?.map(item => ({
       ...item,
-      ...({ service: typeof item.service === 'string' ? item.service : item.service._id }),
+      ...({
+        service: typeof item.service === 'string' ? item.service : item.service._id,
+        service_type: item.service_type ?? 'внутренняя',
+      }),
     })) || []
 
   const [arrivalServicesForm, setArrivalServicesForm] = useState<ServiceArrival[]>(
