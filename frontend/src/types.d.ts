@@ -403,6 +403,10 @@ export interface Counterparty {
 
 export type CounterpartyMutation = Omit<Counterparty, '_id'>
 
+export interface CounterpartyError {
+  name: string
+}
+
 export interface UserTaskReport {
   user: {
     _id: string;
@@ -427,25 +431,6 @@ export interface ReportTaskResponse {
   userTaskReports: UserTaskReport[];
   dailyTaskCounts: DailyTaskCount[];
 }
-
-// export interface ClientOrderReport {
-//   client: {
-//     _id: string;
-//     name: string;
-//     isArchived: boolean
-//   };
-//   orders: {
-//     _id: string
-//     orderNumber: string
-//     status:string
-//     isArchived: boolean
-//   }[],
-//   orderCount: number;
-// }
-//
-// export interface ReportClientResponse {
-//   clientOrderReport: ClientOrderReport[];
-// }
 
 export interface ClientFullReport {
   client: {
