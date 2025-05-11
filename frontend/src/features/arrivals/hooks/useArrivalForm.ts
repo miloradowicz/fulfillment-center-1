@@ -159,6 +159,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       service: newService.service,
       service_amount: Number(newService.service_amount),
       service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+      service_type: selectedService?.type,
     }
 
     if (
@@ -227,6 +228,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       ...prev,
       service: serviceId,
       service_price: selectedService?.price || prev.service_price,
+      service_type: prev.service_type,
     }))
   }
 
