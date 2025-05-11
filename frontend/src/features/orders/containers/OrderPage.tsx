@@ -1,4 +1,4 @@
-import OrdersList from '../components/OrdersList.tsx'
+import OrdersDataList from '../components/OrdersDataList.tsx'
 import Modal from '@/components/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
 import useOrderPage from '../hooks/useOrderPage.ts'
@@ -50,7 +50,7 @@ const OrderPage = () => {
       </div>
 
       <div className="my-8">
-        <OrdersList
+        <OrdersDataList
           onEdit={handleOpenEdit}
           orders={orders || []}
           handleDelete={handleArchive}
