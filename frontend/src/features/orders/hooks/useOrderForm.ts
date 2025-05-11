@@ -46,6 +46,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
         documents: initialData.documents ? initialData.documents : [],
+        paymentStatus: initialData.paymentStatus ? initialData.paymentStatus : '',
       }
       : { ...initialState },
   )
@@ -249,10 +250,40 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     }
   }
 
+  const closeModalProduct = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+    }))
+    setProductsModalOpen(false)
+  }
+
+  const closeModalDefect = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+      defect_description: '',
+    }))
+    setDefectsModalOpen(false)
+  }
+
+  const closeModalService = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      service: '',
+      service_amount: '',
+      service_price: '',
+    }))
+    setServicesModalOpen(false)
+  }
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (Object.values(errors).filter(Boolean).length) {
+      console.log(errors)
       toast.error('Заполните все обязательные поля.')
       return
     }
@@ -344,11 +375,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     handleModalConfirm,
     openDeleteModal,
     productsModalOpen,
-    setProductsModalOpen,
     defectsModalOpen,
-    setDefectsModalOpen,
     servicesModalOpen,
-    setServicesModalOpen,
     setNewService,
     services,
     newService,
@@ -360,5 +388,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     newItem,
     activePopover,
     setActivePopover,
+    closeModalProduct,
+    closeModalDefect,
+    closeModalService,
   }
 }
