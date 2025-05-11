@@ -149,28 +149,28 @@ const OrderDetails = () => {
             <div className="rounded-2xl shadow p-6 mb-6">
               <h3 className="font-bold uppercase mb-3 text-muted-foreground">Дополнительно</h3>
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
-                <TabsList className="mb-5 w-full rounded-2xl">
-                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                <TabsList className="mb-5 w-full h-[40px] rounded-2xl">
+                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto pt-2">
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Товары
                     </TabsTrigger>
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Дефекты
                     </TabsTrigger>
 
                     <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                      <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                         Услуги
                       </TabsTrigger>
                     </ProtectedElement>
 
                     <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                         Документы
                       </TabsTrigger>
                     </ProtectedElement>
 
-                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       История
                     </TabsTrigger>
                   </div>

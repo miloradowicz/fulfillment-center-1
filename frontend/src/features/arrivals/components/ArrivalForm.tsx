@@ -43,13 +43,9 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     defectsForm,
     setDefectsForm,
     productsModalOpen,
-    setProductsModalOpen,
     receivedModalOpen,
-    setReceivedModalOpen,
     defectsModalOpen,
-    setDefectsModalOpen,
     servicesModalOpen,
-    setServicesModalOpen,
     newService,
     setNewService,
     servicesForm,
@@ -74,6 +70,10 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     handleRemoveFile,
     activePopover,
     setActivePopover,
+    closeModalProduct,
+    closeModalReceived,
+    closeModalDefect,
+    closeModalService,
   } = useArrivalForm(initialData, onSuccess)
 
   return (
@@ -257,7 +257,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setProductsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalProduct()}>
                 Закрыть
               </Button>
             </div>
@@ -338,7 +338,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setReceivedModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalReceived()}>
                 Закрыть
               </Button>
             </div>
@@ -421,7 +421,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setDefectsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalDefect()}>
                 Закрыть
               </Button>
             </div>
@@ -510,7 +510,7 @@ const ArrivalForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setServicesModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalService()}>
                 Закрыть
               </Button>
             </div>

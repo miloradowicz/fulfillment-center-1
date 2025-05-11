@@ -55,7 +55,12 @@ const ArrivalDetails = () => {
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
-                <Badge className={cn(arrivalStatusStyles[arrival.arrival_status] || arrivalStatusStyles.default, 'py-2 px-2.5 font-bold mb-4')}>
+                <Badge
+                  className={cn(
+                    arrivalStatusStyles[arrival.arrival_status] || arrivalStatusStyles.default,
+                    'py-2 px-2.5 font-bold mb-4',
+                  )}
+                >
                   {capitalize(arrival.arrival_status)}
                 </Badge>
 
@@ -135,33 +140,33 @@ const ArrivalDetails = () => {
             <div className="rounded-2xl shadow p-6 mb-6">
               <h3 className="font-bold uppercase mb-3 text-muted-foreground text-center">Дополнительно</h3>
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
-                <TabsList className="mb-5 w-full rounded-2xl">
-                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto">
-                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                <TabsList className="mb-5 w-full h-[40px] rounded-2xl">
+                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto pt-2">
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Отправленные
                     </TabsTrigger>
 
-                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Полученные
                     </TabsTrigger>
 
-                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Дефекты
                     </TabsTrigger>
 
                     <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                         Услуги
                       </TabsTrigger>
                     </ProtectedElement>
 
                     <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
-                      <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                      <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                         Документы
                       </TabsTrigger>
                     </ProtectedElement>
 
-                    <TabsTrigger value="5" className={cn(tabTriggerStyles, 'sm:text-sm sm:my-2.5')}>
+                    <TabsTrigger value="5" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       История
                     </TabsTrigger>
                   </div>
@@ -185,7 +190,9 @@ const ArrivalDetails = () => {
 
                 <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                   <TabsContent value="4">
-                    <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !arrival.documents && 'flex-col items-center')}>
+                    <div
+                      className={cn('flex flex-wrap gap-4 mt-3 px-2', !arrival.documents && 'flex-col items-center')}
+                    >
                       {arrival.documents ? (
                         arrival.documents.map((doc, idx) => (
                           <Link
