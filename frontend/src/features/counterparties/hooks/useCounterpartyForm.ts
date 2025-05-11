@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { createCounterparty, fetchAllCounterparties, fetchCounterpartyById, updateCounterparty } from '@/store/thunks/counterpartyThunk.ts'
-import { CounterpartyMutation } from '@/types'
+import { CounterpartyError, CounterpartyMutation } from '@/types'
 import { phoneNumberRegex } from '@/constants.ts'
 import { initialState } from '../state/counterpartyState.ts'
 import { toast } from 'react-toastify'
@@ -21,6 +21,7 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
   const [form, setForm] = useState<CounterpartyMutation>(initialState)
   const [errors, setErrors] = useState<{ [K in keyof CounterpartyMutation]?: string }>({})
   const [submitting, setSubmitting] = useState(false)
+  const [errorsBlur, setErrorsBlur] = useState<CounterpartyError>({ name:'' })
 
   const generalError =
     (createError && typeof createError === 'object' && 'message' in createError ? createError.message : '') ||
@@ -66,6 +67,21 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
       setErrors(prev => ({ ...prev, ...newErrors }))
     }
   }, [createError, updateError])
+
+  const handleBlur = (field: keyof CounterpartyError, value: string | number) => {
+    type ErrorMessages = {
+      [key in keyof CounterpartyError]: string
+    }
+
+    const errorMessages: ErrorMessages = {
+      name: !value ? 'Заполните имя контрагента.' : '',
+    }
+
+    setErrorsBlur(prev => ({
+      ...prev,
+      [field]: errorMessages[field] || '',
+    }))
+  }
 
   const checkCounterpartyNameExistence = (name: string): boolean => {
     if (!name.trim()) return false
@@ -155,6 +171,7 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
       }
 
       setForm(initialState)
+      setErrorsBlur({ name:'' })
       onClose?.()
     } catch (error) {
       console.error('Error:', error)
@@ -174,5 +191,7 @@ export const useCounterpartyForm = (counterpartyId?: string, onClose?: () => voi
     createError,
     updateError,
     hasErrors: Object.keys(errors).length > 0,
+    errorsBlur,
+    handleBlur,
   }
 }
