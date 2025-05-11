@@ -73,6 +73,10 @@ export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
 }
 
+export type StockDefectWithPopulate = Omit<Defect, 'product'> & {
+  product: ProductWithPopulate
+}
+
 export interface ProductOrder {
   product: string
   description: string
@@ -135,6 +139,10 @@ export interface WriteOff {
   product: string
   reason: string
   amount: number
+}
+
+export type StockWriteOffWithPopulatedProducts = Omit<WriteOff, 'product'> & {
+  product: ProductWithPopulate
 }
 
 export type StockWriteOffMutation = Omit<StockWriteOff, '_id'>
@@ -380,7 +388,8 @@ export interface Stock {
   name: string
   address: string
   products?: ProductStockPopulate[]
-  defects?: ProductsStockPopulate[]
+  defects?: StockDefectWithPopulate[]
+  write_offs?: StockWriteOffWithPopulatdProducts[]
 }
 
 export interface StockPopulate {

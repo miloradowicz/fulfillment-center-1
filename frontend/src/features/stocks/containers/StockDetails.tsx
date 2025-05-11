@@ -12,6 +12,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import WriteOffForm from '../components/WriteOffForm.tsx'
 import { MapPinIcon, Warehouse } from 'lucide-react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import StockWriteOffsPage from './StockWriteOffsPage.tsx'
 
 const StockDetails = () => {
   const {
@@ -112,6 +113,9 @@ const StockDetails = () => {
           </TabsContent>
           <TabsContent value="defects">
             <StockDefectsPage />
+          </TabsContent>
+          <TabsContent value="write-offs">
+            <StockWriteOffsPage />
           </TabsContent>
         </Tabs>
       </div>

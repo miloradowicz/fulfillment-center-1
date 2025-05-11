@@ -304,6 +304,7 @@ export class SeederService {
         address: 'Ул. Малдыбаева 7/1',
         products: [{ product: _product3._id, amount: 23 }],
         defects: [{ product: _product3._id, amount: 3 }],
+        write_offs: [{ product: _product3._id, amount: 7, reason: 'Someone stole it.' }],
         isArchived: false,
       },
       {
@@ -311,12 +312,14 @@ export class SeederService {
         address: 'Ул. Гагарина 102',
         products: [{ product: _product3._id, amount: 23 }],
         defects: [{ product: _product2._id, amount: 20 }],
+        write_offs: [{ product: _product3._id, amount: 1, reason: 'The boss called dibs.' }],
         isArchived: false,
       },
       {
         name: 'Склад Санкт-Петербург',
         address: 'Ул. Ленина 100',
         products: [],
+        write_offs: [{ product: _product3._id, amount: 1, reason: 'Yoink! lol' }],
         isArchived: true,
       },
       {
@@ -324,6 +327,7 @@ export class SeederService {
         address: 'Ул. Советская 101',
         products: [{ product: _product2._id, amount: 15 }],
         defects: [{ product: _product1._id, amount: 7 }],
+        write_offs: [{ product: _product2._id, amount: 4, reason: 'Why do I know? Ask the night guard.' }],
         isArchived: true,
       },
     ])
