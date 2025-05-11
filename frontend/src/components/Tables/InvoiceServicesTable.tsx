@@ -28,7 +28,7 @@ const InvoiceServicesTable = ({
             <TableCell className="font-medium whitespace-normal break-words max-w-[200px]">
               {item.service.name}
             </TableCell>
-            <TableCell className="capitalize">{item.service.type}</TableCell>
+            <TableCell className="capitalize">{item.service_type}</TableCell>
             <TableCell>{amount}</TableCell>
             <TableCell>{unitPrice} сом</TableCell>
             <TableCell>{sum} сом</TableCell>
