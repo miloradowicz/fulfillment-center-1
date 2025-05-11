@@ -1,6 +1,6 @@
 import {
   ErrorsFields,
-  Invoice,
+  Invoice, ServiceType,
 } from '@/types'
 
 export type InvoiceData = Omit<Invoice, 'associatedArrival' | 'associatedOrder'> & {
@@ -19,4 +19,7 @@ export type ErrorMessages = Pick<ErrorsFields,
   | 'discount'
   >
 
-export type ServiceField = { service: string | { _id: string } }
+export type ServiceField = {
+  service: string | { _id: string },
+  service_type?: ServiceType
+}
