@@ -357,6 +357,7 @@ export type ServiceInTable = {
   service: string | Service
   service_amount?: number
   service_price?: number
+  service_type: ServiceType
   _id?: string
 }
 
