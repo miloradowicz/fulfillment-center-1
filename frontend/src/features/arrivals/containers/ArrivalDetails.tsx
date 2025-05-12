@@ -19,6 +19,7 @@ import CopyText from '@/components/CopyText/CopyText.tsx'
 import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTsble.tsx'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 const ArrivalDetails = () => {
   const {
@@ -183,7 +184,11 @@ const ArrivalDetails = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="5">
-                  <p className="px-2">История</p>
+                  {arrival.logs && arrival.logs.length > 0 ? (
+                    <LogsAccordionView logs={arrival.logs} />
+                  ) : (
+                    <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+                  )}
                 </TabsContent>
               </Tabs>
             </div>
