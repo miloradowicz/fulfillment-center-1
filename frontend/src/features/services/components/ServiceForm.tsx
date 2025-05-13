@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { cn } from '@/lib/utils'
+import { Textarea } from '@/components/ui/textarea.tsx'
 
 const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () => void }) => {
   const {
@@ -68,7 +69,7 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
                     variant="secondary"
                     className="cursor-pointer text-sm"
                     onClick={() => {
-                      handleAutocompleteChange(null, inputValue)
+                      void handleAutocompleteChange(null, inputValue)
                       setInputValue('')
                     }}
                   >
@@ -83,7 +84,7 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
                       key={category._id}
                       value={category.name}
                       onSelect={() => {
-                        handleAutocompleteChange(null, category)
+                        void handleAutocompleteChange(null, category)
                         setInputValue('')
                         setOpen(false)
                       }}
@@ -165,12 +166,12 @@ const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () =
         error={errors.price}
       />
 
-      <InputWithError
+      <Textarea
         name="description"
         placeholder="Описание"
         value={form.description}
         onChange={handleInputChange}
-        error={errors.description}
+        className="resize-y min-h-[40px] max-h-[250px] text-sm"
       />
 
       <Button type="submit" className="w-full mt-3" disabled={loading || addCategoryLoading || fetchCategoryLoading}>
