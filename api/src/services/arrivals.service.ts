@@ -8,6 +8,7 @@ import { CreateArrivalDto } from '../dto/create-arrival.dto'
 import { FilesService } from './files.service'
 import { StockManipulationService } from './stock-manipulation.service'
 import { LogsService } from './logs.service'
+import { Invoice, InvoiceDocument } from '../schemas/invoice.schema'
 
 export interface DocumentObject {
   document: string
@@ -17,6 +18,7 @@ export interface DocumentObject {
 export class ArrivalsService {
   constructor(
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
+    @InjectModel(Invoice.name) private readonly invoiceModel: Model<InvoiceDocument>,
     private readonly counterService: CounterService,
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
@@ -249,6 +251,21 @@ export class ArrivalsService {
 
     if (arrival.isArchived) throw new ForbiddenException('Поставка уже в архиве.')
 
+    if (arrival.arrival_status === 'ожидается доставка'  ) {
+      throw new ForbiddenException('Поставку можно архивировать только после получения')
+    }
+
+    const hasUnpaidInvoice = await this.invoiceModel.exists({
+      associatedOrder: id,
+      status: { $in: ['в ожидании', 'частично оплачено'] },
+    })
+
+    if (hasUnpaidInvoice) {
+      throw new ForbiddenException(
+        'Поставка не может быть перемещен в архив, так как она не оплачен.',
+      )
+    }
+
     arrival.isArchived = true
 
     const log = this.logsService.generateLogForArchive(userId, arrival.isArchived)
@@ -276,16 +293,39 @@ export class ArrivalsService {
     return { message: 'Клиент восстановлен из архива' }
   }
 
-  async delete(id: string) {
+  async cancel(id: string) {
     const arrival = await this.arrivalModel.findByIdAndDelete(id)
-    if (!arrival) throw new NotFoundException('Поставка не найдена.')
 
+    if (!arrival) throw new NotFoundException('Поставка не найдена.')
 
     this.stockManipulationService.init()
 
     await this.undoStocking(arrival)
 
     await this.stockManipulationService.saveStock(arrival.stock)
-    return { message: 'Поставка успешно удалена.' }
+    return { message: 'Поставка успешно отменена.' }
+  }
+
+  async delete(id: string) {
+    const arrival = await this.arrivalModel.findById(id)
+
+    if (!arrival) throw new NotFoundException('Поставка не найдена.')
+
+    if (arrival.arrival_status === 'ожидается доставка'  ) {
+      throw new ForbiddenException('Поставку можно архивировать только после получения')
+    }
+
+    const hasUnpaidInvoice = await this.invoiceModel.exists({
+      associatedOrder: id,
+      status: { $in: ['в ожидании', 'частично оплачено'] },
+    })
+
+    if (hasUnpaidInvoice) {
+      throw new ForbiddenException(
+        'Поставка не может быть перемещен в архив, так как она не оплачен.',
+      )
+    }
+    await arrival.deleteOne()
+    return { message: 'Поставка удалена' }
   }
 }

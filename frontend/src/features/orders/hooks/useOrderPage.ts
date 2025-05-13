@@ -7,7 +7,7 @@ import {
   selectLoadingFetchOrder,
 } from '@/store/slices/orderSlice.ts'
 import {
-  archiveOrder, fetchArchivedOrders,
+  archiveOrder, cancelOrder, fetchArchivedOrders,
   fetchOrderByIdWithPopulate,
   fetchOrdersWithClient,
 } from '@/store/thunks/orderThunk.ts'
@@ -36,6 +36,18 @@ const UseOrderPage = () => {
       dispatch(fetchArchivedOrders())
     } catch (e) {
       toast.error('Ошибка при архивации заказа.')
+      console.error(e)
+    }
+  }
+
+  const handleCancelOrder = async (id: string) => {
+    try {
+      await dispatch(cancelOrder(id))
+      dispatch(fetchOrdersWithClient())
+      toast.success('Заказ успешно отменен!')
+      dispatch(fetchArchivedOrders())
+    } catch (e) {
+      toast.error('Ошибка при отмене заказа.')
       console.error(e)
     }
   }
@@ -78,6 +90,7 @@ const UseOrderPage = () => {
     setCounterpartyToDelete,
     handleConfirmArchive,
     orderToEdit,
+    handleCancelOrder,
   }
 }
 

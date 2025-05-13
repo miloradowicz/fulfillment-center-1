@@ -12,7 +12,7 @@ import React from 'react'
 interface ConfirmationModalProps {
   open: boolean
   entityName: string
-  actionType: 'delete' | 'archive' | 'unarchive'
+  actionType: 'delete' | 'archive' | 'unarchive' | 'cancel'
   onConfirm: () => void
   onCancel: () => void
 }
@@ -21,6 +21,7 @@ const actionLabels = {
   delete: { text: 'удалить', color: 'bg-red-200 text-red-800 hover:bg-red-300' },
   archive: { text: 'архивировать', color: 'bg-blue-200 text-blue-800 hover:bg-blue-300' },
   unarchive: { text: 'восстановить', color: 'bg-green-200 text-green-800 hover:bg-green-300' },
+  cancel: { text: 'отменить', color: 'bg-green-200 text-green-800 hover:bg-green-300' },
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({

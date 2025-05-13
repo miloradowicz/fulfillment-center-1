@@ -88,6 +88,12 @@ export class ArrivalsController {
     return this.arrivalsService.unarchive(id, userId)
   }
 
+  @Roles('super-admin', 'admin', 'manager')
+  @Delete(':id/cancel')
+  async cancelArrival(@Param('id') id: string) {
+    return this.arrivalsService.cancel(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteArrival(@Param('id') id: string) {

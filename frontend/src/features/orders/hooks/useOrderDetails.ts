@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectLoadingFetchOrder, selectPopulateOrder } from '@/store/slices/orderSlice.ts'
-import { archiveOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
+import { archiveOrder, cancelOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -14,6 +14,7 @@ export const useOrderDetails = () => {
 
   const [open, setOpen] = useState(false)
   const [openArchiveModal, setOpenArchiveModal] = useState(false)
+  const [confirmCancelModalOpen, setConfirmCancelModalOpen] = useState(false)
   const [tabs, setTabs] = useState(0)
 
   useEffect(() => {
@@ -36,6 +37,20 @@ export const useOrderDetails = () => {
     setOpenArchiveModal(false)
   }
 
+  const handleCancel = async () => {
+    try {
+      if (order) {
+        await dispatch(cancelOrder(order._id))
+        navigate('/orders')
+        toast.success('Заказ успешно отменен!')
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error('Ошибка при отмене заказа')
+    }
+    setConfirmCancelModalOpen(false)
+  }
+
   return {
     order,
     loading,
@@ -46,5 +61,8 @@ export const useOrderDetails = () => {
     setOpenArchiveModal,
     tabs,
     setTabs,
+    handleCancel,
+    setConfirmCancelModalOpen,
+    confirmCancelModalOpen,
   }
 }

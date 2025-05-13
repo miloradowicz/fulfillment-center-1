@@ -108,6 +108,20 @@ export const unarchiveArrival = createAsyncThunk<{ id: string }, string, { rejec
   },
 )
 
+export const cancelArrival = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
+  'arrivals/cancelArrival',
+  async (arrivalId: string, { rejectWithValue }) => {
+    try {
+      await axiosAPI.delete(`/arrivals/${ arrivalId }/cancel`)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteArrival = createAsyncThunk<void, string, { rejectValue: GlobalError }>(
   'arrivals/deleteArrival',
   async (arrivalId: string, { rejectWithValue }) => {
