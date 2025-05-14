@@ -121,7 +121,7 @@ const InvoiceDetails = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col gap-3 w-full max-w-[250px] mx-auto md:mx-0 md:items-end">
                 <div className="flex gap-2">
                   <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
                     <EditButton onClick={() => setEditModalOpen(true)} />
