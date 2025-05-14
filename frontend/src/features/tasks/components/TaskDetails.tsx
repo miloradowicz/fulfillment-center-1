@@ -28,7 +28,7 @@ const TaskDetails: React.FC<Props> = ({ taskId, selectedUser }) => {
   }
 
   return (
-    <div className="pt-10 max-w-[350px] max-h-[80vh] h-full mx-auto text-[14px] text-gray-600">
+    <div className="pt-10 max-w-[350px] w-full max-h-[80vh] h-full mx-auto text-[14px] text-gray-600">
       <div className="flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.1)] rounded-md ">
         <div className="flex-8 py-4">
           <div className="flex justify-center items-center gap-2 rounded-md mb-4">
