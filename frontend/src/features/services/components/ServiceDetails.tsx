@@ -6,6 +6,7 @@ import { fetchServiceById } from '@/store/thunks/serviceThunk.ts'
 import { Badge } from '@/components/ui/badge.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   serviceId?: string
@@ -42,7 +43,7 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
               Категория: <span className="text-blue-700">{service.serviceCategory.name}</span>
             </p>
             <p className="text-lg font-semibold text-gray-700">
-              Цена: <span className="text-blue-700">{service.price}</span>
+              Цена: <span className="text-blue-700">{formatMoney(service.price)} ₽</span>
             </p>
           </div>
 
