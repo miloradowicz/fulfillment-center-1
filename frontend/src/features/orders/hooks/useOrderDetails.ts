@@ -4,6 +4,7 @@ import { selectLoadingFetchOrder, selectPopulateOrder } from '@/store/slices/ord
 import { archiveOrder, cancelOrder, fetchOrderByIdWithPopulate } from '@/store/thunks/orderThunk.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useOrderDetails = () => {
   const { id } = useParams()
@@ -26,13 +27,17 @@ export const useOrderDetails = () => {
   const handleArchive = async () => {
     try {
       if (order) {
-        await dispatch(archiveOrder(order._id))
+        await dispatch(archiveOrder(order._id)).unwrap()
         navigate('/orders')
         toast.success('Заказ успешно архивирован!')
       }
     } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось архивировать заказ')
+      }
       console.error(e)
-      toast.error('Ошибка при архивации заказа')
     }
     setOpenArchiveModal(false)
   }

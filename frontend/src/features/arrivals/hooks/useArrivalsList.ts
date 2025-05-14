@@ -5,6 +5,7 @@ import { archiveArrival, cancelArrival, fetchPopulatedArrivals } from '@/store/t
 import { toast } from 'react-toastify'
 import { ArrivalWithClient } from '@/types'
 import { fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 export const useArrivalsList = () => {
   const dispatch = useAppDispatch()
@@ -36,12 +37,16 @@ export const useArrivalsList = () => {
   const handleConfirmArchive = async () => {
     try {
       if (selectedArrivalId) {
-        await dispatch(archiveArrival(selectedArrivalId))
+        await dispatch(archiveArrival(selectedArrivalId)).unwrap()
         await fetchAllArrivals()
         toast.success('Поставка успешно архивирована.')
       }
     } catch (e) {
-      toast.error('Ошибка при архивировании поставки.')
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось архивировать поставку')
+      }
       console.error(e)
     } finally {
       handleClose()

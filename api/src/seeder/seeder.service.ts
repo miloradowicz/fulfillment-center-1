@@ -597,7 +597,7 @@ export class SeederService {
             service_type: _service4.type,
           },
         ],
-        isArchived: true,
+        isArchived: false,
       },
     ])
 
