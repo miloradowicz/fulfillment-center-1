@@ -16,6 +16,7 @@ import { InvoiceData } from '../types/invoiceTypes'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { invoiceStatusStyles } from '@/utils/commonStyles'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   initialData?: InvoiceData | undefined
@@ -203,7 +204,7 @@ const InvoiceForm: React.FC<Props> = ({ initialData, onSuccess }) => {
 
         <div className="space-y-2.5">
           <Label htmlFor="total_amount">К оплате</Label>
-          <Input id="total_amount" name="total_amount" placeholder="К оплате" value={totalAmount} disabled />
+          <Input id="total_amount" name="total_amount" placeholder="К оплате" value={`${ formatMoney(totalAmount) } ₽`} disabled />
         </div>
 
         <Separator />
