@@ -53,11 +53,8 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     handleModalConfirm,
     openDeleteModal,
     productsModalOpen,
-    setProductsModalOpen,
     defectsModalOpen,
-    setDefectsModalOpen,
     servicesModalOpen,
-    setServicesModalOpen,
     setNewService,
     services,
     newService,
@@ -69,8 +66,11 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     newItem,
     activePopover,
     setActivePopover,
+    closeModalProduct,
+    closeModalDefect,
+    closeModalService,
   } = useOrderForm(initialData, onSuccess)
-
+  console.log(productsForm)
   return (
     <>
       <form onSubmit={onSubmit} className="space-y-4">
@@ -234,7 +234,7 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setProductsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalProduct()}>
                 Закрыть
               </Button>
             </div>
@@ -317,7 +317,7 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setDefectsModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalDefect()}>
                 Закрыть
               </Button>
             </div>
@@ -406,7 +406,7 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
                 Добавить
               </Button>
 
-              <Button type="button" variant="outline" onClick={() => setServicesModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => closeModalService()}>
                 Закрыть
               </Button>
             </div>

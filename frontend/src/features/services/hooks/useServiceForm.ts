@@ -96,7 +96,7 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     }
   }, [createServiceError, createServiceCategoryError])
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     setForm(prevState => ({
@@ -220,7 +220,7 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
       return
     }
 
-    const serviceData: ServiceMutation = {
+    const serviceData = {
       name: form.name,
       price: Number.parseFloat(form.price),
       description: form.description,

@@ -15,6 +15,8 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
     errors,
     createError,
     updateError,
+    errorsBlur,
+    handleBlur,
   } = useCounterpartyForm(counterparty?._id, onClose)
 
   return (
@@ -28,7 +30,8 @@ const CounterpartyForm = ({ counterparty, onClose }: { counterparty?: Counterpar
         placeholder="Название компании контрагента"
         value={form.name}
         onChange={inputChangeHandler}
-        error={errors.name || getFieldError('name', createError || updateError)}
+        error={errors.name || getFieldError('name', createError || updateError) || errorsBlur.name}
+        onBlur={e => handleBlur('name', e.target.value)}
       />
 
       <InputWithError

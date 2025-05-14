@@ -304,6 +304,7 @@ export class SeederService {
         address: 'Ул. Малдыбаева 7/1',
         products: [{ product: _product3._id, amount: 23 }],
         defects: [{ product: _product3._id, amount: 3 }],
+        write_offs: [{ product: _product3._id, amount: 7, reason: 'Someone stole it.' }],
         isArchived: false,
       },
       {
@@ -311,12 +312,14 @@ export class SeederService {
         address: 'Ул. Гагарина 102',
         products: [{ product: _product3._id, amount: 23 }],
         defects: [{ product: _product2._id, amount: 20 }],
+        write_offs: [{ product: _product3._id, amount: 1, reason: 'The boss called dibs.' }],
         isArchived: false,
       },
       {
         name: 'Склад Санкт-Петербург',
         address: 'Ул. Ленина 100',
         products: [],
+        write_offs: [{ product: _product3._id, amount: 1, reason: 'Yoink! lol' }],
         isArchived: true,
       },
       {
@@ -324,6 +327,7 @@ export class SeederService {
         address: 'Ул. Советская 101',
         products: [{ product: _product2._id, amount: 15 }],
         defects: [{ product: _product1._id, amount: 7 }],
+        write_offs: [{ product: _product2._id, amount: 4, reason: 'Why do I know? Ask the night guard.' }],
         isArchived: true,
       },
     ])
@@ -333,15 +337,15 @@ export class SeederService {
         orderNumber: 'ORD-1',
         client: _client1._id,
         stock: _stock1._id,
-        products: [{ product: _product3._id, amount: 2 }],
+        products: [{ product: _product2._id, description: '', amount: 2 }],
         price: 2500,
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
         status: 'в сборке',
         isArchived: false,
         services: [
-          { service: _service1._id, service_price: _service1.price },
-          { service: _service2._id, service_amount: 5, service_price: 1000 },
+          { service: _service1._id, service_price: _service1.price, service_type: _service1.type },
+          { service: _service2._id, service_amount: 5, service_price: 1000, service_type: _service2.type },
         ],
       },
       {
@@ -359,15 +363,15 @@ export class SeederService {
         orderNumber: 'ORD-3',
         client: _client1._id,
         stock: _stock1._id,
-        products: [{ product: _product3._id, amount: 7 }],
+        products: [{ product: _product3._id, description: '', amount: 7 }],
         price: 1900,
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'доставлен',
         isArchived: false,
         services: [
-          { service: _service1._id, service_amount: 10, service_price: _service1.price },
-          { service: _service2._id, service_price: 1000 },
+          { service: _service1._id, service_amount: 10, service_price: _service1.price, service_type: _service1.type },
+          { service: _service2._id, service_price: 1000, service_type: _service2.type },
         ],
       },
       {
@@ -384,8 +388,8 @@ export class SeederService {
         status: 'в сборке',
         isArchived: true,
         services: [
-          { service: _service1._id, service_amount: 10 },
-          { service: _service2._id, service_price: 1000 },
+          { service: _service1._id, service_amount: 10, service_type: _service1.type },
+          { service: _service2._id, service_price: 1000, service_type: _service2.type },
         ],
       },
       {
@@ -402,22 +406,22 @@ export class SeederService {
         status: 'в пути',
         isArchived: true,
         services: [
-          { service: _service1._id, service_amount: 10 },
-          { service: _service2._id, service_price: 1000 },
+          { service: _service1._id, service_amount: 10, service_type: _service1.type },
+          { service: _service2._id, service_price: 1000, service_type: _service2.type },
         ],
       },
       {
         orderNumber: 'ORD-6',
         client: _client2._id,
         stock: _stock1._id,
-        products: [{ product: _product3._id, amount: 5 }],
+        products: [{ product: _product3._id, description: '', amount: 5 }],
         price: 2500,
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
         status: 'в сборке',
         services: [
-          { service: _service1._id, service_amount: 10 },
-          { service: _service2._id, service_price: 1000 },
+          { service: _service1._id, service_amount: 10, service_type: _service1.type },
+          { service: _service2._id, service_price: 1000, service_type: _service2.type },
         ],
       },
     ])
@@ -474,11 +478,13 @@ export class SeederService {
             service: _service1._id,
             service_price: _service1.price,
             service_amount: 2,
+            service_type: _service1.type,
           },
           {
             service: _service2._id,
             service_price: _service2.price,
             service_amount: 4,
+            service_type: _service2.type,
           },
         ],
       },
@@ -496,11 +502,13 @@ export class SeederService {
           {
             service: _service3._id,
             service_price: 72000,
+            service_type: _service3.type,
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 5,
+            service_type: _service4.type,
           },
         ],
         logs: [
@@ -527,11 +535,13 @@ export class SeederService {
           {
             service: _service3._id,
             service_price: 72000,
+            service_type: _service3.type,
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 5,
+            service_type: _service4.type,
           },
         ],
         isArchived: false,
@@ -551,11 +561,13 @@ export class SeederService {
           {
             service: _service3._id,
             service_price: 72000,
+            service_type: _service3.type,
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 5,
+            service_type: _service4.type,
           },
         ],
         isArchived: true,
@@ -575,11 +587,13 @@ export class SeederService {
           {
             service: _service3._id,
             service_price: 72000,
+            service_type: _service3.type,
           },
           {
             service: _service4._id,
             service_price: _service4.price,
             service_amount: 5,
+            service_type: _service4.type,
           },
         ],
         isArchived: true,

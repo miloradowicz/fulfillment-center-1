@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Defect, OrderMutation, Product, ProductOrder, ServiceArrival, ServiceOrder } from '@/types'
+import { Defect, OrderMutation, Product, ProductOrder, ServiceArrival } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { selectCreateOrderError, selectLoadingAddOrder } from '@/store/slices/orderSlice.ts'
 import { selectAllClients } from '@/store/slices/clientSlice.ts'
@@ -46,6 +46,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
         status: initialData.status,
         comment: initialData.comment ? initialData.comment : '',
         documents: initialData.documents ? initialData.documents : [],
+        paymentStatus: initialData.paymentStatus ? initialData.paymentStatus : '',
       }
       : { ...initialState },
   )
@@ -58,8 +59,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     normalizeField((initialData?.products as ProductOrder[]) || []),
   )
   const [defectsForm, setDefectForm] = useState<Defect[]>(normalizeField((initialData?.defects as Defect[]) || []))
-  const [servicesForm, setServicesForm] = useState<ServiceOrder[]>(
-    normalizeField((initialData?.services as ServiceOrder[]) || []),
+  const [servicesForm, setServicesForm] = useState<ServiceArrival[]>(
+    normalizeField((initialData?.services as ServiceArrival[]) || []),
   )
   const [newItem, setNewItem] = useState<ProductOrder | Defect>({ ...initialItemState })
   const [newService, setNewService] = useState<ServiceArrival>({ ...initialServiceState })
@@ -147,7 +148,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     initialState: ItemInitialStateMap[T],
   ) => {
     if (type === ItemType.SERVICES) {
-      setNewService(initialState as ServiceOrder)
+      setNewService(initialState as ServiceArrival)
     } else {
       setNewItem(initialState as ProductOrder | Defect)
     }
@@ -179,6 +180,7 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
       service: newService.service,
       service_amount: Number(newService.service_amount),
       service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+      service_type: selectedService?.type,
     }
 
     if (
@@ -249,10 +251,40 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     }
   }
 
+  const closeModalProduct = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+    }))
+    setProductsModalOpen(false)
+  }
+
+  const closeModalDefect = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+      defect_description: '',
+    }))
+    setDefectsModalOpen(false)
+  }
+
+  const closeModalService = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      service: '',
+      service_amount: '',
+      service_price: '',
+    }))
+    setServicesModalOpen(false)
+  }
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (Object.values(errors).filter(Boolean).length) {
+      console.log(errors)
       toast.error('Заполните все обязательные поля.')
       return
     }
@@ -344,11 +376,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     handleModalConfirm,
     openDeleteModal,
     productsModalOpen,
-    setProductsModalOpen,
     defectsModalOpen,
-    setDefectsModalOpen,
     servicesModalOpen,
-    setServicesModalOpen,
     setNewService,
     services,
     newService,
@@ -360,5 +389,8 @@ export const useOrderForm = (initialData?: OrderData, onSuccess?: () => void) =>
     newItem,
     activePopover,
     setActivePopover,
+    closeModalProduct,
+    closeModalDefect,
+    closeModalService,
   }
 }

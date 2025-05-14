@@ -159,6 +159,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       service: newService.service,
       service_amount: Number(newService.service_amount),
       service_price: Number(newService.service_price) || Number(selectedService?.price) || 0,
+      service_type: selectedService?.type,
     }
 
     if (
@@ -227,6 +228,7 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
       ...prev,
       service: serviceId,
       service_price: selectedService?.price || prev.service_price,
+      service_type: prev.service_type,
     }))
   }
 
@@ -247,10 +249,48 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     setFiles(prevFiles => [...prevFiles, ...validFiles])
   }
 
+  const closeModalProduct = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+    }))
+    setProductsModalOpen(false)
+  }
+  const closeModalReceived = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+    }))
+    setReceivedModalOpen(false)
+  }
+
+  const closeModalDefect = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      product: '',
+      amount: '',
+      defect_description: '',
+    }))
+    setDefectsModalOpen(false)
+  }
+
+  const closeModalService = ()=>{
+    setErrors(prev => ({
+      ...prev,
+      service: '',
+      service_amount: '',
+      service_price: '',
+    }))
+    setServicesModalOpen(false)
+  }
+
   const submitFormHandler = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (Object.values(errors).filter(Boolean).length) {
+      console.log(error)
       toast.error('Заполните все обязательные поля.')
       return
     }
@@ -320,16 +360,12 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     defectsForm,
     setDefectsForm,
     productsModalOpen,
-    setProductsModalOpen,
     receivedModalOpen,
-    setReceivedModalOpen,
     defectsModalOpen,
-    setDefectsModalOpen,
     services,
     newService,
     setNewService,
     servicesModalOpen,
-    setServicesModalOpen,
     servicesForm,
     setServicesForm,
     openModal,
@@ -353,5 +389,9 @@ export const useArrivalForm = (initialData?: ArrivalData, onSuccess?: () => void
     handleRemoveFile,
     activePopover,
     setActivePopover,
+    closeModalProduct,
+    closeModalReceived,
+    closeModalDefect,
+    closeModalService,
   }
 }

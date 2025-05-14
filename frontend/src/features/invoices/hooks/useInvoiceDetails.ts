@@ -6,8 +6,9 @@ import { fetchInvoiceById, archiveInvoice } from '@/store/thunks/invoiceThunk'
 import { selectOneInvoice, selectLoadingFetch } from '@/store/slices/invoiceSlice'
 import { hasMessage } from '@/utils/helpers'
 import { saveAs } from 'file-saver'
-import { Service } from '@/types'
+import { Service, ServiceType } from '@/types'
 import * as XLSX from 'xlsx-js-style'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const useInvoiceDetails = () => {
   const { invoiceId } = useParams()
@@ -115,7 +116,7 @@ const useInvoiceDetails = () => {
     })
 
     const addServiceSection = (
-      servicesArray: Array<{ service: Service; service_amount?: number; service_price?: number; _id: string }>,
+      servicesArray: Array<{ service: Service; service_amount?: number; service_price?: number; _id: string; service_type?: ServiceType }>,
       title: string,
     ) => {
       if (!servicesArray?.length) return
@@ -150,6 +151,7 @@ const useInvoiceDetails = () => {
             font: { ...defaultFont, bold: true },
             border: { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder },
             alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+            numFmt: '0.00 "₽"',
           },
         }
       })
@@ -159,10 +161,10 @@ const useInvoiceDetails = () => {
         const row = [
           service.service?.name || '',
           typeof service.service?.serviceCategory === 'object' ? service.service.serviceCategory.name : service.service?.serviceCategory || '',
-          service.service?.type || '',
-          `${ service.service_price ?? service.service?.price ?? 0 } сом`,
+          service?.service_type || '',
+          `${ formatMoney(service.service_price ?? service.service?.price ?? 0) } ₽`,
           service.service_amount || 0,
-          `${ (service.service_price ?? service.service?.price ?? 0) * (service.service_amount || 0) } сом`,
+          `${ formatMoney((service.service_price ?? service.service?.price ?? 0) * (service.service_amount || 0)) } ₽`,
         ]
         wsData.push(row)
 
@@ -221,7 +223,7 @@ const useInvoiceDetails = () => {
     })
     rowIndex++
 
-    const totalRow = ['', '', '', '', 'Итого:', `${ totalAmount } сом`]
+    const totalRow = ['', '', '', '', 'Итого:', `${ formatMoney(totalAmount) } ₽`]
     wsData.push(totalRow)
     totalRow.forEach((val, colIndex) => {
       const cell = String.fromCharCode(65 + colIndex) + (rowIndex + 1)
@@ -251,10 +253,10 @@ const useInvoiceDetails = () => {
     ws['!cols'] = [
       { wch: 30 },
       { wch: 25 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 25 },
     ]
     ws['!rows'] = Array.from({ length: rowIndex + 1 }, () => ({ hpt: 40 }))
 

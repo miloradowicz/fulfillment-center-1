@@ -16,7 +16,7 @@ interface Props {
   onEdit: (data: OrderWithClient) => void
 }
 
-const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
+const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
   const [openModal, setOpenModal] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<OrderWithClient | null>(null)
 
@@ -127,4 +127,4 @@ const OrdersList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
   )
 }
 
-export default OrdersList
+export default OrdersDataList

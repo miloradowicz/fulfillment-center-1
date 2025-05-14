@@ -73,6 +73,10 @@ export type DefectWithPopulate = Omit<Defect, 'product'> & {
   product: Product
 }
 
+export type StockDefectWithPopulate = Omit<Defect, 'product'> & {
+  product: ProductWithPopulate
+}
+
 export interface ProductOrder {
   product: string
   description: string
@@ -104,11 +108,13 @@ export type ProductField = { product: string | { _id: string } }
 
 export type ServiceField = { service: string | { _id: string } }
 
+export type ServiceType = 'внутренняя' | 'внешняя'
+
 export interface ServiceArrival {
   service: string
   service_amount: number
   service_price: number
-  service_type?: 'внутренняя' | 'внешняя'
+  service_type: ServiceType
 }
 
 export type ServiceArrivalWithPopulate = Omit<ServiceArrival, 'service'> & {
@@ -133,6 +139,10 @@ export interface WriteOff {
   product: string
   reason: string
   amount: number
+}
+
+export type StockWriteOffWithPopulatedProducts = Omit<WriteOff, 'product'> & {
+  product: ProductWithPopulate
 }
 
 export type StockWriteOffMutation = Omit<StockWriteOff, '_id'>
@@ -314,8 +324,8 @@ export interface TaskWithPopulate {
   createdAt: string,
   updatedAt: string,
   date_inProgress:string | null,
-  date_Done:string | null,
-  date_ToDO:string | null,
+  date_Done: string | null,
+  date_ToDO: string | null,
 }
 
 export interface TaskMutation {
@@ -333,7 +343,7 @@ export interface Service {
   serviceCategory: { _id: string; name: string }
   price: number
   description: string
-  type: 'внутренняя' | 'внешняя'
+  type: ServiceType
   logs?: Log[]
 }
 
@@ -342,8 +352,9 @@ export interface ServiceCategory {
   name: string
 }
 
-export type ServiceMutation = Omit<Service, '_id' | 'logs'>
-
+export type ServiceMutation = Omit<Service, '_id' | 'logs' | 'serviceCategory'> & {
+  serviceCategory: string
+}
 
 export type ServiceCategoryMutation = Omit<ServiceCategory, '_id'>
 
@@ -355,6 +366,7 @@ export type ServiceInTable = {
   service: string | Service
   service_amount?: number
   service_price?: number
+  service_type: ServiceType
   _id?: string
 }
 
@@ -362,6 +374,7 @@ export type ServiceOrderWithPopulate = {
   service: PopulatedService
   service_amount: number
   service_price?: number
+  service_type: ServiceType
   _id?: string
 }
 
@@ -376,7 +389,8 @@ export interface Stock {
   name: string
   address: string
   products?: ProductStockPopulate[]
-  defects?: ProductsStockPopulate[]
+  defects?: StockDefectWithPopulate[]
+  write_offs?: StockWriteOffWithPopulatdProducts[]
 }
 
 export interface StockPopulate {
@@ -403,6 +417,10 @@ export interface Counterparty {
 
 export type CounterpartyMutation = Omit<Counterparty, '_id'>
 
+export interface CounterpartyError {
+  name: string
+}
+
 export interface UserTaskReport {
   user: {
     _id: string;
@@ -427,25 +445,6 @@ export interface ReportTaskResponse {
   userTaskReports: UserTaskReport[];
   dailyTaskCounts: DailyTaskCount[];
 }
-
-// export interface ClientOrderReport {
-//   client: {
-//     _id: string;
-//     name: string;
-//     isArchived: boolean
-//   };
-//   orders: {
-//     _id: string
-//     orderNumber: string
-//     status:string
-//     isArchived: boolean
-//   }[],
-//   orderCount: number;
-// }
-//
-// export interface ReportClientResponse {
-//   clientOrderReport: ClientOrderReport[];
-// }
 
 export interface ClientFullReport {
   client: {
@@ -490,7 +489,7 @@ export interface Invoice {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?: ServiceType
     _id: string
   }[]
   totalAmount?: number
@@ -504,7 +503,7 @@ export interface Invoice {
       service: Service
       service_amount?: number
       service_price?: number
-      service_type?: 'внутренняя' | 'внешняя'
+      service_type?: ServiceType
       _id: string
     }[]
   }
@@ -515,7 +514,7 @@ export interface Invoice {
       service: Service
       service_amount?: number
       service_price?: number
-      service_type?: 'внутренняя' | 'внешняя'
+      service_type?: ServiceType
       _id: string
     }[]
   }
@@ -523,14 +522,14 @@ export interface Invoice {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?:ServiceType
     _id: string
   }[]
   associatedOrderServices?: {
     service: Service
     service_amount: number
     service_price: number
-    service_type?: 'внутренняя' | 'внешняя'
+    service_type?: ServiceType
     _id: string
   }[]
   logs: Log[]

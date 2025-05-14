@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Service, ServiceInTable } from '@/types'
 import React from 'react'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   services?: ServiceInTable[]
@@ -15,6 +16,10 @@ const ServicesTable: React.FC<Props> = ({ services }) => {
     return typeof service === 'string' ? 'Неизвестная категория' : service.serviceCategory?.name
   }
 
+  const getServiceType = (service: string | Service): string => {
+    return typeof service === 'string' ? 'Неизвестный тип услуги' : service.type
+  }
+
   return (
     services?.length ? (
       <Table>
@@ -24,6 +29,7 @@ const ServicesTable: React.FC<Props> = ({ services }) => {
             <TableHead className="font-bold">Категория</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
             <TableHead className="font-bold">Стоимость</TableHead>
+            <TableHead className="font-bold">Тип</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -32,7 +38,8 @@ const ServicesTable: React.FC<Props> = ({ services }) => {
               <TableCell className="max-w-[200px] whitespace-normal break-words">{getServiceName(service.service)}</TableCell>
               <TableCell className="max-w-[200px] whitespace-normal break-words">{getServiceCategory(service.service)}</TableCell>
               <TableCell>{service.service_amount ?? 0}</TableCell>
-              <TableCell>{service.service_price ?? 0}</TableCell>
+              <TableCell>{service.service_price !== undefined ? formatMoney(service.service_price) : '—'}</TableCell>
+              <TableCell className="max-w-[200px] whitespace-normal break-words capitalize">{getServiceType(service.service)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

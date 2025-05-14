@@ -1,4 +1,4 @@
-import { ProductStockPopulate, Stock } from '@/types'
+import { Stock, StockDefectWithPopulate } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader'
 import DataTable from '@/components/DataTable/DataTable'
@@ -6,10 +6,10 @@ import { useStockDetails } from '../hooks/useStockDetails'
 import { FC } from 'react'
 import Loader from '@/components/Loader/Loader.tsx'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { AlertTriangle } from 'lucide-react'
+import { Info } from 'lucide-react'
 
 interface Props {
-  selector: (stock: Stock) => ProductStockPopulate[]
+  selector: (stock: Stock) => StockDefectWithPopulate[]
 }
 
 const StockProductsDataList: FC<Props> = ({ selector }) => {
@@ -18,7 +18,7 @@ const StockProductsDataList: FC<Props> = ({ selector }) => {
     stock,
   } = useStockDetails()
 
-  const columns: ColumnDef<ProductStockPopulate>[] = [
+  const columns: ColumnDef<StockDefectWithPopulate>[] = [
     {
       accessorKey: 'client',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Клиент" />,
@@ -42,26 +42,17 @@ const StockProductsDataList: FC<Props> = ({ selector }) => {
         title: 'Количество',
       },
       cell: ({ row }) => {
-        const amount = row.original.amount
-        const isNegative = amount < 0
-
         return (
           <div className="flex items-center gap-2">
-            <span className={isNegative ? 'text-red-500 font-semibold'  : 'text-center ml-2'}>
-              {amount}
-            </span>
-            {isNegative && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <AlertTriangle className="text-red-500 w-4 h-4 mb-auto ml-2" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Количество товара меньше нуля. Проверьте правильность внесения данных поставки и заказов!
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+            <span className="text-center ml-2">{row.original.amount}</span>
+            {row.original.defect_description && <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-4 h-4 mb-auto ml-2" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{row.original.defect_description}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>}
           </div>
         )
       },

@@ -1,19 +1,18 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Invoice } from '@/types'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const InvoiceServicesTable = ({
   services,
-  showType = false,
 }: {
   services: Invoice['services']
-  showType?: boolean
   discount?: number
 }) => (
   <Table>
     <TableHeader>
       <TableRow>
         <TableHead className="font-bold">Услуга</TableHead>
-        {showType && <TableHead className="font-bold">Тип</TableHead>}
+        <TableHead className="font-bold">Тип</TableHead>
         <TableHead className="font-bold">Кол-во</TableHead>
         <TableHead className="font-bold">Цена</TableHead>
         <TableHead className="font-bold">Сумма</TableHead>
@@ -30,10 +29,10 @@ const InvoiceServicesTable = ({
             <TableCell className="font-medium whitespace-normal break-words max-w-[200px]">
               {item.service.name}
             </TableCell>
-            {showType && <TableCell>{item.service.type}</TableCell>}
+            <TableCell className="capitalize">{item.service_type}</TableCell>
             <TableCell>{amount}</TableCell>
-            <TableCell>{unitPrice} сом</TableCell>
-            <TableCell>{sum} сом</TableCell>
+            <TableCell>{formatMoney(unitPrice)} ₽</TableCell>
+            <TableCell>{formatMoney(sum)} ₽</TableCell>
           </TableRow>
         )
       })}

@@ -40,8 +40,8 @@ const AppToolbar = () => {
             </Sheet>
           )}
 
-          <NavLink to="/" className="bg-card rounded-md">
-            <img src="/logo.png" alt="logo" className="h-[40px] object-cover" />
+          <NavLink to="/" className=" rounded-md">
+            <img src="/logo.png" alt="logo" className="h-[80px] object-cover" />
           </NavLink>
         </div>
 

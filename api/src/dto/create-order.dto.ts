@@ -68,6 +68,9 @@ export class ServiceDto {
   @IsNumber({}, { message: 'Цена должна быть числом.' })
   @IsPositive({ message: 'Цена должна быть больше 0.' })
   service_price?: number
+
+  @IsNotEmpty({ message: 'Заполните название услуги.' })
+  service_type: string
 }
 
 
