@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter'
 import Modal from '@/components/Modal/Modal'
 import InvoiceForm from '../components/InvoiceForm'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const InvoiceDetails = () => {
   const {
@@ -194,27 +195,27 @@ const InvoiceDetails = () => {
                 </TabsContent>
 
                 <div className="mt-6 border-t pt-4">
-                  <div className="flex justify-between items-start">
+                  <div className="flex sm:flex-row flex-col justify-between items-start">
                     <div className="space-y-1 text-left">
                       {invoice.discount ? (
-                        <div className="text-sm font-semibold text-blue-400">
+                        <div className="text-xs sm:text-sm font-semibold text-blue-400">
                           Скидка на внутренние услуги: {invoice.discount}%
                         </div>
                       ) : null}
 
-                      <div className="text-base font-bold text-primary">
-                        Итого: {invoice.totalAmount} сом
+                      <div className="text-base sm:text-sm font-bold text-primary">
+                        Итого: {formatMoney(invoice.totalAmount)} ₽
                       </div>
                     </div>
 
                     {invoice.paid_amount !== undefined && (
-                      <div className="space-y-1 text-right">
-                        <div className="font-bold text-emerald-600">
-                          Оплачено: {invoice.paid_amount} сом
+                      <div className="text-right sm:text-left">
+                        <div className="font-bold text-emerald-600 sm:text-sm">
+                          Оплачено: {formatMoney(invoice.paid_amount)} ₽
                         </div>
                         {invoice.paid_amount < (invoice.totalAmount ?? 0) && (
-                          <div className="font-bold text-destructive">
-                            Долг: {(invoice.totalAmount ?? 0) - invoice.paid_amount} сом
+                          <div className="font-bold text-destructive sm:text-sm text-left">
+                            Долг: {formatMoney((invoice.totalAmount ?? 0) - invoice.paid_amount)} ₽
                           </div>
                         )}
                       </div>

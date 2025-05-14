@@ -8,6 +8,7 @@ import { hasMessage } from '@/utils/helpers'
 import { saveAs } from 'file-saver'
 import { Service, ServiceType } from '@/types'
 import * as XLSX from 'xlsx-js-style'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const useInvoiceDetails = () => {
   const { invoiceId } = useParams()
@@ -150,6 +151,7 @@ const useInvoiceDetails = () => {
             font: { ...defaultFont, bold: true },
             border: { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder },
             alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+            numFmt: '0.00 "₽"',
           },
         }
       })
@@ -160,9 +162,9 @@ const useInvoiceDetails = () => {
           service.service?.name || '',
           typeof service.service?.serviceCategory === 'object' ? service.service.serviceCategory.name : service.service?.serviceCategory || '',
           service?.service_type || '',
-          `${ service.service_price ?? service.service?.price ?? 0 } сом`,
+          `${ formatMoney(service.service_price ?? service.service?.price ?? 0) } ₽`,
           service.service_amount || 0,
-          `${ (service.service_price ?? service.service?.price ?? 0) * (service.service_amount || 0) } сом`,
+          `${ formatMoney((service.service_price ?? service.service?.price ?? 0) * (service.service_amount || 0)) } ₽`,
         ]
         wsData.push(row)
 
@@ -221,7 +223,7 @@ const useInvoiceDetails = () => {
     })
     rowIndex++
 
-    const totalRow = ['', '', '', '', 'Итого:', `${ totalAmount } сом`]
+    const totalRow = ['', '', '', '', 'Итого:', `${ formatMoney(totalAmount) } ₽`]
     wsData.push(totalRow)
     totalRow.forEach((val, colIndex) => {
       const cell = String.fromCharCode(65 + colIndex) + (rowIndex + 1)
@@ -251,10 +253,10 @@ const useInvoiceDetails = () => {
     ws['!cols'] = [
       { wch: 30 },
       { wch: 25 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 25 },
     ]
     ws['!rows'] = Array.from({ length: rowIndex + 1 }, () => ({ hpt: 40 }))
 
