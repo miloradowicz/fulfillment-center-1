@@ -1,4 +1,4 @@
-import { Stock, StockDefectWithPopulate, StockWriteOffWithPopulatedProducts } from '@/types'
+import { Stock, StockDefectWithPopulate } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader'
 import DataTable from '@/components/DataTable/DataTable'

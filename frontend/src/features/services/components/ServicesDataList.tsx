@@ -9,6 +9,7 @@ import Modal from '@/components/Modal/Modal.tsx'
 import ServiceForm from '@/features/services/components/ServiceForm.tsx'
 import { useServiceActions } from '@/features/services/hooks/useServicesActions.ts'
 import ServiceDetails from '@/features/services/components/ServiceDetails.tsx'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const ServicesDataList = () => {
   const {
@@ -55,7 +56,10 @@ const ServicesDataList = () => {
       accessorKey: 'price',
       header: 'Цена',
       enableColumnFilter: true,
-      cell: info => info.getValue(),
+      cell: info => {
+        const price = info.getValue()
+        return typeof price === 'number' ? `${ formatMoney(price) } ₽` : '-'
+      },
     },
     {
       accessorKey: 'type',

@@ -9,6 +9,7 @@ import SelectableColumn from '@/components/DataTable/SelectableColumn/Selectable
 import ConfirmationModal from '@/components/Modal/ConfirmationModal'
 import { ColumnDef } from '@tanstack/react-table'
 import { invoiceStatusStyles } from '@/utils/commonStyles.ts'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   onEdit: (data: Invoice) => void
@@ -55,8 +56,7 @@ const InvoicesDataList: React.FC<Props> = ({ onEdit }) => {
     {
       accessorKey: 'totalAmount',
       header: 'Общая сумма',
-      cell: ({ row }) => `${ row.original.totalAmount } сом`,
-    },
+      cell: ({ row }) => `${ formatMoney(row.original.totalAmount) } ₽`    },
     {
       accessorKey: 'status',
       header: 'Статус оплаты',

@@ -5,6 +5,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { ClientFullReport } from '@/types'
 import useBreakpoint from '@/hooks/useBreakpoint.ts'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   data: ClientFullReport[]
@@ -64,7 +65,7 @@ const ClientInvoiceBarChart: React.FC<Props> = ({ data }) => {
                 return value.toString()
               }}
             />
-            <Tooltip formatter={(value: number) => `${ value.toLocaleString() } ₽`} />
+            <Tooltip formatter={(value: number) => `${ formatMoney(value) } ₽`} />
             <Legend
               layout="horizontal"
               verticalAlign="top"
