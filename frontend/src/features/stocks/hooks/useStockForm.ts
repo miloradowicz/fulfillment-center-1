@@ -17,7 +17,8 @@ export const useStockForm = (initialData?: Stock, onSuccess?: () => void) => {
   const [form, setForm] = useState<StockMutation>(
     initialData
       ? {
-        ...initialData,
+        name: initialData.name,
+        address: initialData.address,
       }
       : { ...initialState },
   )

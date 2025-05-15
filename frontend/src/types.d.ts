@@ -405,7 +405,10 @@ export interface StockError {
   address: string
 }
 
-export type StockMutation = Omit<Stock, '_id'>
+export interface StockMutation {
+  name: string
+  address: string
+}
 
 export interface Counterparty {
   _id: string
