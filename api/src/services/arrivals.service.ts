@@ -262,7 +262,7 @@ export class ArrivalsService {
 
     if (hasUnpaidInvoice) {
       throw new ForbiddenException(
-        'Поставка не может быть перемещен в архив, так как она не оплачен.',
+        'Поставка не может быть перемещена в архив, так как она не оплачена.',
       )
     }
 
@@ -312,7 +312,7 @@ export class ArrivalsService {
     if (!arrival) throw new NotFoundException('Поставка не найдена.')
 
     if (arrival.arrival_status === 'ожидается доставка'  ) {
-      throw new ForbiddenException('Поставку можно архивировать только после получения')
+      throw new ForbiddenException('Поставку можно удалить только после получения')
     }
 
     const hasUnpaidInvoice = await this.invoiceModel.exists({
@@ -322,7 +322,7 @@ export class ArrivalsService {
 
     if (hasUnpaidInvoice) {
       throw new ForbiddenException(
-        'Поставка не может быть перемещен в архив, так как она не оплачен.',
+        'Поставка не может быть удалена, так как она не оплачена.',
       )
     }
     await arrival.deleteOne()
