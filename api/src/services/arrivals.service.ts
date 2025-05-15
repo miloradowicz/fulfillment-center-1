@@ -256,7 +256,7 @@ export class ArrivalsService {
     }
 
     const hasUnpaidInvoice = await this.invoiceModel.exists({
-      associatedOrder: id,
+      associatedArrival: id,
       status: { $in: ['в ожидании', 'частично оплачено'] },
     })
 
@@ -316,7 +316,7 @@ export class ArrivalsService {
     }
 
     const hasUnpaidInvoice = await this.invoiceModel.exists({
-      associatedOrder: id,
+      associatedArrival: id,
       status: { $in: ['в ожидании', 'частично оплачено'] },
     })
 
