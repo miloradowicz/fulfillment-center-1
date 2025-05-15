@@ -19,6 +19,7 @@ import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/util
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
@@ -209,7 +210,11 @@ const OrderDetails = () => {
                   </TabsContent>
                 </ProtectedElement>
                 <TabsContent value="4">
-                  <p className="px-2">История</p>
+                  {order.logs && order.logs.length > 0 ? (
+                    <LogsAccordionView logs={order.logs} />
+                  ) : (
+                    <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+                  )}
                 </TabsContent>
               </Tabs>
             </div>

@@ -199,7 +199,7 @@ export interface Order {
   status: string
   paymentStatus: string
   orderNumber?: string
-  logs?: Log[]
+  logs: LogWithPopulate[]
   defects: Defect[]
   services?: ServiceArrival[]
   documents?: { document: string }[]
@@ -222,7 +222,7 @@ export type OrderWithClient = Omit<Order, 'client' | 'stock'> & {
   stock: Stock
 }
 
-export type OrderMutation = Omit<Order, '_id'>
+export type OrderMutation = Omit<Order, '_id' | 'logs'>
 
 export interface User {
   _id: string
@@ -532,7 +532,7 @@ export interface Invoice {
     service_type?: ServiceType
     _id: string
   }[]
-  logs: Log[]
+  logs: LogWithPopulate[]
   createdAt: string
   updatedAt: string
 }
