@@ -5,7 +5,7 @@ import {
   selectArrivalWithPopulate,
   selectLoadingFetchArrival,
 } from '@/store/slices/arrivalSlice.ts'
-import { archiveArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
+import { archiveArrival, cancelArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 import { hasMessage } from '@/utils/helpers.ts'
 
@@ -18,6 +18,8 @@ const useArrivalDetails = () => {
   const loading = useAppSelector(selectLoadingFetchArrival)
 
   const [confirmArchiveModalOpen, setConfirmArchiveModalOpen] = useState(false)
+  const [confirmCancelModalOpen, setConfirmCancelModalOpen] = useState(false)
+  const [isCanceled, setIsCanceled] = useState(false)
   const [isArchived, setIsArchived] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
   const [tabs, setTabs] = useState(0)
@@ -47,6 +49,25 @@ const useArrivalDetails = () => {
     setConfirmArchiveModalOpen(false)
   }
 
+  const handleCancel = async () => {
+    if (arrivalId) {
+      try {
+        await dispatch(cancelArrival(arrivalId)).unwrap()
+        toast.success('Поставка успешно отменена!')
+        setIsCanceled(!isCanceled)
+        navigate('/arrivals')
+      } catch (e) {
+        if (hasMessage(e)) {
+          toast.error(e.message || 'Ошибка отмены')
+        } else {
+          console.error(e)
+          toast.error('Неизвестная ошибка')
+        }
+      }
+    }
+    setConfirmCancelModalOpen(false)
+  }
+
   return {
     arrival,
     loading,
@@ -57,6 +78,9 @@ const useArrivalDetails = () => {
     setConfirmArchiveModalOpen,
     tabs,
     setTabs,
+    handleCancel,
+    confirmCancelModalOpen,
+    setConfirmCancelModalOpen,
   }
 }
 

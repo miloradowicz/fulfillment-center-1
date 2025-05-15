@@ -12,11 +12,15 @@ import { RootState } from '@/app/store.ts'
 import {
   addOrder,
   archiveOrder,
-  deleteOrder, fetchArchivedOrders,
-  fetchOrderById, fetchOrderByIdWithPopulate,
+  cancelOrder,
+  deleteOrder,
+  fetchArchivedOrders,
+  fetchOrderById,
+  fetchOrderByIdWithPopulate,
   fetchOrders,
   fetchOrdersByClientId,
-  fetchOrdersWithClient, unarchiveOrder,
+  fetchOrdersWithClient,
+  unarchiveOrder,
   updateOrder,
 } from '../thunks/orderThunk.ts'
 
@@ -33,8 +37,9 @@ interface OrderState {
   loadingAdd: boolean
   loadingArchive: boolean
   loadingUnarchive: boolean
-  loadingDelete: boolean
+  loadingCancel: boolean
   loadingUpdate: boolean
+  loadingDelete: boolean
   error: GlobalError | null
   createAndUpdateError: ValidationError | null
 }
@@ -52,8 +57,9 @@ const initialState: OrderState = {
   loadingAdd: false,
   loadingArchive: false,
   loadingUnarchive: false,
-  loadingDelete: false,
+  loadingCancel: false,
   loadingUpdate: false,
+  loadingDelete: false,
   error: null,
   createAndUpdateError: null,
 }
@@ -68,8 +74,9 @@ export const selectLoadingFetchArchivedOrders = (state: RootState) => state.orde
 export const selectLoadingFetchOrderPopulate = (state: RootState) => state.orders.loadingFetchPopulate
 export const selectLoadingAddOrder = (state: RootState) => state.orders.loadingAdd
 export const selectLoadingArchiveOrder = (state: RootState) => state.orders.loadingArchive
-export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
+export const selectLoadingCancelOrder = (state: RootState) => state.orders.loadingCancel
 export const selectLoadingUpdateOrder = (state: RootState) => state.orders.loadingUpdate
+export const selectLoadingDeleteOrder = (state: RootState) => state.orders.loadingDelete
 export const selectOrderError = (state: RootState) => state.orders.error
 export const selectCreateOrderError = (state: RootState) => state.orders.createAndUpdateError
 
@@ -99,7 +106,7 @@ const orderSlice = createSlice({
       state.loadingAdd = false
       state.loadingArchive = false
       state.loadingUnarchive = false
-      state.loadingDelete = false
+      state.loadingCancel = false
       state.loadingUpdate = false
       state.error = null
       state.createAndUpdateError = null
@@ -194,6 +201,18 @@ const orderSlice = createSlice({
       state.loadingArchive = false
       state.error = error || null
     })
+    builder.addCase(deleteOrder.pending, state => {
+      state.loadingDelete = true
+      state.error = null
+    })
+    builder.addCase(deleteOrder.fulfilled, state => {
+      state.loadingDelete = false
+      state.error = null
+    })
+    builder.addCase(deleteOrder.rejected, (state, { payload: error }) => {
+      state.loadingDelete = false
+      state.error = error || null
+    })
     builder.addCase(unarchiveOrder.pending, state => {
       state.loadingUnarchive = true
       state.error = null
@@ -210,16 +229,16 @@ const orderSlice = createSlice({
       state.loadingUnarchive = false
       state.error = error || null
     })
-    builder.addCase(deleteOrder.pending, state => {
-      state.loadingDelete = true
+    builder.addCase(cancelOrder.pending, state => {
+      state.loadingCancel = true
       state.error = null
     })
-    builder.addCase(deleteOrder.fulfilled, state => {
-      state.loadingDelete = false
+    builder.addCase(cancelOrder.fulfilled, state => {
+      state.loadingCancel = false
       state.error = null
     })
-    builder.addCase(deleteOrder.rejected, (state, { payload: error }) => {
-      state.loadingDelete = false
+    builder.addCase(cancelOrder.rejected, (state, { payload: error }) => {
+      state.loadingCancel = false
       state.error = error || null
     })
     builder.addCase(updateOrder.pending, state => {

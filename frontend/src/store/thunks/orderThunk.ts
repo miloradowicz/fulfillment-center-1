@@ -106,6 +106,18 @@ export const unarchiveOrder = createAsyncThunk<{ id: string }, string, { rejectV
   },
 )
 
+export const cancelOrder = createAsyncThunk<void, string, { rejectValue: GlobalError }
+>('orders/cancelOrder', async (orderId: string, { rejectWithValue }) => {
+  try {
+    await axiosAPI.delete(`/orders/${ orderId }/cancel`)
+  } catch (e) {
+    if (isAxiosError(e) && e.response) {
+      return rejectWithValue(e.response.data as GlobalError)
+    }
+    throw e
+  }
+})
+
 export const deleteOrder = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('orders/deleteOrder', async (orderId: string, { rejectWithValue }) => {
   try {

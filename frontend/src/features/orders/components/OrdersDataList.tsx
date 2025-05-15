@@ -14,11 +14,14 @@ interface Props {
   orders: OrderWithClient[] | []
   handleDelete: (id: string) => void
   onEdit: (data: OrderWithClient) => void
+  handleCancelOrder: (id: string) => void
 }
 
-const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
+const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit, handleCancelOrder }) => {
   const [openModal, setOpenModal] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<OrderWithClient | null>(null)
+  const [orderToCancel, setOrderToCancel] = useState<OrderWithClient | null>(null)
+  const [openCancelModal, setOpenCancelModal] = useState(false)
 
   const columns: ColumnDef<OrderWithClient>[] = [
     {
@@ -94,6 +97,10 @@ const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
             }}
             showDetailsLink={true}
             detailsPathPrefix="orders"
+            handleCancel={() => {
+              setOrderToCancel(tableOrder)
+              setOpenCancelModal(true)
+            }}
           />
         )
       },
@@ -112,6 +119,18 @@ const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
     setOrderToDelete(null)
   }
 
+  const handleCancelConfirm = async () => {
+    if (orderToCancel) {
+      handleCancelOrder(orderToCancel._id)
+    }
+    setOpenCancelModal(false)
+    setOrderToCancel(null)
+  }
+  const handleCancelCancel = () => {
+    setOpenCancelModal(false)
+    setOrderToCancel(null)
+  }
+
   return (
     <div className="max-w-[1000px] mx-auto w-full">
       <DataTable columns={columns} data={orders ?? []} />
@@ -122,6 +141,13 @@ const OrdersDataList: React.FC<Props> = ({ orders, handleDelete, onEdit }) => {
         actionType="archive"
         onConfirm={handleModalConfirm}
         onCancel={handleModalCancel}
+      />
+      <ConfirmationModal
+        open={openCancelModal}
+        entityName="этот заказ"
+        actionType="cancel"
+        onConfirm={handleCancelConfirm}
+        onCancel={handleCancelCancel}
       />
     </div>
   )

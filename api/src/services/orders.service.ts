@@ -20,7 +20,8 @@ export class OrdersService {
     private readonly filesService: FilesService,
     private readonly stockManipulationService: StockManipulationService,
     private readonly logsService: LogsService,
-  ) {}
+  ) {
+  }
 
   async getAllByClient(clientId: string, populate: boolean) {
     const unarchived = this.orderModel.find({ isArchived: false }).populate('stock')
@@ -230,6 +231,21 @@ export class OrdersService {
 
     if (order.isArchived) throw new ForbiddenException('Заказ уже в архиве')
 
+    if (order.status !== 'доставлен') {
+      throw new ForbiddenException('Заказ можно архивировать только после доставки')
+    }
+
+    const hasUnpaidInvoice = await this.invoiceModel.exists({
+      associatedOrder: id,
+      status: { $in: ['в ожидании', 'частично оплачено'] },
+    })
+
+    if (hasUnpaidInvoice) {
+      throw new ForbiddenException(
+        'Заказ не может быть перемещен в архив, так как он не оплачен.',
+      )
+    }
+
     order.isArchived = true
 
     const log = this.logsService.generateLogForArchive(userId, order.isArchived)
@@ -257,7 +273,7 @@ export class OrdersService {
     return { message: 'Заказ восстановлен из архива' }
   }
 
-  async delete(id: string) {
+  async cancel(id: string) {
     const order = await this.orderModel.findByIdAndDelete(id)
     if (!order) throw new NotFoundException('Заказ не найден')
 
@@ -266,6 +282,30 @@ export class OrdersService {
     await this.undoStocking(order)
 
     await this.stockManipulationService.saveStock(order.stock)
-    return { message: 'Заказ успешно удалён' }
+    return { message: 'Заказ успешно отменен' }
+  }
+
+  async delete(id: string) {
+    const order = await this.orderModel.findById(id)
+
+    if (!order) throw new NotFoundException('Заказ не найден')
+
+
+    if (order.status !== 'доставлен') {
+      throw new ForbiddenException('Удалить можно только доставленный заказ')
+    }
+
+    const hasUnpaidInvoice = await this.invoiceModel.exists({
+      associatedOrder: id,
+      status: { $in: ['в ожидании', 'частично оплачено'] },
+    })
+
+    if (hasUnpaidInvoice) {
+      throw new ForbiddenException(
+        'Заказ не может быть удалён, так как он не оплачен.',
+      )
+    }
+    await order.deleteOne()
+    return { message: 'Заказ удалён' }
   }
 }
