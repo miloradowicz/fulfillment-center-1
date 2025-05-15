@@ -96,7 +96,7 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
     }
   }, [createServiceError, createServiceCategoryError])
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     setForm(prevState => ({
@@ -225,10 +225,7 @@ const useServiceForm = (serviceId?: string, onClose?: () => void) => {
       price: Number.parseFloat(form.price),
       description: form.description,
       type: form.type,
-      serviceCategory: {
-        _id: form.serviceCategory._id,
-        name: form.serviceCategory.name,
-      },
+      serviceCategory: form.serviceCategory._id,
     }
 
     try {

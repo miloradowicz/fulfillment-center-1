@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Invoice } from '@/types'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 const InvoiceServicesTable = ({
   services,
@@ -30,8 +31,8 @@ const InvoiceServicesTable = ({
             </TableCell>
             <TableCell className="capitalize">{item.service_type}</TableCell>
             <TableCell>{amount}</TableCell>
-            <TableCell>{unitPrice} сом</TableCell>
-            <TableCell>{sum} сом</TableCell>
+            <TableCell>{formatMoney(unitPrice)} ₽</TableCell>
+            <TableCell>{formatMoney(sum)} ₽</TableCell>
           </TableRow>
         )
       })}
