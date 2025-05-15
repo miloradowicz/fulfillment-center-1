@@ -4,12 +4,15 @@ import { RootState } from '@/app/store.ts'
 import {
   addArrival,
   archiveArrival,
-  deleteArrival, fetchArchivedArrivals,
+  cancelArrival,
+  deleteArrival,
+  fetchArchivedArrivals,
   fetchArrivalById,
   fetchArrivalByIdWithPopulate,
   fetchArrivals,
   fetchArrivalsByClientId,
-  fetchPopulatedArrivals, unarchiveArrival,
+  fetchPopulatedArrivals,
+  unarchiveArrival,
   updateArrival,
 } from '../thunks/arrivalThunk.ts'
 
@@ -24,8 +27,9 @@ interface ArrivalState {
   loadingAdd: boolean;
   loadingArchive: boolean;
   loadingUnarchive: boolean;
-  loadingDelete: boolean;
+  loadingCancel: boolean;
   loadingUpdate: boolean;
+  loadingDelete: boolean;
   error: GlobalError | boolean;
   createAndUpdateError: ValidationError | null;
 }
@@ -41,8 +45,9 @@ const initialState: ArrivalState = {
   loadingAdd: false,
   loadingArchive: false,
   loadingUnarchive: false,
-  loadingDelete: false,
+  loadingCancel: false,
   loadingUpdate: false,
+  loadingDelete: false,
   error: false,
   createAndUpdateError: null,
 }
@@ -56,8 +61,9 @@ export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.lo
 export const selectLoadingFetchArchivedArrivals = (state: RootState) => state.arrivals.loadingFetchArchive
 export const selectLoadingAddArrival = (state: RootState) => state.arrivals.loadingAdd
 export const selectLoadingArchiveArrival = (state: RootState) => state.arrivals.loadingArchive
-export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
+export const selectLoadingCancelArrival = (state: RootState) => state.arrivals.loadingCancel
 export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
+export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
 export const selectArrivalError = (state: RootState) => state.arrivals.error
 export const selectCreateError = (state: RootState) => state.arrivals.createAndUpdateError
 
@@ -79,7 +85,7 @@ const arrivalSlice = createSlice({
       state.loadingAdd = false
       state.loadingArchive = false
       state.loadingUnarchive = false
-      state.loadingDelete = false
+      state.loadingCancel = false
       state.loadingUpdate = false
       state.error = false
       state.createAndUpdateError = null
@@ -177,6 +183,17 @@ const arrivalSlice = createSlice({
         state.loadingArchive = false
         state.error = true
       })
+      .addCase(deleteArrival.pending, state => {
+        state.loadingDelete = true
+        state.error = false
+      })
+      .addCase(deleteArrival.fulfilled, state => {
+        state.loadingDelete = false
+      })
+      .addCase(deleteArrival.rejected, state => {
+        state.loadingDelete = false
+        state.error = true
+      })
       .addCase(unarchiveArrival.pending, state => {
         state.loadingUnarchive = true
         state.error = false
@@ -192,15 +209,15 @@ const arrivalSlice = createSlice({
         state.loadingUnarchive = false
         state.error = error || false
       })
-      .addCase(deleteArrival.pending, state => {
-        state.loadingDelete = true
+      .addCase(cancelArrival.pending, state => {
+        state.loadingCancel = true
         state.error = false
       })
-      .addCase(deleteArrival.fulfilled, state => {
-        state.loadingDelete = false
+      .addCase(cancelArrival.fulfilled, state => {
+        state.loadingCancel = false
       })
-      .addCase(deleteArrival.rejected, state => {
-        state.loadingDelete = false
+      .addCase(cancelArrival.rejected, state => {
+        state.loadingCancel = false
         state.error = true
       })
       .addCase(updateArrival.pending, state => {

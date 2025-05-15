@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
+import { formatMoney } from '@/utils/formatMoney.ts'
 
 interface Props {
   serviceId?: string
@@ -41,12 +42,12 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
             <h3 className="text-[18px] font-bold text-gray-800 mb-4">{service.name}</h3>
             <div className="flex text-gray-700 mb-1">
               <span className="w-[30%]">Категория:</span>
-              <span className="w-[70%] text-blue-500 truncate  font-bold">{service.serviceCategory.name}</span>
+              <span className="w-[70%] text-blue-500 truncate font-bold text-wrap">{service.serviceCategory.name}</span>
             </div>
 
             <div className="flex text-gray-700">
               <span className="w-[30%]">Цена:</span>
-              <span className="w-[70%] text-blue-500  font-bold">{service.price}</span>
+              <span className="w-[70%] text-blue-500 font-bold text-wrap">{formatMoney(service.price)} ₽</span>
             </div>
           </div>
 

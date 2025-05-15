@@ -91,6 +91,12 @@ export class OrdersController {
     return this.ordersService.unarchive(id, userId)
   }
 
+  @Roles('super-admin', 'admin', 'manager')
+  @Delete(':id/cancel')
+  async cancelOrder(@Param('id') id: string) {
+    return this.ordersService.cancel(id)
+  }
+
   @Roles('super-admin')
   @Delete(':id')
   async deleteOrder(@Param('id') id: string) {

@@ -302,7 +302,7 @@ export class SeederService {
       {
         name: 'Склад Бишкек',
         address: 'Ул. Малдыбаева 7/1',
-        products: [{ product: _product3._id, amount: 23 }],
+        products: [{ product: _product3._id, amount: 53 }],
         defects: [{ product: _product3._id, amount: 3 }],
         write_offs: [{ product: _product3._id, amount: 7, reason: 'Someone stole it.' }],
         isArchived: false,
@@ -310,9 +310,9 @@ export class SeederService {
       {
         name: 'Склад Москва',
         address: 'Ул. Гагарина 102',
-        products: [{ product: _product3._id, amount: 23 }],
+        products: [{ product: _product2._id, amount: 13 }],
         defects: [{ product: _product2._id, amount: 20 }],
-        write_offs: [{ product: _product3._id, amount: 1, reason: 'The boss called dibs.' }],
+        write_offs: [{ product: _product2._id, amount: 1, reason: 'The boss called dibs.' }],
         isArchived: false,
       },
       {
@@ -368,7 +368,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'доставлен',
-        isArchived: false,
+        isArchived: true,
         services: [
           { service: _service1._id, service_amount: 10, service_price: _service1.price, service_type: _service1.type },
           { service: _service2._id, service_price: 1000, service_type: _service2.type },
@@ -386,7 +386,7 @@ export class SeederService {
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'в сборке',
-        isArchived: true,
+        isArchived: false,
         services: [
           { service: _service1._id, service_amount: 10, service_type: _service1.type },
           { service: _service2._id, service_price: 1000, service_type: _service2.type },
@@ -398,13 +398,13 @@ export class SeederService {
         stock: _stock2._id,
         products: [
           { product: _product1._id, description: 'Заказ 3 - Сарафан', amount: 1 },
-          { product: _product3._id, description: 'Заказ 3 - Футболка', amount: 2 },
+          { product: _product2._id, description: 'Заказ 3 - Футболка', amount: 2 },
         ],
         price: 2900,
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
         status: 'в пути',
-        isArchived: true,
+        isArchived: false,
         services: [
           { service: _service1._id, service_amount: 10, service_type: _service1.type },
           { service: _service2._id, service_price: 1000, service_type: _service2.type },
@@ -414,7 +414,7 @@ export class SeederService {
         orderNumber: 'ORD-6',
         client: _client2._id,
         stock: _stock1._id,
-        products: [{ product: _product3._id, description: '', amount: 5 }],
+        products: [{ product: _product3._id,description:'', amount: 5 }],
         price: 2500,
         sent_at: new Date().toISOString(),
         delivered_at: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
@@ -491,8 +491,8 @@ export class SeederService {
       {
         arrivalNumber: 'ARL-2',
         client: _client1._id,
-        products: [{ product: _product2._id, description: '', amount: 30 }],
-        received_amount:[{ product: _product2._id, description: '', amount: 30 }],
+        products: [{ product: _product2._id, description: '', amount: 30 },{ product: _product1._id, description: '', amount: 1 }],
+        received_amount:[{ product: _product2._id, description: '', amount: 30 },{ product: _product1._id, description: '', amount: 1 }],
         arrival_price: 2500,
         arrival_status: 'получена',
         arrival_date: new Date().toISOString(),
@@ -549,7 +549,8 @@ export class SeederService {
       {
         arrivalNumber: 'ARL-4',
         client: _client1._id,
-        products: [{ product: _product1._id, description: '', amount: 30 }],
+        products: [{ product: _product3._id, description: '', amount: 30 }],
+        received_amount:[{ product: _product3._id, description: '', amount: 30 }],
         arrival_price: 100,
         arrival_status: 'отсортирована',
         arrival_date: new Date().toISOString(),
@@ -577,7 +578,7 @@ export class SeederService {
         client: _client1._id,
         products: [{ product: _product2._id, description: '', amount: 30 }],
         arrival_price: 1200,
-        arrival_status: 'отсортирована',
+        arrival_status: 'ожидается доставка',
         arrival_date: new Date().toISOString(),
         sent_amount: '5 коробов',
         stock: _stock1._id,
@@ -596,7 +597,7 @@ export class SeederService {
             service_type: _service4.type,
           },
         ],
-        isArchived: true,
+        isArchived: false,
       },
     ])
 

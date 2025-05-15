@@ -20,6 +20,8 @@ import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import CancelButton from '@/components/Buttons/CancelButton.tsx'
+
 
 const ArrivalDetails = () => {
   const {
@@ -32,6 +34,9 @@ const ArrivalDetails = () => {
     setConfirmArchiveModalOpen,
     tabs,
     setTabs,
+    confirmCancelModalOpen,
+    handleCancel,
+    setConfirmCancelModalOpen,
   } = useArrivalDetails()
 
   return (
@@ -50,12 +55,22 @@ const ArrivalDetails = () => {
             onConfirm={handleArchive}
             onCancel={() => setConfirmArchiveModalOpen(false)}
           />
+          <ConfirmationModal
+            open={confirmCancelModalOpen}
+            entityName="эту поставку"
+            actionType="cancel"
+            onConfirm={handleCancel}
+            onCancel={() => setConfirmCancelModalOpen(false)}
+          />
 
           <div className="w-full max-w-[600px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
             <BackButton />
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <CancelButton onClick={() => setConfirmCancelModalOpen(true)} />
+                </ProtectedElement>
                 <Badge
                   className={cn(
                     arrivalStatusStyles[arrival.arrival_status] || arrivalStatusStyles.default,
