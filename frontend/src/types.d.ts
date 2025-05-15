@@ -58,7 +58,7 @@ export interface ProductWithPopulate {
   barcode: string
   article: string
   dynamic_fields: DynamicField[]
-  logs?: Log[]
+  logs: LogWithPopulate[]
 }
 
 export type ProductMutation = Omit<Product, '_id'>
@@ -344,7 +344,7 @@ export interface Service {
   price: number
   description: string
   type: ServiceType
-  logs?: Log[]
+  logs: LogWithPopulate[]
 }
 
 export interface ServiceCategory {
