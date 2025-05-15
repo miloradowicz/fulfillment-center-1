@@ -81,7 +81,7 @@ export class LogsService {
     return (result || []) as Diff[]
   }
 
-  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber', 'orderNumber', 'taskNumber', 'invoiceNumber','date_ToDO', 'date_inProgress', 'date_Done', 'totalAmount' ]
+  private readonly IGNORED_PATHS = ['_id', 'createdAt', 'updatedAt', '__v', 'logs', 'documents', 'isArchived', 'arrivalNumber', 'orderNumber', 'taskNumber', 'invoiceNumber','date_ToDO', 'date_inProgress', 'date_Done', 'totalAmount', 'paymentStatus' ]
 
   private filterMeaningfulDiffs<T>(diffs: Diff<T>[]): Diff<T>[] {
     return diffs.filter(diff => {

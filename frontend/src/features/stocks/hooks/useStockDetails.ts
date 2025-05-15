@@ -22,6 +22,7 @@ export const useStockDetails = () => {
     { value: 'products', label: 'Товары' },
     { value: 'defects', label: 'Брак' },
     { value: 'write-offs', label: 'Списания' },
+    { value: 'logs', label: 'История' },
   ]
 
   const stockColumns = [
