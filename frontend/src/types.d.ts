@@ -311,7 +311,7 @@ export interface TaskWithPopulate {
   title: string
   description: string
   status: string
-  logs?: Log[]
+  logs: LogWithPopulate[]
   type: string
   associated_order?: {
     _id: string | null,
@@ -391,6 +391,7 @@ export interface Stock {
   products?: ProductStockPopulate[]
   defects?: StockDefectWithPopulate[]
   write_offs?: StockWriteOffWithPopulatdProducts[]
+  logs: LogWithPopulate[]
 }
 
 export interface StockPopulate {

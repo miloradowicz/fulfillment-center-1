@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 import StatusCell from '@/features/tasks/components/StatusCell.tsx'
 import { getTaskIcon } from '@/features/tasks/utils/getTaskIcon.tsx'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 interface Props {
   taskId?: string
@@ -43,7 +44,7 @@ const TaskDetails: React.FC<Props> = ({ taskId, selectedUser }) => {
           <div className="px-4 my-2">
             <h3 className="font-bold text-gray-800 text-[16px] text-center">{task.title}</h3>
           </div>
-          <div className="px-4 overflow-y-auto max-h-[400px]">
+          <div className="px-4 overflow-y-auto max-h-[200px]">
             <p className="indent-5">{task.description}</p>
           </div>
         </div>
@@ -81,6 +82,14 @@ const TaskDetails: React.FC<Props> = ({ taskId, selectedUser }) => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="mt-4">
+        <h4 className="text-center font-bold text-gray-600 mb-4">История изменений:</h4>
+        {task.logs && task.logs.length > 0 ? (
+          <LogsAccordionView logs={task.logs} />
+        ) : (
+          <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+        )}
       </div>
     </div>
   )

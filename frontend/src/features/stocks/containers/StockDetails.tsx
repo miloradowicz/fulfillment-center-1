@@ -13,6 +13,7 @@ import WriteOffForm from '../components/WriteOffForm.tsx'
 import { MapPinIcon, Warehouse } from 'lucide-react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import StockWriteOffsPage from './StockWriteOffsPage.tsx'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 const StockDetails = () => {
   const {
@@ -116,6 +117,13 @@ const StockDetails = () => {
           </TabsContent>
           <TabsContent value="write-offs">
             <StockWriteOffsPage />
+          </TabsContent>
+          <TabsContent value="logs">
+            {stock?.logs && stock.logs.length > 0 ? (
+              <LogsAccordionView logs={stock.logs} />
+            ) : (
+              <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+            )}
           </TabsContent>
         </Tabs>
       </div>
