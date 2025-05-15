@@ -1,0 +1,9 @@
+**/dist
+**/node_modules
+**/.gitingore
+**/.editorconfig
+**/.prettierrc
+Dockerfile
+.env.development
+src/tests
+jest*

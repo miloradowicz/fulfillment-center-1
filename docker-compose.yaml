@@ -1,0 +1,50 @@
+services:
+  api:
+    image: js-26-team-2-esdp-api
+    build:
+      context: api
+      dockerfile: Dockerfile
+      network: host
+    ports:
+      - 8000:8000
+    environment:
+      - JWT_SECRET=jwtsecret
+      - ORIGIN=http://localhost,http://127.0.0.1
+      - MONGO_HOST=db
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=root
+    depends_on:
+      db:
+        condition: service_started
+    networks:
+      - backend
+
+  db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    ports:
+      - 27018:27017
+    networks:
+      - backend
+
+  web:
+    image: js-26-team-2-esdp-front
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        - public_api=localhost
+      network: host
+    ports:
+      - 80:80
+    environment:
+      - VITE_API_HOST=api
+    depends_on:
+      api:
+        condition: service_started
+
+networks:
+  backend:
+    driver: bridge
