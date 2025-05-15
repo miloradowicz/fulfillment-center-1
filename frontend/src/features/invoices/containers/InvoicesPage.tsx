@@ -7,6 +7,7 @@ import { useInvoicesPage } from '@/features/invoices/hooks/useInvoicesPage.ts'
 import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import InvoiceForm from '../components/InvoiceForm'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const InvoicesPage = () => {
   const { open, handleOpenCreate, handleClose, loading, handleOpenEdit, invoiceToEdit } = useInvoicesPage()
@@ -34,4 +35,6 @@ const InvoicesPage = () => {
   )
 }
 
-export default InvoicesPage
+const InvoicesPageWithRequestHandler = withRequestHandler(InvoicesPage)
+
+export default InvoicesPageWithRequestHandler

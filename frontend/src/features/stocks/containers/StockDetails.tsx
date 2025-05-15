@@ -13,6 +13,7 @@ import WriteOffForm from '../components/WriteOffForm.tsx'
 import { MapPinIcon, Warehouse } from 'lucide-react'
 import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import StockWriteOffsPage from './StockWriteOffsPage.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const StockDetails = () => {
   const {
@@ -123,4 +124,6 @@ const StockDetails = () => {
   )
 }
 
-export default StockDetails
+const StockDetailsWithRequestHandler = withRequestHandler(StockDetails)
+
+export default StockDetailsWithRequestHandler

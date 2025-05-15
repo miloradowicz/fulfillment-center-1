@@ -26,6 +26,7 @@ import { fetchArchivedUsers } from '@/store/thunks/userThunk.ts'
 import { fetchArchivedServices } from '@/store/thunks/serviceThunk.ts'
 import { fetchArchivedInvoices } from '@/store/thunks/invoiceThunk.ts'
 import { fetchAllArchivedCounterparties } from '@/store/thunks/counterpartyThunk.ts'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ArchivePage = () =>  {
   const [value, setValue] = useState('clients')
@@ -155,4 +156,6 @@ const ArchivePage = () =>  {
   )
 }
 
-export default ArchivePage
+const ArchivePageWithRequestHandler = withRequestHandler(ArchivePage)
+
+export default ArchivePageWithRequestHandler

@@ -7,6 +7,7 @@ import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const UserPage = () => {
   const { open, handleOpen, handleClose, fetchAllUsers, loading } = useUserActions(true)
@@ -39,4 +40,6 @@ const UserPage = () => {
   )
 }
 
-export default UserPage
+const UserPageWithRequestHandler = withRequestHandler(UserPage)
+
+export default UserPageWithRequestHandler

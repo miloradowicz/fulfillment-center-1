@@ -19,6 +19,7 @@ import CopyText from '@/components/CopyText/CopyText.tsx'
 import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ArrivalDetails = () => {
   const {
@@ -227,4 +228,6 @@ const ArrivalDetails = () => {
   )
 }
 
-export default ArrivalDetails
+const ArrivalDetailsWithRequestHandler = withRequestHandler(ArrivalDetails)
+
+export default ArrivalDetailsWithRequestHandler

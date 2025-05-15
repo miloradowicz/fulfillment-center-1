@@ -19,6 +19,7 @@ import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/util
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
@@ -222,4 +223,6 @@ const OrderDetails = () => {
   )
 }
 
-export default OrderDetails
+const OrderDetailsWithRequestHandler = withRequestHandler(OrderDetails)
+
+export default OrderDetailsWithRequestHandler

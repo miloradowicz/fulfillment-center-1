@@ -7,6 +7,7 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { Package } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ProductPage = () => {
   const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)
@@ -33,4 +34,6 @@ const ProductPage = () => {
   )
 }
 
-export default ProductPage
+const ProductPageWithRequestHandler = withRequestHandler(ProductPage)
+
+export default ProductPageWithRequestHandler

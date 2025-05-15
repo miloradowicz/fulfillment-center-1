@@ -7,6 +7,7 @@ import { useServiceActions } from '@/features/services/hooks/useServicesActions.
 import ServicesDataList from '@/features/services/components/ServicesDataList.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ServicesPage = () => {
   const { open, handleOpen, handleClose, loading } = useServiceActions(true)
@@ -34,4 +35,6 @@ const ServicesPage = () => {
   )
 }
 
-export default ServicesPage
+const ServicesPageWithRequestHandler = withRequestHandler(ServicesPage)
+
+export default ServicesPageWithRequestHandler

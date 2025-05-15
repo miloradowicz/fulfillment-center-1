@@ -4,6 +4,7 @@ import { useAppSelector } from '@/app/hooks.ts'
 import { selectProductWithPopulate } from '@/store/slices/productSlice.ts'
 import useProductActions from '@/features/products/hooks/useProductActions.ts'
 import { Link } from 'react-router-dom'
+import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 interface Props {
   id?: string
@@ -72,4 +73,6 @@ const ProductDetails: React.FC<Props> = ({ id }) => {
   )
 }
 
-export default ProductDetails
+const ProductDetailsWithRequestHandler = withRequestHandler(ProductDetails)
+
+export default ProductDetailsWithRequestHandler
