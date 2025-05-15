@@ -4,16 +4,17 @@ import {
   clearErrorOrder,
   clearPopulateOrder,
   selectAllOrdersWithClient,
-  selectLoadingFetchOrder,
+  selectLoadingFetchOrder, selectOrderError,
 } from '@/store/slices/orderSlice.ts'
 import {
-  archiveOrder, fetchArchivedOrders,
+  archiveOrder, cancelOrder, fetchArchivedOrders,
   fetchOrderByIdWithPopulate,
   fetchOrdersWithClient,
 } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { OrderWithClient } from '@/types'
 import { FormType } from '@/features/orders/state/orderState.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 const UseOrderPage = () => {
   const dispatch = useAppDispatch()
@@ -23,6 +24,7 @@ const UseOrderPage = () => {
   const [formType, setFormType] = useState<FormType>('order')
   const [counterpartyToDelete, setCounterpartyToDelete] = useState<OrderWithClient | null>(null)
   const [orderToEdit, setOrderToEdit] = useState<OrderWithClient | undefined>(undefined)
+  const error = useAppSelector(selectOrderError)
 
   useEffect(() => {
     dispatch(fetchOrdersWithClient())
@@ -30,12 +32,28 @@ const UseOrderPage = () => {
 
   const handleArchive = async (id: string) => {
     try {
-      await dispatch(archiveOrder(id))
+      await dispatch(archiveOrder(id)).unwrap()
       dispatch(fetchOrdersWithClient())
       toast.success('Заказ успешно архивирован!')
       dispatch(fetchArchivedOrders())
     } catch (e) {
-      toast.error('Ошибка при архивации заказа.')
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось архивировать заказ')
+      }
+      console.error(e)
+    }
+  }
+
+  const handleCancelOrder = async (id: string) => {
+    try {
+      await dispatch(cancelOrder(id))
+      dispatch(fetchOrdersWithClient())
+      toast.success('Заказ успешно отменен!')
+      dispatch(fetchArchivedOrders())
+    } catch (e) {
+      toast.error('Ошибка при отмене заказа.')
       console.error(e)
     }
   }
@@ -78,6 +96,8 @@ const UseOrderPage = () => {
     setCounterpartyToDelete,
     handleConfirmArchive,
     orderToEdit,
+    handleCancelOrder,
+    error,
   }
 }
 

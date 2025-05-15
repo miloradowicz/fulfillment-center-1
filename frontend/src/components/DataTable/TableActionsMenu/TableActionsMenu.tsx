@@ -1,4 +1,4 @@
-import { ArchiveX, ChevronRight, Edit, MoreHorizontal } from 'lucide-react'
+import { ArchiveX, ChevronRight, Edit, MoreHorizontal, SquareX } from 'lucide-react'
 import { Button } from '../../ui/button.tsx'
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ interface Props<T> {
   detailsPathPrefix?: string
   handleOpenDetailsModal?: (id: string) => void
   useModalForDetails?: boolean
+  handleCancel?: (id: string) => void
 }
 
 const TableActionsMenu = <T extends { _id: string }>({
@@ -28,6 +29,7 @@ const TableActionsMenu = <T extends { _id: string }>({
   showDetailsLink = true,
   detailsPathPrefix,
   handleOpenDetailsModal,
+  handleCancel,
   useModalForDetails = false,
 }: Props<T>) => {
   return (
@@ -93,6 +95,19 @@ const TableActionsMenu = <T extends { _id: string }>({
         )}
 
         <DropdownMenuSeparator />
+        {handleCancel? <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <DropdownMenuItem className="!bg-transparent px-1.5">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => handleCancel(row._id)}
+              className="text-red-600 hover:bg-blue-100 bg-transparent w-full transition-colors shadow-sm"
+            >
+              Отменить
+              <SquareX size={18} className="stroke-red-600" />
+            </Button>
+          </DropdownMenuItem>
+        </ProtectedElement>:null}
 
         <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
           <DropdownMenuItem className="!bg-transparent px-1.5">
@@ -107,6 +122,7 @@ const TableActionsMenu = <T extends { _id: string }>({
             </Button>
           </DropdownMenuItem>
         </ProtectedElement>
+
       </DropdownMenuContent>
     </DropdownMenu>
   )

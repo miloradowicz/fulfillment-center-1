@@ -19,10 +19,11 @@ import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/util
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import CancelButton from '@/components/Buttons/CancelButton.tsx'
 import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const OrderDetails = () => {
-  const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs } =
+  const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs, confirmCancelModalOpen, handleCancel, setConfirmCancelModalOpen  } =
     useOrderDetails()
 
   return (
@@ -42,12 +43,22 @@ const OrderDetails = () => {
             onConfirm={() => handleArchive()}
             onCancel={() => setOpenArchiveModal(false)}
           />
+          <ConfirmationModal
+            open={confirmCancelModalOpen}
+            entityName="эту поставку"
+            actionType="cancel"
+            onConfirm={handleCancel}
+            onCancel={() => setConfirmCancelModalOpen(false)}
+          />
 
           <div className="w-full max-w-[600px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
             <BackButton />
 
             <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
               <div>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <CancelButton onClick={() => setConfirmCancelModalOpen(true)} />
+                </ProtectedElement>
                 <h3 className="text-xl font-bold flex gap-1 items-center mb-4">
                   <ClipboardList />
                   {order.orderNumber}

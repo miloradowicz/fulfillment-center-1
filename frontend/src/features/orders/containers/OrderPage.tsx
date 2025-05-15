@@ -21,6 +21,7 @@ const OrderPage = () => {
     loading,
     handleOpenEdit,
     orderToEdit,
+    handleCancelOrder,
   } = useOrderPage()
 
   return (
@@ -55,6 +56,7 @@ const OrderPage = () => {
           onEdit={handleOpenEdit}
           orders={orders || []}
           handleDelete={handleArchive}
+          handleCancelOrder={handleCancelOrder}
         />
       </div>
     </>

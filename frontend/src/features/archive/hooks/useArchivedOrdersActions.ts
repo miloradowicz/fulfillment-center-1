@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useState } from 'react'
-import { deleteOrder, unarchiveOrder, fetchArchivedOrders } from '@/store/thunks/orderThunk.ts'
+import { unarchiveOrder, fetchArchivedOrders, deleteOrder } from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
 import { selectAllArchivedOrders, selectLoadingFetchArchivedOrders } from '@/store/slices/orderSlice.ts'
 import { OrderWithClient } from '@/types'
