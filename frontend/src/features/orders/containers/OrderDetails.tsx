@@ -21,10 +21,57 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
+import { useEffect, useState } from 'react'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs, confirmCancelModalOpen, handleCancel, setConfirmCancelModalOpen  } =
     useOrderDetails()
+
+  interface NavigatorUAData {
+    getHighEntropyValues(hints: string[]): Promise<{ [key: string]: string }>
+    platform: string
+    brands: { brand: string; version: string }[]
+    mobile: boolean
+  }
+
+  interface ExtendedNavigator extends Navigator {
+    userAgentData?: NavigatorUAData
+  }
+
+  const getOS = async (navigator: ExtendedNavigator): Promise<string> => {
+    if (navigator.userAgentData) {
+      const uaData = await navigator.userAgentData.getHighEntropyValues(['platform'])
+      return uaData.platform
+    } else {
+      const userAgent = navigator.userAgent
+
+      if (/Windows NT/.test(userAgent)) {
+        return 'Windows'
+      } else if (/Mac OS X/.test(userAgent)) {
+        return 'Mac OS'
+      } else if (/Android/.test(userAgent)) {
+        return 'Android'
+      } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+        return 'iOS'
+      } else if (/Linux/.test(userAgent)) {
+        return 'Linux'
+      } else {
+        return 'Unknown'
+      }
+    }
+  }
+
+  const [os, setOS] = useState<string>('Detecting...')
+
+  useEffect(() => {
+    getOS(navigator as ExtendedNavigator).then(setOS)
+  }, [getOS])
+
+  console.log(os)
+
+
+  const paddingTop = os === 'Mac OS' ? 'pt-0' : 'pt-2'
+  const heightTab = os === 'Mac OS' ? 'h-0' : 'h-[40px]'
 
   return (
     <>
@@ -161,8 +208,8 @@ const OrderDetails = () => {
             <div className="rounded-2xl shadow p-6 mb-6">
               <h3 className="font-bold uppercase mb-3 text-muted-foreground">Дополнительно</h3>
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
-                <TabsList className="mb-5 w-full h-[40px] rounded-2xl">
-                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto pt-2">
+                <TabsList className={`mb-5 w-full ${ heightTab } rounded-2xl`}>
+                  <div className={`inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto ${ paddingTop }`} >
                     <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Товары
                     </TabsTrigger>
