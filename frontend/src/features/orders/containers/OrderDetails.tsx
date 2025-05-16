@@ -70,8 +70,8 @@ const OrderDetails = () => {
   console.log(os)
 
 
-  const paddingTop = os === 'Mac OS' ? 'pt-0' : 'pt-2'
-  const heightTab = os === 'Mac OS' ? 'h-0' : 'h-[40px]'
+  const paddingTop = os === 'Mac OS' ? 'pt-0' : os === 'Windows' ? 'pt-0': os === 'Android' ? 'pt-0' : 'pt-2'
+  const heightTab = os === 'Mac OS' ? 'h-[45px]' : os === 'Windows' ? 'h-[50px]' : os === 'Android' ? 'h-auto' : 'h-[45px]'
 
   return (
     <>
