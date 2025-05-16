@@ -12,20 +12,7 @@ import {
 } from '@/store/slices/productSlice.ts'
 import { ErrorMessagesList } from '@/messages.ts'
 import { PopoverType } from '@/components/CustomSelect/CustomSelect'
-
-const initialState: ProductMutation = {
-  client: '',
-  title: '',
-  barcode: '',
-  article: '',
-  dynamic_fields: [],
-}
-
-const dynamicFieldState: DynamicField = {
-  key: '',
-  label: '',
-  value: '',
-}
+import { dynamicFieldState, ErrorProduct, initialErrorProductState, initialProductState } from '../utils/ProductStateAndTypes.ts'
 
 const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => void) => {
   const [form, setForm] = useState<ProductMutation>(
@@ -36,7 +23,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
         barcode: initialData.barcode,
         article: initialData.article,
       }
-      : { ...initialState },
+      : { ...initialProductState },
   )
   const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
@@ -52,7 +39,7 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
   const [newField, setNewField] = useState<DynamicField>(dynamicFieldState)
   const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
+  const [errorsBlur, setErrorsBlur] = useState<ErrorProduct>(initialErrorProductState)
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
   const loadingAdd = useAppSelector(selectLoadingAddProduct)
@@ -74,9 +61,26 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
     }))
   }
 
+  const handleBlur = (field: keyof ErrorProduct, value: string | number) => {
+    type ErrorMessages = {
+      [key in keyof ErrorProduct]: string
+    }
+
+    const errorMessages: ErrorMessages = {
+      client: !value ? ErrorMessagesList.ClientErr : '',
+      title: !value ? ErrorMessagesList.ProductTitle : '',
+      barcode: !value ? ErrorMessagesList.ProductBarcode : '',
+      article: !value ? ErrorMessagesList.ProductArticle : '',
+    }
+
+    setErrors(prev => ({
+      ...prev,
+      [field]: errorMessages[field] || '',
+    }))
+  }
+
   const addDynamicField = () => {
     if (!newField.key.trim() || !newField.label.trim()) return
-
     setDynamicFields(prev => [...prev, newField])
     setNewField(dynamicFieldState)
     setShowNewFieldInputs(false)
@@ -109,10 +113,11 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
         await dispatch(addProduct(updatedForm)).unwrap()
         onSuccess?.()
         toast.success('Товар успешно создан.')
-        setForm(initialState)
+        setForm(initialProductState)
         setDynamicFields([])
       }
       setErrors({})
+      setErrorsBlur(initialErrorProductState)
     } catch (e) {
       console.error(e)
     }
@@ -125,13 +130,13 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
       newErrors.client = ErrorMessagesList.ClientErr
     }
     if (!form.title.trim()) {
-      newErrors.title = 'Заполните название товара'
+      newErrors.title = ErrorMessagesList.ProductTitle
     }
     if (!form.barcode.trim()) {
-      newErrors.barcode = 'Поле "Баркод" обязательно для заполнения'
+      newErrors.barcode = ErrorMessagesList.ProductBarcode
     }
     if (!form.article.trim()) {
-      newErrors.article = 'Поле "Артикул" обязательно для заполнения'
+      newErrors.article = ErrorMessagesList.ProductArticle
     }
 
     setErrors(newErrors)
@@ -158,6 +163,8 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => voi
     createError,
     activePopover,
     setActivePopover,
+    errorsBlur,
+    handleBlur,
   }
 }
 

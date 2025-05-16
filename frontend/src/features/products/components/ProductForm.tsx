@@ -33,6 +33,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     createError,
     activePopover,
     setActivePopover,
+    errorsBlur,
+    handleBlur,
   } = useProductForm(initialData, onSuccess)
 
   return (
@@ -52,8 +54,9 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         searchPlaceholder="Поиск клиента..."
         activePopover={activePopover}
         setActivePopover={setActivePopover}
-        error={errors.client || getFieldError('client', createError)}
+        error={errors.client || getFieldError('client', createError) || errorsBlur.client}
         renderValue={client => client.name}
+        onBlur={e => handleBlur('client', e.target.value)}
       />
 
       <InputWithError
@@ -61,7 +64,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         placeholder="Название"
         value={form.title}
         onChange={inputChangeHandler}
-        error={errors.title || getFieldError('title', createError)}
+        error={errors.title || getFieldError('title', createError)|| errorsBlur.title}
+        onBlur={e => handleBlur('title', e.target.value)}
       />
 
       <InputWithError
@@ -69,7 +73,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         placeholder="Баркод"
         value={form.barcode}
         onChange={inputChangeHandler}
-        error={errors.barcode || getFieldError('barcode', createError)}
+        error={errors.barcode || getFieldError('barcode', createError)||errorsBlur.barcode}
+        onBlur={e => handleBlur('barcode', e.target.value)}
       />
 
       <InputWithError
@@ -77,7 +82,8 @@ const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
         placeholder="Артикул"
         value={form.article}
         onChange={inputChangeHandler}
-        error={errors.article || getFieldError('article', createError)}
+        error={errors.article || getFieldError('article', createError) || errorsBlur.article}
+        onBlur={e => handleBlur('article', e.target.value)}
       />
 
       <h6 className="font-bold text-sm sm:text-md">Дополнительные параметры</h6>
