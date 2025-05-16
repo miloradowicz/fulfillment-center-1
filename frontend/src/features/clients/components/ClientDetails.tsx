@@ -61,11 +61,12 @@ const ClientDetails: React.FC<Props> = ({ id }) => {
               <CopyText text={client.address} children={<MapPin className="h-4 w-4" /> }/>
             </div> : null
           }
-
-          <div className="flex items-center gap-2 px-4 justify-between">
-            <p className="font-bold text-muted-foreground">Банковские реквизиты</p>
-            <CopyText text={client.banking_data} children={<CreditCard className="h-4 w-4" />} />
-          </div>
+          {client.banking_data ?
+            <div className="flex items-center gap-2 px-4 justify-between">
+              <p className="font-bold text-muted-foreground">Банковские реквизиты</p>
+              <CopyText text={client.banking_data} children={<CreditCard className="h-4 w-4" />} />
+            </div>:null
+          }
         </div>
       )}
     </>
