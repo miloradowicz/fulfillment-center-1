@@ -21,7 +21,7 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs, confirmCancelModalOpen, handleCancel, setConfirmCancelModalOpen  } =
@@ -38,7 +38,7 @@ const OrderDetails = () => {
     userAgentData?: NavigatorUAData
   }
 
-  const getOS = async (navigator: ExtendedNavigator): Promise<string> => {
+  const getOS = useCallback(async (navigator: ExtendedNavigator): Promise<string> => {
     if (navigator.userAgentData) {
       const uaData = await navigator.userAgentData.getHighEntropyValues(['platform'])
       return uaData.platform
@@ -59,7 +59,7 @@ const OrderDetails = () => {
         return 'Unknown'
       }
     }
-  }
+  }, [])
 
   const [os, setOS] = useState<string>('Detecting...')
 
