@@ -113,21 +113,18 @@ export class ServicesService {
     if (!service) throw new NotFoundException('Услуга не найдена')
 
     const hasActiveArrivals = await this.arrivalModel.exists({
-      isArchived: { $ne: true },
       services: { $elemMatch: { service: service._id } },
     })
 
     if (hasActiveArrivals) return true
 
     const hasActiveOrders = await this.orderModel.exists({
-      isArchived: { $ne: true },
       services: { $elemMatch: { service: service._id } },
     })
 
     if (hasActiveOrders) return true
 
     const hasActiveInvoices = await this.invoiceModel.exists({
-      isArchived: { $ne: true },
       services: { $elemMatch: { service: service._id } },
     })
 
