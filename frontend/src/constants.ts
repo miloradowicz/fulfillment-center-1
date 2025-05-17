@@ -1,6 +1,6 @@
 import { Options } from 'check-password-strength'
 
-export const publicApi = import.meta.env.VITE_PUBLIC_API ?? 'localhost'
+export const apiHost = import.meta.env.VITE_API_HOST ?? 'localhost'
 export const featureProtection = import.meta.env.VITE_FEATURE_PROTECTION_DISABLED !== '1'
 
 export const emailRegex = /^(\w+[-.]?\w+)@(\w+)([.-]?\w+)?(\.[a-zA-Z]{2,3})$/

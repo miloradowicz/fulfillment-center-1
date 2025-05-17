@@ -4,7 +4,7 @@ FROM node:22.15.0 AS builder
 ARG public_api=localhost
 WORKDIR /app
 COPY --exclude=nginx . .
-RUN echo VITE_PUBLIC_API=${public_api} > .env.production
+RUN echo VITE_API_HOST=${apiHost} > .env.production
 RUN npm i
 RUN npm run build
 
