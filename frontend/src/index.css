@@ -172,3 +172,16 @@
 .rdp-root .rdp-day_button {
   margin: 2px;
 }
+
+.recharts-wrapper,
+.recharts-surface,
+.recharts-layer,
+.recharts-pie,
+.recharts-pie-sector,
+.recharts-sector,
+.recharts-wrapper svg,
+.recharts-wrapper div {
+  outline: none !important;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
