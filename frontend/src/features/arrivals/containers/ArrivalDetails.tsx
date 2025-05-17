@@ -22,7 +22,6 @@ import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 
-
 const ArrivalDetails = () => {
   const {
     arrival,

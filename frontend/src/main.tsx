@@ -9,9 +9,12 @@ import './index.css'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
+import { ErrorBoundary } from '@/hoc/ErrorBoundary.tsx'
 
 dayjs.extend(localizedFormat)
 dayjs.locale('ru')
+
+const AppWithErrorBoundary = ErrorBoundary(App)
 
 addCsrf()
 checkAuthentication(store)
@@ -19,7 +22,7 @@ checkAuthentication(store)
     <Provider store={store}>
       <ToastContainer position={'top-center'} />
       <BrowserRouter>
-        <App />
+        <AppWithErrorBoundary />
       </BrowserRouter>
     </Provider>,
   ))
