@@ -16,7 +16,10 @@ const ProductPage = () => {
       {loading && <Loader />}
 
       <Modal handleClose={handleClose} open={open}>
-        <ProductForm onSuccess={fetchAllProducts} />
+        <ProductForm onSuccess={() => {
+          handleClose()
+          void fetchAllProducts()}
+        } />
       </Modal>
 
       <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between">
