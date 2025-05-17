@@ -27,7 +27,7 @@ export class ProductsService {
     let product: ProductDocument | null
 
     if (populate) {
-      product = await this.productModel.findById(id).populate('client').exec()
+      product = await this.productModel.findById(id).populate('client').populate({ path: 'logs.user', select: '-password -token' }).exec()
     } else {
       product = await this.productModel.findById(id).exec()
     }

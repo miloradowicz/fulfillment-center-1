@@ -10,6 +10,7 @@ import ServiceForm from '@/features/services/components/ServiceForm.tsx'
 import { useServiceActions } from '@/features/services/hooks/useServicesActions.ts'
 import ServiceDetails from '@/features/services/components/ServiceDetails.tsx'
 import { formatMoney } from '@/utils/formatMoney.ts'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 
 const ServicesDataList = () => {
   const {
@@ -109,9 +110,9 @@ const ServicesDataList = () => {
         onCancel={handleConfirmationClose}
       />
 
-      <Modal open={openDetailsModal} handleClose={handleCloseDetailsModal}>
+      <RightPanel open={openDetailsModal} onOpenChange={handleCloseDetailsModal}>
         <ServiceDetails serviceId={selectedService?._id} />
-      </Modal>
+      </RightPanel>
 
       <Modal open={open} handleClose={handleClose}>
         <ServiceForm serviceId={selectedService?._id} onClose={handleClose} />

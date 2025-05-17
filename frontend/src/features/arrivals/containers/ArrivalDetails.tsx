@@ -18,6 +18,7 @@ import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx
 import CopyText from '@/components/CopyText/CopyText.tsx'
 import { arrivalStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 
@@ -228,7 +229,11 @@ const ArrivalDetails = () => {
                 </ProtectedElement>
 
                 <TabsContent value="5">
-                  <p className="px-2">История</p>
+                  {arrival.logs && arrival.logs.length > 0 ? (
+                    <LogsAccordionView logs={arrival.logs} />
+                  ) : (
+                    <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+                  )}
                 </TabsContent>
               </Tabs>
             </div>

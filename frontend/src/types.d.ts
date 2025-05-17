@@ -58,7 +58,7 @@ export interface ProductWithPopulate {
   barcode: string
   article: string
   dynamic_fields: DynamicField[]
-  logs?: Log[]
+  logs: LogWithPopulate[]
 }
 
 export type ProductMutation = Omit<Product, '_id'>
@@ -199,7 +199,7 @@ export interface Order {
   status: string
   paymentStatus: string
   orderNumber?: string
-  logs?: Log[]
+  logs: LogWithPopulate[]
   defects: Defect[]
   services?: ServiceArrival[]
   documents?: { document: string }[]
@@ -222,7 +222,7 @@ export type OrderWithClient = Omit<Order, 'client' | 'stock'> & {
   stock: Stock
 }
 
-export type OrderMutation = Omit<Order, '_id'>
+export type OrderMutation = Omit<Order, '_id' | 'logs'>
 
 export interface User {
   _id: string
@@ -311,7 +311,7 @@ export interface TaskWithPopulate {
   title: string
   description: string
   status: string
-  logs?: Log[]
+  logs: LogWithPopulate[]
   type: string
   associated_order?: {
     _id: string | null,
@@ -344,7 +344,7 @@ export interface Service {
   price: number
   description: string
   type: ServiceType
-  logs?: Log[]
+  logs: LogWithPopulate[]
 }
 
 export interface ServiceCategory {
@@ -391,6 +391,7 @@ export interface Stock {
   products?: ProductStockPopulate[]
   defects?: StockDefectWithPopulate[]
   write_offs?: StockWriteOffWithPopulatdProducts[]
+  logs: LogWithPopulate[]
 }
 
 export interface StockPopulate {
@@ -405,7 +406,10 @@ export interface StockError {
   address: string
 }
 
-export type StockMutation = Omit<Stock, '_id'>
+export interface StockMutation {
+  name: string
+  address: string
+}
 
 export interface Counterparty {
   _id: string
@@ -532,7 +536,7 @@ export interface Invoice {
     service_type?: ServiceType
     _id: string
   }[]
-  logs: Log[]
+  logs: LogWithPopulate[]
   createdAt: string
   updatedAt: string
 }

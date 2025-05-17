@@ -74,6 +74,7 @@ export class OrdersService {
           model: 'ServiceCategory',
         },
       })
+      .populate({ path: 'logs.user', select: '-password -token' })
       .lean()
       .exec()
 
@@ -183,9 +184,9 @@ export class OrdersService {
     }
 
     const orderDtoObj = { ...orderDto }
-    if (!orderDto.defects) {
-      orderDtoObj.defects = []
-    }
+
+    orderDtoObj.defects = orderDtoObj.defects || []
+    orderDtoObj.services = orderDtoObj.services || []
 
     const log = this.logsService.trackChanges(
       existingOrder.toObject(),

@@ -36,6 +36,7 @@ export class StocksService {
         path: 'products.product defects.product write_offs.product',
         populate: { path: 'client' },
       })
+      .populate({ path: 'logs.user', select: '-password -token' })
       .exec()
 
     if (!stock) throw new NotFoundException('Склад не найден.')

@@ -18,6 +18,7 @@ import { capitalize } from '@/utils/capitalizeFirstLetter'
 import Modal from '@/components/Modal/Modal'
 import InvoiceForm from '../components/InvoiceForm'
 import { formatMoney } from '@/utils/formatMoney.ts'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 const InvoiceDetails = () => {
   const {
@@ -191,7 +192,11 @@ const InvoiceDetails = () => {
                 )}
 
                 <TabsContent value="2">
-                  <p className="px-2">История</p>
+                  {invoice.logs && invoice.logs.length > 0 ? (
+                    <LogsAccordionView logs={invoice.logs} />
+                  ) : (
+                    <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+                  )}
                 </TabsContent>
 
                 <div className="mt-6 border-t pt-4">

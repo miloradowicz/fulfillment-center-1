@@ -70,7 +70,7 @@ const OrderForm: React.FC<Props> = ({ initialData, onSuccess }) => {
     closeModalDefect,
     closeModalService,
   } = useOrderForm(initialData, onSuccess)
-  console.log(productsForm)
+
   return (
     <>
       <form onSubmit={onSubmit} className="space-y-4">
