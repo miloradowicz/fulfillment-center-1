@@ -10,9 +10,8 @@ import TaskReport from '../taskPeport/components/TaskReport'
 import ClientReport from '../clientReport/components/ClientReport'
 import Loader from '@/components/Loader/Loader.tsx'
 import { tabTriggerStyles } from '@/utils/commonStyles.ts'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
-function ReportTabs() {
+export default function ReportTabs() {
   const [value, setValue] = useState('tasks')
   const loadingTask = useAppSelector(selectLoadingFetchTask)
   const dispatch = useAppDispatch()
@@ -82,7 +81,3 @@ function ReportTabs() {
     </div>
   )
 }
-
-const ReportTabsWithRequestHandler = withRequestHandler(ReportTabs)
-
-export default ReportTabsWithRequestHandler

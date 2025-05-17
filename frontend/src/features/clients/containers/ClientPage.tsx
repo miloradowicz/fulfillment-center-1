@@ -7,7 +7,6 @@ import { useClientActions } from '../hooks/useClientActions.ts'
 import { Users } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ClientsPage = () => {
   const { open, handleOpen, handleClose, loading } = useClientActions(true)
@@ -35,6 +34,4 @@ const ClientsPage = () => {
   )
 }
 
-const ClientsPageWithRequestHandler = withRequestHandler(ClientsPage)
-
-export default ClientsPageWithRequestHandler
+export default ClientsPage

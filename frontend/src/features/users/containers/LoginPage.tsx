@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '@/app/hooks.ts'
 import { selectUser } from '@/store/slices/authSlice.ts'
 import { useEffect } from 'react'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 
 const images = [
@@ -15,7 +14,7 @@ const images = [
   '/login/illustration-5.jpg',
 ]
 
-function LoginPage() {
+export default function LoginPage() {
   const randomImage = images[Math.floor(Math.random() * images.length)]
   const user = useAppSelector(selectUser)
   const navigate = useNavigate()
@@ -55,7 +54,3 @@ function LoginPage() {
     </div>
   )
 }
-
-const LoginPageWithRequestHandler = withRequestHandler(LoginPage)
-
-export default LoginPageWithRequestHandler

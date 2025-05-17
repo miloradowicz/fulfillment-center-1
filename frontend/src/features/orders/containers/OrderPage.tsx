@@ -8,7 +8,6 @@ import { ClipboardList } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import InvoiceForm from '@/features/invoices/components/InvoiceForm'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const OrderPage = () => {
   const {
@@ -63,6 +62,4 @@ const OrderPage = () => {
   )
 }
 
-const OrderPageWithRequestHandler = withRequestHandler(OrderPage)
-
-export default OrderPageWithRequestHandler
+export default OrderPage

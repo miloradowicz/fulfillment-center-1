@@ -7,7 +7,6 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { Warehouse } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const StockPage = () => {
   const { open, handleOpen, isLoading, handleClose, stocks } = useStockPage()
@@ -38,6 +37,4 @@ const StockPage = () => {
   )
 }
 
-const StockPageWithRequestHandler = withRequestHandler(StockPage)
-
-export default StockPageWithRequestHandler
+export default StockPage

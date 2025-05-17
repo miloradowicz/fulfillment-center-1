@@ -9,7 +9,6 @@ import ProductForm from '@/features/products/components/ProductForm.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import InvoiceForm from '@/features/invoices/components/InvoiceForm'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const ArrivalPage = () => {
   const { open, formType, handleOpen, handleClose, isLoading, arrivalToEdit, handleOpenEdit } = useArrivalPage()
@@ -53,6 +52,4 @@ const ArrivalPage = () => {
   )
 }
 
-const ArrivalPageWithRequestHandler = withRequestHandler(ArrivalPage)
-
-export default ArrivalPageWithRequestHandler
+export default ArrivalPage

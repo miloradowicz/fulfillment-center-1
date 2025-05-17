@@ -6,7 +6,6 @@ import ServicesPage from '@/features/services/containers/ServicesPage.tsx'
 import InvoicesPage from '@/features/invoices/containers/InvoicesPage.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { tabTriggerStyles } from '@/utils/commonStyles.ts'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const tabs = [
   { value: 'users', label: 'Сотрудники' },
@@ -62,6 +61,4 @@ const AdminPage = () => {
   )
 }
 
-const AdminPageWithRequestHandler = withRequestHandler(AdminPage)
-
-export default AdminPageWithRequestHandler
+export default AdminPage

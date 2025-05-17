@@ -7,7 +7,6 @@ import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
 import { BookUser } from 'lucide-react'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const CounterpartiesPage = () => {
   const { open, handleOpen, handleClose, isLoading } = useCounterpartyPage()
@@ -34,6 +33,4 @@ const CounterpartiesPage = () => {
   )
 }
 
-const CounterpartiesPageWithRequestHandler = withRequestHandler(CounterpartiesPage)
-
-export default CounterpartiesPageWithRequestHandler
+export default CounterpartiesPage

@@ -20,7 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.t
 import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const OrderDetails = () => {
   const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs, confirmCancelModalOpen, handleCancel, setConfirmCancelModalOpen  } =
@@ -234,6 +233,4 @@ const OrderDetails = () => {
   )
 }
 
-const OrderDetailsWithRequestHandler = withRequestHandler(OrderDetails)
-
-export default OrderDetailsWithRequestHandler
+export default OrderDetails

@@ -18,7 +18,6 @@ import { capitalize } from '@/utils/capitalizeFirstLetter'
 import Modal from '@/components/Modal/Modal'
 import InvoiceForm from '../components/InvoiceForm'
 import { formatMoney } from '@/utils/formatMoney.ts'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const InvoiceDetails = () => {
   const {
@@ -234,6 +233,4 @@ const InvoiceDetails = () => {
   )
 }
 
-const InvoiceDetailsWithRequestHandler = withRequestHandler(InvoiceDetails)
-
-export default InvoiceDetailsWithRequestHandler
+export default InvoiceDetails

@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge.tsx'
 import Loader from '@/components/Loader/Loader.tsx'
 import { Separator } from '@/components/ui/separator.tsx'
 import { formatMoney } from '@/utils/formatMoney.ts'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 interface Props {
   serviceId?: string
@@ -63,6 +62,4 @@ const ServiceDetails: React.FC<Props> = ({ serviceId }) => {
   )
 }
 
-const ServiceDetailsWithRequestHandler = withRequestHandler(ServiceDetails)
-
-export default ServiceDetailsWithRequestHandler
+export default ServiceDetails

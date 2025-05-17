@@ -3,7 +3,6 @@ import React, { useEffect } from 'react'
 import { Contact, CreditCard, Mail, MapPin, Phone, User } from 'lucide-react'
 import CopyText from '@/components/CopyText/CopyText.tsx'
 import { fetchClientById } from '@/store/thunks/clientThunk.ts'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 interface Props {
   id?: string
@@ -73,6 +72,4 @@ const ClientDetails: React.FC<Props> = ({ id }) => {
   )
 }
 
-const ClientDetailsWithRequestHandler = withRequestHandler(ClientDetails)
-
-export default ClientDetailsWithRequestHandler
+export default ClientDetails

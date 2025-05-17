@@ -15,7 +15,6 @@ import CustomButton from '@/components/CustomButton/CustomButton.tsx'
 import TaskCard from './TaskCard.tsx'
 import RightPanel from '@/components/RightPanel/RightPanel.tsx'
 import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 const TaskBoard = () => {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
@@ -149,6 +148,4 @@ const TaskBoard = () => {
   )
 }
 
-const TaskBoardWithRequestHandler = withRequestHandler(TaskBoard)
-
-export default TaskBoardWithRequestHandler
+export default TaskBoard

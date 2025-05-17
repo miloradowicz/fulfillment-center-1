@@ -21,8 +21,6 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
-
 const ArrivalDetails = () => {
   const {
     arrival,
@@ -243,6 +241,4 @@ const ArrivalDetails = () => {
   )
 }
 
-const ArrivalDetailsWithRequestHandler = withRequestHandler(ArrivalDetails)
-
-export default ArrivalDetailsWithRequestHandler
+export default ArrivalDetails

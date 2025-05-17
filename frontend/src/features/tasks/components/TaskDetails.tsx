@@ -6,7 +6,6 @@ import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 import StatusCell from '@/features/tasks/components/StatusCell.tsx'
 import { getTaskIcon } from '@/features/tasks/utils/getTaskIcon.tsx'
-import { withRequestHandler } from '@/utils/withRequestHandler.tsx'
 
 interface Props {
   taskId?: string
@@ -87,6 +86,4 @@ const TaskDetails: React.FC<Props> = ({ taskId, selectedUser }) => {
   )
 }
 
-const TaskDetailsWithRequestHandler = withRequestHandler(TaskDetails)
-
-export default TaskDetailsWithRequestHandler
+export default TaskDetails
