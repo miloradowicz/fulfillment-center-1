@@ -1,0 +1,50 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: /src
+
+      - name: Install key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PUBLIC_IP }}
+
+      - name: Copy project source to remote
+        run: |
+          scp -r /src ${{ secrets.PRINCIPAL }}@${{ secrets.PUBLIC_IP }}:/src
+
+      - name: Build project on remote
+        run: |
+          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.PUBLIC_IP }} \
+            cd /src && \
+            docker compose build
+        env:
+          PUBLIC_API: ${{ secrets.PUBLIC_IP }}        
+
+      - name: Delete project source from remote
+        run: |
+          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.PUBLIC_IP }} \
+            rm -rf /src/!(docker-compose.yaml)
+                   
+      - name: Start project on remote
+        run: |
+          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.PUBLIC_IP }} \
+            cd /src && \
+            docker compose up
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ORIGIN: ${{ secrets.PUBLIC_IP }}
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}

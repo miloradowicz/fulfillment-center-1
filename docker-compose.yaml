@@ -8,11 +8,11 @@ services:
     ports:
       - 8000:8000
     environment:
-      - JWT_SECRET=jwtsecret
-      - ORIGIN=http://localhost,http://127.0.0.1
+      - JWT_SECRET=${JWT_SECRET}
+      - ORIGIN=${PUBLIC_WEB}
       - MONGO_HOST=db
-      - MONGO_USERNAME=root
-      - MONGO_PASSWORD=root
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     depends_on:
       db:
         condition: service_started
@@ -22,10 +22,10 @@ services:
   db:
     image: mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     ports:
-      - 27018:27017
+      - 27017:27017
     networks:
       - backend
 
@@ -35,12 +35,10 @@ services:
       context: frontend
       dockerfile: Dockerfile
       args:
-        - public_api=localhost
+        - public_api=${PUBLIC_API}
       network: host
     ports:
       - 80:80
-    environment:
-      - VITE_API_HOST=api
     depends_on:
       api:
         condition: service_started
