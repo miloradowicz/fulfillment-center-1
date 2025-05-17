@@ -67,6 +67,7 @@ export class TasksService {
       .populate('user', 'email displayName role')
       .populate('associated_order', 'orderNumber')
       .populate('associated_arrival', 'arrivalNumber')
+      .populate({ path: 'logs.user', select: '-password -token' })
 
     if (!task) throw new NotFoundException('Задача не найдена')
 

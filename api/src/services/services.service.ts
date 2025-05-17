@@ -30,7 +30,7 @@ export class ServicesService {
   }
 
   async getById(id: string) {
-    const service = await this.serviceModel.findById(id).populate('serviceCategory').exec()
+    const service = await this.serviceModel.findById(id).populate('serviceCategory').populate({ path: 'logs.user', select: '-password -token' }).exec()
 
     if (!service) throw new NotFoundException('Услуга не найдена')
 

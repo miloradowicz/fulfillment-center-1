@@ -188,9 +188,9 @@ export class ArrivalsService {
 
     const arrivalDtoObj = { ...arrivalDto }
 
-    if (!arrivalDto.defects) {
-      arrivalDtoObj.defects = []
-    }
+    arrivalDtoObj.received_amount = arrivalDtoObj.received_amount || []
+    arrivalDtoObj.defects = arrivalDtoObj.defects || []
+    arrivalDtoObj.services = arrivalDtoObj.services || []
 
     const log = this.logsService.trackChanges(
       existingArrival.toObject(),

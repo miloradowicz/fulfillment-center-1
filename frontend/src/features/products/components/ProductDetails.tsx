@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { ArrowUpRight, ScrollText, Package } from 'lucide-react'
+import { ArrowUpRight, Package, ScrollText } from 'lucide-react'
 import { useAppSelector } from '@/app/hooks.ts'
 import { selectProductWithPopulate } from '@/store/slices/productSlice.ts'
 import useProductActions from '@/features/products/hooks/useProductActions.ts'
 import { Link } from 'react-router-dom'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
 interface Props {
   id?: string
@@ -66,6 +67,14 @@ const ProductDetails: React.FC<Props> = ({ id }) => {
               ))}
             </>
           ): null}
+          <div className="mt-2">
+            <h4 className="text-center font-bold text-gray-600 mb-4">История изменений:</h4>
+            {product.logs && product.logs.length > 0 ? (
+              <LogsAccordionView logs={product.logs} />
+            ) : (
+              <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+            )}
+          </div>
         </div>
       )}
     </>
