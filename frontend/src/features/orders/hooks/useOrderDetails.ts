@@ -5,6 +5,7 @@ import { archiveOrder, cancelOrder, fetchOrderByIdWithPopulate } from '@/store/t
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
+import { ExtendedNavigator, getOS } from '@/utils/getOS.ts'
 
 export const useOrderDetails = () => {
   const { id } = useParams()
@@ -17,12 +18,20 @@ export const useOrderDetails = () => {
   const [openArchiveModal, setOpenArchiveModal] = useState(false)
   const [confirmCancelModalOpen, setConfirmCancelModalOpen] = useState(false)
   const [tabs, setTabs] = useState(0)
+  const [os, setOS] = useState<string>('Detecting...')
 
   useEffect(() => {
     if (id) {
       dispatch(fetchOrderByIdWithPopulate(id))
     }
   }, [dispatch, id])
+
+  useEffect(() => {
+    getOS(navigator as ExtendedNavigator).then(setOS)
+  }, [])
+
+  const paddingTop = os === 'Mac OS' ? 'pt-0' : os === 'Windows' ? 'pt-0': os === 'Android' ? 'pt-0' : 'pt-2'
+  const heightTab = os === 'Mac OS' ? 'h-[45px]' : os === 'Windows' ? 'h-[50px]' : os === 'Android' ? 'h-auto' : 'h-[45px]'
 
   const handleArchive = async () => {
     try {
@@ -69,5 +78,8 @@ export const useOrderDetails = () => {
     handleCancel,
     setConfirmCancelModalOpen,
     confirmCancelModalOpen,
+    os,
+    paddingTop,
+    heightTab,
   }
 }
