@@ -34,8 +34,6 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
-      args:
-        - apiHost=${API_HOST}
       network: host
     ports:
       - 80:80

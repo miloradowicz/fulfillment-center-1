@@ -18,7 +18,7 @@ const config = {
     secret: process.env.JWT_SECRET as string,
   },
   csrf: {
-    origin: (`${ process.env.ORIGIN }`).split(','),
+    origin: (`${ process.env.ORIGIN }`).split(',').map(x => `http://${ x }`),
   },
   saltWorkFactor: 10,
   rootPath: join(__dirname, '..'),

@@ -1,3 +1,5 @@
+name: Deploy to DigitalOcean droplet
+
 on:
   pull_request:
     branches:
@@ -5,16 +7,20 @@ on:
     types:
       - closed
 
+env:
+  HOST: ${{ secrets.HOST }}
+  PRINCIPAL: ${{ secrets.PRINCIPAL }}
+
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
-          path: /src
 
       - name: Install keys
         uses: shimataro/ssh-key-action@v2
@@ -22,30 +28,19 @@ jobs:
           key: ${{ secrets.SSH_DEPLOYMENT_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Copy project source to the remote
-        run: |
-          scp -r /src ${{ secrets.PRINCIPAL }}@${{ secrets.HOST }}:/src
+      - name: Create remote docker context
+        run: docker context create remote --docker "host=ssh://${{ env.PRINCIPAL }}@${{ env.HOST }}"
 
-      - name: Build project on the remote
-        run: |
-          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.HOST }} \
-            cd /src && \
-            docker compose build
-        env:
-          API_HOST: ${{ secrets.HOST }}
+      - name: Stop project on remote
+        run: docker --context remote compose down
 
-      - name: Delete project source from the remote
-        run: |
-          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.HOST }} \
-            rm -rf /src/!(docker-compose.yaml)
-                   
-      - name: Start project on the remote
-        run: |
-          ssh ${{ secrets.PRINCIPAL }}@${{ secrets.HOST }} \
-            cd /src && \
-            docker compose up
+      - name: Build project on remote
+        run: docker --context remote compose build --build-arg API_HOST=${{ env.HOST }}
+
+      - name: Start project on remote
+        run: docker --context remote compose up --detach
         env:
+          WEB_HOST: ${{ env.HOST }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          WEB_HOST: ${{ secrets.HOST }}
           MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
