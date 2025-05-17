@@ -36,6 +36,8 @@ const ArrivalDetails = () => {
     confirmCancelModalOpen,
     handleCancel,
     setConfirmCancelModalOpen,
+    paddingTop,
+    heightTab,
   } = useArrivalDetails()
 
   return (
@@ -155,8 +157,8 @@ const ArrivalDetails = () => {
             <div className="rounded-2xl shadow p-6 mb-6">
               <h3 className="font-bold uppercase mb-3 text-muted-foreground text-center">Дополнительно</h3>
               <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
-                <TabsList className="mb-5 w-full h-[40px] rounded-2xl">
-                  <div className="inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto pt-2">
+                <TabsList className={`mb-5 w-full ${ heightTab } rounded-2xl`}>
+                  <div className={`inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto ${ paddingTop }`} >
                     <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm')}>
                       Отправленные
                     </TabsTrigger>

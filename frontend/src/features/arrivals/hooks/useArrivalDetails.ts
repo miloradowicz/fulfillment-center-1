@@ -8,6 +8,7 @@ import {
 import { archiveArrival, cancelArrival, fetchArrivalByIdWithPopulate } from '@/store/thunks/arrivalThunk.ts'
 import { toast } from 'react-toastify'
 import { hasMessage } from '@/utils/helpers.ts'
+import { ExtendedNavigator, getOS } from '@/utils/getOS.ts'
 
 const useArrivalDetails = () => {
   const { arrivalId } = useParams()
@@ -23,12 +24,18 @@ const useArrivalDetails = () => {
   const [isArchived, setIsArchived] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
   const [tabs, setTabs] = useState(0)
+  const [os, setOS] = useState<string>('Detecting...')
 
   useEffect(() => {
     if (arrivalId) {
       dispatch(fetchArrivalByIdWithPopulate(arrivalId))
     }
   }, [dispatch, arrivalId])
+
+
+  useEffect(() => {
+    getOS(navigator as ExtendedNavigator).then(setOS)
+  }, [])
 
   const handleArchive = async () => {
     if (arrivalId) {
@@ -48,6 +55,10 @@ const useArrivalDetails = () => {
     }
     setConfirmArchiveModalOpen(false)
   }
+
+
+  const paddingTop = os === 'Mac OS' ? 'pt-0' : os === 'Windows' ? 'pt-0': os === 'Android' ? 'pt-0' : 'pt-2'
+  const heightTab = os === 'Mac OS' ? 'h-[45px]' : os === 'Windows' ? 'h-[50px]' : os === 'Android' ? 'h-auto' : 'h-[45px]'
 
   const handleCancel = async () => {
     if (arrivalId) {
@@ -81,6 +92,8 @@ const useArrivalDetails = () => {
     handleCancel,
     confirmCancelModalOpen,
     setConfirmCancelModalOpen,
+    paddingTop,
+    heightTab,
   }
 }
 
