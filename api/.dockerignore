@@ -1,10 +1,11 @@
 **/dist
 **/node_modules
 **/.gitingore
+**/.dockerignore
 **/.editorconfig
 **/.prettierrc
-Dockerfile
-.env.development
+**/*Dockerfile
+.*
+.env*
 test
-src/seeder
 uploads

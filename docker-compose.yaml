@@ -1,6 +1,7 @@
 services:
   api:
     image: js-26-team-2-esdp-api
+    container_name: api
     build:
       context: api
       dockerfile: Dockerfile
@@ -18,9 +19,13 @@ services:
         condition: service_started
     networks:
       - backend
+    restart: always
 
   db:
     image: mongo
+    container_name: db
+    volumes:
+      - db-volume:/data/db/
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
@@ -28,9 +33,11 @@ services:
       - 27017:27017
     networks:
       - backend
+    restart: always
 
   web:
-    image: js-26-team-2-esdp-front
+    image: js-26-team-2-esdp-web
+    container_name: web
     build:
       context: frontend
       dockerfile: Dockerfile
@@ -40,7 +47,14 @@ services:
     depends_on:
       api:
         condition: service_started
+    restart: always
 
 networks:
   backend:
+    name: backend
     driver: bridge
+
+volumes:
+  db-volume:
+    name: ${MONGO_VOLUME}
+    external: true
