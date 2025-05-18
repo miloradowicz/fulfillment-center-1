@@ -2,8 +2,10 @@
 
 FROM node:22.15.0 AS builder
 WORKDIR /app
-COPY --exclude=src/seeder . .
+COPY package.json package-lock.json ./
 RUN npm i
+ARG KEEP_CACHE=1
+COPY --exclude=src/seeder --exclude=package.json --exclude=package-lock.json . .
 RUN npm run build
 
 FROM node:22.15.0

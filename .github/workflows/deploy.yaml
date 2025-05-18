@@ -17,6 +17,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
+      timestamp: ${{ steps.get_timestamp.outputs.timestamp }}
       db-needs-creating: ${{ steps.check_db_volume.outputs.db-needs-creating }}
       db-needs-seeding: ${{ steps.create_db_volume.outputs.db-needs-seeding }}
 
@@ -49,15 +50,22 @@ jobs:
           docker --context remote volume create ${{ env.MONGO_VOLUME }}
           echo db-needs-seeding=true >> $GITHUB_OUTPUT
 
+      - name: Get timestamp
+        id: get_timestamp
+        run: echo timestamp=$(date +%s)
+
       - name: Build the project on the remote
-        run: docker --context remote compose build --build-arg API_HOST=${{ env.HOST }}
+        run: |
+          docker --context remote compose build \
+            --build-arg KEEP_CACHE=${{ steps.get_timestamp.outputs.timestamp }} \
+            --build-arg API_HOST=${{ env.HOST }}
 
       - name: Build the seeder if the database volume has been just created
         if: ${{ steps.create_db_volume.outputs.db-needs-seeding == 'true' }}
-        run: docker --context remote build -t seeder -f api/src/seeder/Dockerfile api
+        run: docker --context remote build -t seeder -f api/src/seeder/Dockerfile --build-arg KEEP_CACHE=${{ steps.get_timestamp.outputs.timestamp }} api
 
       - name: Start the project on the remote
-        run: docker --context remote compose up --detach
+        run: docker --context remote compose up -d
         env:
           WEB_HOST: ${{ env.HOST }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
