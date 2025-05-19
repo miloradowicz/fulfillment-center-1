@@ -30,8 +30,8 @@ export class UsersController {
 
     res.cookie('token', user.token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
+      secure: false,
+      sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 

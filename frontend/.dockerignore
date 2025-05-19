@@ -1,0 +1,11 @@
+**/dist
+**/node_modules
+**/.gitingore
+**/.dockerignore
+**/.editorconfig
+**/.prettierrc
+**/*Dockerfile
+.*
+.env*
+src/tests
+jest*

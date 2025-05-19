@@ -16,7 +16,13 @@ import { Invoice, InvoiceSchema } from '../schemas/invoice.schema'
 
 @Module({
   imports: [
-    MongooseModule.forRoot(new URL(config.mongo.db, config.mongo.host).href),
+    MongooseModule.forRoot(
+      config.mongo.host,
+      {
+        auth: { username: config.mongo.username, password: config.mongo.password },
+        dbName: config.mongo.db,
+      }
+    ),
     MongooseModule.forFeature([
       { name: Product.name, schema: ProductSchema },
       { name: Task.name, schema: TaskSchema },

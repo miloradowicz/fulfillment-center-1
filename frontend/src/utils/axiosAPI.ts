@@ -1,10 +1,11 @@
 import { RootState } from '@/app/store'
+import { apiHost } from '@/constants'
 import { setUser, unsetUser } from '@/store/slices/authSlice'
 import { Store } from '@reduxjs/toolkit'
 import axios from 'axios'
 
 const axiosAPI = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: `http://${apiHost}:8000`,
   withCredentials: true,
   xsrfCookieName: 'XSRF-TOKEN',
 })
