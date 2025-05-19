@@ -1,31 +1,102 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
-import { DynamicField, ServiceMutation } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { isAxiosError } from 'axios'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { ServiceCategory, ServiceMutation, ValidationError } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { createService, fetchServiceById, fetchServices, updateService } from '@/store/thunks/serviceThunk'
+import { selectAllServices, selectLoadingAddService, selectService, selectServiceCreationAndModificationError } from '@/store/slices/serviceSlice'
+import { selectAllServiceCateogories, selectLoadingAddServiceCategory, selectLoadingFetchServiceCategory, selectServiceCategoryCreationAndModificationError } from '@/store/slices/serviceCategorySlice'
+import { createServiceCategory, deleteServiceCategory, fetchServiceCategories } from '@/store/thunks/serviceCategoryThunk'
 import { toast } from 'react-toastify'
-import { createService } from '../../../store/thunks/serviceThunk'
-import { selectLoadingAddService } from '../../../store/slices/serviceSlice'
+import { clearCreationAndModificationError as clearServiceCreateError } from '@/store/slices/serviceSlice'
+import { clearCreationAndModificationError as clearServiceCategoryCreateError } from '@/store/slices/serviceCategorySlice'
+import { isAxiosError } from 'axios'
+import { isGlobalError, isServiceCategory, isValidationError } from '@/utils/helpers'
+import { positiveDecimalNumber } from '@/constants'
 
-interface Errors {
-  name?: string;
-  dynamicField_?: string;
-  newFieldValue?: string;
-  newFieldKey?: string;
-  newFieldLabel?: string;
-  [key: `dynamicField_${ number }`]: string;
+
+const requiredFields: (keyof Form)[] = ['name', 'serviceCategory', 'price']
+
+type Form = Omit<ServiceMutation, 'serviceCategory' | 'price'> & {
+  price: string,
+  serviceCategory: ServiceCategory | null
 }
 
-const useServiceForm = (onClose: () => void) => {
-  const [form, setForm] = useState<ServiceMutation>({ name: '', dynamic_fields: [] })
-  const [dynamicFields, setDynamicFields] = useState<DynamicField[]>([])
-  const [newField, setNewField] = useState<DynamicField>({ key: '', label: '', value: '' })
-  const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
+const initialState: Form = {
+  name: '',
+  price: '',
+  description: '',
+  serviceCategory: null,
+  type: 'внутренняя',
+}
+
+interface Errors {
+  [key: string]: string;
+}
+
+const reassemble = (e: ValidationError) => {
+  return Object.entries(e.errors)
+    .map(([k, v]) => ({ [k]: v.messages.join(', ') }))
+    .reduce((a, x) => ({ ...a, ...x }), {})
+}
+
+const useServiceForm = (serviceId?: string, onClose?: () => void) => {
+  const [form, setForm] = useState<Form>(initialState)
   const [errors, setErrors] = useState<Errors>({})
+  const addCategoryLoading = useAppSelector(selectLoadingAddServiceCategory)
+  const fetchCategoryLoading = useAppSelector(selectLoadingFetchServiceCategory)
+
+  const service = useAppSelector(selectService)
+  const services = useAppSelector(selectAllServices)
+  const serviceCategories = useAppSelector(selectAllServiceCateogories)
+
+  const createServiceCategoryError = useAppSelector(selectServiceCategoryCreationAndModificationError)
+  const createServiceError = useAppSelector(selectServiceCreationAndModificationError)
 
   const loading = useAppSelector(selectLoadingAddService)
   const dispatch = useAppDispatch()
 
-  const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const [inputValue, setInputValue] = useState('')
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    dispatch(fetchServiceCategories())
+    if (serviceId) {
+      dispatch(fetchServiceById(serviceId))
+    }
+  }, [dispatch, serviceId])
+
+  useEffect(() => {
+    dispatch(clearServiceCreateError())
+    dispatch(clearServiceCategoryCreateError())
+    dispatch(fetchServices())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (serviceId && service) {
+      const category = serviceCategories.find(x => x._id === service.serviceCategory._id)
+
+      if (category) {
+        setForm({
+          name: service.name,
+          price: service.price.toString(),
+          description: service.description || '',
+          type: service.type,
+          serviceCategory: category,
+        })
+      }
+    }
+  }, [serviceId, service, serviceCategories])
+
+  useEffect(() => {
+    if (isValidationError(createServiceError)) {
+      setErrors(() => (reassemble(createServiceError)))
+    }
+
+    if (isValidationError(createServiceCategoryError)) {
+      setErrors(() => ( { serviceCategory: createServiceCategoryError.errors.name.messages.join(', ') }))
+    }
+  }, [createServiceError, createServiceCategoryError])
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     setForm(prevState => ({
@@ -34,143 +105,175 @@ const useServiceForm = (onClose: () => void) => {
     }))
   }
 
-  const addDynamicField = () => {
-    const newErrors: Errors = {}
+  const handleAutocompleteChange = async (_: unknown, newValue: ServiceCategory | string | null) => {
+    setErrors(prevErrors => ({ ...prevErrors, serviceCategory: '' }))
 
-    if (!newField.label.trim()) {
-      newErrors.newFieldValue = 'Значение обязательно!'
-    }
-
-    if (!newField.key.trim()) {
-      newErrors.newFieldKey = 'Ключ обязателен!'
-    }
-
-    if (!newField.label.trim()) {
-      newErrors.newFieldLabel = 'Название обязательно!'
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
+    if (newValue === null) {
+      setForm(prevState => ({ ...prevState, serviceCategory: null }))
       return
     }
 
-    const isDuplicate = dynamicFields.some(
-      field => field.key === newField.key || field.label === newField.label,
-    )
-
-    if (isDuplicate) {
-      setErrors({ dynamicField_: 'Поле с таким ключом или названием уже существует' })
+    if (isServiceCategory(newValue)) {
+      setForm(prevState => ({ ...prevState, serviceCategory: newValue }))
       return
     }
 
-    setDynamicFields(prev => [...prev, newField])
-    setNewField({ key: '', label: '', value: '' })
-    setShowNewFieldInputs(false)
-    setErrors({})
+    if (newValue.trim() !== '') {
+      try {
+        const existingCategory = serviceCategories.find(
+          cat => cat.name.toLowerCase() === newValue.toLowerCase(),
+        )
+
+        if (existingCategory) {
+          setForm(prevState => ({
+            ...prevState,
+            serviceCategory: existingCategory,
+          }))
+          return
+        }
+
+        const category = await dispatch(createServiceCategory({ name: newValue })).unwrap()
+        await dispatch(fetchServiceCategories())
+
+        setForm(prevState => ({
+          ...prevState,
+          serviceCategory: category,
+        }))
+      } catch (e) {
+        setErrors(prev => ({
+          ...prev,
+          serviceCategory: 'Не удалось создать категорию',
+        }))
+        console.error(e)
+      }
+    } else {
+      setForm(prevState => ({ ...prevState, serviceCategory: null }))
+    }
   }
 
-  const onChangeDynamicFieldValue = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const value = e.target.value
-    setDynamicFields(prev => prev.map((field, i) => (i === index ? { ...field, value } : field)))
-    setErrors(prevErrors => ({ ...prevErrors, [`dynamicField_${ index }`]: '' }))
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      await dispatch(deleteServiceCategory(categoryId)).unwrap()
+      await dispatch(fetchServiceCategories())
+
+      if (form.serviceCategory?._id === categoryId) {
+        setForm(prev => ({ ...prev, serviceCategory: null }))
+      }
+      toast.success('Категория успешно удалена')
+    } catch (error) {
+      toast.error('Не удалось удалить категорию')
+      console.error(error)
+    }
+  }
+
+  const validateField = (name: keyof Form, value: unknown): string => {
+    if (typeof value === 'string') {
+      if (!value.trim()) return 'Поле не может быть пустым'
+      if (name === 'price' && !positiveDecimalNumber.test(value)) return 'Цена должна быть положительным числом'
+    } else {
+      if (!value) return 'Поле не может быть пустым'
+    }
+    return ''
+  }
+
+  const validateFields = () => {
+    const newErrors: Errors = {}
+
+    requiredFields.forEach(field => {
+      newErrors[field] = validateField(field, form[field] || '')
+    })
+
+    setErrors(newErrors)
+    return Object.values(newErrors).some(error => error)
+  }
+
+  const checkServiceNameExistence = (name: string) => {
+    const existingService = services.find(
+      service => service.name.toLowerCase() === name.toLowerCase() && service._id !== serviceId,
+    )
+    if (existingService) {
+      setErrors(prev => ({
+        ...prev,
+        name: 'Услуга с таким именем уже существует',
+      }))
+      return true
+    }
+    setErrors(prev => {
+      const { name, ...rest } = prev
+      return rest
+    })
+    return false
   }
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    if (!form.name.trim()) {
-      setErrors(prevErrors => ({ ...prevErrors, name: 'Название обязательно' }))
+    if (validateFields()) return
+
+    if (checkServiceNameExistence(form.name)) return
+
+    if (!form.serviceCategory) {
+      setErrors(prev => ({
+        ...prev,
+        serviceCategory: 'Выберите категорию услуги',
+      }))
       return
     }
 
-    if (dynamicFields.length === 0) {
-      setErrors(prevErrors => ({ ...prevErrors, dynamicField_: 'Добавьте хотя бы одно дополнительное свойство' }))
-      toast.warn('Добавьте хотя бы одно дополнительное свойство')
-      return
-    }
-
-    const hasEmptyFields = dynamicFields.some(field => !field.key.trim() || !field.label.trim() || !field.value.trim())
-    if (hasEmptyFields) {
-      setErrors(prevErrors => ({ ...prevErrors, dynamicField_: 'Все дополнительные поля должны быть заполнены' }))
-      toast.warn('Все дополнительные поля должны быть заполнены')
-      return
-    }
-
-    const keys = new Set<string>()
-    const labels = new Set<string>()
-    for (const field of dynamicFields) {
-      if (keys.has(field.key) || labels.has(field.label)) {
-        setErrors({ dynamicField_: 'Поле с таким ключом или названием уже существует' })
-        toast.warn('Поле с таким ключом или названием уже существует')
-        return
-      }
-      keys.add(field.key)
-      labels.add(field.label)
+    const serviceData = {
+      name: form.name,
+      price: Number.parseFloat(form.price),
+      description: form.description,
+      type: form.type,
+      serviceCategory: form.serviceCategory._id,
     }
 
     try {
-      const serviceData: ServiceMutation = {
-        name: form.name,
-        dynamic_fields: dynamicFields,
+      if (serviceId) {
+        await dispatch(updateService({ id: serviceId, data: serviceData })).unwrap()
+        await dispatch(fetchServices())
+        toast.success('Услуга успешно обновлена!')
+      } else {
+        await dispatch(createService(serviceData)).unwrap()
+        await dispatch(fetchServices())
+        toast.success('Услуга успешно создана!')
+        setForm(initialState)
       }
-
-      await dispatch(createService(serviceData)).unwrap()
-      toast.success('Услуга успешно создана!')
-
-      onClose()
-      setForm({ name: '', dynamic_fields: [] })
-      setDynamicFields([])
-      setErrors({})
     } catch (e) {
       if (isAxiosError(e) && e.response?.data) {
-        console.error('Ошибка валидации:', e.response.data)
-
-        if (e.response.data.message) {
-          if (Array.isArray(e.response.data.message)) {
-            setErrors(prev => ({
-              ...prev,
-              dynamicField_: e.response?.data.message.join(', '),
-            }))
-            toast.error(e.response.data.message.join(', '))
-          } else {
-            toast.error(e.response.data.message)
-          }
+        if (isGlobalError(e.response.data)) {
+          toast.error(e.response.data.message)
         } else {
-          toast.error('Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
+          toast.error(serviceId
+            ? 'Ошибка при обновлении услуги. Проверьте данные и попробуйте снова.'
+            : 'Ошибка при создании услуги. Проверьте данные и попробуйте снова.')
         }
       } else {
         console.error('Ошибка сервера:', e)
       }
     }
-  }
 
-
-  const handleCancel = () => {
-    setShowNewFieldInputs(false)
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      newFieldKey: '',
-      newFieldLabel: '',
-    }))
+    if (onClose) onClose()
   }
 
   return {
     form,
-    dynamicFields,
-    newField,
-    showNewFieldInputs,
     loading,
-    inputChangeHandler,
-    addDynamicField,
-    onChangeDynamicFieldValue,
+    services,
+    serviceCategories,
+    addCategoryLoading,
+    fetchCategoryLoading,
+    handleInputChange,
+    handleAutocompleteChange,
+    handleDeleteCategory,
     onSubmit,
-    setNewField,
-    setShowNewFieldInputs,
     errors,
-    handleCancel,
+    createServiceError,
+    createServiceCategoryError,
+    inputValue,
+    setInputValue,
+    open,
+    setOpen,
   }
 }
 

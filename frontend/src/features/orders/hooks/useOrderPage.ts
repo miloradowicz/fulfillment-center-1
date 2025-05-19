@@ -1,60 +1,103 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import {
   clearErrorOrder,
   clearPopulateOrder,
   selectAllOrdersWithClient,
-  selectLoadingFetchOrder,
-} from '../../../store/slices/orderSlice.ts'
-import { deleteOrder, fetchOrderByIdWithPopulate, fetchOrdersWithClient } from '../../../store/thunks/orderThunk.ts'
+  selectLoadingFetchOrder, selectOrderError,
+} from '@/store/slices/orderSlice.ts'
+import {
+  archiveOrder, cancelOrder, fetchArchivedOrders,
+  fetchOrderByIdWithPopulate,
+  fetchOrdersWithClient,
+} from '@/store/thunks/orderThunk.ts'
 import { toast } from 'react-toastify'
-import { OrderWithClient } from '../../../types'
+import { OrderWithClient } from '@/types'
+import { FormType } from '@/features/orders/state/orderState.ts'
+import { hasMessage, isGlobalError } from '@/utils/helpers.ts'
 
 const UseOrderPage = () => {
   const dispatch = useAppDispatch()
   const orders = useAppSelector(selectAllOrdersWithClient)
   const loading = useAppSelector(selectLoadingFetchOrder)
   const [open, setOpen] = useState(false)
+  const [formType, setFormType] = useState<FormType>('order')
+  const [counterpartyToDelete, setCounterpartyToDelete] = useState<OrderWithClient | null>(null)
+  const [orderToEdit, setOrderToEdit] = useState<OrderWithClient | undefined>(undefined)
+  const error = useAppSelector(selectOrderError)
 
   useEffect(() => {
     dispatch(fetchOrdersWithClient())
   }, [dispatch])
 
-  const handleDelete = async (id: string) => {
+  const handleArchive = async (id: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
-        await dispatch(deleteOrder(id))
-        dispatch(fetchOrdersWithClient())
-      } else {
-        toast.info('Вы отменили удаление заказа')
-      }
+      await dispatch(archiveOrder(id)).unwrap()
+      dispatch(fetchOrdersWithClient())
+      toast.success('Заказ успешно архивирован!')
+      dispatch(fetchArchivedOrders())
     } catch (e) {
+      if (isGlobalError(e) || hasMessage(e)) {
+        toast.error(e.message)
+      } else {
+        toast.error('Не удалось архивировать заказ')
+      }
       console.error(e)
     }
   }
 
-  const handleOpen = () => setOpen(true)
+  const handleCancelOrder = async (id: string) => {
+    try {
+      await dispatch(cancelOrder(id))
+      dispatch(fetchOrdersWithClient())
+      toast.success('Заказ успешно отменен!')
+      dispatch(fetchArchivedOrders())
+    } catch (e) {
+      toast.error('Ошибка при отмене заказа.')
+      console.error(e)
+    }
+  }
+
+  const handleOpen = (type: FormType = 'order') => {
+    setFormType(type)
+    setOpen(true)
+  }
 
   const handleClose = () => {
     setOpen(false)
     dispatch(clearPopulateOrder())
-    dispatch( clearErrorOrder ())
+    setOrderToEdit(undefined)
+    dispatch(clearErrorOrder())
   }
 
   const handleOpenEdit = async (order: OrderWithClient) => {
     await dispatch(fetchOrderByIdWithPopulate(order._id))
-    setOpen(true)
+    setOrderToEdit(order)
+    handleOpen('order')
   }
 
+  const handleConfirmArchive = async () => {
+    if (counterpartyToDelete) {
+      await dispatch(archiveOrder(counterpartyToDelete._id))
+      dispatch(fetchOrdersWithClient())
+      handleClose()
+    }
+  }
 
   return {
     orders,
     open,
+    formType,
     handleOpen,
     loading,
     handleClose,
-    handleDelete,
+    handleArchive,
     handleOpenEdit,
+    setCounterpartyToDelete,
+    handleConfirmArchive,
+    orderToEdit,
+    handleCancelOrder,
+    error,
   }
 }
 

@@ -1,116 +1,174 @@
-import { Stock, ValidationError } from '../../types'
+import { GlobalError, Stock, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { addStock, archiveStock, deleteStock, fetchStockById, fetchStocks, updateStock } from '../thunks/stocksThunk.ts'
-import { RootState } from '../../app/store.ts'
+import {
+  addStock,
+  addWriteOff,
+  archiveStock,
+  deleteStock,
+  fetchArchivedStocks,
+  fetchStockById,
+  fetchStocks,
+  updateStock,
+} from '../thunks/stocksThunk.ts'
+import { RootState } from '@/app/store.ts'
 
 interface StockState {
   stocks: Stock[] | null
+  archivedStocks: Stock[] | null
   stock: Stock | null
-  isFetching: boolean
-  isCreating: boolean
-  isArchiving: boolean
-  error: boolean
-  createError: ValidationError | null
+  archivedStock: Stock | null
+  loadingFetch: boolean
+  loadingFetchArchive: boolean
+  loadingCreate: boolean
+  loadingUpdate: boolean
+  loadingDelete: boolean
+  loadingArchive: boolean
+  loadingWriteOff: boolean
+  error: GlobalError | null
+  createAndUpdateError: ValidationError | null
+  deletionError: GlobalError | null
+  createWriteOffError: ValidationError | null
 }
 
 const initialState: StockState = {
   stocks: null,
+  archivedStocks: null,
   stock: null,
-  isFetching: false,
-  isCreating: false,
-  isArchiving: false,
-  error: false,
-  createError: null,
+  archivedStock: null,
+  loadingFetch: false,
+  loadingFetchArchive: false,
+  loadingCreate: false,
+  loadingUpdate: false,
+  loadingDelete: false,
+  loadingArchive: false,
+  loadingWriteOff: false,
+  error: null,
+  createAndUpdateError: null,
+  deletionError: null,
+  createWriteOffError: null,
 }
 
 export const selectAllStocks = (state: RootState) => state.stocks.stocks
+export const selectAllArchivedStocks = (state: RootState) => state.stocks.archivedStocks
 export const selectOneStock = (state: RootState) => state.stocks.stock
-export const selectIsStocksLoading = (state: RootState) => state.stocks.isFetching
-export const selectIsStockArchiving = (state: RootState) => state.stocks.isArchiving
-export const selectIsStockCreating = (state: RootState) => state.stocks.isCreating
-export const selectStockCreateError = (state: RootState) => state.stocks.createError
+export const selectOneArchivedStock = (state: RootState) => state.stocks.archivedStock
+export const selectIsStocksLoading = (state: RootState) => state.stocks.loadingFetch
+export const selectLoadingFetchArchivedStocks = (state: RootState) => state.stocks.loadingFetchArchive
+export const selectIsStockArchiving = (state: RootState) => state.stocks.loadingArchive
+export const selectIsStockCreating = (state: RootState) => state.stocks.loadingCreate
+export const selectStockCreateError = (state: RootState) => state.stocks.createAndUpdateError
 export const selectStockError = (state: RootState) => state.stocks.error
+export const selectLoadingWriteOff = (state: RootState) => state.stocks.loadingWriteOff
+export const selectCreateWriteOffError = (state: RootState) => state.stocks.createWriteOffError
 
 const stocksSlice = createSlice({
   name: 'stocks',
   initialState,
-  reducers: {},
+  reducers: {
+    clearStockError: state => {
+      state.createAndUpdateError = null
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchStocks.pending, state => {
-        state.isFetching = true
-        state.error = false
+        state.loadingFetch = true
+        state.error = null
       })
       .addCase(fetchStocks.fulfilled, (state, { payload: stocks }) => {
-        state.isFetching = false
+        state.loadingFetch = false
         state.stocks = stocks
       })
       .addCase(fetchStocks.rejected, state => {
-        state.isFetching = false
-        state.error = true
+        state.loadingFetch = false
+      })
+
+      .addCase(fetchArchivedStocks.pending, state => {
+        state.loadingFetchArchive = true
+        state.error = null
+      })
+      .addCase(fetchArchivedStocks.fulfilled, (state, action) => {
+        state.loadingFetchArchive = false
+        state.archivedStocks = action.payload
+      })
+      .addCase(fetchArchivedStocks.rejected, (state, action) => {
+        state.loadingFetchArchive = false
+        state.error = (action.payload as GlobalError) || { message: 'Ошибка загрузки архивных складов' }
       })
 
       .addCase(fetchStockById.pending, state => {
-        state.isFetching = true
-        state.error = false
+        state.loadingFetch = true
+        state.error = null
       })
       .addCase(fetchStockById.fulfilled, (state, { payload: stock }) => {
-        state.isFetching = false
+        state.loadingFetch = false
         state.stock = stock
       })
       .addCase(fetchStockById.rejected, state => {
-        state.isFetching = false
-        state.error = true
+        state.loadingFetch = false
       })
 
       .addCase(addStock.pending, state => {
-        state.isCreating = true
-        state.createError = null
+        state.loadingCreate = true
+        state.createAndUpdateError = null
       })
       .addCase(addStock.fulfilled, state => {
-        state.isCreating = false
+        state.loadingCreate = false
       })
       .addCase(addStock.rejected, (state, { payload: error }) => {
-        state.isCreating = false
-        state.createError = error || null
+        state.loadingCreate = false
+        state.createAndUpdateError = error || null
       })
 
       .addCase(archiveStock.pending, state => {
-        state.isArchiving = true
-        state.error = false
+        state.loadingArchive = true
+        state.error = null
       })
       .addCase(archiveStock.fulfilled, state => {
-        state.isArchiving = false
+        state.loadingArchive = false
       })
-      .addCase(archiveStock.rejected, state => {
-        state.isArchiving = false
-        state.error = true
+      .addCase(archiveStock.rejected, (state, { payload: error }) => {
+        state.loadingArchive = false
+        state.error = error || null
       })
 
       .addCase(deleteStock.pending, state => {
-        state.isFetching = true
-        state.error = false
+        state.loadingDelete = true
+        state.error = null
       })
       .addCase(deleteStock.fulfilled, state => {
-        state.isFetching = false
+        state.loadingDelete = false
       })
-      .addCase(deleteStock.rejected, state => {
-        state.isFetching = false
-        state.error = true
+      .addCase(deleteStock.rejected, (state, { payload: error }) => {
+        state.loadingDelete = false
+        state.error = error || null
       })
 
       .addCase(updateStock.pending, state => {
-        state.isFetching = true
-        state.error = false
+        state.loadingUpdate = true
+        state.createAndUpdateError = null
       })
       .addCase(updateStock.fulfilled, state => {
-        state.isFetching = false
+        state.loadingUpdate = false
       })
-      .addCase(updateStock.rejected, state => {
-        state.isFetching = false
-        state.error = true
+      .addCase(updateStock.rejected, (state, { payload: error }) => {
+        state.loadingUpdate = false
+        state.createAndUpdateError = error || null
+      })
+
+      .addCase(addWriteOff.pending, state => {
+        state.loadingWriteOff = true
+        state.createWriteOffError = null
+      })
+      .addCase(addWriteOff.fulfilled, state => {
+        state.loadingWriteOff = false
+      })
+      .addCase(addWriteOff.rejected, (state, { payload: error }) => {
+        state.loadingWriteOff = false
+        state.createWriteOffError = error || null
       })
   },
 })
 
+export const { clearStockError } = stocksSlice.actions
 export const stockReducer = stocksSlice.reducer

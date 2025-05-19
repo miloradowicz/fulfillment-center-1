@@ -1,16 +1,20 @@
-import { useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useState } from 'react'
-import { clearErrorArrival, selectLoadingFetchArrival } from '../../../store/slices/arrivalSlice.ts'
-import { ArrivalWithClient } from '../../../types'
-import { useDispatch } from 'react-redux'
+import { clearErrorArrival, selectLoadingFetchArrival } from '@/store/slices/arrivalSlice.ts'
+import { ArrivalWithClient } from '@/types'
+import { FormType } from '@/features/arrivals/state/arrivalState.ts'
 
 export const useArrivalPage = () => {
   const [open, setOpen] = useState(false)
+  const [formType, setFormType] = useState<FormType>('arrival')
   const isLoading = useAppSelector(selectLoadingFetchArrival)
   const [arrivalToEdit, setArrivalToEdit] = useState<ArrivalWithClient | undefined>(undefined)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const handleOpen = () => setOpen(true)
+  const handleOpen = (type: FormType = 'arrival') => {
+    setFormType(type)
+    setOpen(true)
+  }
 
   const handleClose = async () => {
     setOpen(false)
@@ -20,11 +24,12 @@ export const useArrivalPage = () => {
 
   const handleOpenEdit = (arrival: ArrivalWithClient) => {
     setArrivalToEdit(arrival)
-    handleOpen()
+    handleOpen('arrival')
   }
 
   return {
     open,
+    formType,
     handleOpen,
     isLoading,
     handleClose,

@@ -1,9 +1,12 @@
-import Grid from '@mui/material/Grid2'
-import { Button, CircularProgress, TextField, Typography, Box, Autocomplete } from '@mui/material'
 import useProductForm from '../hooks/useProductForm.ts'
-import { ProductWithPopulate } from '../../../types'
+import { ProductWithPopulate } from '@/types'
 import React from 'react'
-import { getFieldError } from '../../../utils/getFieldError.ts'
+import { getFieldError } from '@/utils/getFieldError.ts'
+import { LoaderCircle, Plus } from 'lucide-react'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { CustomSelect } from '@/components/CustomSelect/CustomSelect.tsx'
 
 interface Props {
   initialData?: ProductWithPopulate
@@ -13,174 +16,120 @@ interface Props {
 const ProductForm: React.FC<Props> = ({ initialData, onSuccess }) => {
   const {
     form,
-    selectedClient,
     dynamicFields,
     newField,
     showNewFieldInputs,
-    file,
     clients,
     loadingAdd,
     loadingUpdate,
     inputChangeHandler,
-    handleFileChange,
     addDynamicField,
     onChangeDynamicFieldValue,
     onSubmit,
     setForm,
-    setSelectedClient,
     setNewField,
     setShowNewFieldInputs,
-    setErrors,
     errors,
     createError,
+    activePopover,
+    setActivePopover,
+    errorsBlur,
+    handleBlur,
   } = useProductForm(initialData, onSuccess)
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
-        { initialData? 'Редактировать данные товара' : 'Добавить новый товар'}
-      </Typography>
-      <Grid container direction="column" spacing={2}>
-        <Grid>
-          <Autocomplete
-            options={clients || []}
-            getOptionLabel={option => option.name}
-            value={clients?.find(client => client._id === selectedClient) || null}
-            onChange={(_event, newValue) => {
-              const clientId = newValue ? newValue._id : ''
-              setSelectedClient(clientId)
-              setErrors(prevErrors => ({ ...prevErrors, client: '' }))
-              setForm(prevState => ({ ...prevState, client: clientId }))
-            }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Клиент"
-                fullWidth
-                size="small"
-                error={Boolean(errors.client || getFieldError('client',createError))}
-                helperText={errors.client || getFieldError('client',createError)}
-              />
-            )}
-          />
-        </Grid>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {initialData ? 'Редактировать данные товара' : 'Добавить новый товар'}
+      </h3>
 
-        <Grid>
-          <TextField
-            name="title"
-            label="Название"
-            value={form.title}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.title || getFieldError('title',createError))}
-            helperText={errors.title || getFieldError('title',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            name="amount"
-            label="Количество"
-            type="number"
-            value={form.amount || ''}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.amount || getFieldError('amount',createError))}
-            helperText={errors.amount || getFieldError('amount',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            name="barcode"
-            label="Баркод"
-            value={form.barcode}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.barcode || getFieldError('barcode',createError))}
-            helperText={errors.barcode || getFieldError('barcode',createError)}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            name="article"
-            label="Артикул"
-            value={form.article}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={Boolean(errors.article || getFieldError('article',createError))}
-            helperText={errors.article || getFieldError('article',createError)}
-          />
-        </Grid>
+      <CustomSelect
+        value={clients?.find(c => c._id === form.client)?.name}
+        placeholder="Выберите клиента"
+        options={clients || []}
+        onSelect={clientId => {
+          setForm(prev => ({ ...prev, client: clientId }))
+        }}
+        popoverKey="client"
+        searchPlaceholder="Поиск клиента..."
+        activePopover={activePopover}
+        setActivePopover={setActivePopover}
+        error={errors.client || getFieldError('client', createError) || errorsBlur.client}
+        renderValue={client => client.name}
+        onBlur={e => handleBlur('client', e.target.value)}
+      />
 
-        <Typography variant="h6">Дополнительные параметры</Typography>
-        {dynamicFields.map((field, i) => (
-          <Grid key={i} sx={{ mb: 2 }}>
-            <TextField
-              name={field.label}
-              label={field.label}
-              fullWidth
-              size="small"
-              value={field.value || ''}
-              onChange={e => onChangeDynamicFieldValue(i, e)}
-            />
-          </Grid>
-        ))}
+      <InputWithError
+        name="title"
+        placeholder="Название"
+        value={form.title}
+        onChange={inputChangeHandler}
+        error={errors.title || getFieldError('title', createError)|| errorsBlur.title}
+        onBlur={e => handleBlur('title', e.target.value)}
+      />
 
-        {showNewFieldInputs && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid>
-              <TextField
-                label="Ключ"
-                value={newField.key}
-                onChange={e => setNewField({ ...newField, key: e.target.value })}
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid>
-              <TextField
-                label="Название"
-                value={newField.label}
-                onChange={e => setNewField({ ...newField, label: e.target.value })}
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid>
-              <Button variant="contained" onClick={addDynamicField}>
-                Добавить
-              </Button>
-              <Button variant="outlined" color="error" onClick={() => setShowNewFieldInputs(false)} sx={{ ml: 1 }}>
-                Отмена
-              </Button>
-            </Grid>
-          </Grid>
-        )}
+      <InputWithError
+        name="barcode"
+        placeholder="Баркод"
+        value={form.barcode}
+        onChange={inputChangeHandler}
+        error={errors.barcode || getFieldError('barcode', createError)||errorsBlur.barcode}
+        onBlur={e => handleBlur('barcode', e.target.value)}
+      />
 
-        <Button type="button" onClick={() => setShowNewFieldInputs(true)}>
-          + Добавить параметр
-        </Button>
+      <InputWithError
+        name="article"
+        placeholder="Артикул"
+        value={form.article}
+        onChange={inputChangeHandler}
+        error={errors.article || getFieldError('article', createError) || errorsBlur.article}
+        onBlur={e => handleBlur('article', e.target.value)}
+      />
 
-        <Typography variant="h6">Загрузить файл</Typography>
-        <Grid>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button variant="outlined" component="label" sx={{ mr: 2 }}>
-              Выбрать файл
-              <input type="file" accept=".pdf, .doc, .docx" hidden onChange={handleFileChange} />
+      <h6 className="font-bold text-sm sm:text-md">Дополнительные параметры</h6>
+      {dynamicFields.map((field, i) => (
+        <Input
+          key={field.key || i}
+          placeholder={field.label}
+          value={field.value || ''}
+          onChange={e => onChangeDynamicFieldValue(i, e)}
+        />
+      ))}
+
+      {showNewFieldInputs && (
+        <div className="flex-col space-y-4">
+          <Input
+            placeholder="Ключ"
+            value={newField.key}
+            onChange={e => setNewField({ ...newField, key: e.target.value })}
+          />
+          <Input
+            placeholder="Название"
+            value={newField.label}
+            onChange={e => setNewField({ ...newField, label: e.target.value })}
+          />
+
+          <div className="flex gap-3 justify-start">
+            <Button type="button" onClick={addDynamicField}>
+              Добавить
             </Button>
-            {file && <Typography variant="body2">{file.name}</Typography>}
-          </Box>
-        </Grid>
+            <Button type="button" variant="outline" onClick={() => setShowNewFieldInputs(false)}>
+              Отмена
+            </Button>
+          </div>
+        </div>
+      )}
 
-        <Grid>
-          <Button type="submit" fullWidth variant="contained" disabled={loadingAdd || loadingUpdate}>
-            {loadingAdd || loadingUpdate ? <CircularProgress size={24} /> : initialData ? 'Обновить товар' : 'Создать товар'}
-          </Button>
-        </Grid>
-      </Grid>
+      {!showNewFieldInputs && (
+        <Button type="button" variant="outline" onClick={() => setShowNewFieldInputs(true)}>
+          <Plus className=" h-4 w-4" /> Добавить параметр
+        </Button>
+      )}
+
+      <Button type="submit" className="w-full mt-3" disabled={loadingAdd || loadingUpdate}>
+        {initialData ? 'Сохранить' : 'Создать'}
+        {loadingAdd || loadingUpdate ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
+      </Button>
     </form>
   )
 }

@@ -12,6 +12,7 @@ import { Order } from './order.schema'
 import { Counterparty } from './counterparty.schema'
 import { Service } from './service.schema'
 import { Stock } from './stock.schema'
+import { RolesList, RolesType } from 'src/enums'
 
 export interface UserDocument extends Document {
   isArchived: boolean;
@@ -50,11 +51,11 @@ export class User {
   })
   displayName: string
 
-  @Prop({ required: true, enum: ['super-admin', 'admin', 'manager', 'stock-worker'] })
-  role: string
+  @Prop({ required: true, enum: RolesList })
+  role: RolesType
 
   @Prop({
-    required: true,
+    required: false,
   })
   token: string
 }
@@ -66,7 +67,7 @@ UserSchema.methods.checkPassword = function (this: UserDocument, password: strin
 }
 
 UserSchema.methods.generateToken = function (this: UserDocument) {
-  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret)
+  this.token = jwt.sign({ id: this._id } as JwtToken, config.jwt.secret, { expiresIn: config.jwt.expiresIn })
 }
 
 UserSchema.methods.clearToken = function (this: UserDocument) {

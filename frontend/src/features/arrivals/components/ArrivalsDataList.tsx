@@ -1,172 +1,121 @@
-import { useArrivalsList } from '../hooks/useArrivalsList.ts'
-import { ArrivalWithClient } from '../../../types'
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import ClearIcon from '@mui/icons-material/Clear'
-import { NavLink } from 'react-router-dom'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import dayjs from 'dayjs'
-import { ruRU } from '@mui/x-data-grid/locales'
 import React from 'react'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import { useArrivalsList } from '../hooks/useArrivalsList.ts'
+import { ArrivalWithClient } from '@/types'
+import { NavLink } from 'react-router-dom'
+import dayjs from 'dayjs'
+import Modal from '@/components/Modal/Modal.tsx'
 import ArrivalForm from './ArrivalForm.tsx'
 import StatusArrivalCell from './StatusArrivalCell.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
 
 interface Props {
   onEdit: (data: ArrivalWithClient) => void
 }
 
 const ArrivalsDataList: React.FC<Props> = ({ onEdit }) => {
-  const { arrivals, deleteOneArrival, handleClose, isOpen } = useArrivalsList()
+  const { arrivals, handleArchiveClick, handleConfirmArchive, handleClose, isOpen, archiveModalOpen, handleCancelConfirm,
+    handleCancelCancel, openCancelModal,  setArrivalToCancel, setOpenCancelModal } = useArrivalsList()
 
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const columns: ColumnDef<ArrivalWithClient>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: 'arrivalNumber',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Номер поставки" />,
+      cell: ({ row }) => {
+        const tableArrival = row.original
 
-  const columns: GridColDef<ArrivalWithClient>[] = [
-    {
-      field: 'arrivalNumber',
-      headerName: 'Номер поставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      renderCell: ({ row }) => (
-        <NavLink
-          to={`/arrivals/${ row._id }`}
-          className="
-        py-2 px-3
-        bg-blue-50
-        text-blue-700
-        rounded-md
-        text-sm
-        font-medium
-        hover:bg-blue-100
-        transition-colors
-        duration-150
-        border
-        border-blue-200
-        hover:border-blue-300
-        whitespace-nowrap
-      "
-          style={{
-            lineHeight: '1.25rem',
-            maxWidth: '120px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {row.arrivalNumber}
-        </NavLink>
-      ),
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.arrivalNumber,
-    },
-    {
-      field: 'client',
-      headerName: 'Клиент',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.client?.name ?? 'Неизвестный клиент',
-    },
-    {
-      field: 'stock',
-      headerName: 'Склад',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: ArrivalWithClient) => row.stock.name ?? 'Неизвестный склад',
-    },
-    {
-      field: 'arrival_date',
-      headerName: 'Дата поставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 140 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      type: 'date',
-      valueGetter: (_value: string, row: ArrivalWithClient) => new Date(row.arrival_date),
-      valueFormatter: row => dayjs(row).format('DD.MM.YYYY'),
-    },
-    {
-      field: 'arrival_price',
-      headerName: 'Цена доставки',
-      flex: 1,
-      minWidth: isMediumScreen ? 170 : 140,
-      align: 'left',
-      headerAlign: 'left',
-      type: 'number',
-    },
-    {
-      field: 'arrival_status',
-      headerName: 'Статус',
-      flex: 1,
-      minWidth: isMediumScreen ? 160 : 140,
-      align: 'left',
-      headerAlign: 'left',
-      renderCell: params => <StatusArrivalCell row={params.row} />,
-    },
-    {
-      field: 'Actions',
-      headerName: 'Действия',
-      flex: 1,
-      minWidth: isMediumScreen ? 220 : 160,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      filterable: false,
-      renderCell: ({ row }) => {
         return (
-          <>
-            <IconButton onClick={() => onEdit(row)}>
-              <EditIcon />
-            </IconButton>
-            <IconButton onClick={() => deleteOneArrival(row._id)}>
-              <ClearIcon />
-            </IconButton>
-          </>
+          <NavLink
+            to={`/arrivals/${ tableArrival._id }`}
+            className="inline-block text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 hover:text-blue-800 transition-colors px-3 py-1.5 rounded-lg shadow-sm"
+          >
+            {tableArrival.arrivalNumber}
+          </NavLink>
+        )
+      },
+      enableHiding: false,
+    },
+    {
+      accessorKey: 'client.name',
+      header: 'Клиент',
+      cell: ({ row }) => row.original.client?.name ?? 'Неизвестный клиент',
+    },
+    {
+      accessorKey: 'stock.name',
+      header: 'Склад',
+      cell: ({ row }) => row.original.stock?.name ?? 'Неизвестный склад',
+    },
+    {
+      accessorKey: 'arrival_date',
+      header: 'Дата поставки',
+      cell: ({ row }) => dayjs(row.original.arrival_date).format('DD.MM.YYYY'),
+    },
+    {
+      accessorKey: 'arrival_status',
+      header: 'Статус',
+      cell: ({ row }) => <StatusArrivalCell row={row.original} />,
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableArrival = row.original
+
+        return (
+          <TableActionsMenu<ArrivalWithClient>
+            row={tableArrival}
+            handleOpen={() => onEdit(tableArrival)}
+            handleConfirmationOpen={() => handleArchiveClick(tableArrival._id)}
+            showDetailsLink={true}
+            detailsPathPrefix="arrivals"
+            handleCancel={() => {
+              setArrivalToCancel(tableArrival)
+              setOpenCancelModal(true)
+            }}
+          />
         )
       },
     },
   ]
 
   return (
-    <Box className="max-w-[1000px] mx-auto w-full">
-      {arrivals ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={arrivals}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
-      ) : (
-        <Typography className="text-center mt-5">Поставки не найдены.</Typography>
-      )}
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={arrivals ?? []} />
 
-      <Box className="my-8">
+      <ConfirmationModal
+        open={archiveModalOpen}
+        entityName="эту поставку"
+        actionType="archive"
+        onConfirm={handleConfirmArchive}
+        onCancel={handleClose}
+      />
+      <ConfirmationModal
+        open={openCancelModal}
+        entityName="эту поставку"
+        actionType="cancel"
+        onConfirm={handleCancelConfirm}
+        onCancel={handleCancelCancel}
+      />
+
+      <div className="my-8">
         <Modal handleClose={handleClose} open={isOpen}>
           <ArrivalForm />
         </Modal>
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
 

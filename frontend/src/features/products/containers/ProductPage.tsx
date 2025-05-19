@@ -1,37 +1,37 @@
-import { Box, Button, Typography } from '@mui/material'
 import ProductsDataList from '../components/ProductsDataList.tsx'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from '../components/ProductForm.tsx'
 import useProductActions from '../hooks/useProductActions.ts'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { Package } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
 
 const ProductPage = () => {
-  const { open, handleOpen, handleClose, fetchAllProducts } = useProductActions(true)
+  const { open, handleOpen, handleClose, fetchAllProducts, loading } = useProductActions(true)
 
   return (
     <>
+      {loading && <Loader />}
+
       <Modal handleClose={handleClose} open={open}>
-        <ProductForm
-          onSuccess={fetchAllProducts}
-        />
+        <ProductForm onSuccess={() => {
+          handleClose()
+          void fetchAllProducts()}
+        } />
       </Modal>
-      <Box display={'flex'}  className="text-center mb-5 mt-7 text-[20px] flex items-center justify-center">
-        <Typography className="flex-grow text-[20px]">Товары</Typography>
-        <Button
-          sx={{
-            color: '#32363F',
-            marginLeft: 'auto',
-            border: '1px solid #32363F',
-            transition: 'all 0.3s ease-in-out',
-            '&:hover': {
-              color: '#ffffff',
-              backgroundColor: '#32363F',
-              border: '1px solid #ffffff',
-            },
-          }}
-          variant="outlined"
-          onClick={() => handleOpen()} >Добавить товар</Button>
-      </Box>
-      <Box><ProductsDataList/></Box>
+
+      <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between">
+        <CustomTitle text={'Товары'} icon={<Package size={25} />} />
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <CustomButton text={'Добавить товар'} onClick={handleOpen} />
+        </ProtectedElement>
+      </div>
+
+      <div className="my-8">
+        <ProductsDataList />
+      </div>
     </>
   )
 }

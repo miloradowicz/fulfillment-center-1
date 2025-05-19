@@ -7,11 +7,12 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import mongoose from 'mongoose'
 
 class LogDto {
   @IsNotEmpty({ message: 'Поле пользователь не должно быть пустым.' })
   @IsMongoId({ message: 'Некорректный формат ID' })
-  user: string
+  user: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле описание изменения не должно быть пустым.' })
   change: string
@@ -22,7 +23,8 @@ class LogDto {
 
 export class CreateTaskDto {
   @IsNotEmpty({ message: 'Поле исполнитель обязательно для заполнения' })
-  user: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  user: mongoose.Types.ObjectId
 
   @IsNotEmpty({ message: 'Поле заголовок задачи обязательно для заполнения' }) title: string
 
@@ -30,21 +32,33 @@ export class CreateTaskDto {
   description?: string
 
   @IsOptional()
+  date_ToDO?: string
+
+  @IsOptional()
+  date_inProgress?: string
+
+  @IsOptional()
+  date_Done?: string
+
+  @IsOptional()
   @IsEnum(['к выполнению', 'в работе', 'готово'], {
     message: 'Статус должен быть одним из: "к выполнению", "в работе", "готово"',
   })
   status: 'к выполнению' | 'в работе' | 'готово'
 
+  @IsOptional()
   @IsEnum(['поставка', 'заказ', 'другое'], {
     message: 'Тип задачи должен быть один из: "поставка", "заказ", "другое"',
   })
   type: 'поставка' | 'заказ' | 'другое'
 
   @IsOptional()
-  associated_order?: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  associated_order?: mongoose.Types.ObjectId | null
 
   @IsOptional()
-  associated_arrival?: string
+  @IsMongoId({ message: 'Некорректный формат ID' })
+  associated_arrival?: mongoose.Types.ObjectId | null
 
   @IsOptional()
   @IsArray({ message: 'Заполните список логов.' })

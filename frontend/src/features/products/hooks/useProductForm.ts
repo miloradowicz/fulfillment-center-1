@@ -1,45 +1,31 @@
-import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { DynamicField, ProductMutation, ProductWithPopulate } from '../../../types'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
-import { selectAllClients } from '../../../store/slices/clientSlice.ts'
-import { fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { addProduct, updateProduct } from '../../../store/thunks/productThunk.ts'
+import { DynamicField, ProductMutation, ProductWithPopulate } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
+import { selectAllClients } from '@/store/slices/clientSlice.ts'
+import { fetchClients } from '@/store/thunks/clientThunk.ts'
+import { addProduct, updateProduct } from '@/store/thunks/productThunk.ts'
 import {
   selectCreateProductError,
   selectLoadingAddProduct,
   selectLoadingUpdateProduct,
-} from '../../../store/slices/productSlice.ts'
+} from '@/store/slices/productSlice.ts'
+import { ErrorMessagesList } from '@/messages.ts'
+import { PopoverType } from '@/components/CustomSelect/CustomSelect'
+import { dynamicFieldState, ErrorProduct, initialErrorProductState, initialProductState } from '../utils/ProductStateAndTypes.ts'
 
-const initialState: ProductMutation = {
-  client: '',
-  title: '',
-  amount: 0,
-  barcode: '',
-  article: '',
-  documents: [],
-  dynamic_fields: [],
-}
-
-const dynamicFieldState: DynamicField = {
-  key: '',
-  label: '',
-  value: '',
-}
-
-const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void) => {
+const useProductForm = (initialData?: ProductWithPopulate, onSuccess?: () => void) => {
   const [form, setForm] = useState<ProductMutation>(
-    initialData? {
-      client: initialData.client._id,
-      title: initialData.title,
-      amount: initialData.amount,
-      barcode: initialData.barcode,
-      article: initialData.article,
-    } : { ...initialState },
+    initialData
+      ? {
+        client: initialData.client._id,
+        title: initialData.title,
+        barcode: initialData.barcode,
+        article: initialData.article,
+      }
+      : { ...initialProductState },
   )
-  const [selectedClient, setSelectedClient] = useState(
-    initialData?  initialData.client._id : '',
-  )
+  const [activePopover, setActivePopover] = useState<PopoverType>(null)
 
   const [dynamicFields, setDynamicFields] = useState<DynamicField[]>(
     initialData?.dynamic_fields
@@ -52,9 +38,8 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
   )
   const [newField, setNewField] = useState<DynamicField>(dynamicFieldState)
   const [showNewFieldInputs, setShowNewFieldInputs] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
+  const [errorsBlur, setErrorsBlur] = useState<ErrorProduct>(initialErrorProductState)
   const dispatch = useAppDispatch()
   const clients = useAppSelector(selectAllClients)
   const loadingAdd = useAppSelector(selectLoadingAddProduct)
@@ -67,47 +52,41 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
 
   const inputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
-    if (name === 'amount') {
-      const amountValue = value === '' ? 0 : Number(value)
-      if (amountValue < 0 || isNaN(amountValue)) return
-      setForm(prevState => ({
-        ...prevState,
-        [name]: amountValue,
-      }))
-    } else {
-      setForm(prevState => ({
-        ...prevState,
-        [name]: value,
-      }))
-    }
+
+    setForm(prevState => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null
-    if (selectedFile) {
-      const maxFileSize = 10 * 1024 * 1024
-      if (selectedFile.size > maxFileSize) {
-        toast.warn('Размер файла слишком большой. Максимальный размер: 10MB')
-        setFile(null)
-        return
-      }
-      setFile(selectedFile)
+  const handleBlur = (field: keyof ErrorProduct, value: string | number) => {
+    type ErrorMessages = {
+      [key in keyof ErrorProduct]: string
     }
+
+    const errorMessages: ErrorMessages = {
+      client: !value ? ErrorMessagesList.ClientErr : '',
+      title: !value ? ErrorMessagesList.ProductTitle : '',
+      barcode: !value ? ErrorMessagesList.ProductBarcode : '',
+      article: !value ? ErrorMessagesList.ProductArticle : '',
+    }
+
+    setErrors(prev => ({
+      ...prev,
+      [field]: errorMessages[field] || '',
+    }))
   }
 
   const addDynamicField = () => {
     if (!newField.key.trim() || !newField.label.trim()) return
-
     setDynamicFields(prev => [...prev, newField])
     setNewField(dynamicFieldState)
     setShowNewFieldInputs(false)
   }
 
-  const onChangeDynamicFieldValue = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const onChangeDynamicFieldValue = (index: number, e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value
     setDynamicFields(prev => prev.map((field, i) => (i === index ? { ...field, value } : field)))
     setErrors(prevErrors => ({ ...prevErrors, [`dynamicField_${ index }`]: '' }))
@@ -121,35 +100,24 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     }
 
     try {
-      const formData = new FormData()
-      formData.append('client', form.client)
-      formData.append('title', form.title)
-      formData.append('amount', String(form.amount))
-      formData.append('barcode', form.barcode)
-      formData.append('article', form.article)
-
-      if (dynamicFields.length > 0) {
-        formData.append('dynamic_fields', JSON.stringify(dynamicFields))
-      }
-
-      if (file) {
-        formData.append('documents', file)
+      const updatedForm = {
+        ...form,
+        dynamic_fields: dynamicFields,
       }
 
       if (initialData) {
-        await dispatch(updateProduct({ productId: initialData._id, data: formData })).unwrap()
+        await dispatch(updateProduct({ productId: initialData._id, data: updatedForm })).unwrap()
         onSuccess?.()
         toast.success('Товар успешно обновлен.')
       } else {
-        await dispatch(addProduct(formData)).unwrap()
+        await dispatch(addProduct(updatedForm)).unwrap()
         onSuccess?.()
         toast.success('Товар успешно создан.')
-        setForm(initialState)
+        setForm(initialProductState)
         setDynamicFields([])
-        setSelectedClient('')
       }
-      setFile(null)
       setErrors({})
+      setErrorsBlur(initialErrorProductState)
     } catch (e) {
       console.error(e)
     }
@@ -159,19 +127,16 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
     const newErrors: Record<string, string> = {}
 
     if (!form.client) {
-      newErrors.client = 'Поле "Клиент" обязательно для заполнения!'
+      newErrors.client = ErrorMessagesList.ClientErr
     }
     if (!form.title.trim()) {
-      newErrors.title = 'Поле "Название" обязательно для заполнения!'
-    }
-    if (form.amount === 0) {
-      newErrors.amount = 'Поле "Количество" обязательно для заполнения!'
+      newErrors.title = ErrorMessagesList.ProductTitle
     }
     if (!form.barcode.trim()) {
-      newErrors.barcode = 'Поле "Баркод" обязательно для заполнения!'
+      newErrors.barcode = ErrorMessagesList.ProductBarcode
     }
     if (!form.article.trim()) {
-      newErrors.article = 'Поле "Артикул" обязательно для заполнения!'
+      newErrors.article = ErrorMessagesList.ProductArticle
     }
 
     setErrors(newErrors)
@@ -180,28 +145,26 @@ const useProductForm = (initialData?: ProductWithPopulate, onSuccess?:() => void
 
   return {
     form,
-    selectedClient,
     dynamicFields,
     newField,
     showNewFieldInputs,
-    file,
     clients,
     loadingAdd,
     loadingUpdate,
     inputChangeHandler,
-    handleFileChange,
     addDynamicField,
     onChangeDynamicFieldValue,
     onSubmit,
     setForm,
     setDynamicFields,
-    setSelectedClient,
-    setFile,
     setNewField,
     setShowNewFieldInputs,
-    setErrors,
     errors,
     createError,
+    activePopover,
+    setActivePopover,
+    errorsBlur,
+    handleBlur,
   }
 }
 

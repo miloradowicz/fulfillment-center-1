@@ -16,17 +16,17 @@ export class Product {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
   })
-  client: string
+  client: mongoose.Types.ObjectId
+
   @Prop({ required: true })
   title: string
-  @Prop({ required: true })
-  amount: number
+
   @Prop({ required: true })
   barcode: string
+
   @Prop({ required: true })
   article: string
-  @Prop()
-  documents: [{ document: string }]
+
   @Prop()
   dynamic_fields: [
     {
@@ -35,6 +35,7 @@ export class Product {
       value: string
     },
   ]
+
   @Prop({
     type: [
       {
@@ -46,7 +47,7 @@ export class Product {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

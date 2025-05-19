@@ -1,0 +1,84 @@
+name: Deploy to DigitalOcean droplet
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  HOST: ${{ secrets.HOST }}
+  PRINCIPAL: ${{ secrets.PRINCIPAL }}
+  MONGO_VOLUME: ${{ secrets.MONGO_VOLUME }}
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.get_timestamp.outputs.timestamp }}
+      db-needs-creating: ${{ steps.check_db_volume.outputs.db-needs-creating }}
+      db-needs-seeding: ${{ steps.create_db_volume.outputs.db-needs-seeding }}
+
+    steps:
+      - name: Checkout the main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install ssh keys
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_DEPLOYMENT_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Create a remote docker context
+        run: docker context create remote --docker "host=ssh://${{ env.PRINCIPAL }}@${{ env.HOST }}"
+
+      - name: Check if the database volume exists
+        id: check_db_volume
+        run: |
+          if ! docker --context remote volume ls | tr -s ' ' | cut -d ' ' -f2 | grep -x ${{ env.MONGO_VOLUME }}; then
+            echo db-needs-creating=true >> $GITHUB_OUTPUT;
+          fi
+
+      - name: Create the database volume if it does not exist
+        id: create_db_volume
+        if: ${{ steps.check_db_volume.outputs.db-needs-creating == 'true' }}
+        run: |
+          docker --context remote volume create ${{ env.MONGO_VOLUME }}
+          echo db-needs-seeding=true >> $GITHUB_OUTPUT
+
+      - name: Get timestamp
+        id: get_timestamp
+        run: echo timestamp=$(date +%s)
+
+      - name: Build the project on the remote
+        run: |
+          docker --context remote compose build \
+            --build-arg KEEP_CACHE=${{ steps.get_timestamp.outputs.timestamp }} \
+            --build-arg API_HOST=${{ env.HOST }}
+
+      - name: Build the seeder if the database volume has been just created
+        if: ${{ steps.create_db_volume.outputs.db-needs-seeding == 'true' }}
+        run: docker --context remote build -t seeder -f api/src/seeder/Dockerfile --build-arg KEEP_CACHE=${{ steps.get_timestamp.outputs.timestamp }} api
+
+      - name: Start the project on the remote
+        run: docker --context remote compose up -d
+        env:
+          WEB_HOST: ${{ env.HOST }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+          MONGO_VOLUME: ${{ env.MONGO_VOLUME }}
+
+      - name: Seed the database if the database volume has been just created
+        if: ${{ steps.create_db_volume.outputs.db-needs-seeding == 'true' }}
+        run: |
+          docker --context remote run \
+            --network backend \
+            -e MONGO_HOST=db \
+            -e MONGO_USERNAME=${{ secrets.MONGO_USERNAME }} \
+            -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+            seeder

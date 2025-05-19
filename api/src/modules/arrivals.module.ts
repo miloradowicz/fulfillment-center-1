@@ -5,10 +5,14 @@ import { DbModule } from './db.module'
 import { ValidatorsModule } from './validators.module'
 import { AuthModule } from './auth.module'
 import { CounterService } from '../services/counter.service'
+import { FilesModule } from './file-upload.module'
+import { StockManipulationService } from 'src/services/stock-manipulation.service'
+import { FilesService } from '../services/files.service'
+import { LogsService } from '../services/logs.service'
 
 @Module({
-  imports: [DbModule, AuthModule, ValidatorsModule],
+  imports: [DbModule, AuthModule, ValidatorsModule, FilesModule],
   controllers: [ArrivalsController],
-  providers: [ArrivalsService, CounterService],
+  providers: [ArrivalsService, CounterService, StockManipulationService, FilesService, LogsService],
 })
-export class ArrivalsModule {}
+export class ArrivalsModule { }

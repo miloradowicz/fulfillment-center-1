@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useEffect, useState } from 'react'
-import { deleteStock, fetchStockById } from '../../../store/thunks/stocksThunk.ts'
-import { selectIsStocksLoading, selectOneStock } from '../../../store/slices/stocksSlice.ts'
+import { archiveStock, fetchArchivedStocks, fetchStockById, fetchStocks } from '@/store/thunks/stocksThunk.ts'
+import { selectIsStocksLoading, selectOneStock } from '@/store/slices/stocksSlice.ts'
 import { toast } from 'react-toastify'
-import { hasMessage } from '../../../utils/helpers.ts'
+import { hasMessage } from '@/utils/helpers.ts'
 
 export const useStockDetails = () => {
   const { stockId } = useParams()
@@ -13,8 +13,17 @@ export const useStockDetails = () => {
   const isLoading = useAppSelector(selectIsStocksLoading)
   const navigate = useNavigate()
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+  const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const [writeOffModalOpen, setWriteOffModalOpen] = useState(false)
+  const [currentTab, setCurrentTab] = useState('products')
+
+  const tabs = [
+    { value: 'products', label: 'Товары' },
+    { value: 'defects', label: 'Брак' },
+    { value: 'write-offs', label: 'Списания' },
+    { value: 'logs', label: 'История' },
+  ]
 
   const stockColumns = [
     { field: 'client', headerName: 'Клиент', flex: 1 },
@@ -30,48 +39,67 @@ export const useStockDetails = () => {
     }
   }, [dispatch, stockId])
 
-  const navigateBack = () => {
-    navigate(-1)
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const tab = searchParams.get('tab')
+    if (tab) setCurrentTab(tab)
+  }, [])
+
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value)
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.set('tab', value)
+    window.history.replaceState(null, '', `${ location.pathname }?${ searchParams.toString() }`)
   }
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (stockId) {
       try {
-        await dispatch(deleteStock(stockId)).unwrap()
+        await dispatch(archiveStock(stockId)).unwrap()
+        await dispatch(fetchStocks())
+        await dispatch(fetchArchivedStocks())
+        toast.success('Склад успешно архивирован!')
         navigate('/stocks')
-        toast.success('Склад успешно удален')
       } catch (e) {
         if (hasMessage(e)) {
-          toast.error(e.message || 'Ошибка удаления')
+          toast.error(e.message || 'Ошибка архивирования')
         } else {
           console.error(e)
           toast.error('Неизвестная ошибка')
         }
       }
     }
-
-    hideDeleteModal()
+    hideArchiveModal()
   }
 
-  const showDeleteModal = () => {
-    setDeleteModalOpen(true)
+  const showArchiveModal = () => {
+    setArchiveModalOpen(true)
   }
 
-  const hideDeleteModal = () => {
-    setDeleteModalOpen(false)
+  const hideArchiveModal = () => {
+    setArchiveModalOpen(false)
   }
+
+  const openWriteOffModal = () => setWriteOffModalOpen(true)
+  const closeWriteOffModal = () => setWriteOffModalOpen(false)
 
   return {
     stock,
     stockId,
     isLoading,
     stockColumns,
-    deleteModalOpen,
-    showDeleteModal,
-    hideDeleteModal,
-    handleDelete,
-    navigateBack,
+    archiveModalOpen,
+    showArchiveModal,
+    hideArchiveModal,
+    handleArchive,
     editModalOpen,
     setEditModalOpen,
+    writeOffModalOpen,
+    openWriteOffModal,
+    closeWriteOffModal,
+    tabs,
+    currentTab,
+    handleTabChange,
   }
 }

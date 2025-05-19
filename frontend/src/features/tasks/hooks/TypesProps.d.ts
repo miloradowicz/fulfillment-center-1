@@ -1,21 +1,27 @@
-import { TaskWithPopulate, User } from '../../../types'
+import { TaskWithPopulate, UserStripped } from '@/types'
 
 export interface TaskLineProps {
   title: string;
   items: TaskWithPopulate[];
   selectedUser: string | null
+  activeColumnId: string | null
 }
 
 export interface TaskCardProps {
   task: TaskWithPopulate
-  index: number
-  parent: string
+  index?: number
+  parent?: string
   selectedUser: string | null
 }
 
-interface UserListProps {
-  users: User[]
+export interface UserListProps {
+  users: UserStripped[]
   selectedUser: string | null
   setSelectedUser: (userId: string | null) => void
 }
 
+export interface PropsStatus {
+  task: TaskWithPopulate,
+  selectedUser: string | null
+  taskId?: string
+}

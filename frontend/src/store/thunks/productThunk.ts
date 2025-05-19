@@ -1,12 +1,20 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import axiosAPI from '../../utils/axiosAPI.ts'
-import { GlobalError, Product, ProductMutation, ProductWithPopulate, ValidationError } from '../../types'
+import axiosAPI from '@/utils/axiosAPI.ts'
+import { GlobalError, Product, ProductMutation, ProductWithPopulate, ValidationError } from '@/types'
 import { isAxiosError } from 'axios'
 
 export const fetchProducts = createAsyncThunk<Product[]>(
   'products/fetchProducts',
   async () => {
     const response = await axiosAPI.get('/products')
+    return response.data
+  },
+)
+
+export const fetchArchivedProducts = createAsyncThunk<ProductWithPopulate[]>(
+  'clients/fetchArchivedProducts',
+  async () => {
+    const response = await axiosAPI.get('/products/archived/all?populate=1')
     return response.data
   },
 )
@@ -43,13 +51,11 @@ export const fetchProductsWithPopulate = createAsyncThunk<ProductWithPopulate[]>
   },
 )
 
-export const addProduct = createAsyncThunk<Product, ProductMutation | FormData, { rejectValue: ValidationError }>(
+export const addProduct = createAsyncThunk<Product, ProductMutation, { rejectValue: ValidationError }>(
   'products/addProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await axiosAPI.post('/products', productData, {
-        headers: productData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
-      })
+      const response = await axiosAPI.post('/products', productData)
       return response.data
     } catch (e) {
       if (isAxiosError(e) && e.response) {
@@ -75,6 +81,21 @@ export const archiveProduct = createAsyncThunk<{ id: string }, string, { rejectV
   },
 )
 
+export const unarchiveProduct = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'products/unarchiveProduct',
+  async (productId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/products/${ productId }/unarchive`)
+      return { id: productId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 export const deleteProduct = createAsyncThunk<void, string, { rejectValue: GlobalError }
 >('products/deleteProduct', async (productId: string, { rejectWithValue }) => {
   try {
@@ -87,7 +108,7 @@ export const deleteProduct = createAsyncThunk<void, string, { rejectValue: Globa
   }
 })
 
-export const updateProduct = createAsyncThunk<void, { productId: string; data: FormData  }, { rejectValue: ValidationError }>(
+export const updateProduct = createAsyncThunk<void, { productId: string; data: ProductMutation }, { rejectValue: ValidationError }>(
   'products/updateProduct',
   async ({ productId, data }, { rejectWithValue }) => {
     try {

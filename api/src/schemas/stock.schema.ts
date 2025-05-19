@@ -21,16 +21,44 @@ export class Stock {
     type: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        description: { type: String },
         amount: { type: Number, required: true },
       },
     ],
     default: [],
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
-    description: string
+    product: mongoose.Types.ObjectId
     amount: number
+  }[]
+
+  @Prop({
+    type: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        amount: { type: Number, required: true },
+      },
+    ],
+    default: [],
+  })
+  defects: {
+    product: mongoose.Types.ObjectId
+    amount: number
+  }[]
+
+  @Prop({
+    type: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        amount: { type: Number, required: true },
+        reason: { type: String, required: true },
+      },
+    ],
+    default: [],
+  })
+  write_offs: {
+    product: mongoose.Types.ObjectId
+    amount: number
+    reason: string
   }[]
 
   @Prop({
@@ -44,7 +72,7 @@ export class Stock {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

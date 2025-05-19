@@ -5,13 +5,21 @@ import {
   Task,
   TaskMutation,
   TaskWithPopulate, ValidationError,
-} from '../../types'
+} from '@/types'
 import { isAxiosError } from 'axios'
 
 export const fetchTasks = createAsyncThunk<Task[]>(
   'tasks/fetchTasks',
   async () => {
     const response = await axiosAPI.get('/tasks')
+    return response.data
+  },
+)
+
+export const fetchArchivedTasks = createAsyncThunk<TaskWithPopulate[]>(
+  'tasks/fetchArchivedTasks',
+  async () => {
+    const response = await axiosAPI.get('/tasks/archived/all?populate=1')
     return response.data
   },
 )
@@ -39,10 +47,10 @@ export const fetchTasksByUserIdWithPopulate = createAsyncThunk<TaskWithPopulate[
   },
 )
 
-export const fetchTaskById = createAsyncThunk<Task, string>(
+export const fetchTaskById = createAsyncThunk<TaskWithPopulate, string>(
   'tasks/fetchTaskById',
   async (taskId: string) => {
-    const response = await axiosAPI.get(`/tasks/?=${ taskId }`)
+    const response = await axiosAPI.get(`/tasks/${ taskId }`)
     return response.data
   },
 )
@@ -81,6 +89,21 @@ export const archiveTask = createAsyncThunk<{ id: string }, string>(
   },
 )
 
+export const unarchiveTask = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'tasks/unarchiveTask',
+  async (taskId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/tasks/${ taskId }/unarchive`)
+      return { id: taskId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
 
 export const updateTask = createAsyncThunk<
   void,
@@ -97,4 +120,16 @@ export const updateTask = createAsyncThunk<
   }
 })
 
-
+export const updateTaskStatus = createAsyncThunk<void, { taskId: string; data: TaskMutation }, { rejectValue: GlobalError }>(
+  'tasks/updateTaskStatus',
+  async ({ taskId, data }, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/tasks/${ taskId }/status`, data)
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)

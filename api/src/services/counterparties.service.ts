@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Counterparty, CounterpartyDocument } from '../schemas/counterparty.schema'
@@ -10,11 +10,13 @@ export class CounterpartiesService {
   constructor(@InjectModel(Counterparty.name) private readonly counterpartyModel: Model<CounterpartyDocument>) {}
 
   async getAll() {
-    return this.counterpartyModel.find({ isArchived: false }).exec()
+    const counterparties = await this.counterpartyModel.find({ isArchived: false }).exec()
+    return counterparties.reverse()
   }
 
-  async getAllWithArchived() {
-    return this.counterpartyModel.find().exec()
+  async getAllArchived() {
+    const counterparties = await this.counterpartyModel.find({ isArchived: true }).exec()
+    return counterparties.reverse()
   }
 
   async getById(id: string) {
@@ -27,19 +29,37 @@ export class CounterpartiesService {
     return counterparty
   }
 
-  async getByIdWithArchived(id: string) {
+  async getArchivedById(id: string) {
     const counterparty = await this.counterpartyModel.findById(id).exec()
 
     if (!counterparty) throw new NotFoundException('Контрагент не найден')
+    if (!counterparty.isArchived) throw new ForbiddenException('Этот контрагент не в архиве')
 
     return counterparty
   }
 
   async create(counterpartyDto: CreateCounterpartyDto) {
+    const existingCounterparty = await this.counterpartyModel.findOne({ name: counterpartyDto.name }).exec()
+    if (existingCounterparty) {
+      throw new BadRequestException({
+        message: 'Контрагент с таким именем уже существует',
+        errors: { name: 'Имя должно быть уникальным' },
+      })
+    }
+
     return this.counterpartyModel.create(counterpartyDto)
   }
 
   async update(id: string, counterpartyDto: UpdateCounterpartyDto) {
+    const existingCounterparty = await this.counterpartyModel.findOne({ name: counterpartyDto.name }).exec()
+
+    if (existingCounterparty && existingCounterparty.id !== id) {
+      throw new BadRequestException({
+        message: 'Контрагент с таким именем уже существует',
+        errors: { name: 'Имя должно быть уникальным' },
+      })
+    }
+
     const counterparty = await this.counterpartyModel.findByIdAndUpdate(id, counterpartyDto, { new: true }).exec()
     if (!counterparty) {
       throw new NotFoundException('Контрагент не найден')
@@ -49,7 +69,6 @@ export class CounterpartiesService {
 
   async archive(id: string) {
     const counterparty = await this.counterpartyModel.findById(id).exec()
-
     if (!counterparty) throw new NotFoundException('Контрагент не найден')
     if (counterparty.isArchived) throw new ForbiddenException('Контрагент уже в архиве')
 
@@ -57,6 +76,19 @@ export class CounterpartiesService {
     await counterparty.save()
 
     return { message: 'Контрагент перемещен в архив' }
+  }
+
+  async unarchive(id: string) {
+    const counterparty = await this.counterpartyModel.findById(id)
+
+    if (!counterparty) throw new NotFoundException('Контрагент не найден')
+
+    if (!counterparty.isArchived) throw new ForbiddenException('Контрагент не находится в архиве')
+
+    counterparty.isArchived = false
+    await counterparty.save()
+
+    return { message: 'Контрагент восстановлен из архива' }
   }
 
   async delete(id: string) {

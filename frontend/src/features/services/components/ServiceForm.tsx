@@ -1,103 +1,183 @@
 import useServiceForm from '../hooks/useServiceForm'
-import { Button, CircularProgress, TextField, Typography } from '@mui/material'
-import Grid from '@mui/material/Grid2'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
+import { Button } from '@/components/ui/button'
+import { CheckIcon, ChevronDownIcon, LoaderCircle, X } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ChangeEvent } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Progress } from '@/components/ui/progress'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { ScrollArea } from '@/components/ui/scroll-area.tsx'
+import { cn } from '@/lib/utils'
+import { Textarea } from '@/components/ui/textarea.tsx'
 
-const ServiceForm = ({ onClose }: { onClose: () => void }) => {
+const ServiceForm = ({ serviceId, onClose }: { serviceId?: string; onClose: () => void }) => {
   const {
     form,
-    dynamicFields,
-    newField,
-    showNewFieldInputs,
     loading,
-    inputChangeHandler,
-    addDynamicField,
-    onChangeDynamicFieldValue,
+    serviceCategories,
+    addCategoryLoading,
+    fetchCategoryLoading,
+    handleInputChange,
+    handleAutocompleteChange,
+    handleDeleteCategory,
     onSubmit,
-    setNewField,
-    setShowNewFieldInputs,
     errors,
-    handleCancel,
-  } = useServiceForm(onClose)
+    inputValue,
+    setInputValue,
+    open,
+    setOpen,
+  } = useServiceForm(serviceId, onClose)
 
   return (
-    <form onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
-        Добавить новую услугу
-      </Typography>
-      <Grid container direction="column" spacing={2}>
-        <Grid>
-          <TextField
-            name="name"
-            label="Название"
-            value={form.name}
-            onChange={inputChangeHandler}
-            fullWidth
-            size="small"
-            error={!!errors.name}
-            helperText={errors.name}
-          />
-        </Grid>
-        <Typography variant="h6">Дополнительные параметры</Typography>
-        {dynamicFields.map((field, i) => (
-          <Grid key={i} sx={{ mb: 2 }}>
-            <TextField
-              name={field.label}
-              label={field.label}
-              fullWidth
-              size="small"
-              value={field.value || ''}
-              onChange={e => onChangeDynamicFieldValue(i, e)}
-              error={!!errors[`dynamicField_${ i }`]}
-              helperText={errors[`dynamicField_${ i }`] || ''}
-            />
-          </Grid>
-        ))}
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {serviceId ? 'Редактировать услугу' : 'Добавить новую услугу'}
+      </h3>
 
-        {showNewFieldInputs && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid>
-              <TextField
-                label="Ключ"
-                value={newField.key}
-                onChange={e => setNewField({ ...newField, key: e.target.value })}
-                fullWidth
-                size="small"
-                error={!!errors.newFieldKey}
-                helperText={errors.newFieldKey || ''}
+      <div className="space-y-1">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              role="combobox"
+              className={cn(
+                'w-full flex justify-between items-center px-2 py-2 border rounded-md text-sm cursor-pointer text-muted-foreground',
+                open && 'bg-muted',
+                form.serviceCategory && 'text-primary',
+                errors.serviceCategory && 'border-destructive',
+              )}
+            >
+              {form.serviceCategory?.name || 'Выберите/создайте категорию'}
+              <ChevronDownIcon className="ml-2 h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+            <Command shouldFilter={true}>
+              <CommandInput
+                placeholder="Поиск категории..."
+                value={inputValue}
+                onValueChange={value => {
+                  setInputValue(value)
+                }}
               />
-            </Grid>
-            <Grid>
-              <TextField
-                label="Название"
-                value={newField.label}
-                onChange={e => setNewField({ ...newField, label: e.target.value })}
-                fullWidth
-                size="small"
-                error={!!errors.newFieldLabel}
-                helperText={errors.newFieldLabel || ''}
-              />
-            </Grid>
-            <Grid>
-              <Button variant="contained" onClick={addDynamicField}>
-                Добавить
-              </Button>
-              <Button variant="outlined" color="error" onClick={handleCancel} sx={{ ml: 1 }}>
-                Отмена
-              </Button>
-            </Grid>
-          </Grid>
-        )}
+              {inputValue && !serviceCategories.some(cat => cat.name.toLowerCase() === inputValue.toLowerCase()) && (
+                <CommandEmpty>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="cursor-pointer text-sm"
+                    onClick={() => {
+                      void handleAutocompleteChange(null, inputValue)
+                      setInputValue('')
+                    }}
+                  >
+                    Добавить категорию «{inputValue}»
+                  </Button>
+                </CommandEmpty>
+              )}
+              <ScrollArea>
+                <CommandGroup>
+                  {serviceCategories.map(category => (
+                    <CommandItem
+                      key={category._id}
+                      value={category.name}
+                      onSelect={() => {
+                        void handleAutocompleteChange(null, category)
+                        setInputValue('')
+                        setOpen(false)
+                      }}
+                      className="rounded-md truncate"
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <div className="flex items-center">
+                          <CheckIcon
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              form.serviceCategory?._id === category._id ? 'opacity-100' : 'opacity-0',
+                            )}
+                          />
+                          {category.name}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 hover:bg-transparent"
+                          onClick={e => {
+                            e.stopPropagation()
+                            handleDeleteCategory(category._id)
+                          }}
+                        >
+                          <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </ScrollArea>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        {(addCategoryLoading || fetchCategoryLoading) && <Progress value={0} className="h-1" />}
+        {errors.serviceCategory && <p className="text-sm font-medium text-destructive">{errors.serviceCategory}</p>}
+      </div>
 
-        <Button type="button" onClick={() => setShowNewFieldInputs(true)}>
-          + Добавить дополнительное свойство
-        </Button>
+      <div className="space-y-1">
+        <Select
+          name="type"
+          value={form.type}
+          onValueChange={value =>
+            handleInputChange({
+              target: { name: 'type', value },
+            } as ChangeEvent<HTMLInputElement>)
+          }
+        >
+          <SelectTrigger
+            className={cn(
+              'w-full flex justify-between items-center px-2 py-2 border rounded-md text-sm',
+              errors.type && 'border-destructive',
+            )}
+          >
+            <SelectValue placeholder="Выберите тип услуги" />
+          </SelectTrigger>
 
-        <Grid>
-          <Button type="submit" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Создать услугу'}
-          </Button>
-        </Grid>
-      </Grid>
+          <SelectContent className="max-w-full">
+            <SelectItem value="внутренняя">Внутренняя услуга</SelectItem>
+            <SelectItem value="внешняя">Внешняя услуга</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.type && <p className="text-sm font-medium text-destructive">{errors.type}</p>}
+      </div>
+
+      <InputWithError
+        name="name"
+        placeholder="Название"
+        value={form.name}
+        onChange={handleInputChange}
+        error={errors.name}
+      />
+
+      <InputWithError
+        name="price"
+        placeholder="Цена"
+        value={form.price}
+        onChange={handleInputChange}
+        error={errors.price}
+      />
+
+      <Textarea
+        name="description"
+        placeholder="Описание"
+        value={form.description}
+        onChange={handleInputChange}
+        className="resize-y min-h-[40px] max-h-[250px] text-sm"
+      />
+
+      <Button type="submit" className="w-full mt-3" disabled={loading || addCategoryLoading || fetchCategoryLoading}>
+        {serviceId ? 'Сохранить' : 'Создать'}
+        {loading ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : null}
+      </Button>
     </form>
   )
 }

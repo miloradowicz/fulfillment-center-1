@@ -16,7 +16,6 @@ export class UsersService {
       throw new HttpException(`Пользователь с эл. почтой ${ userDto.email } уже зарегистрирован`, HttpStatus.CONFLICT)
     }
     const user = new this.userModel(userDto)
-    user.generateToken()
     return user.save()
   }
 
@@ -25,6 +24,11 @@ export class UsersService {
     if (!user) {
       throw new UnauthorizedException('Неверный email')
     }
+
+    if (user.isArchived) {
+      throw new ForbiddenException('Ваш аккаунт был деактивирован')
+    }
+
     const isMatch = await user.checkPassword(loginDto.password)
 
     if (!isMatch) {
@@ -51,7 +55,13 @@ export class UsersService {
   }
 
   async getAll() {
-    return this.userModel.find({ isArchived: false }).select('-token')
+    const users = await this.userModel.find({ isArchived: false }).select('-token')
+    return users.reverse()
+  }
+
+  async getArchivedUsers() {
+    const users = await this.userModel.find({ isArchived: true }).select('-token')
+    return users.reverse()
   }
 
   async getById(id: string) {
@@ -64,11 +74,40 @@ export class UsersService {
     return user
   }
 
+  async getArchivedById(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (!user.isArchived) throw new ForbiddenException('Этот пользователь не в архиве')
+
+    return user
+  }
+
   async update(id: string, userDto: UpdateUserDto) {
     const user = await this.userModel.findById(id)
     if (!user) {
       throw new NotFoundException('Пользователь не найден')
     }
+
+    if (userDto.email && userDto.email !== user.email) {
+      const existingUser = await this.userModel.findOne({ email: userDto.email }).exec()
+
+      if (existingUser && existingUser.id !== id) {
+        throw new HttpException({
+          type: 'ValidationError',
+          errors: {
+            email: {
+              name: 'DtoValidationError',
+              messages: [
+                'Пользователь с такой электронной почтой уже существует',
+              ],
+            },
+          },
+        }, HttpStatus.BAD_REQUEST)
+      }
+    }
+
     Object.assign(user, userDto)
     user.generateToken()
     await user.save()
@@ -83,6 +122,19 @@ export class UsersService {
     if (user.isArchived) throw new ForbiddenException('Пользователь уже в архиве')
 
     return { message: 'Пользователь перемещен в архив' }
+  }
+
+  async unarchive(id: string) {
+    const user = await this.userModel.findById(id)
+
+    if (!user) throw new NotFoundException('Пользователь не найден')
+
+    if (!user.isArchived) throw new ForbiddenException('Пользователь не находится в архиве')
+
+    user.isArchived = false
+    await user.save()
+
+    return { message: 'Пользователь восстановлен из архива' }
   }
 
   async delete(id: string) {

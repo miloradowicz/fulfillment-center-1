@@ -1,16 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import { CreateProductDto } from '../dto/create-product.dto'
 import { UpdateProductDto } from '../dto/update-product.dto'
 import { Product, ProductDocument } from '../schemas/product.schema'
-import { FilesService } from './files.service'
 import { Arrival, ArrivalDocument } from 'src/schemas/arrival.schema'
 import { Order, OrderDocument } from 'src/schemas/order.schema'
-
-interface DocumentObject {
-  document: string;
-}
+import { LogsService } from './logs.service'
 
 interface DynamicFieldDto {
   key: string;
@@ -24,14 +20,14 @@ export class ProductsService {
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     @InjectModel(Arrival.name) private readonly arrivalModel: Model<ArrivalDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    private readonly filesService: FilesService,
+    private readonly logsService: LogsService,
   ) {}
 
   async getById(id: string, populate?: boolean) {
     let product: ProductDocument | null
 
     if (populate) {
-      product = await this.productModel.findById(id).populate('client').exec()
+      product = await this.productModel.findById(id).populate('client').populate({ path: 'logs.user', select: '-password -token' }).exec()
     } else {
       product = await this.productModel.findById(id).exec()
     }
@@ -63,7 +59,36 @@ export class ProductsService {
     return (await unarchived).reverse()
   }
 
-  async create(productDto: CreateProductDto, files: Array<Express.Multer.File> = []) {
+  async getAllArchived(populate: boolean) {
+    const query = this.productModel.find({ isArchived: true })
+
+    if (populate) {
+      query.populate({
+        path: 'client',
+        select: 'name',
+      })
+    }
+
+    return (await query.exec()).reverse()
+  }
+
+  async getArchivedById(id: string, populate?: boolean) {
+    let product: ProductDocument | null
+
+    if (populate) {
+      product = await this.productModel.findById(id).populate('client').exec()
+    } else {
+      product = await this.productModel.findById(id).exec()
+    }
+
+    if (!product) throw new NotFoundException('Товар не найден')
+
+    if (!product.isArchived) throw new ForbiddenException('Этот товар не в архиве')
+
+    return product
+  }
+
+  async create(productDto: CreateProductDto, userId: mongoose.Types.ObjectId) {
 
     const barcode = await this.productModel.findOne({ barcode: productDto.barcode })
     if (barcode) {
@@ -96,30 +121,14 @@ export class ProductsService {
         }
       }
 
-      if (files && files.length > 0) {
-        const documentPaths = files.map(file => ({
-          document: this.filesService.getFilePath(file.filename),
-        }))
+      const log = this.logsService.generateLogForCreate(userId)
 
-        productDto.documents = productDto.documents || []
-        if (typeof productDto.documents === 'string') {
-          try {
-            productDto.documents = JSON.parse(productDto.documents) as DocumentObject[]
-          } catch (_e) {
-            productDto.documents = []
-          }
-        }
-
-        const formattedDocs = Array.isArray(productDto.documents)
-          ? productDto.documents.map((doc: DocumentObject | string) =>
-            typeof doc === 'string' ? { document: doc } : doc,
-          )
-          : []
-
-        productDto.documents = [...formattedDocs, ...documentPaths]
+      const productToCreate = {
+        ...productDto,
+        logs: [log],
       }
 
-      return await this.productModel.create(productDto)
+      return await this.productModel.create(productToCreate)
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
@@ -150,22 +159,43 @@ export class ProductsService {
       $or: [{ products: { $elemMatch: { product: product._id } } }],
     })
 
-    if (orders.length) return true
+    return !!orders.length
 
-    return false
   }
 
-  async archive(id: string) {
+  async archive(id: string, userId: mongoose.Types.ObjectId) {
     if (await this.isLocked(id))
       throw new ForbiddenException('Товар не может быть перемещен в архив, поскольку уже используется в поставках и/или заказах.')
 
-    const product = await this.productModel.findByIdAndUpdate(id, { isArchived: true })
+    const product = await this.productModel.findById(id)
 
     if (!product) throw new NotFoundException('Товар не найден')
 
     if (product.isArchived) throw new ForbiddenException('Товар уже в архиве')
 
+    product.isArchived = true
+    const log = this.logsService.generateLogForArchive(userId, product.isArchived)
+
+    product.logs.push(log)
+    await product.save()
+
     return { message: 'Товар перемещен в архив' }
+  }
+
+  async unarchive(id: string, userId: mongoose.Types.ObjectId) {
+    const product = await this.productModel.findById(id)
+
+    if (!product) throw new NotFoundException('Продукт не найден')
+
+    if (!product.isArchived) throw new ForbiddenException('Продукт не находится в архиве')
+
+    product.isArchived = false
+    const log = this.logsService.generateLogForArchive(userId, product.isArchived)
+
+    product.logs.push(log)
+    await product.save()
+
+    return { message: 'Продукт восстановлен из архива' }
   }
 
   async delete(id: string) {
@@ -189,11 +219,19 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, productDto: UpdateProductDto, files: Array<Express.Multer.File> = []) {
-    const existingProduct = await this.getById(id)
+  async update(id: string, productDto: UpdateProductDto, userId: mongoose.Types.ObjectId) {
+    const existingProduct = await this.productModel.findById(id)
     if (!existingProduct){
       throw new NotFoundException('Товар не найден')
     }
+
+    const productDtoObj = { ...productDto }
+
+    const log = this.logsService.trackChanges(
+      existingProduct.toObject(),
+      productDtoObj,
+      userId,
+    )
 
     if (productDto.barcode !== existingProduct.barcode) {
       const barcodeExists = await this.productModel.findOne({ barcode: productDto.barcode })
@@ -226,20 +264,13 @@ export class ProductsService {
         }
       }
 
-      if (files && files.length > 0) {
-        const documentPaths = files.map(file => ({
-          document: this.filesService.getFilePath(file.filename),
-        }))
+      existingProduct.set(productDto)
 
-        const existingDocs = existingProduct.documents || []
-        productDto.documents = [...existingDocs, ...documentPaths]
+      if (log) {
+        existingProduct.logs.push(log)
       }
 
-      return this.productModel.findByIdAndUpdate(
-        id,
-        productDto,
-        { new: true }
-      )
+      await existingProduct.save()
     } catch (error: unknown) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error

@@ -2,6 +2,7 @@ import { IsEnum, IsNotEmpty, Matches, MinLength } from 'class-validator'
 import { MongoDocumentExists } from 'src/validators/mongo-document-exists'
 import { User } from 'src/schemas/user.schema'
 import { Regex } from 'src/enums'
+import { RolesList, RolesType } from 'src/enums'
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Заполните поле эл. почту.' })
@@ -19,8 +20,8 @@ export class CreateUserDto {
   displayName: string
 
   @IsNotEmpty({ message: 'Заполните поле роль.' })
-  @IsEnum(['super-admin', 'admin', 'manager', 'stock-worker'], {
+  @IsEnum(RolesList, {
     message: 'Неверная роль. Доступные значения: super-admin, admin, manager, stock-worker.',
   })
-  role: 'super-admin' | 'admin' | 'manager' | 'stock-worker'
+  role: RolesType
 }

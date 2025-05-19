@@ -1,15 +1,18 @@
-import { Arrival, ArrivalWithClient, ArrivalWithPopulate, ValidationError } from '../../types'
+import { Arrival, ArrivalWithClient, ArrivalWithPopulate, GlobalError, ValidationError } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
-import { RootState } from '../../app/store.ts'
+import { RootState } from '@/app/store.ts'
 import {
   addArrival,
   archiveArrival,
+  cancelArrival,
   deleteArrival,
+  fetchArchivedArrivals,
   fetchArrivalById,
   fetchArrivalByIdWithPopulate,
   fetchArrivals,
   fetchArrivalsByClientId,
   fetchPopulatedArrivals,
+  unarchiveArrival,
   updateArrival,
 } from '../thunks/arrivalThunk.ts'
 
@@ -18,12 +21,16 @@ interface ArrivalState {
   arrivalsPopulate: ArrivalWithClient[] | null;
   arrivalWithPopulate: ArrivalWithPopulate | null;
   arrivals: Arrival[] | null;
+  archivedArrivals: ArrivalWithClient[] | null;
   loadingFetch: boolean;
+  loadingFetchArchive: boolean;
   loadingAdd: boolean;
   loadingArchive: boolean;
-  loadingDelete: boolean;
+  loadingUnarchive: boolean;
+  loadingCancel: boolean;
   loadingUpdate: boolean;
-  error: boolean;
+  loadingDelete: boolean;
+  error: GlobalError | boolean;
   createAndUpdateError: ValidationError | null;
 }
 
@@ -32,11 +39,15 @@ const initialState: ArrivalState = {
   arrivalWithPopulate: null,
   arrivalsPopulate: null,
   arrivals: null,
+  archivedArrivals: null,
   loadingFetch: false,
+  loadingFetchArchive: false,
   loadingAdd: false,
   loadingArchive: false,
-  loadingDelete: false,
+  loadingUnarchive: false,
+  loadingCancel: false,
   loadingUpdate: false,
+  loadingDelete: false,
   error: false,
   createAndUpdateError: null,
 }
@@ -44,12 +55,15 @@ const initialState: ArrivalState = {
 export const selectArrival = (state: RootState) => state.arrivals.arrival
 export const selectArrivalWithPopulate = (state: RootState) => state.arrivals.arrivalWithPopulate
 export const selectAllArrivals = (state: RootState) => state.arrivals.arrivals
+export const selectAllArchivedArrivals = (state: RootState) => state.arrivals.archivedArrivals
 export const selectPopulatedArrivals = (state: RootState) => state.arrivals.arrivalsPopulate
 export const selectLoadingFetchArrival = (state: RootState) => state.arrivals.loadingFetch
+export const selectLoadingFetchArchivedArrivals = (state: RootState) => state.arrivals.loadingFetchArchive
 export const selectLoadingAddArrival = (state: RootState) => state.arrivals.loadingAdd
 export const selectLoadingArchiveArrival = (state: RootState) => state.arrivals.loadingArchive
-export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
+export const selectLoadingCancelArrival = (state: RootState) => state.arrivals.loadingCancel
 export const selectLoadingUpdateArrival = (state: RootState) => state.arrivals.loadingUpdate
+export const selectLoadingDeleteArrival = (state: RootState) => state.arrivals.loadingDelete
 export const selectArrivalError = (state: RootState) => state.arrivals.error
 export const selectCreateError = (state: RootState) => state.arrivals.createAndUpdateError
 
@@ -58,6 +72,22 @@ const arrivalSlice = createSlice({
   initialState,
   reducers: {
     clearErrorArrival: state => {
+      state.createAndUpdateError = null
+    },
+    clearAll: state => {
+      state.arrival = null
+      state.arrivalWithPopulate = null
+      state.arrivalsPopulate = null
+      state.arrivals = null
+      state.archivedArrivals = null
+      state.loadingFetch = false
+      state.loadingFetchArchive = false
+      state.loadingAdd = false
+      state.loadingArchive = false
+      state.loadingUnarchive = false
+      state.loadingCancel = false
+      state.loadingUpdate = false
+      state.error = false
       state.createAndUpdateError = null
     },
   },
@@ -74,6 +104,16 @@ const arrivalSlice = createSlice({
       .addCase(fetchArrivals.rejected, state => {
         state.loadingFetch = false
         state.error = true
+      })
+      .addCase(fetchArchivedArrivals.pending, state => {
+        state.loadingFetchArchive = true
+      })
+      .addCase(fetchArchivedArrivals.fulfilled, (state, action) => {
+        state.loadingFetchArchive = false
+        state.archivedArrivals = action.payload
+      })
+      .addCase(fetchArchivedArrivals.rejected, state => {
+        state.loadingFetchArchive = false
       })
       .addCase(fetchArrivalById.pending, state => {
         state.loadingFetch = true
@@ -154,6 +194,32 @@ const arrivalSlice = createSlice({
         state.loadingDelete = false
         state.error = true
       })
+      .addCase(unarchiveArrival.pending, state => {
+        state.loadingUnarchive = true
+        state.error = false
+      })
+      .addCase(unarchiveArrival.fulfilled, (state, action) => {
+        state.loadingUnarchive = false
+        state.error = false
+        if (state.archivedArrivals) {
+          state.archivedArrivals = state.archivedArrivals.filter(arrival => arrival._id !== action.payload.id)
+        }
+      })
+      .addCase(unarchiveArrival.rejected, (state, { payload: error }) => {
+        state.loadingUnarchive = false
+        state.error = error || false
+      })
+      .addCase(cancelArrival.pending, state => {
+        state.loadingCancel = true
+        state.error = false
+      })
+      .addCase(cancelArrival.fulfilled, state => {
+        state.loadingCancel = false
+      })
+      .addCase(cancelArrival.rejected, state => {
+        state.loadingCancel = false
+        state.error = true
+      })
       .addCase(updateArrival.pending, state => {
         state.loadingUpdate = true
         state.error = false
@@ -170,4 +236,4 @@ const arrivalSlice = createSlice({
 })
 
 export const arrivalReducer = arrivalSlice.reducer
-export const { clearErrorArrival } = arrivalSlice.actions
+export const { clearErrorArrival, clearAll } = arrivalSlice.actions

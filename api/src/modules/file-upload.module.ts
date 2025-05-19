@@ -4,9 +4,12 @@ import { diskStorage } from 'multer'
 import { FilesService } from '../services/files.service'
 import * as path from 'path'
 import * as fs from 'fs'
+import { FilesController } from '../controllers/files.controller'
+import { DbModule } from './db.module'
 
 @Module({
   imports: [
+    DbModule,
     MulterModule.register({
       storage: diskStorage({
         destination: (_req, _file, cb) => {
@@ -23,9 +26,8 @@ import * as fs from 'fs'
         },
       }),
       fileFilter: (_req, file, cb) => {
-        const allowedTypes = ['.pdf', '.doc', '.docx']
+        const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx']
         const ext = path.extname(file.originalname).toLowerCase()
-
         if (allowedTypes.includes(ext)) {
           cb(null, true)
         } else {
@@ -34,10 +36,13 @@ import * as fs from 'fs'
       },
       limits: {
         fileSize: 10 * 1024 * 1024,
+        files: 10,
       },
     }),
   ],
+  controllers: [FilesController],
   providers: [FilesService],
   exports: [FilesService],
 })
+
 export class FilesModule {}

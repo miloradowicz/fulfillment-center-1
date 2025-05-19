@@ -12,17 +12,32 @@ export class Task {
   isArchived: boolean
 
   @Prop({
+    type: String,
+    unique: true,
+  })
+  taskNumber: string
+
+  @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
-  user: string
+  user: mongoose.Types.ObjectId
 
   @Prop({ required: true })
   title: string
 
   @Prop()
   description: string
+
+  @Prop({ type: String, required: false, default: null })
+  date_ToDO?: string
+
+  @Prop({ type: String, required: false, default: null })
+  date_inProgress?: string
+
+  @Prop({ type: String, required: false, default: null })
+  date_Done?: string
 
   @Prop({
     type: String,
@@ -42,13 +57,14 @@ export class Task {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
   })
-  associated_order: string
+  associated_order: mongoose.Types.ObjectId
+
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Arrival',
   })
-  associated_arrival: string
+  associated_arrival: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -61,7 +77,7 @@ export class Task {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]

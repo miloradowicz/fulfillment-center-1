@@ -1,186 +1,242 @@
-import { useState } from 'react'
-import { Box, Button, Card, CircularProgress, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { useOrderDetails } from '../hooks/useOrderDetails.ts'
-import DefectsTable from '../components/DefectsTable.tsx'
-import OrderLogs from '../components/OrderLogs.tsx'
-import { DeleteOutline, EditOutlined } from '@mui/icons-material'
-import { useAppDispatch } from '../../../app/hooks.ts'
-import { deleteOrder } from '../../../store/thunks/orderThunk.ts'
-import { toast } from 'react-toastify'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import OrderForm from '../components/OrderForm.tsx'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import ProductsTable from '@/components/Tables/ProductsTable.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { basename } from 'path-browserify'
+import EditButton from '@/components/Buttons/EditButton.tsx'
+import BackButton from '@/components/Buttons/BackButton.tsx'
+import ArchiveButton from '@/components/Buttons/ArchiveButton.tsx'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
+import { Badge } from '@/components/ui/badge.tsx'
+import { cn } from '@/lib/utils.ts'
+import { ArrowUpRight, ClipboardList, File, Minus, Phone } from 'lucide-react'
+import CopyText from '@/components/CopyText/CopyText.tsx'
+import { invoiceStatusStyles, orderStatusStyles, tabTriggerStyles } from '@/utils/commonStyles.ts'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+import CancelButton from '@/components/Buttons/CancelButton.tsx'
+import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
 
-enum OrderStatus {
-  InAssembly = 'в сборке',
-  InTransit = 'в пути',
-  Delivered = 'доставлен',
-}
 
 const OrderDetails = () => {
-  const { order, client, defects, loading } = useOrderDetails()
-  const [tabValue, setTabValue] = useState(0)
-  const dispatch = useAppDispatch()
-  const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
+  const { order, loading, open, openArchiveModal, handleArchive, setOpen, setOpenArchiveModal, tabs, setTabs, confirmCancelModalOpen, handleCancel, setConfirmCancelModalOpen, paddingTop, heightTab } =
+    useOrderDetails()
 
-  const statuses = Object.values(OrderStatus)
-  const activeStep = order ? statuses.indexOf(order.status as OrderStatus) : 0
-
-  const orderColumns = [
-    { field: 'title', headerName: 'Наименование', flex: 1 },
-    { field: 'amount', headerName: 'Количество', width: 130 },
-    { field: 'barcode', headerName: 'Штрихкод', width: 180 },
-    { field: 'article', headerName: 'Артикул', width: 150 },
-  ]
-
-  const handleDelete = async (id: string) => {
-    try {
-      if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
-        await dispatch(deleteOrder(id))
-        navigate('/orders')
-      } else {
-        toast.info('Вы отменили удаление заказа')
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  const handleOpenEdit = () => {
-    setOpen(true)
-  }
-
-  if (loading) {
-    return (
-      <Box className="flex justify-center mt-4">
-        <CircularProgress />
-      </Box>
-    )
-  }
-
-  if (!order) {
-    return <Typography className="text-center mt-4">Заказ не найден</Typography>
-  }
 
   return (
-    <Card className="max-w-4xl mx-auto mt-6 bg-white shadow-lg rounded-lg p-6">
-      <Box className="flex justify-between items-center pb-2 mb-2">
-        <Typography variant="h5" className="font-semibold">
-          Заказ #{order._id}
-        </Typography>
-        <Box className="text-right">
-          <Typography variant="body2" className="text-gray-600 text-sm">
-            Отправлен: <span className="font-bold">{dayjs(order.sent_at).format('DD.MM.YYYY HH:mm')}</span>
-          </Typography>
+    <>
+      {loading && <Loader />}
 
-          <Typography variant="body2" className="text-gray-600 text-sm">
-            {order.delivered_at ? (
-              <>
-                Доставлен: <span className="font-bold">{dayjs(order.delivered_at).format('DD.MM.YYYY HH:mm')}</span>
-              </>
-            ) : (
-              'Не доставлен'
-            )}
-          </Typography>
+      {order ? (
+        <>
+          <Modal handleClose={() => setOpen(false)} open={open}>
+            <OrderForm initialData={order} onSuccess={() => setOpen(false)} />
+          </Modal>
 
-          <Typography variant="h6" className="text-sky-700" sx={{ fontWeight: 600, fontSize: '18px' }}>
-            Стоимость: {order.price}
-          </Typography>
-        </Box>
-      </Box>
+          <ConfirmationModal
+            open={openArchiveModal}
+            entityName="этот заказ"
+            actionType="archive"
+            onConfirm={() => handleArchive()}
+            onCancel={() => setOpenArchiveModal(false)}
+          />
+          <ConfirmationModal
+            open={confirmCancelModalOpen}
+            entityName="эту поставку"
+            actionType="cancel"
+            onConfirm={handleCancel}
+            onCancel={() => setConfirmCancelModalOpen(false)}
+          />
 
-      <Box className="flex justify-center gap-4 mt-4">
-        {client && (
-          <Card className="bg-gray-100 p-4 shadow-sm flex flex-col gap-1 w-100">
-            <Typography variant="h6" marginBottom={2} className="text-center">
-              Клиент
-            </Typography>
-            <Typography variant="body1">{client.name}</Typography>
-            <Typography variant="body1">{client.email}</Typography>
-            <Typography variant="body1">{client.phone_number}</Typography>
-          </Card>
-        )}
-        <Card className="bg-gray-100 p-4 shadow-sm w-100">
-          <Typography variant="h6" marginBottom={4} className="text-center">
-            Статус заказа
-          </Typography>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {statuses.map((label, index) => (
-              <Step key={index}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Card>
-      </Box>
+          <div className="w-full max-w-[600px] mx-auto px-4 sm:space-y-7 space-y-5 text-primary">
+            <BackButton />
 
-      <Box className="mt-2 bg-gray-50 p-4 rounded-lg">
-        <Typography variant="h6" className="mb-3 font-semibold text-center">
-          Товары:
-        </Typography>
-        <DataGrid
-          rows={order.products.map(item => ({
-            id: item._id,
-            title: item.product.title,
-            amount: item.amount,
-            barcode: item.product.barcode,
-            article: item.product.article,
-          }))}
-          columns={orderColumns}
-          pageSizeOptions={[5, 10, 20, 100]}
-          disableRowSelectionOnClick
-        />
-      </Box>
-      <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} className="mt-6">
-        <Tab label="История" />
-        <Tab label="Дефекты" />
-      </Tabs>
-      <Box className="mt-4 bg-gray-50 p-4 rounded-lg">
-        {tabValue === 0 ? <OrderLogs logs={order.logs || []} /> : <DefectsTable defects={defects} />}
-      </Box>
-      <Box
-        sx={{
-          mt: 4,
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'flex-end',
-        }}
-      >
-        <Button
-          type={'button'}
-          variant="contained"
-          startIcon={<EditOutlined />}
-          sx={{
-            px: 3,
-            borderRadius: 2,
-            textTransform: 'none',
-          }}
-          onClick={() => handleOpenEdit()}
-        >
-          Редактировать
-        </Button>
-        <Button
-          type={'button'}
-          variant="contained"
-          color="error"
-          startIcon={<DeleteOutline />}
-          sx={{
-            px: 3,
-            borderRadius: 2,
-            textTransform: 'none',
-          }}
-          onClick={() => handleDelete(order._id)}
-        >
-          Удалить
-        </Button>
-        <Modal handleClose={() => setOpen(false)} open={open}>
-          <OrderForm onSuccess={() => setOpen(false)} />
-        </Modal>
-      </Box>
-    </Card>
+            <div className="rounded-2xl shadow p-6 flex flex-col md:flex-row md:justify-between gap-6">
+              <div>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <CancelButton onClick={() => setConfirmCancelModalOpen(true)} />
+                </ProtectedElement>
+                <h3 className="text-xl font-bold flex gap-1 items-center mb-4">
+                  <ClipboardList />
+                  {order.orderNumber}
+                </h3>
+
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="flex flex-col">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Доставка</p>
+                    <Badge
+                      className={cn(
+                        orderStatusStyles[order.status] || orderStatusStyles.default,
+                        'py-1.5 px-3 font-bold text-center',
+                      )}
+                    >
+                      {capitalize(order.status)}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-muted-foreground">Дата отправки</p>
+                    <p className="font-bold">{dayjs(order.sent_at).format('D MMMM YYYY')}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-bold text-muted-foreground">Дата доставки</p>
+                    <p className="font-bold">
+                      {order.delivered_at ? (
+                        dayjs(order.delivered_at).format('D MMMM YYYY')
+                      ) : (
+                        <Minus className="w-6 h-6" />
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:items-start justify-between">
+                <div className="flex gap-2 mt-4 md:mt-0 md:mb-3 order-last md:order-none items-start">
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <EditButton onClick={() => setOpen(true)} />
+                  </ProtectedElement>
+                  <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                    <ArchiveButton onClick={() => setOpenArchiveModal(true)} />
+                  </ProtectedElement>
+                </div>
+
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <div className="flex flex-col mb-4">
+                    <p className="text-sm font-bold text-muted-foreground mb-2">Оплата</p>
+                    {order.paymentStatus !== undefined && (
+                      <Badge
+                        className={cn(
+                          invoiceStatusStyles[
+                            order.paymentStatus as 'в ожидании' | 'оплачено' | 'частично оплачено'
+                          ] || invoiceStatusStyles['в ожидании'],
+                          'py-1.5 px-3 font-bold text-center',
+                        )}
+                      >
+                        {capitalize(order.paymentStatus ?? 'в ожидании')}
+                      </Badge>
+                    )}
+                  </div>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <div className="space-y-1 mb-4">
+                    <p className="text-sm text-muted-foreground font-bold">Склад</p>
+                    <Link
+                      to={`/stocks/${ order.stock._id }`}
+                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
+                    >
+                      {order.stock.name}
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground font-bold">Заказчик</p>
+                    <Link
+                      to={`/clients/${ order.client._id }`}
+                      className="inline-flex items-center gap-1 font-bold hover:text-blue-500 transition-colors m-0 p-0"
+                    >
+                      {order.client.name}
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+
+                    <div className="flex gap-2 items-center">
+                      <CopyText text={order.client.phone_number} children={<Phone className="h-4 w-4" />} />
+                    </div>
+                  </div>
+                </ProtectedElement>
+              </div>
+            </div>
+
+            <div className="rounded-2xl shadow p-6 mb-6">
+              <h3 className="font-bold uppercase mb-3 text-muted-foreground">Дополнительно</h3>
+              <Tabs value={tabs.toString()} onValueChange={val => setTabs(Number(val))}>
+                <TabsList className={`mb-5 w-full ${ heightTab } rounded-2xl`}>
+                  <div className={`inline-flex flex-nowrap px-2 space-x-2 sm:space-x-4 overflow-x-auto ${ paddingTop }`} >
+                    <TabsTrigger value="0" className={cn(tabTriggerStyles, 'sm:text-sm')}>
+                      Товары
+                    </TabsTrigger>
+                    <TabsTrigger value="1" className={cn(tabTriggerStyles, 'sm:text-sm')}>
+                      Дефекты
+                    </TabsTrigger>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="2" className={cn(tabTriggerStyles, 'sm:text-sm')}>
+                        Услуги
+                      </TabsTrigger>
+                    </ProtectedElement>
+
+                    <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                      <TabsTrigger value="3" className={cn(tabTriggerStyles, 'sm:text-sm')}>
+                        Документы
+                      </TabsTrigger>
+                    </ProtectedElement>
+
+                    <TabsTrigger value="4" className={cn(tabTriggerStyles, 'sm:text-sm')}>
+                      История
+                    </TabsTrigger>
+                  </div>
+                </TabsList>
+
+                <TabsContent value="0">
+                  <ProductsTable products={order.products} />
+                </TabsContent>
+                <TabsContent value="1">{order.defects && <ProductsTable defects={order.defects} />}</TabsContent>
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="2">
+                    <ServicesTable services={order.services} />
+                  </TabsContent>
+                </ProtectedElement>
+
+                <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+                  <TabsContent value="3">
+                    <div className={cn('flex flex-wrap gap-4 mt-3 px-2', !order.documents && 'flex-col items-center')}>
+                      {order.documents ? (
+                        order.documents.map((doc, idx) => (
+                          <Link
+                            key={idx}
+                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
+                          >
+                            <File className="h-6 w-6" />
+                            <span className="text-xs truncate w-40">{basename(doc.document)}</span>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground font-bold text-center text-sm">Документы отсутствуют.</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </ProtectedElement>
+                <TabsContent value="4">
+                  {order.logs && order.logs.length > 0 ? (
+                    <LogsAccordionView logs={order.logs} />
+                  ) : (
+                    <p className="px-2 text-sm text-muted-foreground">История изменений отсутствует</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </>
+      ) : (
+        <p className="font-bold text-center text-lg mt-6">Заказ не найден</p>
+      )}
+    </>
   )
 }
 

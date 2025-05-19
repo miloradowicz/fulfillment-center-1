@@ -1,21 +1,37 @@
 import { Module } from '@nestjs/common'
 import { getModelToken, MongooseModule } from '@nestjs/mongoose'
 import config from '../config'
-import { Arrival, ArrivalSchema } from '../schemas/arrival.schema'
+import { Arrival, ArrivalSchemaFactory } from '../schemas/arrival.schema'
 import { Client, ClientSchemaFactory } from '../schemas/client.schema'
 import { Product, ProductSchema } from '../schemas/product.schema'
-import { Order, OrderSchema } from 'src/schemas/order.schema'
+import { Order, OrderSchemaFactory } from 'src/schemas/order.schema'
 import { User, UserSchemaFactory } from '../schemas/user.schema'
 import { Task, TaskSchema } from '../schemas/task.schema'
 import { Service, ServiceSchema } from '../schemas/service.schema'
 import { Stock, StockSchema } from '../schemas/stock.schema'
 import { Counter, CounterSchema } from '../schemas/counter.schema'
 import { Counterparty, CounterpartySchema } from '../schemas/counterparty.schema'
-import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-category.schema'
+import { ServiceCategory, ServiceCategorySchemaFactory } from '../schemas/service-category.schema'
+import { Invoice, InvoiceSchema } from '../schemas/invoice.schema'
 
 @Module({
   imports: [
-    MongooseModule.forRoot(new URL(config.mongo.db, config.mongo.host).href),
+    MongooseModule.forRoot(
+      config.mongo.host,
+      {
+        auth: { username: config.mongo.username, password: config.mongo.password },
+        dbName: config.mongo.db,
+      }
+    ),
+    MongooseModule.forFeature([
+      { name: Product.name, schema: ProductSchema },
+      { name: Task.name, schema: TaskSchema },
+      { name: Service.name, schema: ServiceSchema },
+      { name: Stock.name, schema: StockSchema },
+      { name: Counter.name, schema: CounterSchema },
+      { name: Counterparty.name, schema: CounterpartySchema },
+      { name: Invoice.name, schema: InvoiceSchema },
+    ]),
     MongooseModule.forFeatureAsync([
       {
         name: Client.name,
@@ -23,11 +39,18 @@ import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-categ
         imports: [DbModule],
         inject: [getModelToken(Arrival.name), getModelToken(Order.name), getModelToken(Product.name)],
       },
-    ]),
-    MongooseModule.forFeature([{ name: Arrival.name, schema: ArrivalSchema }]),
-    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
-    MongooseModule.forFeatureAsync([
+      {
+        name: Arrival.name,
+        useFactory: ArrivalSchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Task.name)],
+      },
+      {
+        name: Order.name,
+        useFactory: OrderSchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Task.name)],
+      },
       {
         name: User.name,
         useFactory: UserSchemaFactory,
@@ -43,13 +66,13 @@ import { ServiceCategory, ServiceCategorySchema } from '../schemas/service-categ
           getModelToken(Task.name),
         ],
       },
+      {
+        name: ServiceCategory.name,
+        useFactory: ServiceCategorySchemaFactory,
+        imports: [DbModule],
+        inject: [getModelToken(Service.name)],
+      },
     ]),
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
-    MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
-    MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
-    MongooseModule.forFeature([{ name: Counter.name, schema: CounterSchema }]),
-    MongooseModule.forFeature([{ name: Counterparty.name, schema: CounterpartySchema }]),
-    MongooseModule.forFeature([{ name: ServiceCategory.name, schema: ServiceCategorySchema }]),
   ],
   exports: [MongooseModule],
 })

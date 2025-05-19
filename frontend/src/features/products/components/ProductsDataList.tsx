@@ -1,108 +1,117 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import { ProductWithPopulate } from '../../../types'
-import EditIcon from '@mui/icons-material/Edit'
-import { ruRU } from '@mui/x-data-grid/locales'
-import { NavLink } from 'react-router-dom'
+import { ProductWithPopulate } from '@/types'
 import useProductActions from '../hooks/useProductActions.ts'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
 import ProductForm from './ProductForm.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { ColumnDef } from '@tanstack/react-table'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import ProductDetails from './ProductDetails.tsx'
 
 const ProductsDataList = () => {
-  const { products, selectedProduct, deleteOneProduct, open, handleClose, handleOpen, fetchAllProducts } = useProductActions(true)
+  const {
+    products,
+    selectedProduct,
+    open,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationArchive,
+    handleClose,
+    handleOpen,
+    fetchAllProducts,
+    openDetailsModal,
+    selectedProductId,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
+  } = useProductActions(true)
 
-  const columns: GridColDef<ProductWithPopulate>[] = [
+  const columns: ColumnDef<ProductWithPopulate>[] = [
     {
-      field: 'title',
-      headerName: 'Название',
-      flex: 1,
-      editable: false,
-      sortable:true,
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'client',
-      headerName: 'Клиент',
-      flex: 1,
-      editable: false,
-      filterable: true,
-      valueGetter: (_value: string, row: ProductWithPopulate) => row.client.name,
+      accessorKey: 'client',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Клиент" />,
+      enableColumnFilter: true,
+      enableHiding: false,
+      cell: info => (info.getValue() as ProductWithPopulate['client'])?.name || '—',
+
     },
     {
-      field: 'article',
-      headerName: 'Артикул',
-      flex: 1,
-      sortable: true,
-      editable: false,
-      filterable: true,
+      accessorKey: 'title',
+      header: 'Название',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
     },
     {
-      field: 'barcode',
-      headerName: 'Баркод',
-      flex: 1,
-      sortable: false,
-      editable: false,
-      filterable: true },
+      accessorKey: 'article',
+      header: 'Артикул',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
+    },
     {
-      field: 'amount',
-      headerName: 'Количество',
-      width: 100,
-      sortable: true,
-      editable: false,
-      filterable: true },
+      accessorKey: 'barcode',
+      header: 'Баркод',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
+    },
     {
-      field: 'Actions',
-      headerName: '',
-      type: 'number',
-      width: 210,
-      sortable: false,
-      editable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <>
-          <IconButton onClick={() => handleOpen(row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => deleteOneProduct(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <NavLink className="text-gray-500 hover:text-gray-700 ml-2"
-            to={`/products/${ row._id }`}
-          >
-              Подробнее
-          </NavLink>
-        </>
-      ),
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableProduct = row.original
+
+        return (
+          <TableActionsMenu<ProductWithPopulate>
+            row={tableProduct}
+            handleOpen={handleOpen}
+            handleConfirmationOpen={handleConfirmationOpen}
+            detailsPathPrefix="products"
+            showDetailsLink={true}
+            useModalForDetails={true}
+            handleOpenDetailsModal={() => handleOpenDetailsModal(tableProduct._id)}
+          />
+        )
+      },
     },
   ]
-  return (
 
-    <Box className="max-w-[1000px] mx-auto w-full">
+  return (
+    <div className="max-w-[1000px] mx-auto w-full">
+      <DataTable columns={columns} data={products ?? []} />
+
+      <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal} >
+        <ProductDetails id={selectedProductId ?? undefined} />
+      </RightPanel>
+
       <Modal handleClose={handleClose} open={open}>
         <ProductForm
           initialData={selectedProduct || undefined}
-          onSuccess={() => fetchAllProducts()}
+          onSuccess={() => {
+            void fetchAllProducts()
+            handleClose()
+          }}
         />
       </Modal>
-      {products ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={products}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
-      ) : <Typography className="text-center mt-5">Товаров нет</Typography>}
-    </Box>
+
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этот товар"
+        actionType={'archive'}
+        onConfirm={handleConfirmationArchive}
+        onCancel={handleConfirmationClose}
+      />
+    </div>
   )
 }
 

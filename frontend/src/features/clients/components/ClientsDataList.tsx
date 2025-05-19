@@ -1,147 +1,115 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { Box, IconButton, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
-import EditIcon from '@mui/icons-material/Edit'
-import { Client } from '../../../types'
-import { ruRU } from '@mui/x-data-grid/locales'
-import { NavLink } from 'react-router-dom'
-import { useClientsList } from '../hooks/useClientsList.ts'
-import { useState } from 'react'
+import { Client } from '@/types'
+import { useClientActions } from '../hooks/useClientActions.ts'
 import ClientForm from './ClientForm.tsx'
-import Modal from '../../../components/UI/Modal/Modal.tsx'
+import Modal from '@/components/Modal/Modal.tsx'
+import ConfirmationModal from '@/components/Modal/ConfirmationModal.tsx'
+import { ColumnDef } from '@tanstack/react-table'
+import DataTable from '@/components/DataTable/DataTable.tsx'
+import TableActionsMenu from '@/components/DataTable/TableActionsMenu/TableActionsMenu.tsx'
+import SelectableColumn from '@/components/DataTable/SelectableColumn/SelectableColumn.tsx'
+import DataTableColumnHeader from '@/components/DataTable/DataTableColumnHeader/DataTableColumnHeader.tsx'
+import RightPanel from '@/components/RightPanel/RightPanel.tsx'
+import ClientDetails from '@/features/clients/components/ClientDetails.tsx'
 
 const ClientsDataList = () => {
-  const { clients, deleteOneClient, isLoading } = useClientsList()
+  const {
+    clients,
+    selectedClient,
+    open,
+    handleOpen,
+    handleClose,
+    confirmationOpen,
+    handleConfirmationOpen,
+    handleConfirmationClose,
+    handleConfirmationArchive,
+    selectedClientId,
+    openDetailsModal,
+    handleOpenDetailsModal,
+    handleCloseDetailsModal,
+  } = useClientActions(true)
 
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-
-  const handleOpenEditModal = (client: Client) => {
-    setSelectedClient(client)
-    setEditModalOpen(true)
-  }
-
-  const handleCloseEditModal = () => {
-    setEditModalOpen(false)
-    setSelectedClient(null)
-  }
-
-  const theme = useTheme()
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'))
-
-  const columns: GridColDef<Client>[] = [
+  const columns: ColumnDef<Client>[] = [
     {
-      field: 'name',
-      headerName: 'Имя',
-      flex: 1,
-      minWidth: isMediumScreen ? 180 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      sortable: true,
+      id: 'select',
+      header: ({ table }) => SelectableColumn(table, 'header'),
+      cell: ({ row }) => SelectableColumn(row, 'cell'),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
-      field: 'phone_number',
-      headerName: 'Телефон',
-      flex: 1,
-      minWidth: isMediumScreen ? 140 : 120,
-      align: 'left',
-      headerAlign: 'left',
-      editable: false,
-      filterable: true,
+      accessorKey: 'name',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Имя" />,
+      enableColumnFilter: true,
+      enableHiding: false,
+      cell: info => info.getValue(),
     },
     {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1,
-      minWidth: isMediumScreen ? 170 : 150,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: true,
-      editable: false,
-      filterable: true,
+      accessorKey: 'phone_number',
+      header: 'Телефон',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
     },
     {
-      field: 'inn',
-      headerName: 'ИНН',
-      flex: 1,
-      minWidth: isMediumScreen ? 170 : 100,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: true,
-      editable: false,
-      filterable: true,
+      accessorKey: 'email',
+      header: 'Email',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
     },
     {
-      field: 'address',
-      headerName: 'Адрес',
-      flex: 1,
-      minWidth: isMediumScreen ? 220 : 160,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: true,
+      accessorKey: 'inn',
+      header: 'ИНН',
+      enableColumnFilter: true,
+      cell: info => info.getValue(),
     },
     {
-      field: 'Actions',
-      headerName: '',
-      minWidth: isMediumScreen ? 220 : 180,
-      align: 'left',
-      headerAlign: 'left',
-      sortable: false,
-      editable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => handleOpenEditModal(row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => deleteOneClient(row._id)}>
-            <ClearIcon />
-          </IconButton>
-          <NavLink
-            to={`/clients/${ row._id }`}
-            style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Подробнее
-          </NavLink>
-        </Box>
-      ),
+      accessorKey: 'address',
+      header: 'Адрес',
+      enableColumnFilter: true,
+      cell: info => info.getValue() || '—',
+    },
+    {
+      id: 'actions',
+      header: 'Действия',
+      enableGlobalFilter: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        const tableClient = row.original
+
+        return (
+          <TableActionsMenu<Client>
+            row={tableClient}
+            handleOpen={handleOpen}
+            handleConfirmationOpen={handleConfirmationOpen}
+            showDetailsLink={true}
+            detailsPathPrefix="clients"
+            useModalForDetails={true}
+            handleOpenDetailsModal={() => handleOpenDetailsModal(tableClient._id)}
+          />
+        )
+      },
     },
   ]
 
   return (
-    <Box className="max-w-[1000px] mx-auto w-full">
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      ) : clients && clients.length > 0 ? (
-        <DataGrid
-          getRowId={row => row._id}
-          rows={clients}
-          columns={columns}
-          localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
-      ) : (
-        <Typography className="text-center mt-5">Клиентов нет</Typography>
-      )}
-      <Modal open={editModalOpen} handleClose={handleCloseEditModal}>
-        {selectedClient && <ClientForm client={selectedClient} onClose={handleCloseEditModal} />}
+    <div className="max-w-[1000px] w-full mx-auto space-y-4">
+      <DataTable columns={columns} data={clients ?? []} />
+
+      <RightPanel onOpenChange={handleCloseDetailsModal} open={openDetailsModal}>
+        <ClientDetails id={selectedClientId ?? undefined} />
+      </RightPanel>
+
+      <ConfirmationModal
+        open={confirmationOpen}
+        entityName="этого клиента"
+        actionType="archive"
+        onConfirm={handleConfirmationArchive}
+        onCancel={handleConfirmationClose}
+      />
+
+      <Modal open={open} handleClose={handleClose}>
+        <ClientForm client={selectedClient} onClose={handleClose} />
       </Modal>
-    </Box>
+    </div>
   )
 }
 

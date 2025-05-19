@@ -1,60 +1,71 @@
-import Grid from '@mui/material/Grid2'
-import { Box, Button, TextField, Typography } from '@mui/material'
-import { getFieldError } from '../../../utils/getFieldError.ts'
-import { useLoginForm } from '../hooks/useLoginForm.ts'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { useLoginForm } from '../hooks/useLoginForm'
+import { getFieldError } from '@/utils/getFieldError'
+import { cn } from '@/lib/utils'
+import { LoaderCircle } from 'lucide-react'
 
 const LoginForm = () => {
-  const { form, handleChange, onSubmit, isFormValid, sending, backendError } = useLoginForm()
+  const {
+    form,
+    handleChange,
+    onSubmit,
+    isFormValid,
+    sending,
+    loginError,
+    errors,
+  } = useLoginForm()
 
   return (
-    <Box noValidate component="form" onSubmit={onSubmit} style={{ maxWidth: '20%', margin: '0 auto' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-          Вход в систему
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <TextField
-            required
-            fullWidth
-            size="small"
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl font-bold">Вход в систему</h1>
+        <p className="text-muted-foreground text-sm">Пожалуйста, войдите, чтобы продолжить</p>
+      </div>
+
+      <div className="grid gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             name="email"
-            label="Email"
+            type="text"
             value={form.email}
             onChange={handleChange}
-            error={!!getFieldError('email', backendError)}
-            helperText={getFieldError('email', backendError)}
+            disabled={sending}
+            className={cn(errors.email || getFieldError('email', loginError) ? 'border-red-500' : '')}
           />
-        </Grid>
+          {(errors.email || getFieldError('email', loginError)) && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.email || getFieldError('email', loginError)}
+            </p>
+          )}
+        </div>
 
-        <Grid size={12}>
-          <TextField
-            required
-            fullWidth
-            size="small"
-            type="password"
+        <div className="grid gap-2">
+          <Label htmlFor="password">Пароль</Label>
+          <Input
             id="password"
             name="password"
-            label="Пароль"
+            type="password"
             value={form.password}
             onChange={handleChange}
-            error={!!getFieldError('password', backendError)}
-            helperText={getFieldError('password', backendError)}
+            disabled={sending}
+            className={cn(errors.password || getFieldError('password', loginError) ? 'border-red-500' : '')}
           />
-        </Grid>
+          {(errors.password || getFieldError('password', loginError)) && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.password || getFieldError('password', loginError)}
+            </p>
+          )}
+        </div>
 
-        <Grid size={12}>
-          <Button
-            type="submit"
-            loading={sending}
-            variant="outlined"
-            disabled={!isFormValid}
-          >
-              Войти
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
+        <Button type="submit" className="w-full" disabled={!isFormValid || sending}>
+          {sending ? <LoaderCircle className="animate-spin w-5 h-5" /> : 'Войти'}
+        </Button>
+      </div>
+    </form>
   )
 }
 

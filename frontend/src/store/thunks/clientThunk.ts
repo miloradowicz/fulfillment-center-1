@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { Client, ClientMutation, GlobalError, ValidationError } from '../../types'
-import axiosAPI from '../../utils/axiosAPI.ts'
+import { Client, ClientMutation, GlobalError, ValidationError } from '@/types'
+import axiosAPI from '@/utils/axiosAPI.ts'
 import { isAxiosError } from 'axios'
 
 export const fetchClients = createAsyncThunk<Client[]>(
@@ -15,6 +15,14 @@ export const fetchClientById = createAsyncThunk<Client, string>(
   'clients/fetchClient',
   async (clientId: string) => {
     const response = await axiosAPI.get(`/clients/${ clientId }`)
+    return response.data
+  },
+)
+
+export const fetchArchivedClients = createAsyncThunk<Client[]>(
+  'clients/fetchArchivedClients',
+  async () => {
+    const response = await axiosAPI.get('/clients/archived/all')
     return response.data
   },
 )
@@ -40,6 +48,21 @@ export const archiveClient = createAsyncThunk<{ id: string }, string, { rejectVa
   async (clientId: string, { rejectWithValue }) => {
     try {
       await axiosAPI.patch(`/clients/${ clientId }/archive`)
+      return { id: clientId }
+    } catch (e) {
+      if (isAxiosError(e) && e.response) {
+        return rejectWithValue(e.response.data as GlobalError)
+      }
+      throw e
+    }
+  },
+)
+
+export const unarchiveClient = createAsyncThunk<{ id: string }, string, { rejectValue: GlobalError }>(
+  'clients/unarchiveClient',
+  async (clientId, { rejectWithValue }) => {
+    try {
+      await axiosAPI.patch(`/clients/${ clientId }/unarchive`)
       return { id: clientId }
     } catch (e) {
       if (isAxiosError(e) && e.response) {

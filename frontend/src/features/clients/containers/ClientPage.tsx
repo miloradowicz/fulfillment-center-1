@@ -1,53 +1,35 @@
-import Modal from '../../../components/UI/Modal/Modal.tsx'
-import { Box, Button, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { useClientPage } from '../hooks/useClientPage.ts'
+import Modal from '@/components/Modal/Modal.tsx'
 import ClientsDataList from '../components/ClientsDataList.tsx'
 import ClientForm from '../components/ClientForm.tsx'
+import CustomButton from '@/components/CustomButton/CustomButton.tsx'
+import CustomTitle from '@/components/CustomTitle/CustomTitle.tsx'
+import { useClientActions } from '../hooks/useClientActions.ts'
+import { Users } from 'lucide-react'
+import ProtectedElement from '@/components/ProtectedElement/ProtectedElement.tsx'
+import Loader from '@/components/Loader/Loader.tsx'
 
 const ClientsPage = () => {
-  const { open, handleOpen, handleClose, isLoading } = useClientPage()
-
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const { open, handleOpen, handleClose, loading } = useClientActions(true)
 
   return (
     <>
-      {isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 5 }}>
-          <CircularProgress />
-        </Box>
-      )}
+      {loading && <Loader />}
 
       <Modal handleClose={handleClose} open={open}>
         <ClientForm onClose={handleClose} />
       </Modal>
-      <Box className="max-w-[1000px] mx-auto mb-5 mt-7 w-full flex items-center justify-end">
-        <Typography variant={isSmallScreen ? 'h6' : 'h5'} className="flex-grow">
-          Клиенты
-        </Typography>
-        <Button
-          sx={{
-            color: '#32363F',
-            marginLeft: 'auto',
-            border: '1px solid #32363F',
-            transition: 'all 0.3s ease-in-out',
-            padding: isSmallScreen ? '1px 3px' : '3px 6px',
-            fontSize: isSmallScreen ? '10px' : '12px',
-            '&:hover': {
-              color: '#ffffff',
-              backgroundColor: '#32363F',
-              border: '1px solid #ffffff',
-            },
-          }}
-          variant="outlined"
-          onClick={handleOpen}
-        >
-          Добавить клиента
-        </Button>
-      </Box>
-      <Box className="my-8">
+
+      <div className="max-w-[1000px] mx-auto my-7 w-full flex items-center justify-between">
+        <CustomTitle text={'Клиенты'} icon={<Users size={25} />} />
+
+        <ProtectedElement allowedRoles={['super-admin', 'admin', 'manager']}>
+          <CustomButton text={'Добавить клиента'} onClick={handleOpen} />
+        </ProtectedElement>
+      </div>
+
+      <div className="my-8">
         <ClientsDataList />
-      </Box>
+      </div>
     </>
   )
 }

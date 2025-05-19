@@ -1,11 +1,24 @@
-import Grid from '@mui/material/Grid2'
-import { Box, Button, MenuItem, TextField, Typography } from '@mui/material'
-import SelectField from '../../../components/SelectField/SelectField.tsx'
-import {  roles } from '../../../constants.ts'
-import { useRegistrationForm } from '../hooks/useRegistrationForm.ts'
+import React from 'react'
+import { useRegistrationForm } from '../hooks/useRegistrationForm'
+import { roles } from '@/constants'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { LoaderCircle } from 'lucide-react'
+import { UserUpdateMutation } from '@/types'
+import { InputWithError } from '@/components/ui/input-with-error.tsx'
 
+interface RegistrationFormProps {
+  onSuccess: () => void
+  initialFormData?: Partial<UserUpdateMutation>
+}
 
-const RegistrationForm = () => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSuccess, initialFormData }) => {
   const {
     sending,
     backendError,
@@ -16,116 +29,106 @@ const RegistrationForm = () => {
     handleChange,
     validateFields,
     getFieldError,
-  } = useRegistrationForm()
+    isFormValid,
+    isEditMode,
+    handleBlur,
+  } = useRegistrationForm(onSuccess, initialFormData)
 
   return (
-    <>
-      <Box noValidate component="form" onSubmit={onSubmit} style={{ width: '70%', margin: '0 auto' }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Добавить нового пользователя
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              required
-              fullWidth
-              size="small"
-              id="email"
-              name="email"
-              label="Email"
-              value={form.email}
-              onChange={handleChange}
-              error={!!getFieldError('email')}
-              helperText={getFieldError('email')}
-              onBlur={() => validateFields('email')}
-            />
-          </Grid>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h3 className="text-md sm:text-2xl font-semibold text-center">
+        {isEditMode ? 'Редактировать пользователя' : 'Добавить нового сотрудника'}
+      </h3>
 
-          <Grid size={12}>
-            <TextField
-              required
-              fullWidth
-              size="small"
-              id="displayName"
-              name="displayName"
-              label="Отображаемое имя"
-              value={form.displayName}
-              onChange={handleChange}
-              error={!!getFieldError('displayName')}
-              helperText={getFieldError('displayName')}
-            />
-          </Grid>
+      <InputWithError
+        id="email"
+        name="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={handleChange}
+        onBlur={e => {
+          handleBlur('email', e.target.value)
+          validateFields('email')
+        }}
+        error={getFieldError('email')}
+      />
 
-          <Grid size={6}>
-            <TextField
-              required
-              fullWidth
-              size="small"
-              type="password"
-              id="password"
-              name="password"
-              label="Пароль"
-              value={form.password}
-              onChange={handleChange}
-              error={!!getFieldError('password')}
-              helperText={getFieldError('password')}
-              onBlur={() => validateFields('confirmPassword')}
-            />
-          </Grid>
+      <InputWithError
+        id="displayName"
+        name="displayName"
+        placeholder="Отображаемое имя"
+        value={form.displayName}
+        onChange={handleChange}
+        onBlur={e => handleBlur('displayName', e.target.value)}
+        error={getFieldError('displayName')}
+      />
 
-          <Grid size={6}>
-            <TextField
-              required
-              fullWidth
-              size="small"
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              label="Подтвердите пароль"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              error={!!getFieldError('confirmPassword')}
-              helperText={getFieldError('confirmPassword')}
-              onBlur={() => validateFields('confirmPassword')}
-            />
-          </Grid>
+      <InputWithError
+        id="password"
+        name="password"
+        placeholder={isEditMode ? 'Новый пароль (необязательно)' : 'Пароль'}
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        onBlur={e => {
+          if (!isEditMode) {
+            handleBlur('password', e.target.value)
+          }
+        }}
+        error={getFieldError('password')}
+      />
 
-          <Grid size={12}>
-            <SelectField
-              required
-              fullWidth
-              size="small"
-              id="role"
-              name="role"
-              label="Роль"
-              defaultValue="default"
-              value={form.role}
-              onChange={handleChange}
-              error={!!getFieldError('role')}
-              helperText={getFieldError('role')}
-              onBlur={() => validateFields('role')}
-            >
-              {roles.map((x, i) => (
-                <MenuItem key={i} value={x.name}>
-                  {x.title}
-                </MenuItem>
-              ))}
-            </SelectField>
-          </Grid>
+      <InputWithError
+        id="confirmPassword"
+        name="confirmPassword"
+        placeholder="Подтвердите пароль"
+        type="password"
+        value={confirmPassword}
+        onChange={handleConfirmPasswordChange}
+        onBlur={() => {
+          if (!isEditMode) {
+            handleBlur('confirmPassword', confirmPassword)
+          }
+          validateFields('confirmPassword')
+        }}
+        error={getFieldError('confirmPassword')}
+      />
 
-          <Grid size={12}>
-            <Button
-              type="submit"
-              loading={sending}
-              variant="outlined"
-              disabled={!!backendError && !!Object.keys(backendError.errors).length}
-            >
-              Создать пользователя
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </>
+      <Select
+        value={form.role}
+        onValueChange={(value: string) => {
+          handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLInputElement>)
+          validateFields('role')
+        }}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Выберите роль" />
+        </SelectTrigger>
+        <SelectContent>
+          {roles.map((role, i) => (
+            <SelectItem key={i} value={role.name}>
+              {role.title}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {getFieldError('role') && (
+        <p className="text-sm text-destructive mt-1">{getFieldError('role')}</p>
+      )}
+
+      <Button
+        type="submit"
+        className="w-full mt-3"
+        disabled={
+          (!!backendError && !!Object.keys(backendError.errors).length) ||
+          !isFormValid() ||
+          sending
+        }
+      >
+        {sending ? <LoaderCircle className="animate-spin h-4 w-4 mr-2" /> : null}
+        {isEditMode ? 'Сохранить изменения' : 'Создать пользователя'}
+      </Button>
+    </form>
   )
 }
 

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, HydratedDocument, Model } from 'mongoose'
+import { Task } from './task.schema'
 
 export type ArrivalDocument = Arrival & Document
 
@@ -22,7 +23,7 @@ export class Arrival {
     ref: 'Client',
     required: true,
   })
-  client: mongoose.Schema.Types.ObjectId
+  client: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -35,13 +36,10 @@ export class Arrival {
     required: true,
   })
   products: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     description: string
     amount: number
   }[]
-
-  @Prop({ required: true })
-  arrival_price: number
 
   @Prop({
     type: String,
@@ -59,19 +57,22 @@ export class Arrival {
   @Prop({ default: null })
   pickup_location: string
 
+  @Prop({ default: null })
+  documents: [{ document: string }]
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Counterparty',
     required: false,
   })
-  shipping_agent?: mongoose.Schema.Types.ObjectId | null
+  shipping_agent?: mongoose.Types.ObjectId | null
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Stock',
     required: true,
   })
-  stock: mongoose.Schema.Types.ObjectId
+  stock: mongoose.Types.ObjectId
 
   @Prop({
     type: [
@@ -84,7 +85,7 @@ export class Arrival {
     default: [],
   })
   logs: {
-    user: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
     change: string
     date: Date
   }[]
@@ -100,7 +101,7 @@ export class Arrival {
     default: [],
   })
   defects: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     defect_description: string
     amount: number
   }[]
@@ -116,13 +117,98 @@ export class Arrival {
     default: [],
   })
   received_amount: {
-    product: mongoose.Schema.Types.ObjectId
+    product: mongoose.Types.ObjectId
     description: string
     amount: number
   }[]
+
+  @Prop({
+    type: [
+      {
+        service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
+        service_amount: { type: Number, required: true, default: 1 },
+        service_price: { type: Number, required: false },
+        service_type: { type: String, required: true },
+      },
+    ],
+    default: [],
+  })
+  services: {
+    service: mongoose.Types.ObjectId
+    service_amount: number
+    service_price: number
+    service_type: string
+  }[]
+
+  @Prop({ default: null }) comment: string
+
 }
 
-export const ArrivalSchema = SchemaFactory.createForClass(Arrival)
+const ArrivalSchema = SchemaFactory.createForClass(Arrival)
 
+export const ArrivalSchemaFactory = (
+  taskModel: Model<Task>,
+) => {
+  const cascadeArchive = async (arrival: HydratedDocument<Arrival>) => {
+    const tasks = await taskModel.find({ associated_arrival: arrival._id })
 
+    await Promise.all([
+      ...tasks.map(x => x.updateOne({ isArchived: true })),
+    ])
+  }
 
+  const cascadeDelete = async (arrival: HydratedDocument<Arrival>) => {
+    const tasks = await taskModel.find({ associated_arrival: arrival._id })
+
+    await Promise.all([
+      ...tasks.map(x => x.deleteOne()),
+    ])
+  }
+
+  ArrivalSchema.pre('findOneAndUpdate', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(arrival)
+    }
+  })
+
+  ArrivalSchema.pre('updateOne', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    const update = this.getUpdate()
+
+    if (update && 'isArchived' in update && update.isArchived) {
+      await cascadeArchive(arrival)
+    }
+  })
+
+  ArrivalSchema.pre('save', async function () {
+    if (this.isModified('isArchived') && this.isArchived) {
+      await cascadeArchive(this)
+    }
+  })
+
+  ArrivalSchema.pre('findOneAndDelete', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    await cascadeDelete(arrival)
+  })
+
+  ArrivalSchema.pre('deleteOne', async function () {
+    const arrival = await this.model.findOne<HydratedDocument<Arrival>>(this.getQuery())
+
+    if (!arrival) return
+
+    await cascadeDelete(arrival)
+  })
+
+  return ArrivalSchema
+}

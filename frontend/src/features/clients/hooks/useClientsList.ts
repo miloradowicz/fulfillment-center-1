@@ -1,7 +1,7 @@
-import { useAppDispatch, useAppSelector } from '../../../app/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts'
 import { useCallback, useEffect } from 'react'
-import { deleteClient, fetchClients } from '../../../store/thunks/clientThunk.ts'
-import { selectAllClients, selectLoadingFetchClient } from '../../../store/slices/clientSlice.ts'
+import { deleteClient, fetchClients } from '@/store/thunks/clientThunk.ts'
+import { selectAllClients, selectLoadingFetchClient } from '@/store/slices/clientSlice.ts'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 
@@ -19,16 +19,12 @@ export const useClientsList = () => {
     void fetchAllClients()
   }, [dispatch, fetchAllClients])
 
-  const deleteOneClient = async (id: string) => {
+  const handleConfirmDelete = async (clientId: string) => {
     try {
-      if (confirm('Вы уверены, что хотите удалить этого клиента?')) {
-        await dispatch(deleteClient(id)).unwrap()
-        navigate('/clients')
-        void fetchAllClients()
-        toast.success('Клиент успешно удалён!')
-      } else {
-        toast.info('Вы отменили удаление клиента')
-      }
+      await dispatch(deleteClient(clientId)).unwrap()
+      navigate('/clients')
+      await fetchAllClients()
+      toast.success('Клиент успешно удалён!')
     } catch (e) {
       console.error(e)
       let errorMessage = 'Не удалось удалить клиента'
@@ -44,7 +40,8 @@ export const useClientsList = () => {
 
   return {
     clients,
-    deleteOneClient,
     isLoading,
+    handleConfirmDelete,
+    fetchAllClients,
   }
 }
