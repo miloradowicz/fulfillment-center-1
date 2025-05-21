@@ -1,0 +1,14 @@
+server {
+  listen 443 ssl;
+
+  server_name domain;
+  ssl_certificate /etc/ssl/domain/live/fullchain.pem;
+  ssl_certificate_key /etc/ssl/domain/live/privkey.pem;
+
+  root /data/www/domain/html;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html =404;
+  }
+}

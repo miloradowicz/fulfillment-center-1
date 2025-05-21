@@ -8,12 +8,16 @@ services:
       network: host
     ports:
       - 8000:8000
+    volumes:
+      - uploads-volume:/app/uploads/
+      - ${SSL_LOCATION:-/dev/null}:${SSL_LOCATION:-/dev/null}:ro
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - ORIGIN=${WEB_HOST}
       - MONGO_HOST=db
       - MONGO_USERNAME=${MONGO_USERNAME}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - SSL_LOCATION=${SSL_LOCATION}
     depends_on:
       db:
         condition: service_started
@@ -29,8 +33,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-    ports:
-      - 27017:27017
     networks:
       - backend
     restart: always
@@ -42,8 +44,10 @@ services:
       context: frontend
       dockerfile: Dockerfile
       network: host
+    volumes:
+      - ${SSL_LOCATION:-/dev/null}:${SSL_LOCATION:-/dev/null}:ro
     ports:
-      - 80:80
+      - 443:443
     depends_on:
       api:
         condition: service_started
@@ -55,6 +59,10 @@ networks:
     driver: bridge
 
 volumes:
+  uploads-volume:
+    name: ${UPLOADS_VOLUME}
+    external: true
+
   db-volume:
     name: ${MONGO_VOLUME}
     external: true

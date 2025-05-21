@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Label } from '@/components/ui/label.tsx'
 
 import { basename } from 'path-browserify'
+import { apiHost } from '@/constants'
 
 type ExistingFile = { document: string }
 
@@ -40,7 +41,7 @@ const FileAttachments: React.FC<FileAttachmentsProps> = ({
                   <div key={`existing-${ index }`} className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <Link
-                        to={`http://localhost:8000/uploads/documents/${ basename(file.document) }`}
+                        to={`${apiHost}/uploads/documents/${ basename(file.document) }`}
                         download
                         target="_blank"
                         rel="noopener noreferrer"

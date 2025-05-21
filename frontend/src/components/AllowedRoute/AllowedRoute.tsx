@@ -14,7 +14,7 @@ const AllowedRoute: FC<Props> = ({ allowedRoles, children }) => {
 
   useEffect(() => {
     if (featureProtection && user && !allowedRoles.includes(user.role)) {
-      navigate(-1)
+      navigate('/login')
     }
   }, [user, allowedRoles, navigate])
 

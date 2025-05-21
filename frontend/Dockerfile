@@ -11,5 +11,10 @@ COPY --exclude=nginx --exclude=package.json --exclude=package-lock.json . .
 RUN npm run build
 
 FROM nginx:latest
-COPY --from=builder /app/dist /usr/share/nginx/html/
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+ARG DOMAIN=localhost
+RUN mkdir -p /data/www/${DOMAIN}/html
+COPY --from=builder /app/dist /data/www/${DOMAIN}/html/
+RUN chmod -R 755 /data/www/${DOMAIN}
+COPY nginx/conf /etc/nginx/conf.d/${DOMAIN}.conf
+RUN sed -ie "s@domain@${DOMAIN}@g" /etc/nginx/conf.d/${DOMAIN}.conf

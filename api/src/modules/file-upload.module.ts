@@ -6,6 +6,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { FilesController } from '../controllers/files.controller'
 import { DbModule } from './db.module'
+import config from 'src/config'
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { DbModule } from './db.module'
     MulterModule.register({
       storage: diskStorage({
         destination: (_req, _file, cb) => {
-          const uploadDir = path.join(__dirname, '../../uploads/documents')
+          const uploadDir = config.server.uploadsPath
           if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true })
           }

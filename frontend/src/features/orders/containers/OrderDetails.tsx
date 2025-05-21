@@ -21,6 +21,7 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
 import ServicesTable from '@/components/Tables/ServicesTable.tsx'
 import CancelButton from '@/components/Buttons/CancelButton.tsx'
 import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
+import { apiHost } from '@/constants.ts'
 
 
 const OrderDetails = () => {
@@ -207,7 +208,7 @@ const OrderDetails = () => {
                         order.documents.map((doc, idx) => (
                           <Link
                             key={idx}
-                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
+                            to={`${apiHost}/uploads/documents/${ basename(doc.document) }`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"

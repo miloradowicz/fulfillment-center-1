@@ -1,0 +1,260 @@
+diff --git a/.github/workflows/deploy.yaml b/.github/workflows/deploy.yaml
+index 88b5549..d8b08a8 100644
+--- a/.github/workflows/deploy.yaml
++++ b/.github/workflows/deploy.yaml
+@@ -10,6 +10,7 @@ on:
+ env:
+   HOST: ${{ secrets.HOST }}
+   PRINCIPAL: ${{ secrets.PRINCIPAL }}
++  UPLOADS_VOLUME: ${{ secrets.UPLOADS_VOLUME }}
+   MONGO_VOLUME: ${{ secrets.MONGO_VOLUME }}
+ 
+ jobs:
+@@ -18,6 +19,7 @@ jobs:
+     runs-on: ubuntu-latest
+     outputs:
+       timestamp: ${{ steps.get_timestamp.outputs.timestamp }}
++      uploads-needs-creating: ${{ steps.check_uploads_volume.outputs.uploads-needs-creating }}
+       db-needs-creating: ${{ steps.check_db_volume.outputs.db-needs-creating }}
+       db-needs-seeding: ${{ steps.create_db_volume.outputs.db-needs-seeding }}
+ 
+@@ -36,6 +38,19 @@ jobs:
+       - name: Create a remote docker context
+         run: docker context create remote --docker "host=ssh://${{ env.PRINCIPAL }}@${{ env.HOST }}"
+ 
++      - name: Check if the uploads volume exists
++        id: check_uploads_volume
++        run: |
++          if ! docker --context remote volume ls | tr -s ' ' | cut -d ' ' -f2 | grep -x ${{ env.UPLOADS_VOLUME }}; then
++            echo uploads-needs-creating=true >> $GITHUB_OUTPUT;
++          fi
++
++      - name: Create the uploads volume if it does not exist
++        id: create_uploads_volume
++        if: ${{ steps.check_uploads_volume.outputs.uploads-needs-creating == 'true' }}
++        run: |
++          docker --context remote volume create ${{ env.UPLOADS_VOLUME }}
++
+       - name: Check if the database volume exists
+         id: check_db_volume
+         run: |
+@@ -70,6 +85,7 @@ jobs:
+         env:
+           WEB_HOST: https://${{ env.HOST }}
+           JWT_SECRET: ${{ secrets.JWT_SECRET }}
++          UPLOADS_VOLUME: ${{ env.UPLOADS_VOLUME }}
+           MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+           MONGO_VOLUME: ${{ env.MONGO_VOLUME }}
+diff --git a/api/cert/fullchain.pem b/api/cert/fullchain.pem
+new file mode 100644
+index 0000000..9e43036
+--- /dev/null
++++ b/api/cert/fullchain.pem
+@@ -0,0 +1,23 @@
++-----BEGIN CERTIFICATE-----
++MIIDyzCCArOgAwIBAgIUPVYnacRegvNPMIZxkMtTk17M8KkwDQYJKoZIhvcNAQEL
++BQAwdTELMAkGA1UEBhMCS0cxEzARBgNVBAgMClNvbWUtU3RhdGUxEDAOBgNVBAcM
++B0Jpc2hrZWsxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDEcMBoG
++A1UEAwwTbG9jYWxob3N0LDEyNy4wLjAuMTAeFw0yNTA1MjExOTA1MjZaFw0yNTA2
++MjAxOTA1MjZaMHUxCzAJBgNVBAYTAktHMRMwEQYDVQQIDApTb21lLVN0YXRlMRAw
++DgYDVQQHDAdCaXNoa2VrMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBM
++dGQxHDAaBgNVBAMME2xvY2FsaG9zdCwxMjcuMC4wLjEwggEiMA0GCSqGSIb3DQEB
++AQUAA4IBDwAwggEKAoIBAQCVBMWlOqc88V1XGl9Mgrmc5jQwACgQZnkR9rToAXkR
++ur3Lpza4lrEIPCkr6qbVKncfAv6spddclN7AeTCydlqprosyW6KebsrC4LB1TCRi
++sxPwEx6qLdEE7InxjIZpZCASaxLMKtCniyrgCGEiaqC4XCkYXadpOqTz4VJPvUFm
++rNW2/IpghPi4glkOPn3+2csbNdAHb+/ibW8767dg2QpzZZK7zVW7+9UNS8vfKcbF
++z4lgGc9yTCObQ5Db/l5sZaH+3MIXeVuJkingzqBNNw8THv3hzWJV0U8j0HDZI+0B
++4JeNKA2ponQWDW9eCVY3mEcqLJlMF8wd4K01Vbm621jzAgMBAAGjUzBRMB0GA1Ud
++DgQWBBQ2QBfZvRLFnCQLFydwpwN7zylnoDAfBgNVHSMEGDAWgBQ2QBfZvRLFnCQL
++FydwpwN7zylnoDAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQCS
++aZM8YzFGXvFM9BjMuMOmLkxanR48DQphcppFp01fM1woPvbhiaBGQYV2dA/XwaLf
++2CZxD5yTvoH5+YNEQzDxVQAMvcSzOelGOW8IRaMfVpBK49CK9zBlkrTLc2iG64ff
++zmud+bVH4p4doDKmpglTS2Xhu1LoDwxoqQymOx4YiWFmaULIQV7X+WRyeab6+cvn
++7wz58ZTf80ODYeaBX7hcss1PBDeKlDDaUEyfHpJxmRL+GI8czv2sqXD6YF8nE8kX
++qidAWE9jDT5t6tLae9YLL90J5AgK98+Wn4s56XQjAROBZEMrP9GLr7t1k4u+f3KM
++QVT1XhuKIi6NuCYC4cIF
++-----END CERTIFICATE-----
+diff --git a/api/cert/privkey.pem b/api/cert/privkey.pem
+new file mode 100644
+index 0000000..0e71ee2
+--- /dev/null
++++ b/api/cert/privkey.pem
+@@ -0,0 +1,28 @@
++-----BEGIN PRIVATE KEY-----
++MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCVBMWlOqc88V1X
++Gl9Mgrmc5jQwACgQZnkR9rToAXkRur3Lpza4lrEIPCkr6qbVKncfAv6spddclN7A
++eTCydlqprosyW6KebsrC4LB1TCRisxPwEx6qLdEE7InxjIZpZCASaxLMKtCniyrg
++CGEiaqC4XCkYXadpOqTz4VJPvUFmrNW2/IpghPi4glkOPn3+2csbNdAHb+/ibW87
++67dg2QpzZZK7zVW7+9UNS8vfKcbFz4lgGc9yTCObQ5Db/l5sZaH+3MIXeVuJking
++zqBNNw8THv3hzWJV0U8j0HDZI+0B4JeNKA2ponQWDW9eCVY3mEcqLJlMF8wd4K01
++Vbm621jzAgMBAAECggEADuE7GxSQPnWbbGclvO4QuqoB7AkX9wtEa5bG2aPMAwky
++inNX83aYlsnrEoeLwR1MZ7xU0ch9iLEUzQNM6YUH6ImVPKIJyuglNvBYrl28BF79
++TquaFEQe6u7zlzsA8OUejrhCWECuNQyga15q1JTxF3ecYuJ3JPrGHdQR9ARh026n
++l3Q+gOzFouzJAHW9SUWxleIdZMu6ibEx1weyRMdldPVPY3yVxipqN2RH+Pm1Pw6v
++yT9ksxhuN3MM+5icp3gc7FDwCm2CZvtGzPZVBXH5iGspYjYUDKyhGvcAxZyS9ChP
++67DM3aUZ4wVrtguvlH38peplQsLuBylS7EDXMeM4AQKBgQDOdznYMeuir5s+UaYp
++Lby7pnObzjLs+d/JRfdjDCS++UMY9RXIfEKkqXtD5b7ZrdB3rP8O/Ttk1ogDnKKI
++/13tnkd6Haw7nl95dxjAgZxhCkugcUPeeAlBTrtFxh0Wsg5QkX+q9ZwjEOTGeREh
++oQgGNtw59Ci5oU9qFbt+PpFtwQKBgQC4xT5k/fZXTGgz4ZLJRqtYPEgFoqlSMBMk
++szvyMycQKFgibf6LQ3i0Yz9X4tGlZXTJaKcJl5plRF6+HzfVbDe6dpLrhXoAcnyi
++UgmrYi0vMVObghV5vnWFFdxgaOGSryVdXAVP/I3YhsAuZF4CggDfx9mjDcFZckPh
++QyHr4yhbswKBgHRZc9uFpkhztYSU9pJWF/mXf6bZuJEa7yW5rAPBICQOy+UQmEn2
++3Id2iuRkX/zDmqsWblXAFuxoiRWf+2hAoGn7vEPw3NJsGVmV5/j0EXAOITg1HA4O
++jwiimZ5kWpgjlzWICO4KowaPypyeNS1CVgdKeyidkyWo5dvei15FXCcBAoGAP0Hg
++E6lSvh59ik2O+HPGU6YHrk47E9U7qJPoUQosNH7rdZYc0EbgOznDRO51gd+TNSUs
++Er+hb0wR95sufVXYWnEf6Zw/4YlQnC3j+5XYDFEh45qMiaqoB1EtqqAdoh9udmD7
++vJ+lXFz9zKQ1/zvM2tBL9WPPLzVMggF+yohxl7sCgYBoPez9ib2NzT9w1sP9yqp1
++uK47YezhvEgjTq+UZddEhkA4Zu/BzvLhn3f01gcUnk1I+GzIq4TjG3d5lcv5HVCF
++oWMzBWhQliKyYk3RjfQrK6uYyR3Uf7tG4IbAeb4tiIyxNomtCxueDXyqUFnFidAF
++tbuPZgFnranT3RSS5HzgcQ==
++-----END PRIVATE KEY-----
+diff --git a/docker-compose.yaml b/docker-compose.yaml
+index 75d622d..854fdff 100644
+--- a/docker-compose.yaml
++++ b/docker-compose.yaml
+@@ -9,6 +9,7 @@ services:
+     ports:
+       - 8000:8000
+     volumes:
++      - uploads-volume:/uploads/
+       - ${SSL_LOCATION:-/dev/null}:${SSL_LOCATION:-/dev/null}:ro
+     environment:
+       - JWT_SECRET=${JWT_SECRET}
+@@ -58,6 +59,10 @@ networks:
+     driver: bridge
+ 
+ volumes:
++  uploads-volume:
++    name: ${UPLOADS_VOLUME}
++    external: true
++
+   db-volume:
+     name: ${MONGO_VOLUME}
+     external: true
+diff --git a/frontend/cert/fullchain.pem b/frontend/cert/fullchain.pem
+new file mode 100644
+index 0000000..9e43036
+--- /dev/null
++++ b/frontend/cert/fullchain.pem
+@@ -0,0 +1,23 @@
++-----BEGIN CERTIFICATE-----
++MIIDyzCCArOgAwIBAgIUPVYnacRegvNPMIZxkMtTk17M8KkwDQYJKoZIhvcNAQEL
++BQAwdTELMAkGA1UEBhMCS0cxEzARBgNVBAgMClNvbWUtU3RhdGUxEDAOBgNVBAcM
++B0Jpc2hrZWsxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDEcMBoG
++A1UEAwwTbG9jYWxob3N0LDEyNy4wLjAuMTAeFw0yNTA1MjExOTA1MjZaFw0yNTA2
++MjAxOTA1MjZaMHUxCzAJBgNVBAYTAktHMRMwEQYDVQQIDApTb21lLVN0YXRlMRAw
++DgYDVQQHDAdCaXNoa2VrMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBM
++dGQxHDAaBgNVBAMME2xvY2FsaG9zdCwxMjcuMC4wLjEwggEiMA0GCSqGSIb3DQEB
++AQUAA4IBDwAwggEKAoIBAQCVBMWlOqc88V1XGl9Mgrmc5jQwACgQZnkR9rToAXkR
++ur3Lpza4lrEIPCkr6qbVKncfAv6spddclN7AeTCydlqprosyW6KebsrC4LB1TCRi
++sxPwEx6qLdEE7InxjIZpZCASaxLMKtCniyrgCGEiaqC4XCkYXadpOqTz4VJPvUFm
++rNW2/IpghPi4glkOPn3+2csbNdAHb+/ibW8767dg2QpzZZK7zVW7+9UNS8vfKcbF
++z4lgGc9yTCObQ5Db/l5sZaH+3MIXeVuJkingzqBNNw8THv3hzWJV0U8j0HDZI+0B
++4JeNKA2ponQWDW9eCVY3mEcqLJlMF8wd4K01Vbm621jzAgMBAAGjUzBRMB0GA1Ud
++DgQWBBQ2QBfZvRLFnCQLFydwpwN7zylnoDAfBgNVHSMEGDAWgBQ2QBfZvRLFnCQL
++FydwpwN7zylnoDAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQCS
++aZM8YzFGXvFM9BjMuMOmLkxanR48DQphcppFp01fM1woPvbhiaBGQYV2dA/XwaLf
++2CZxD5yTvoH5+YNEQzDxVQAMvcSzOelGOW8IRaMfVpBK49CK9zBlkrTLc2iG64ff
++zmud+bVH4p4doDKmpglTS2Xhu1LoDwxoqQymOx4YiWFmaULIQV7X+WRyeab6+cvn
++7wz58ZTf80ODYeaBX7hcss1PBDeKlDDaUEyfHpJxmRL+GI8czv2sqXD6YF8nE8kX
++qidAWE9jDT5t6tLae9YLL90J5AgK98+Wn4s56XQjAROBZEMrP9GLr7t1k4u+f3KM
++QVT1XhuKIi6NuCYC4cIF
++-----END CERTIFICATE-----
+diff --git a/frontend/cert/privkey.pem b/frontend/cert/privkey.pem
+new file mode 100644
+index 0000000..0e71ee2
+--- /dev/null
++++ b/frontend/cert/privkey.pem
+@@ -0,0 +1,28 @@
++-----BEGIN PRIVATE KEY-----
++MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCVBMWlOqc88V1X
++Gl9Mgrmc5jQwACgQZnkR9rToAXkRur3Lpza4lrEIPCkr6qbVKncfAv6spddclN7A
++eTCydlqprosyW6KebsrC4LB1TCRisxPwEx6qLdEE7InxjIZpZCASaxLMKtCniyrg
++CGEiaqC4XCkYXadpOqTz4VJPvUFmrNW2/IpghPi4glkOPn3+2csbNdAHb+/ibW87
++67dg2QpzZZK7zVW7+9UNS8vfKcbFz4lgGc9yTCObQ5Db/l5sZaH+3MIXeVuJking
++zqBNNw8THv3hzWJV0U8j0HDZI+0B4JeNKA2ponQWDW9eCVY3mEcqLJlMF8wd4K01
++Vbm621jzAgMBAAECggEADuE7GxSQPnWbbGclvO4QuqoB7AkX9wtEa5bG2aPMAwky
++inNX83aYlsnrEoeLwR1MZ7xU0ch9iLEUzQNM6YUH6ImVPKIJyuglNvBYrl28BF79
++TquaFEQe6u7zlzsA8OUejrhCWECuNQyga15q1JTxF3ecYuJ3JPrGHdQR9ARh026n
++l3Q+gOzFouzJAHW9SUWxleIdZMu6ibEx1weyRMdldPVPY3yVxipqN2RH+Pm1Pw6v
++yT9ksxhuN3MM+5icp3gc7FDwCm2CZvtGzPZVBXH5iGspYjYUDKyhGvcAxZyS9ChP
++67DM3aUZ4wVrtguvlH38peplQsLuBylS7EDXMeM4AQKBgQDOdznYMeuir5s+UaYp
++Lby7pnObzjLs+d/JRfdjDCS++UMY9RXIfEKkqXtD5b7ZrdB3rP8O/Ttk1ogDnKKI
++/13tnkd6Haw7nl95dxjAgZxhCkugcUPeeAlBTrtFxh0Wsg5QkX+q9ZwjEOTGeREh
++oQgGNtw59Ci5oU9qFbt+PpFtwQKBgQC4xT5k/fZXTGgz4ZLJRqtYPEgFoqlSMBMk
++szvyMycQKFgibf6LQ3i0Yz9X4tGlZXTJaKcJl5plRF6+HzfVbDe6dpLrhXoAcnyi
++UgmrYi0vMVObghV5vnWFFdxgaOGSryVdXAVP/I3YhsAuZF4CggDfx9mjDcFZckPh
++QyHr4yhbswKBgHRZc9uFpkhztYSU9pJWF/mXf6bZuJEa7yW5rAPBICQOy+UQmEn2
++3Id2iuRkX/zDmqsWblXAFuxoiRWf+2hAoGn7vEPw3NJsGVmV5/j0EXAOITg1HA4O
++jwiimZ5kWpgjlzWICO4KowaPypyeNS1CVgdKeyidkyWo5dvei15FXCcBAoGAP0Hg
++E6lSvh59ik2O+HPGU6YHrk47E9U7qJPoUQosNH7rdZYc0EbgOznDRO51gd+TNSUs
++Er+hb0wR95sufVXYWnEf6Zw/4YlQnC3j+5XYDFEh45qMiaqoB1EtqqAdoh9udmD7
++vJ+lXFz9zKQ1/zvM2tBL9WPPLzVMggF+yohxl7sCgYBoPez9ib2NzT9w1sP9yqp1
++uK47YezhvEgjTq+UZddEhkA4Zu/BzvLhn3f01gcUnk1I+GzIq4TjG3d5lcv5HVCF
++oWMzBWhQliKyYk3RjfQrK6uYyR3Uf7tG4IbAeb4tiIyxNomtCxueDXyqUFnFidAF
++tbuPZgFnranT3RSS5HzgcQ==
++-----END PRIVATE KEY-----
+diff --git a/frontend/src/components/FileAttachment/FileAttachment.tsx b/frontend/src/components/FileAttachment/FileAttachment.tsx
+index 903acc7..bfa80c2 100644
+--- a/frontend/src/components/FileAttachment/FileAttachment.tsx
++++ b/frontend/src/components/FileAttachment/FileAttachment.tsx
+@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
+ import { Label } from '@/components/ui/label.tsx'
+ 
+ import { basename } from 'path-browserify'
++import { apiHost } from '@/constants'
+ 
+ type ExistingFile = { document: string }
+ 
+@@ -40,7 +41,7 @@ const FileAttachments: React.FC<FileAttachmentsProps> = ({
+                   <div key={`existing-${ index }`} className="space-y-2">
+                     <div className="flex items-center justify-between gap-2">
+                       <Link
+-                        to={`http://localhost:8000/uploads/documents/${ basename(file.document) }`}
++                        to={`${apiHost}/uploads/documents/${ basename(file.document) }`}
+                         download
+                         target="_blank"
+                         rel="noopener noreferrer"
+diff --git a/frontend/src/features/arrivals/containers/ArrivalDetails.tsx b/frontend/src/features/arrivals/containers/ArrivalDetails.tsx
+index 150c820..1e31e7b 100644
+--- a/frontend/src/features/arrivals/containers/ArrivalDetails.tsx
++++ b/frontend/src/features/arrivals/containers/ArrivalDetails.tsx
+@@ -21,6 +21,7 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+ import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
+ import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+ import CancelButton from '@/components/Buttons/CancelButton.tsx'
++import { apiHost } from '@/constants'
+ 
+ const ArrivalDetails = () => {
+   const {
+@@ -214,7 +215,7 @@ const ArrivalDetails = () => {
+                         arrival.documents.map((doc, idx) => (
+                           <Link
+                             key={idx}
+-                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
++                            to={`${apiHost}/uploads/documents/${ basename(doc.document) }`}
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"
+diff --git a/frontend/src/features/orders/containers/OrderDetails.tsx b/frontend/src/features/orders/containers/OrderDetails.tsx
+index 9887c8a..498cf7e 100644
+--- a/frontend/src/features/orders/containers/OrderDetails.tsx
++++ b/frontend/src/features/orders/containers/OrderDetails.tsx
+@@ -21,6 +21,7 @@ import { capitalize } from '@/utils/capitalizeFirstLetter.ts'
+ import ServicesTable from '@/components/Tables/ServicesTable.tsx'
+ import CancelButton from '@/components/Buttons/CancelButton.tsx'
+ import LogsAccordionView from '@/components/LogsAccordionView/LogsAccordionView.tsx'
++import { apiHost } from '@/constants.ts'
+ 
+ 
+ const OrderDetails = () => {
+@@ -207,7 +208,7 @@ const OrderDetails = () => {
+                         order.documents.map((doc, idx) => (
+                           <Link
+                             key={idx}
+-                            to={`http://localhost:8000/uploads/documents/${ basename(doc.document) }`}
++                            to={`${apiHost}/uploads/documents/${ basename(doc.document) }`}
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             className="flex justify-center items-center gap-2 hover:text-blue-500 transition-colors"

@@ -15,11 +15,16 @@ import { TokenAuthService } from './services/token-auth.service'
 import { RolesGuard } from './guards/roles.guard'
 import { RolesService } from './services/roles.service'
 import { ValidationErrorFilter } from './exception-filters/mongo-validation-error.filter'
+import { existsSync, readFileSync } from 'fs'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const httpsOptions = existsSync(config.server.sslPrivateKeyLocation) && existsSync(config.server.sslCertificateLocation) ? {
+    key: readFileSync(config.server.sslPrivateKeyLocation),
+    cert: readFileSync(config.server.sslCertificateLocation),
+  } : undefined
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { httpsOptions })
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
-  app.use('/uploads', express.static(join(__dirname, '../uploads')))
+  app.use('/uploads', express.static(config.server.uploadsPath))
   app.use(express.json({ limit: '10mb' }))
   app.use(express.urlencoded({ limit: '10mb', extended: true }))
   app.use(cookieParser())

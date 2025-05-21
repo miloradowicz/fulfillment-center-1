@@ -7,5 +7,6 @@
 **/*Dockerfile
 .*
 .env*
+cert
 src/tests
 jest*

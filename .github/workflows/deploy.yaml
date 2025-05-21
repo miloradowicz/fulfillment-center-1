@@ -1,23 +1,26 @@
 name: Deploy to DigitalOcean droplet
 
 on:
-  pull_request:
+  push:
+  # pull_request:
     branches:
       - main
-    types:
-      - closed
+    # types:
+    #   - closed
 
 env:
   HOST: ${{ secrets.HOST }}
   PRINCIPAL: ${{ secrets.PRINCIPAL }}
+  UPLOADS_VOLUME: ${{ secrets.UPLOADS_VOLUME }}
   MONGO_VOLUME: ${{ secrets.MONGO_VOLUME }}
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.get_timestamp.outputs.timestamp }}
+      uploads-needs-creating: ${{ steps.check_uploads_volume.outputs.uploads-needs-creating }}
       db-needs-creating: ${{ steps.check_db_volume.outputs.db-needs-creating }}
       db-needs-seeding: ${{ steps.create_db_volume.outputs.db-needs-seeding }}
 
@@ -35,6 +38,19 @@ jobs:
 
       - name: Create a remote docker context
         run: docker context create remote --docker "host=ssh://${{ env.PRINCIPAL }}@${{ env.HOST }}"
+
+      - name: Check if the uploads volume exists
+        id: check_uploads_volume
+        run: |
+          if ! docker --context remote volume ls | tr -s ' ' | cut -d ' ' -f2 | grep -x ${{ env.UPLOADS_VOLUME }}; then
+            echo uploads-needs-creating=true >> $GITHUB_OUTPUT;
+          fi
+
+      - name: Create the uploads volume if it does not exist
+        id: create_uploads_volume
+        if: ${{ steps.check_uploads_volume.outputs.uploads-needs-creating == 'true' }}
+        run: |
+          docker --context remote volume create ${{ env.UPLOADS_VOLUME }}
 
       - name: Check if the database volume exists
         id: check_db_volume
@@ -58,7 +74,8 @@ jobs:
         run: |
           docker --context remote compose build \
             --build-arg KEEP_CACHE=${{ steps.get_timestamp.outputs.timestamp }} \
-            --build-arg API_HOST=${{ env.HOST }}
+            --build-arg API_HOST=https://${{ env.HOST }}:8000 \
+            --build-arg DOMAIN=${{ env.HOST }}
 
       - name: Build the seeder if the database volume has been just created
         if: ${{ steps.create_db_volume.outputs.db-needs-seeding == 'true' }}
@@ -67,11 +84,13 @@ jobs:
       - name: Start the project on the remote
         run: docker --context remote compose up -d
         env:
-          WEB_HOST: ${{ env.HOST }}
+          WEB_HOST: https://${{ env.HOST }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          UPLOADS_VOLUME: ${{ env.UPLOADS_VOLUME }}
           MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
           MONGO_VOLUME: ${{ env.MONGO_VOLUME }}
+          SSL_LOCATION: /etc/ssl/${{ env.HOST }}
 
       - name: Seed the database if the database volume has been just created
         if: ${{ steps.create_db_volume.outputs.db-needs-seeding == 'true' }}
@@ -82,3 +101,6 @@ jobs:
             -e MONGO_USERNAME=${{ secrets.MONGO_USERNAME }} \
             -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
             seeder
+
+      - name: Cleaning up after the build
+        run: docker --context remote system prune -af
